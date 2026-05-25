@@ -9,6 +9,7 @@ export interface SocketSession {
   isAnonymous: boolean
   ws: any // Using 'any' for WebSocket transport abstraction across browser / node environments
   isAlive: boolean
+  ip?: string
   rateLimiter: RateLimiter
 }
 

@@ -1,7 +1,9 @@
 import { redisPublish, redisSubscribe } from "@/services/redis"
+import { queueConnection } from "@/lib/queue/connection"
 import { DomainEventEnvelope, EventType } from "../contracts/events"
 
 const CHANNEL_PREFIX = "neoshop:events:"
+const IDEMPOTENCY_KEY_PREFIX = "neoshop:events:processed:"
 
 /**
  * Propagate event envelopes onto the distributed Redis Pub/Sub bus
@@ -15,16 +17,29 @@ export async function publishEventToBus<T>(
 }
 
 /**
- * Subscribe to realtime channels on the Redis bus
+ * Subscribe to realtime channels on the Redis bus with replay protection
  */
 export async function subscribeToBusEvent<T>(
   eventType: EventType,
   callback: (envelope: DomainEventEnvelope<T>) => void | Promise<void>
 ): Promise<void> {
   const channel = `${CHANNEL_PREFIX}${eventType}`
-  await redisSubscribe(channel, (message: string) => {
+  await redisSubscribe(channel, async (message: string) => {
     try {
       const envelope = JSON.parse(message) as DomainEventEnvelope<T>
+      
+      // Idempotency check: Prevent duplicate processing (Replay Protection)
+      if (envelope.eventId) {
+        const lockKey = `${IDEMPOTENCY_KEY_PREFIX}${envelope.eventId}`
+        // Set the lock with a 7-day expiration. NX ensures it only sets if it doesn't exist
+        const acquired = await queueConnection.set(lockKey, "1", "EX", 7 * 24 * 60 * 60, "NX")
+        
+        if (!acquired) {
+          console.log(`[EventBus] Dropping duplicate event (Replay Protection): ${envelope.eventId}`)
+          return
+        }
+      }
+
       // Cast ISO timestamp strings back to Date objects
       if (envelope.timestamp && typeof envelope.timestamp === "string") {
         envelope.timestamp = new Date(envelope.timestamp)

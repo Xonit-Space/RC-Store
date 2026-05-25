@@ -47,6 +47,20 @@ export function initializeWSServer(port: number = WS_PORT): WebSocketServer {
       }
     }
 
+    // Security: Extract IP address and enforce concurrent connection limit
+    let clientIp = req.socket.remoteAddress || "unknown"
+    if (req.headers["x-forwarded-for"]) {
+      clientIp = (req.headers["x-forwarded-for"] as string).split(",")[0]
+    }
+    
+    // Check if IP exceeds 5 connections
+    const currentSessions = presenceTracker.getAllSessions().filter(s => s.ip === clientIp)
+    if (currentSessions.length >= 5) {
+      console.warn(`[WSS] Connection rejected: IP ${clientIp} exceeded 5 connections.`)
+      ws.close(1008, "Too many connections")
+      return
+    }
+
     const sessionId = `ws_sess_${crypto.randomUUID().replace(/-/g, "")}`
 
     const session: SocketSession = {
@@ -55,6 +69,7 @@ export function initializeWSServer(port: number = WS_PORT): WebSocketServer {
       isAnonymous,
       ws,
       isAlive: true,
+      ip: clientIp, // Adding IP tracking to session
       rateLimiter: {
         tokens: 15,
         lastRefill: Date.now(),
@@ -80,6 +95,14 @@ export function initializeWSServer(port: number = WS_PORT): WebSocketServer {
     // 2. Wire client packet processing events
     ws.on("message", (rawData) => {
       try {
+        const rawString = rawData.toString()
+        // Security: Prevent extremely large payloads to avoid memory exhaustion (Max 8KB)
+        if (rawString.length > 8192) {
+          console.warn(`[WSS] Payload too large from IP ${clientIp}. Terminating.`)
+          ws.close(1009, "Message too big")
+          return
+        }
+
         // Enforce Token-Bucket Rate Limiter
         if (!checkRateLimit(session)) {
           ws.send(
@@ -91,7 +114,7 @@ export function initializeWSServer(port: number = WS_PORT): WebSocketServer {
           return
         }
 
-        const message = JSON.parse(rawData.toString()) as SocketMessage
+        const message = JSON.parse(rawString) as SocketMessage
 
         // Standard connection checkouts
         if (message.type === "ping") {

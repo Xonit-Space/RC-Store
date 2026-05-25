@@ -10,7 +10,10 @@ export default withAuth(
     // 1. Admin Routes protection (/admin/...)
     if (path.startsWith("/admin")) {
       const isAdmin = token?.role === UserRole.SUPER_ADMIN || token?.role === UserRole.ADMIN
-      if (!isAdmin) {
+      const isActive = token?.isActive !== false // Assuming we might inject isActive into JWT
+      
+      if (!isAdmin || !isActive) {
+        console.warn(`[Security] Unauthorized admin access attempt to ${path}`)
         return NextResponse.redirect(new URL("/", req.url))
       }
     }

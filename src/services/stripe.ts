@@ -30,7 +30,7 @@ export interface CheckoutSessionOptions {
 export async function createCheckoutSession(options: CheckoutSessionOptions) {
   const { userId, email, items, successUrl, cancelUrl, couponCode, shippingCost = 0 } = options
 
-  const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = items.map((item) => ({
+  const lineItems = items.map((item) => ({
     price_data: {
       currency: "usd",
       product_data: {

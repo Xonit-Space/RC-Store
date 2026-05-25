@@ -178,7 +178,7 @@ export function SmartSearch() {
               ))}
             </div>
           ) : query.length > 1 ? (
-            <div className="text-center py-4 text-sm text-muted-foreground">No results found for "{query}"</div>
+            <div className="text-center py-4 text-sm text-muted-foreground">No results found for &quot;{query}&quot;</div>
           ) : null}
         </Card>
       )}

@@ -111,14 +111,18 @@ export async function runAbandonedCartJob(): Promise<ActionResponse> {
 
     // 2. Iterate and fire recovery campaigns
     for (const cart of cartsToRecover) {
-      if (!cart.user || !cart.user.email) continue
+      if (!cart.user || !cart.user.email || !cart.userId) continue
+
+      const userEmail = cart.user.email
+      const userName = cart.user.name || "Customer"
+      const userId = cart.userId
 
       await db.$transaction(async (tx) => {
         // Flag basket as recovered
         await tx.abandonedCart.create({
           data: {
             cartId: cart.id,
-            userId: cart.userId,
+            userId: userId,
             lastActive: cart.updatedAt,
             emailSent: true,
           },
@@ -126,8 +130,8 @@ export async function runAbandonedCartJob(): Promise<ActionResponse> {
 
         // Fire Resend campaign
         await sendAbandonedCartRecovery(
-          cart.user.email,
-          cart.user.name || "Customer",
+          userEmail,
+          userName,
           "http://localhost:3000/cart"
         )
       })

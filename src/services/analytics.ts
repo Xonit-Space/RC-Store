@@ -1,5 +1,5 @@
 import { trace, type Span } from "@opentelemetry/api"
-import PostHog from "posthog-node"
+import { PostHog } from "posthog-node"
 import { db } from "@/lib/db"
 
 const posthogProjectKey = process.env.POSTGRES_API_KEY || process.env.POSTHOG_API_KEY

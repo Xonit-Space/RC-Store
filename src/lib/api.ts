@@ -17,12 +17,16 @@ export async function getProducts(options?: {
         OR: [
           { name: { contains: search, mode: "insensitive" } },
           { description: { contains: search, mode: "insensitive" } },
-          { tags: { has: search } },
         ],
       }),
     },
     include: {
       category: true,
+      images: {
+        orderBy: {
+          sortOrder: "asc",
+        },
+      },
       reviews: {
         select: {
           rating: true,
@@ -37,6 +41,8 @@ export async function getProducts(options?: {
 
   return products.map((product) => ({
     ...product,
+    images: product.images.map((img) => img.url),
+    tags: product.createdAt > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) ? ["new"] : [],
     averageRating:
       product.reviews.length > 0
         ? product.reviews.reduce((sum, review) => sum + review.rating, 0) / product.reviews.length
@@ -63,6 +69,11 @@ export async function getProductBySlug(slug: string) {
     where: { slug },
     include: {
       category: true,
+      images: {
+        orderBy: {
+          sortOrder: "asc",
+        },
+      },
       reviews: {
         include: {
           user: {
@@ -83,6 +94,8 @@ export async function getProductBySlug(slug: string) {
 
   return {
     ...product,
+    images: product.images.map((img) => img.url),
+    tags: product.createdAt > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) ? ["new"] : [],
     averageRating:
       product.reviews.length > 0
         ? product.reviews.reduce((sum, review) => sum + review.rating, 0) / product.reviews.length

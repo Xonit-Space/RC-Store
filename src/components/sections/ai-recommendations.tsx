@@ -97,7 +97,7 @@ export function AIRecommendations() {
               <h2 className="text-3xl md:text-4xl font-bold">AI-Powered Recommendations</h2>
             </div>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Our advanced AI analyzes your preferences and behavior to suggest products you'll love
+              Our advanced AI analyzes your preferences and behavior to suggest products you&apos;ll love
             </p>
           </div>
           <ProductGridSkeleton count={4} />
@@ -115,7 +115,7 @@ export function AIRecommendations() {
             <h2 className="text-3xl md:text-4xl font-bold">AI-Powered Recommendations</h2>
           </div>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Our advanced AI analyzes your preferences and behavior to suggest products you'll love
+            Our advanced AI analyzes your preferences and behavior to suggest products you&apos;ll love
           </p>
         </div>
 

@@ -1,0 +1,56 @@
+name: Neoshop Ultra CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      # Optional Postgres service node if integration DB migrations tests are executed
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: neoshop_admin
+          POSTGRES_PASSWORD: neoshop_secure_password_2026
+          POSTGRES_DB: neoshop_ultra_test_db
+        ports:
+          - 5432:5432
+        # Set health checks to wait for Postgres to start
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-runs 5
+
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install Package Dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client Types
+        run: npx prisma generate
+        env:
+          DATABASE_URL: "postgresql://neoshop_admin:neoshop_secure_password_2026@localhost:5432/neoshop_ultra_test_db?schema=public"
+
+      - name: Verify TypeScript compilation
+        run: npx tsc --noEmit
+
+      - name: Run ESLint Checks
+        run: npm run lint
+        continue-on-error: true # Let warnings pass during dev builds
+
+      - name: Run Backend Unit Tests (Vitest)
+        run: npx vitest run

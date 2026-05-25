@@ -12,7 +12,7 @@ import { processDomainEvent, getUserNotifications, getUserUnreadCount, markNotif
 import { initializeNotificationPipeline } from "../notifications/event-subscriber"
 import { DomainEventEnvelope } from "@/events/contracts/events"
 
-const TEST_PORT = 3002
+const TEST_PORT = 3003 // Use 3003 to avoid collision with websocket.test.ts which owns 3002
 const TEST_WS_URL = `ws://localhost:${TEST_PORT}`
 
 describe("Neoshop Realtime Notifications Integration Tests", () => {
@@ -182,54 +182,71 @@ describe("Neoshop Realtime Notifications Integration Tests", () => {
   // 3. WebSockets Realtime Streaming Delivery
   // --------------------------------------------------
   describe("Realtime Sockets Stream Delivery", () => {
-    it("should seamlessly bridge: emitDomainEvent -> Event Bus -> Notification Engine -> WebSocket client", () => {
-      return new Promise<void>((resolve, reject) => {
-        const client = new WebSocket(`${TEST_WS_URL}?token=usr_realtime_buyer`)
+    it(
+      "should seamlessly bridge: emitDomainEvent -> Event Bus -> Notification Engine -> WebSocket client",
+      { timeout: 10000 },
+      () => {
+        return new Promise<void>((resolve, reject) => {
+          const client = new WebSocket(`${TEST_WS_URL}?token=usr_realtime_buyer`)
 
-        let notificationPayload: any = null
+          let notificationPayload: any = null
+          let settled = false
 
-        client.on("open", () => {
-          // Subscribe client to notifications channel
-          client.send(JSON.stringify({ type: "subscribe", channel: "notifications:usr_realtime_buyer" }))
-        })
-
-        client.on("message", (data) => {
-          const envelope = JSON.parse(data.toString())
-          // Intercept notification pushes
-          if (envelope.type === "event" && envelope.payload?.title === "Order Created Successfully") {
-            notificationPayload = envelope.payload
-          }
-        })
-
-        // Wait to make sure socket registers
-        setTimeout(async () => {
-          try {
-            const domainPayload = {
-              orderId: "ord_realtime_101",
-              userId: "usr_realtime_buyer",
-              total: 399.0,
-              items: [{ variantId: "var_hoodie", quantity: 1, price: 399.0 }],
-            }
-
-            // Emit Order Created Event
-            // Exposes: emitDomainEvent -> Event Bus -> Pipeline -> ws push -> socket client
-            await emitDomainEvent("ORDER_CREATED", domainPayload)
-
-            // Allow asynchronous message propagation and sockets delivery
-            setTimeout(() => {
-              client.close()
-
-              expect(notificationPayload).toBeDefined()
-              expect(notificationPayload.message).toContain("ord_realtime_101")
-              expect(notificationPayload.type).toBe("ORDER")
-              resolve()
-            }, 150)
-          } catch (err) {
+          // Guard: prevents double resolve/reject from racing timeouts
+          const finish = (err?: Error) => {
+            if (settled) return
+            settled = true
             client.close()
-            reject(err)
+            if (err) reject(err)
+            else resolve()
           }
-        }, 150)
-      })
-    })
+
+          client.on("open", () => {
+            // Subscribe client to notifications channel
+            client.send(JSON.stringify({ type: "subscribe", channel: "notifications:usr_realtime_buyer" }))
+          })
+
+          client.on("message", (data) => {
+            const envelope = JSON.parse(data.toString())
+            // Intercept notification pushes
+            if (envelope.type === "event" && envelope.payload?.title === "Order Created Successfully") {
+              notificationPayload = envelope.payload
+            }
+          })
+
+          client.on("error", (err) => finish(err))
+
+          // Wait 300ms for handshake + subscription to fully register before firing event
+          setTimeout(async () => {
+            try {
+              const domainPayload = {
+                orderId: "ord_realtime_101",
+                userId: "usr_realtime_buyer",
+                total: 399.0,
+                items: [{ variantId: "var_hoodie", quantity: 1, price: 399.0 }],
+              }
+
+              // Emit Order Created Event
+              // Bridge: emitDomainEvent -> Event Bus -> Notification Pipeline -> WebSocket -> Client
+              await emitDomainEvent("ORDER_CREATED", domainPayload)
+
+              // Allow 500ms for full async propagation under parallel test load
+              setTimeout(() => {
+                try {
+                  expect(notificationPayload).toBeDefined()
+                  expect(notificationPayload.message).toContain("ord_realtime_101")
+                  expect(notificationPayload.type).toBe("ORDER")
+                  finish()
+                } catch (assertionErr) {
+                  finish(assertionErr as Error)
+                }
+              }, 500)
+            } catch (err) {
+              finish(err as Error)
+            }
+          }, 300)
+        })
+      }
+    )
   })
 })

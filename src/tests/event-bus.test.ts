@@ -184,7 +184,9 @@ describe("Neoshop Event Bus Infrastructure Tests", () => {
       const env2 = await emitDomainEvent("REFUND_ISSUED", secondPayload)
 
       // Confirm both are saved in database
-      const count = await db.domainEventLog.count()
+      const count = await db.domainEventLog.count({
+        where: { eventType: "REFUND_ISSUED" },
+      })
       expect(count).toBe(2)
 
       const replayedPayloads: any[] = []

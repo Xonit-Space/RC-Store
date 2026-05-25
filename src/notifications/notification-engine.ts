@@ -2,6 +2,9 @@ import { db } from "@/lib/db"
 import { DomainEventEnvelope } from "@/events/contracts/events"
 import { mapEventToNotification, NormalizedNotification } from "./notification-mapper"
 import { routeNotification, DeliveryChannel } from "./notification-router"
+import { InAppStrategy } from "./strategies/in-app"
+import { WebSocketStrategy } from "./strategies/websocket"
+import { EmailStrategy } from "./strategies/email"
 
 // Registry for delivery strategies, to be populated dynamically by the strategies layer
 type DeliveryStrategy = (notification: NormalizedNotification) => Promise<any>
@@ -78,3 +81,14 @@ export async function getUserUnreadCount(userId: string): Promise<number> {
     },
   })
 }
+
+// ----------------------------------------------------
+// Automatic Delivery Strategies Registration
+// ----------------------------------------------------
+const inApp = new InAppStrategy()
+const ws = new WebSocketStrategy()
+const email = new EmailStrategy()
+
+registerDeliveryStrategy("IN_APP", (n) => inApp.send(n))
+registerDeliveryStrategy("WEBSOCKET", (n) => ws.send(n))
+registerDeliveryStrategy("EMAIL", (n) => email.send(n))

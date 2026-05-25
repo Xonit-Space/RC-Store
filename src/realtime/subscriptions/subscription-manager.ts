@@ -88,7 +88,13 @@ class SubscriptionManager {
     const eventTypeMap: Record<string, EventType[]> = {
       orders: ["ORDER_CREATED", "PAYMENT_COMPLETED", "SHIPMENT_UPDATED", "REFUND_ISSUED"],
       inventory: ["INVENTORY_RESERVED", "INVENTORY_RELEASED"],
-      notifications: ["USER_REGISTERED"],
+      notifications: [
+        "USER_REGISTERED",
+        "ORDER_CREATED",
+        "PAYMENT_COMPLETED",
+        "SHIPMENT_UPDATED",
+        "REFUND_ISSUED",
+      ],
       admin: ["ORDER_CREATED", "PAYMENT_COMPLETED", "REVIEW_CREATED"],
     }
 

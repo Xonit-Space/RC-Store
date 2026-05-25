@@ -1013,8 +1013,10 @@ model RecentlyViewed {
 
 enum NotificationType {
   ORDER
-  PROMO
+  PAYMENT
   SYSTEM
+  INVENTORY
+  PROMO
 }
 
 model Notification {
@@ -1024,7 +1026,8 @@ model Notification {
   title     String
   message   String
   type      NotificationType @default(SYSTEM)
-  isRead    Boolean          @default(false)
+  read      Boolean          @default(false)
+  metadata  Json?            // Event payload context details
   createdAt DateTime         @default(now())
 
   @@index([userId])

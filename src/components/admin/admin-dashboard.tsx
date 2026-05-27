@@ -1,11 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { BarChart3, Package, Users, ShoppingCart, TrendingUp, Settings, Bell, Search, Plus } from "lucide-react"
+import { BarChart3, Package, Users, ShoppingCart, TrendingUp, Settings, Bell, Search, Plus, Truck, Calculator } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { POSManagement } from "./pos-management"
+import { CourierManagement } from "./courier-management"
 
 export function AdminDashboard() {
   const [activeModule, setActiveModule] = useState("overview")
@@ -43,11 +45,14 @@ export function AdminDashboard() {
 
   const modules = [
     { id: "overview", name: "Overview", icon: BarChart3 },
+    { id: "pos", name: "Point of Sale (POS)", icon: Calculator },
+    { id: "couriers", name: "Courier Operations", icon: Truck },
     { id: "products", name: "Products", icon: Package },
     { id: "orders", name: "Orders", icon: ShoppingCart },
     { id: "customers", name: "Customers", icon: Users },
     { id: "settings", name: "Settings", icon: Settings },
   ]
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -182,7 +187,9 @@ export function AdminDashboard() {
             </div>
           )}
 
-          {/* Add other module content as needed */}
+          {activeModule === "pos" && <POSManagement />}
+
+          {activeModule === "couriers" && <CourierManagement />}
         </main>
       </div>
     </div>

@@ -472,6 +472,8 @@ model Shipment {
   status            ShipmentStatus @default(PENDING)
   estimatedDelivery DateTime?
   actualDelivery    DateTime?
+  courierId         String?
+  courier           Courier?       @relation(fields: [courierId], references: [id], onDelete: SetNull)
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
 
@@ -479,6 +481,20 @@ model Shipment {
   @@index([trackingNumber])
   @@map("shipments")
 }
+
+model Courier {
+  id        String     @id @default(cuid())
+  name      String
+  phone     String?
+  email     String?
+  isActive  Boolean    @default(true)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  shipments Shipment[]
+
+  @@map("couriers")
+}
+
 
 model ReturnRequest {
   id        String             @id @default(cuid())

@@ -1,4 +1,4 @@
-"use"
+"use server"
 
 import { db } from "@/lib/db"
 import { ActionResponse } from "./auth"

@@ -1,4 +1,4 @@
-import { analyticsQueue, inventoryQueue } from "./queues"
+import { analyticsQueue, inventoryQueue, dlqQueue } from "./queues"
 
 /**
  * Initializes all repeatable background cron jobs on the BullMQ queue system.
@@ -9,9 +9,7 @@ export async function initializeScheduledJobs(): Promise<void> {
     "daily_summary",
     { event: "SYSTEM_DAILY_SUMMARY", payload: {} },
     {
-      repeat: {
-        pattern: "0 0 * * *", // Midnight every day
-      },
+      repeat: { pattern: "0 0 * * *" },
       jobId: "daily_analytics_summary_job"
     }
   )
@@ -21,10 +19,38 @@ export async function initializeScheduledJobs(): Promise<void> {
     "inventory_sync",
     { action: "SYNC", payload: {} },
     {
-      repeat: {
-        pattern: "0 * * * *", // Top of every hour
-      },
+      repeat: { pattern: "0 * * * *" },
       jobId: "hourly_inventory_sync_job"
+    }
+  )
+
+  // 3. Reservation Expiry Sweep — every 5 minutes
+  await inventoryQueue.add(
+    "reservation_expiry_sweep",
+    { action: "EXPIRE_RESERVATIONS" },
+    {
+      repeat: { pattern: "*/5 * * * *" },
+      jobId: "reservation_expiry_sweep_job"
+    }
+  )
+
+  // 4. DLQ Processing — every 10 minutes
+  await dlqQueue.add(
+    "dlq_batch",
+    { action: "PROCESS_DLQ_BATCH" },
+    {
+      repeat: { pattern: "*/10 * * * *" },
+      jobId: "dlq_batch_processing_job"
+    }
+  )
+
+  // 5. Nightly Payment Reconciliation — 2am
+  await analyticsQueue.add(
+    "payment_reconciliation",
+    { action: "RECONCILE_PAYMENTS", date: null }, // null = yesterday
+    {
+      repeat: { pattern: "0 2 * * *" },
+      jobId: "nightly_payment_reconciliation_job"
     }
   )
 }

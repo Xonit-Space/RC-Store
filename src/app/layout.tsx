@@ -1,19 +1,26 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { Inter, Cormorant_Garamond } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { LoadingProvider } from "@/components/providers/loading-provider"
+import { SessionProvider } from "@/providers/session-provider"
+import { QueryProvider } from "@/providers/query-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { Suspense } from "react"
 import { HeaderSkeleton } from "@/components/ui/loading-skeleton"
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
+const cormorant = Cormorant_Garamond({ 
+  weight: ["300", "400", "500", "600", "700"],
+  subsets: ["latin"], 
+  variable: "--font-cormorant" 
+})
 
 export const metadata: Metadata = {
   title: "NEOSHOP ULTRA - Smart E-Commerce Platform",
   description: "The most customizable and scalable e-commerce platform",
-    generator: 'v0.dev'
+  generator: 'v0.dev'
 }
 
 export default function RootLayout({
@@ -23,13 +30,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <LoadingProvider>
-            <Suspense fallback={<HeaderSkeleton />}>{children}</Suspense>
-            <Toaster />
-          </LoadingProvider>
-        </ThemeProvider>
+      <body className={`${inter.variable} ${cormorant.variable} font-sans antialiased bg-background text-foreground selection:bg-brass/30 selection:text-forest`}>
+        <SessionProvider>
+          <QueryProvider>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+              <LoadingProvider>
+                <Suspense fallback={<HeaderSkeleton />}>{children}</Suspense>
+                <Toaster />
+              </LoadingProvider>
+            </ThemeProvider>
+          </QueryProvider>
+        </SessionProvider>
       </body>
     </html>
   )

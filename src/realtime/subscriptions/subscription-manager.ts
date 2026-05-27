@@ -95,7 +95,16 @@ class SubscriptionManager {
         "SHIPMENT_UPDATED",
         "REFUND_ISSUED",
       ],
-      admin: ["ORDER_CREATED", "PAYMENT_COMPLETED", "REVIEW_CREATED"],
+      admin: [
+        "ORDER_CREATED", 
+        "PAYMENT_COMPLETED", 
+        "REVIEW_CREATED", 
+        "CART_UPDATED", 
+        "PRODUCT_VIEWED",
+        "USER_REGISTERED",
+        "REFUND_ISSUED"
+      ],
+      cart: ["CART_UPDATED"],
     }
 
     const eventsToHook = eventTypeMap[resourceType] || []
@@ -147,6 +156,12 @@ class SubscriptionManager {
       if (payload.productId) {
         targetChannels.add(`inventory:${payload.productId}`)
       }
+    } else if (eventType === "CART_UPDATED") {
+      if (payload.userId) {
+        targetChannels.add(`cart:${payload.userId}`)
+      }
+    } else if (eventType === "PRODUCT_VIEWED") {
+      // Broadcast to admin dashboard only (already handled by admin:dashboard)
     }
 
     // Consolidate target subscriber sessions

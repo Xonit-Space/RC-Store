@@ -1,5 +1,6 @@
 import { db } from "@/lib/db"
 import { OrderStatus, PaymentStatus } from "@prisma/client"
+import { validateOrderTransition } from "@/lib/security/state-machine"
 
 export interface OrderItemInput {
   variantId: string
@@ -23,22 +24,41 @@ export interface CreateOrderInput {
 
 export async function createOrder(input: CreateOrderInput) {
   return db.$transaction(async (tx) => {
-    // 1. Verify and lock inventory stock first
+    // 1. Verify and lock inventory stock first using raw pessimistic row locks
     for (const item of input.items) {
-      const inventory = await tx.inventory.findUnique({
-        where: { variantId: item.variantId },
-      })
+      const inventories = await tx.$queryRaw<any[]>`
+        SELECT id, quantity, reserved FROM inventory
+        WHERE "variantId" = ${item.variantId}
+        FOR UPDATE
+      `
+      const inventory = inventories[0]
 
-      if (!inventory || inventory.quantity < item.quantity) {
-        throw new Error(`Insufficient stock for item variant: ${item.variantId}`)
+      if (!inventory) {
+        throw new Error(`Inventory records not found for SKU variant: ${item.variantId}`)
       }
 
-      // Decrement stock and update inventory
+      const available = inventory.quantity - inventory.reserved
+      if (available < item.quantity) {
+        throw new Error(`Insufficient stock for item variant: ${item.variantId}. Available: ${available}, Requested: ${item.quantity}`)
+      }
+
+      // Decrement stock and update inventory (releasing the reservation lock)
       await tx.inventory.update({
-        where: { variantId: item.variantId },
+        where: { id: inventory.id },
         data: {
           quantity: { decrement: item.quantity },
+          reserved: { decrement: Math.min(inventory.reserved, item.quantity) },
         },
+      })
+
+      // Write inventory movement log
+      await tx.inventoryMovement.create({
+        data: {
+          inventoryId: inventory.id,
+          quantity: -item.quantity,
+          type: "SHIPMENT",
+          reason: `Stripe online checkout: ${input.orderNumber}`
+        }
       })
     }
 
@@ -145,9 +165,22 @@ export async function getOrderById(id: string) {
 }
 
 export async function updateOrderStatus(id: string, status: OrderStatus) {
-  return db.order.update({
-    where: { id },
-    data: { status },
+  return db.$transaction(async (tx) => {
+    const order = await tx.order.findUnique({
+      where: { id },
+      select: { status: true },
+    })
+
+    if (!order) {
+      throw new Error(`Order not found with ID: ${id}`)
+    }
+
+    validateOrderTransition(order.status, status)
+
+    return tx.order.update({
+      where: { id },
+      data: { status },
+    })
   })
 }
 
@@ -156,13 +189,14 @@ export async function updatePaymentStatus(orderId: string, transactionId: string
     const order = await tx.order.findUnique({ where: { id: orderId } })
     if (!order) throw new Error("Order not found")
 
-    // Update order status if payment is completed
-    const updatedOrderStatus = status === PaymentStatus.COMPLETED ? OrderStatus.PAID : OrderStatus.PENDING
-
-    await tx.order.update({
-      where: { id: orderId },
-      data: { status: updatedOrderStatus },
-    })
+    // Update order status if payment is completed — enforced through the state machine
+    if (status === PaymentStatus.COMPLETED) {
+      validateOrderTransition(order.status, OrderStatus.PAID)
+      await tx.order.update({
+        where: { id: orderId },
+        data: { status: OrderStatus.PAID },
+      })
+    }
 
     return tx.payment.upsert({
       where: { orderId },

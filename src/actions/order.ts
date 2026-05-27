@@ -1,4 +1,4 @@
-"use"
+"use server"
 
 import { db } from "@/lib/db"
 import { getCart } from "./cart"
@@ -107,5 +107,34 @@ export async function processStripeCheckout(
   } catch (error: any) {
     console.error("Stripe Checkout Action Error:", error)
     return { success: false, error: error.message || "Failed to initialize secure checkout" }
+  }
+}
+
+import { updateOrderStatus } from "@/repositories/order"
+import { OrderStatus } from "@prisma/client"
+
+export async function adminUpdateOrderStatus(
+  adminId: string,
+  orderId: string,
+  status: OrderStatus
+): Promise<ActionResponse> {
+  try {
+    const updated = await updateOrderStatus(orderId, status)
+    
+    // Write admin audit trail
+    await db.auditLog.create({
+      data: {
+        userId: adminId,
+        action: "ORDER_STATUS_UPDATE",
+        entity: "Order",
+        entityId: orderId,
+        changes: JSON.stringify({ status })
+      }
+    }).catch(() => {})
+
+    return { success: true, data: updated }
+  } catch (err: any) {
+    console.error("CMS Order Status Update Error:", err)
+    return { success: false, error: err.message || "Failed to update order status" }
   }
 }

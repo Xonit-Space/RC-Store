@@ -1,71 +1,102 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { ShoppingCart, User, Menu, Heart } from "lucide-react"
+import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { SmartSearch } from "@/components/features/smart-search"
-import { NotificationCenter } from "@/components/features/notification-center"
+import { useCartStore } from "@/store/cart"
+import { useSession } from "next-auth/react"
 
 export function Header() {
+  const { data: session } = useSession()
+  const cartStore = useCartStore()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [cartCount] = useState(3) // This would come from global state
+  const [scrolled, setScrolled] = useState(false)
+  
+  const cartCount = cartStore.getItemCount()
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50)
+    }
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        {/* Logo */}
-        <Link href="/" className="flex items-center space-x-2">
-          <div className="h-8 w-8 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600" />
-          <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            NEOSHOP ULTRA
-          </span>
-        </Link>
-
-        {/* Smart Search */}
-        <div className="hidden md:flex flex-1 max-w-md mx-8">
-          <SmartSearch />
-        </div>
-
-        {/* Actions */}
-        <div className="flex items-center space-x-2">
-          <ThemeToggle />
-
-          {/* Notifications */}
-          <NotificationCenter />
-
-          {/* Wishlist */}
-          <Button variant="ghost" size="icon" className="relative">
-            <Heart className="h-5 w-5" />
-            <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 text-xs">2</Badge>
-          </Button>
-
-          {/* Cart */}
-          <Button variant="ghost" size="icon" className="relative">
-            <ShoppingCart className="h-5 w-5" />
-            {cartCount > 0 && (
-              <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 text-xs">{cartCount}</Badge>
+    <header className={`fixed top-0 z-50 w-full transition-all duration-500 ${scrolled ? "bg-background/90 backdrop-blur-md border-b border-border/50 py-2" : "bg-transparent py-4"}`}>
+      <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
+        
+        {/* Left: Hamburger & Navigation */}
+        <div className="flex items-center space-x-8 flex-1">
+          <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <Menu strokeWidth={1} className="h-6 w-6 text-foreground" />
+          </button>
+          
+          <nav className="hidden md:flex items-center space-x-8">
+            <Link href="/products" className="text-[11px] font-medium tracking-[0.2em] uppercase hover:text-accent transition-colors">
+              Shop
+            </Link>
+            <Link href="/collections" className="text-[11px] font-medium tracking-[0.2em] uppercase hover:text-accent transition-colors">
+              Collections
+            </Link>
+            <Link href="/campaigns" className="text-[11px] font-medium tracking-[0.2em] uppercase hover:text-accent transition-colors">
+              Campaigns
+            </Link>
+            {session && (session.user.role === "SUPER_ADMIN" || session.user.role === "ADMIN") && (
+              <Link href="/admin" className="text-[11px] font-medium tracking-[0.2em] uppercase text-accent hover:text-foreground transition-colors">
+                Admin
+              </Link>
             )}
-          </Button>
+          </nav>
+        </div>
 
-          {/* User Account */}
-          <Button variant="ghost" size="icon">
-            <User className="h-5 w-5" />
-          </Button>
+        {/* Center: Brand Name (Editorial Serif) */}
+        <div className="flex-1 flex justify-center">
+          <Link href="/" className="font-serif text-2xl md:text-3xl tracking-widest text-foreground">
+            NEOSHOP
+          </Link>
+        </div>
 
-          {/* Mobile Menu */}
-          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-            <Menu className="h-5 w-5" />
-          </Button>
+        {/* Right: Actions (Text-led) */}
+        <div className="flex items-center justify-end space-x-6 md:space-x-8 flex-1">
+          <div className="hidden md:block">
+            <ThemeToggle />
+          </div>
+
+          <Link href="/customer" className="hidden md:block text-[11px] font-medium tracking-[0.2em] uppercase hover:text-accent transition-colors">
+            Account
+          </Link>
+
+          <button className="hidden md:block text-[11px] font-medium tracking-[0.2em] uppercase hover:text-accent transition-colors">
+            Search
+          </button>
+
+          <Link href="/cart" className="text-[11px] font-medium tracking-[0.2em] uppercase hover:text-accent transition-colors">
+            Cart ({cartCount})
+          </Link>
         </div>
       </div>
 
-      {/* Mobile Search */}
-      <div className="md:hidden border-t p-4">
-        <SmartSearch />
-      </div>
+      {/* Mobile Fullscreen Menu overlay */}
+      {isMenuOpen && (
+        <div className="fixed inset-0 z-50 bg-background flex flex-col items-center justify-center space-y-8 animate-in fade-in duration-300">
+          <button className="absolute top-6 left-6" onClick={() => setIsMenuOpen(false)}>
+            <X strokeWidth={1} className="h-8 w-8 text-foreground" />
+          </button>
+          
+          <Link href="/products" onClick={() => setIsMenuOpen(false)} className="font-serif text-4xl tracking-widest hover:text-accent transition-colors">
+            SHOP
+          </Link>
+          <Link href="/collections" onClick={() => setIsMenuOpen(false)} className="font-serif text-4xl tracking-widest hover:text-accent transition-colors">
+            COLLECTIONS
+          </Link>
+          <Link href="/customer" onClick={() => setIsMenuOpen(false)} className="font-serif text-4xl tracking-widest hover:text-accent transition-colors">
+            ACCOUNT
+          </Link>
+        </div>
+      )}
     </header>
   )
 }

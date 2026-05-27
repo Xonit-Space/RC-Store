@@ -1,0 +1,318 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { Header } from "@/components/layout/header"
+import { Footer } from "@/components/layout/footer"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import { MapPin, RefreshCw, ChevronRight, Home, Plus, Trash2, ShieldAlert } from "lucide-react"
+import { addCustomerAddress } from "@/actions/auth"
+import { AddressSchema } from "@/validators/auth"
+
+export default function CustomerAddressesPage() {
+  const router = useRouter()
+  const { data: session, status } = useSession()
+  const [profile, setProfile] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  // Address form modal
+  const [isAddAddressOpen, setIsAddAddressOpen] = useState(false)
+  const [addrTitle, setAddrTitle] = useState("Home")
+  const [line1, setLine1] = useState("")
+  const [line2, setLine2] = useState("")
+  const [city, setCity] = useState("")
+  const [addrState, setAddrState] = useState("")
+  const [postalCode, setPostalCode] = useState("")
+  const [country, setCountry] = useState("US")
+  const [phone, setPhone] = useState("")
+  const [addressLoading, setAddressLoading] = useState(false)
+
+  const fetchProfile = async () => {
+    setLoading(true)
+    try {
+      const res = await fetch("/api/customer/profile")
+      if (res.ok) {
+        const data = await res.json()
+        setProfile(data)
+      } else {
+        toast.error("Failed to load customer profile details")
+      }
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login?callbackUrl=/customer/addresses")
+    } else if (status === "authenticated") {
+      fetchProfile()
+    }
+  }, [status])
+
+  const handleAddAddress = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setAddressLoading(true)
+
+    const payload = {
+      title: addrTitle,
+      line1,
+      line2: line2 || undefined,
+      city,
+      state: addrState,
+      postalCode,
+      country,
+      phone,
+      isDefaultShipping: profile?.addresses?.length === 0,
+      isDefaultBilling: profile?.addresses?.length === 0,
+    }
+
+    const validation = AddressSchema.safeParse(payload)
+    if (!validation.success) {
+      const errorMsg = validation.error.errors.map((err) => err.message).join(", ")
+      toast.error(errorMsg)
+      setAddressLoading(false)
+      return
+    }
+
+    try {
+      const response = await addCustomerAddress(session?.user?.id || "", payload)
+      if (response.success) {
+        toast.success("Successfully added address record")
+        setIsAddAddressOpen(false)
+        setLine1("")
+        setLine2("")
+        setCity("")
+        setAddrState("")
+        setPostalCode("")
+        setPhone("")
+        await fetchProfile()
+      } else {
+        toast.error(response.error || "Failed to register address")
+      }
+    } catch (err) {
+      toast.error("An unexpected error occurred")
+    } finally {
+      setAddressLoading(false)
+    }
+  }
+
+  if (status === "loading" || loading) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col justify-between">
+        <Header />
+        <div className="flex-grow flex items-center justify-center p-12">
+          <div className="flex flex-col items-center gap-2">
+            <RefreshCw className="h-10 w-10 text-primary animate-spin" />
+            <span className="text-sm font-bold text-slate-500">Loading addresses...</span>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-background flex flex-col justify-between text-slate-800 font-sans">
+      <Header />
+
+      <main className="flex-grow container mx-auto px-4 py-8 space-y-6">
+        {/* Navigation Breadcrumb */}
+        <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+          <a href="/customer" className="hover:text-primary transition flex items-center gap-1"><Home className="w-3.5 h-3.5" /> Dashboard</a>
+          <ChevronRight className="w-3 h-3" />
+          <span className="text-slate-600">Address Book</span>
+        </div>
+
+        <div className="flex items-center justify-between pb-4 border-b">
+          <div>
+            <h2 className="text-2xl font-extrabold text-slate-800 tracking-tight leading-snug">Address Book</h2>
+            <p className="text-xs text-slate-400 font-semibold mt-0.5">Manage your shipping and billing registries.</p>
+          </div>
+          <Button
+            onClick={() => setIsAddAddressOpen(true)}
+            className="h-11 px-5 rounded-xl bg-primary hover:bg-primary/95 text-white text-xs font-bold transition active:scale-95 shadow-md shadow-primary/10"
+          >
+            <Plus className="h-4.5 w-4.5 mr-2" /> Add Address
+          </Button>
+        </div>
+
+        {/* ── ADDRESS REGISTRY GRID ── */}
+        {profile?.addresses?.length === 0 ? (
+          <Card className="border border-dashed border-slate-200 p-12 text-center rounded-2xl">
+            <CardContent className="pt-6">
+              <MapPin className="h-14 w-14 mx-auto text-slate-300 mb-3 animate-pulse" />
+              <p className="text-sm font-bold text-slate-700">No address records found</p>
+              <p className="text-xs text-muted-foreground pt-1 mb-6">Create a default delivery address to enable Stripe checkouts.</p>
+              <Button onClick={() => setIsAddAddressOpen(true)} className="h-11 px-6 rounded-xl bg-primary">
+                Add Delivery Address
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {profile?.addresses?.map((addr: any) => (
+              <Card key={addr.id} className="border border-slate-100 rounded-2xl shadow-sm bg-card transition hover:border-slate-200">
+                <CardHeader className="bg-slate-50 border-b border-slate-100 p-4 flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle className="text-sm font-extrabold text-slate-800 uppercase tracking-wide">
+                      {addr.title}
+                    </CardTitle>
+                    <CardDescription className="text-[10px] text-slate-400 font-bold mt-0.5">
+                      {addr.isDefaultShipping ? "Default Shipping Address" : "Alternate Address"}
+                    </CardDescription>
+                  </div>
+                  <MapPin className="h-5 w-5 text-primary shrink-0" />
+                </CardHeader>
+                <CardContent className="p-4 space-y-3">
+                  <div className="text-xs font-semibold text-slate-600 space-y-1">
+                    <p>{addr.line1}</p>
+                    {addr.line2 && <p>{addr.line2}</p>}
+                    <p>{addr.city}, {addr.state} {addr.postalCode}</p>
+                    <p>{addr.country}</p>
+                  </div>
+                  <div className="pt-3 border-t border-slate-100 text-[10px] text-slate-400 font-bold flex items-center">
+                    Phone: {addr.phone}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {/* ── ADD ADDRESS MODAL OVERLAY ── */}
+        {isAddAddressOpen && (
+          <div className="fixed inset-0 z-50 bg-[#0e0918]/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="max-w-lg w-full rounded-2xl border border-slate-100 bg-white shadow-2xl p-6 relative animate-in fade-in zoom-in duration-200">
+              <button
+                onClick={() => setIsAddAddressOpen(false)}
+                className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition"
+              >
+                <RefreshCw className="h-5 w-5 rotate-45" />
+              </button>
+
+              <h3 className="text-lg font-bold text-slate-800 mb-1">Add Address Record</h3>
+              <p className="text-xs text-slate-400 mb-6 font-semibold">Please provide the complete shipping details below.</p>
+
+              <form onSubmit={handleAddAddress} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Address Label</label>
+                    <Input
+                      type="text"
+                      placeholder="Home, Office..."
+                      value={addrTitle}
+                      onChange={(e) => setAddrTitle(e.target.value)}
+                      className="h-10 border-slate-200 rounded-xl"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Phone Contact</label>
+                    <Input
+                      type="text"
+                      placeholder="0771234567"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="h-10 border-slate-200 rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Street Address</label>
+                  <Input
+                    type="text"
+                    placeholder="Line 1"
+                    value={line1}
+                    onChange={(e) => setLine1(e.target.value)}
+                    className="h-10 border-slate-200 rounded-xl"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Input
+                    type="text"
+                    placeholder="Line 2 (Optional)"
+                    value={line2}
+                    onChange={(e) => setLine2(e.target.value)}
+                    className="h-10 border-slate-200 rounded-xl"
+                  />
+                </div>
+
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">City</label>
+                    <Input
+                      type="text"
+                      placeholder="Colombo"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      className="h-10 border-slate-200 rounded-xl"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">State</label>
+                    <Input
+                      type="text"
+                      placeholder="Western"
+                      value={addrState}
+                      onChange={(e) => setAddrState(e.target.value)}
+                      className="h-10 border-slate-200 rounded-xl"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Postal Code</label>
+                    <Input
+                      type="text"
+                      placeholder="00100"
+                      value={postalCode}
+                      onChange={(e) => setPostalCode(e.target.value)}
+                      className="h-10 border-slate-200 rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Country</label>
+                  <Input
+                    type="text"
+                    placeholder="US, LK..."
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    className="h-10 border-slate-200 rounded-xl"
+                  />
+                </div>
+
+                <div className="flex gap-3 justify-end pt-4 border-t">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsAddAddressOpen(false)}
+                    className="h-10 rounded-xl"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={addressLoading}
+                    className="h-10 rounded-xl bg-primary text-white"
+                  >
+                    {addressLoading ? "Saving..." : "Save Address"}
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+      </main>
+
+      <Footer />
+    </div>
+  )
+}

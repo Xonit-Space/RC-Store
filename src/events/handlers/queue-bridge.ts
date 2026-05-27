@@ -55,4 +55,55 @@ export function initializeQueueBridge(): void {
       orderId: envelope.payload.reservationId
     })
   })
+
+  // 4. Payment & Refund Flow
+  registerHandler("PAYMENT_COMPLETED", async (envelope) => {
+    await emailQueue.add("receipt_email", {
+      to: "customer@example.com", // In a real app, fetch order/user email
+      subject: "Payment Receipt - Neoshop Ultra",
+      html: `<p>We have received your payment of $${envelope.payload.amount} for order ${envelope.payload.orderId}.</p>`
+    })
+  })
+
+  registerHandler("REFUND_ISSUED", async (envelope) => {
+    await emailQueue.add("refund_email", {
+      to: "customer@example.com",
+      subject: "Refund Issued - Neoshop Ultra",
+      html: `<p>A refund of $${envelope.payload.amount} has been issued for order ${envelope.payload.orderId}.</p>`
+    })
+  })
+
+  // 5. Shipping Flow
+  registerHandler("SHIPMENT_UPDATED", async (envelope) => {
+    await emailQueue.add("shipment_update", {
+      to: "customer@example.com",
+      subject: `Shipment Update: ${envelope.payload.status}`,
+      html: `<p>Your order ${envelope.payload.orderId} is now ${envelope.payload.status}. Tracking: ${envelope.payload.trackingNumber}</p>`
+    })
+  })
+
+  // 6. Analytics Flows
+  registerHandler("PRODUCT_VIEWED", async (envelope) => {
+    await analyticsQueue.add("track_view", {
+      event: "PRODUCT_VIEWED",
+      productId: envelope.payload.productId,
+      userId: envelope.payload.userId || envelope.payload.anonymousId
+    })
+  })
+
+  registerHandler("CART_UPDATED", async (envelope) => {
+    await analyticsQueue.add("track_cart", {
+      event: "CART_UPDATED",
+      cartId: envelope.payload.cartId,
+      userId: envelope.payload.userId
+    })
+  })
+
+  registerHandler("REVIEW_CREATED", async (envelope) => {
+    await analyticsQueue.add("track_review", {
+      event: "REVIEW_CREATED",
+      productId: envelope.payload.productId,
+      rating: envelope.payload.rating
+    })
+  })
 }

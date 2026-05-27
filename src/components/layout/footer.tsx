@@ -1,113 +1,100 @@
 import Link from "next/link"
-import { Facebook, Twitter, Instagram, Youtube, Mail, Phone } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { ArrowRight } from "lucide-react"
 
 export function Footer() {
   return (
-    <footer className="bg-background border-t">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Brand */}
-          <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600" />
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                NEOSHOP ULTRA
-              </span>
-            </div>
-            <p className="text-muted-foreground">
-              The smartest, most customizable, and scalable e-commerce platform for brands who want to dominate.
+    <footer className="bg-background pt-24 pb-12 border-t border-border/40">
+      <div className="container mx-auto px-6 md:px-12">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-16 md:gap-8 mb-24">
+          
+          {/* Brand Manifesto */}
+          <div className="md:col-span-5 space-y-8">
+            <Link href="/" className="font-serif text-3xl md:text-5xl tracking-widest text-foreground block">
+              NEOSHOP
+            </Link>
+            <p className="text-sm md:text-base leading-relaxed text-muted-foreground max-w-md font-serif italic">
+              Crafting timeless digital commerce. A curation of the world's most exceptional products, presented with architectural precision and quiet luxury.
             </p>
-            <div className="flex space-x-2">
-              <Button variant="outline" size="icon">
-                <Facebook className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="icon">
-                <Twitter className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="icon">
-                <Instagram className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="icon">
-                <Youtube className="h-4 w-4" />
-              </Button>
-            </div>
           </div>
 
-          {/* Quick Links */}
-          <div className="space-y-4">
-            <h3 className="font-semibold">Quick Links</h3>
-            <div className="space-y-2">
-              <Link href="/products" className="block text-muted-foreground hover:text-foreground">
-                All Products
-              </Link>
-              <Link href="/categories" className="block text-muted-foreground hover:text-foreground">
-                Categories
-              </Link>
-              <Link href="/deals" className="block text-muted-foreground hover:text-foreground">
-                Deals & Offers
-              </Link>
-              <Link href="/new-arrivals" className="block text-muted-foreground hover:text-foreground">
-                New Arrivals
-              </Link>
-            </div>
+          {/* Curated Links */}
+          <div className="md:col-span-3 space-y-6">
+            <h3 className="text-[10px] font-bold tracking-[0.2em] uppercase text-foreground mb-8">Boutique</h3>
+            <ul className="space-y-4">
+              <li>
+                <Link href="/products" className="text-sm text-muted-foreground hover:text-accent transition-colors">
+                  The Catalog
+                </Link>
+              </li>
+              <li>
+                <Link href="/collections" className="text-sm text-muted-foreground hover:text-accent transition-colors">
+                  Seasonal Collections
+                </Link>
+              </li>
+              <li>
+                <Link href="/campaigns" className="text-sm text-muted-foreground hover:text-accent transition-colors">
+                  Campaigns
+                </Link>
+              </li>
+              <li>
+                <Link href="/materials" className="text-sm text-muted-foreground hover:text-accent transition-colors">
+                  Signature Materials
+                </Link>
+              </li>
+            </ul>
           </div>
 
-          {/* Customer Service */}
-          <div className="space-y-4">
-            <h3 className="font-semibold">Customer Service</h3>
-            <div className="space-y-2">
-              <Link href="/contact" className="block text-muted-foreground hover:text-foreground">
-                Contact Us
-              </Link>
-              <Link href="/shipping" className="block text-muted-foreground hover:text-foreground">
-                Shipping Info
-              </Link>
-              <Link href="/returns" className="block text-muted-foreground hover:text-foreground">
-                Returns & Exchanges
-              </Link>
-              <Link href="/faq" className="block text-muted-foreground hover:text-foreground">
-                FAQ
-              </Link>
-            </div>
-            <div className="space-y-2 pt-2">
-              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                <Phone className="h-4 w-4" />
-                <span>+1 (555) 123-4567</span>
+          <div className="md:col-span-4 space-y-6">
+            <h3 className="text-[10px] font-bold tracking-[0.2em] uppercase text-foreground mb-8">Client Services</h3>
+            <ul className="space-y-4">
+              <li>
+                <Link href="/contact" className="text-sm text-muted-foreground hover:text-accent transition-colors">
+                  Contact an Advisor
+                </Link>
+              </li>
+              <li>
+                <Link href="/shipping" className="text-sm text-muted-foreground hover:text-accent transition-colors">
+                  Shipping & Returns
+                </Link>
+              </li>
+              <li>
+                <Link href="/faq" className="text-sm text-muted-foreground hover:text-accent transition-colors">
+                  FAQ
+                </Link>
+              </li>
+            </ul>
+            
+            {/* Minimal Newsletter */}
+            <div className="pt-8">
+              <h3 className="text-[10px] font-bold tracking-[0.2em] uppercase text-foreground mb-4">The Newsletter</h3>
+              <div className="relative group">
+                <input 
+                  type="email" 
+                  placeholder="Email Address" 
+                  className="w-full bg-transparent border-b border-border/50 pb-2 text-sm text-foreground focus:outline-none focus:border-accent transition-colors placeholder:text-muted-foreground/50"
+                />
+                <button className="absolute right-0 top-0 bottom-2 text-muted-foreground group-hover:text-accent transition-colors">
+                  <ArrowRight strokeWidth={1} className="w-5 h-5" />
+                </button>
               </div>
-              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                <Mail className="h-4 w-4" />
-                <span>support@neoshop.com</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Newsletter */}
-          <div className="space-y-4">
-            <h3 className="font-semibold">Stay Updated</h3>
-            <p className="text-sm text-muted-foreground">
-              Subscribe to get special offers, free giveaways, and updates.
-            </p>
-            <div className="flex space-x-2">
-              <Input placeholder="Enter your email" className="flex-1" />
-              <Button>Subscribe</Button>
             </div>
           </div>
         </div>
 
-        <div className="border-t mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-sm text-muted-foreground">© 2024 NEOSHOP ULTRA. All rights reserved.</p>
-          <div className="flex space-x-4 mt-4 md:mt-0">
-            <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground">
-              Privacy Policy
+        <div className="border-t border-border/40 pt-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <p className="text-[10px] tracking-[0.1em] text-muted-foreground uppercase">
+            © {new Date().getFullYear()} NEOSHOP ULTRA. ALL RIGHTS RESERVED.
+          </p>
+          <div className="flex space-x-8">
+            <Link href="/privacy" className="text-[10px] tracking-[0.1em] text-muted-foreground hover:text-foreground uppercase transition-colors">
+              Privacy
             </Link>
-            <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground">
-              Terms of Service
+            <Link href="/terms" className="text-[10px] tracking-[0.1em] text-muted-foreground hover:text-foreground uppercase transition-colors">
+              Terms
             </Link>
-            <Link href="/cookies" className="text-sm text-muted-foreground hover:text-foreground">
-              Cookie Policy
-            </Link>
+            <a href="https://instagram.com" target="_blank" rel="noreferrer" className="text-[10px] tracking-[0.1em] text-muted-foreground hover:text-foreground uppercase transition-colors">
+              Instagram
+            </a>
           </div>
         </div>
       </div>

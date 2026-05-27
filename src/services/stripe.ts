@@ -1,4 +1,6 @@
 import Stripe from "stripe"
+import { reserveStock } from "@/services/inventory"
+import { inventoryQueue } from "@/lib/queue/queues"
 
 if (!process.env.STRIPE_API_KEY) {
   throw new Error("Missing STRIPE_API_KEY environment variable")
@@ -30,6 +32,11 @@ export interface CheckoutSessionOptions {
 export async function createCheckoutSession(options: CheckoutSessionOptions) {
   const { userId, email, items, successUrl, cancelUrl, couponCode, shippingCost = 0 } = options
 
+  // 1. Pessimistically reserve stock for items in transaction before generating session
+  for (const item of items) {
+    await reserveStock({ variantId: item.variantId, quantity: item.quantity })
+  }
+
   const lineItems = items.map((item) => ({
     price_data: {
       currency: "usd",
@@ -47,6 +54,23 @@ export async function createCheckoutSession(options: CheckoutSessionOptions) {
 
   // Generate unique internal tracking reference
   const orderNumber = `NS-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`
+
+  // 2. Schedule delayed BullMQ job to automatically release reserved stock if cart is abandoned (15 mins TTL)
+  try {
+    await inventoryQueue.add(
+      "release_reservation",
+      {
+        action: "RELEASE_RESERVATION",
+        orderNumber,
+        items: items.map(item => ({ variantId: item.variantId, quantity: item.quantity }))
+      },
+      {
+        delay: 15 * 60 * 1000 // 15 minutes delay
+      }
+    )
+  } catch (err) {
+    console.error("Failed to enqueue delayed stock release job:", err)
+  }
 
   // Map session payload parameters
   const sessionCreateParams: Stripe.Checkout.SessionCreateParams = {

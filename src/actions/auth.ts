@@ -1,4 +1,4 @@
-"use"
+"use server"
 
 import { RegisterSchema, AddressSchema } from "@/validators/auth"
 import { createUser, getUserByEmail, addAddress } from "@/repositories/user"

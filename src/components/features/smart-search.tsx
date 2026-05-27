@@ -10,6 +10,7 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { useLoading } from "@/components/providers/loading-provider"
 import { getProducts } from "@/lib/api"
 import { debounce } from "lodash"
+import { toast } from "sonner"
 
 interface SearchSuggestion {
   id: string
@@ -40,7 +41,7 @@ export function SmartSearch() {
       try {
         const products = await getProducts({ search: searchQuery, limit: 5 })
         const mockSuggestions: SearchSuggestion[] = [
-          ...products.map((product) => ({
+          ...products.map((product: any) => ({
             id: product.id,
             text: product.name,
             type: "product" as const,
@@ -107,9 +108,8 @@ export function SmartSearch() {
     }
   }
 
-  const handleImageSearch = async () => {
-    await withLoading(new Promise((resolve) => setTimeout(resolve, 1500)))
-    console.log("Image search triggered")
+  const handleImageSearch = () => {
+    toast.info("Visual AI search model integration is scheduled for our next catalog update.")
   }
 
   const clearSearch = () => {

@@ -302,6 +302,7 @@ model InventoryMovement {
 
   @@index([inventoryId])
   @@index([userId])
+  @@index([createdAt])
   @@map("inventory_movements")
 }
 
@@ -427,6 +428,8 @@ model Order {
   @@index([orderNumber])
   @@index([shippingAddressId])
   @@index([billingAddressId])
+  @@index([status])
+  @@index([createdAt])
   @@map("orders")
 }
 
@@ -479,6 +482,7 @@ model Shipment {
 
   @@index([orderId])
   @@index([trackingNumber])
+  @@index([status])
   @@map("shipments")
 }
 
@@ -936,14 +940,19 @@ model ProductAnswer {
 }
 
 model WebhookEvent {
-  id           String    @id @default(cuid())
-  eventType    String
-  payload      String    // JSON string
-  status       String    // "PENDING", "PROCESSED", "FAILED"
-  errorMessage String?
-  createdAt    DateTime  @default(now())
-  processedAt  DateTime?
+  id              String    @id @default(cuid())
+  stripeEventId   String    @unique // Stripe event.id — final ordering authority
+  stripeCreated   Int       // Stripe event.created (Unix epoch) — for ordering
+  eventType       String
+  payload         String    // JSON string
+  status          String    // "PENDING", "PROCESSED", "FAILED"
+  errorMessage    String?
+  createdAt       DateTime  @default(now())
+  processedAt     DateTime?
 
+  @@index([stripeEventId])
+  @@index([eventType])
+  @@index([status])
   @@map("webhook_events")
 }
 
@@ -972,6 +981,8 @@ model AuditLog {
   createdAt DateTime @default(now())
 
   @@index([userId])
+  @@index([createdAt])
+  @@index([action])
   @@map("audit_logs")
 }
 
@@ -1062,4 +1073,95 @@ model DomainEventLog {
   @@index([eventType])
   @@index([createdAt])
   @@map("domain_event_logs")
+}
+
+// ==========================================
+// 9. DISTRIBUTED RESILIENCE ENGINE SCHEMAS
+// ==========================================
+
+// Hybrid idempotency: Redis fast-path + DB final authority
+model IdempotencyRecord {
+  id          String   @id @default(cuid())
+  key         String   @unique   // SHA-256 of (namespace:requestId)
+  namespace   String             // "stripe_webhook", "checkout", "pos_sale"
+  resultJson  String?            // Cached response payload (JSON)
+  status      String   @default("PROCESSING") // PROCESSING | COMPLETED | FAILED
+  expiresAt   DateTime           // TTL — after which record can be pruned
+  createdAt   DateTime @default(now())
+
+  @@index([key])
+  @@index([expiresAt])
+  @@map("idempotency_records")
+}
+
+// 3-phase inventory reservation engine
+enum ReservationStatus {
+  RESERVED
+  COMMITTED
+  RELEASED
+}
+
+model InventoryReservation {
+  id          String            @id @default(cuid())
+  variantId   String
+  quantity    Int
+  checkoutId  String            // Stripe session ID or POS transaction ID
+  status      ReservationStatus @default(RESERVED)
+  expiresAt   DateTime          // RESERVED auto-releases after this
+  committedAt DateTime?
+  releasedAt  DateTime?
+  createdAt   DateTime          @default(now())
+
+  @@index([variantId])
+  @@index([checkoutId])
+  @@index([status])
+  @@index([expiresAt])
+  @@map("inventory_reservations")
+}
+
+// Dead letter queue for failed financial events
+enum DLQStatus {
+  PENDING
+  RETRYING
+  RESOLVED
+  ESCALATED
+}
+
+model FinancialDLQ {
+  id           String    @id @default(cuid())
+  eventId      String    @unique // Original event/idempotency key
+  namespace    String    // "stripe_webhook", "order_creation", "inventory_commit"
+  payloadJson  String    // Original event payload
+  errorMessage String
+  retryCount   Int       @default(0)
+  maxRetries   Int       @default(5)
+  status       DLQStatus @default(PENDING)
+  lastAttempt  DateTime?
+  resolvedAt   DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([status])
+  @@index([namespace])
+  @@index([eventId])
+  @@map("financial_dlq")
+}
+
+// Daily payment reconciliation reports
+model ReconciliationReport {
+  id                 String   @id @default(cuid())
+  reportDate         DateTime // Date being reconciled
+  stripeTotal        Float    // Total from Stripe
+  dbTotal            Float    // Total from DB payments
+  delta              Float    // Difference (should be 0)
+  missingInDB        String   @default("[]") // JSON array of Stripe PI IDs
+  missingInStripe    String   @default("[]") // JSON array of DB payment IDs
+  mismatchedAmounts  String   @default("[]") // JSON array of {orderId, stripe, db}
+  duplicateOrders    String   @default("[]") // JSON array of orderNumbers
+  status             String   @default("PENDING") // PENDING | CLEAN | DISCREPANCY
+  createdAt          DateTime @default(now())
+
+  @@index([reportDate])
+  @@index([status])
+  @@map("reconciliation_reports")
 }

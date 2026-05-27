@@ -1,25 +1,47 @@
 import { db } from "@/lib/db"
-import { OrderStatus, PaymentStatus } from "@prisma/client"
-import { NextResponse } from "next/server"
+import { OrderStatus, PaymentStatus, InventoryMovementType } from "@prisma/client"
+import { NextRequest, NextResponse } from "next/server"
+import { withApiHandler } from "@/lib/api-middleware"
+import { queueConnection } from "@/lib/queue/connection"
+import { PosOrderCreateSchema } from "@/validators/pos"
 
-export async function POST(req: Request) {
+export const dynamic = "force-dynamic"
+
+export const POST = withApiHandler(async (req: NextRequest) => {
+  const body = await req.json()
+
+  // 1. Zod Input Validation
+  const validatedData = PosOrderCreateSchema.safeParse(body)
+  if (!validatedData.success) {
+    return NextResponse.json({ 
+      error: "Validation failed", 
+      details: validatedData.error.format() 
+    }, { status: 400 })
+  }
+
+  const { customerId, items, payment, note, idempotencyKey } = validatedData.data
+  const lockKey = `pos:idempotency:${idempotencyKey}`
+
+  // 2. Redis-Backed Idempotency Guard
   try {
-    const body = await req.json()
-    const { customerId, items, payment, note } = body
-
-    if (!items || items.length === 0) {
-      return NextResponse.json({ error: "Checkout items are required" }, { status: 400 })
+    const acquired = await queueConnection.set(lockKey, "processing", "EX", 86400, "NX")
+    if (!acquired) {
+      return NextResponse.json({ error: "Duplicate transaction request detected" }, { status: 409 })
     }
+  } catch (redisError) {
+    console.error("Idempotency Redis connection failure:", redisError)
+    // Fail open or allow check to pass so POS stays up if Redis is offline
+  }
 
-    // 1. Resolve User and Addresses
+  try {
+    // 3. Resolve User and Addresses
     let customerUserId = customerId
     if (!customerUserId) {
-      // Find default guest customer seeded user
       const guestCustomer = await db.user.findFirst({
         where: { email: "customer@neoshop.ultra" }
       })
       if (!guestCustomer) {
-        return NextResponse.json({ error: "Default customer account not found" }, { status: 500 })
+        throw new Error("Default customer account not found in database")
       }
       customerUserId = guestCustomer.id
     }
@@ -38,18 +60,57 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Customer profile must have at least one address" }, { status: 400 })
     }
 
-    // 2. Compute financial breakdown
+    // 4. Compute financial breakdown
     let subtotal = 0
     for (const it of items) {
       subtotal += it.unitPrice * it.quantity
     }
-    const tax = subtotal * 0.08 // NY tax or similar
-    const total = subtotal + tax
+    const tax = Math.round(subtotal * 0.08 * 100) / 100
+    const total = Math.round((subtotal + tax) * 100) / 100
     const orderNumber = `ORD-POS-${Date.now()}`
 
-    // 3. PostgreSQL Transaction Scope
-    const finalOrder = await db.$transaction(async (tx: any) => {
-      // Create Order
+    // 5. PostgreSQL Pessimistic Transaction Scope
+    const finalOrder = await db.$transaction(async (tx) => {
+      // 5.1 Enforce Concurrency stock checks via Pessimistic SELECT FOR UPDATE
+      for (const it of items) {
+        const inventories = await tx.$queryRaw<any[]>`
+          SELECT id, quantity, reserved FROM inventory
+          WHERE "variantId" = ${it.variantId}
+          FOR UPDATE
+        `
+        const inventory = inventories[0]
+
+        if (!inventory) {
+          throw new Error(`Product variant inventory record not found for variantId ${it.variantId}`)
+        }
+
+        const available = inventory.quantity - inventory.reserved
+        if (available < it.quantity) {
+          throw new Error(`Insufficient stock for item variant: ${it.variantId}. Available: ${available}, Requested: ${it.quantity}`)
+        }
+
+        // Decrement stock levels securely
+        await tx.inventory.update({
+          where: { id: inventory.id },
+          data: {
+            quantity: {
+              decrement: it.quantity
+            }
+          }
+        })
+
+        // Add inventory movement audit logs
+        await tx.inventoryMovement.create({
+          data: {
+            inventoryId: inventory.id,
+            quantity: -it.quantity,
+            type: InventoryMovementType.SHIPMENT,
+            reason: `POS sale checkout: ${orderNumber}`
+          }
+        })
+      }
+
+      // 5.2 Create the secure Order
       const newOrder = await tx.order.create({
         data: {
           orderNumber,
@@ -57,14 +118,13 @@ export async function POST(req: Request) {
           status: OrderStatus.PAID,
           subtotal,
           tax,
-          shippingCost: 0, // In-store POS checkout
+          shippingCost: 0,
           discount: 0,
           total,
           shippingAddressId: address.id,
           billingAddressId: address.id,
-          notes: note || "In-store POS Sale",
           items: {
-            create: items.map((it: any) => ({
+            create: items.map((it) => ({
               variantId: it.variantId,
               quantity: it.quantity,
               price: it.unitPrice,
@@ -77,7 +137,7 @@ export async function POST(req: Request) {
         }
       })
 
-      // Create Payment Log
+      // 5.3 Create Payment Log record
       await tx.payment.create({
         data: {
           orderId: newOrder.id,
@@ -88,38 +148,13 @@ export async function POST(req: Request) {
         }
       })
 
-      // Update Inventory
-      for (const it of items) {
-        const inventory = await tx.inventory.findFirst({
-          where: { variantId: it.variantId }
-        })
-
-        if (inventory) {
-          await tx.inventory.update({
-            where: { id: inventory.id },
-            data: {
-              quantity: {
-                decrement: it.quantity
-              }
-            }
-          })
-
-          // Add movement log
-          await tx.inventoryMovement.create({
-            data: {
-              inventoryId: inventory.id,
-              quantity: -it.quantity,
-              type: "SHIPMENT",
-              reason: `POS sale checkout: ${orderNumber}`
-            }
-          })
-        }
-      }
-
       return newOrder
-    })
+    }) as any
 
-    // 4. Map for Frontend compatibility
+    // 6. Update Idempotency status to 'completed'
+    await queueConnection.set(lockKey, "completed", "EX", 86400).catch(() => {})
+
+    // 7. Map payload for POS Frontend compatibility
     const responseData = {
       orderId: finalOrder.id,
       orderNumber: finalOrder.orderNumber,
@@ -147,8 +182,15 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ success: true, data: responseData })
-  } catch (error) {
-    console.error("API POS Orders Checkout Error:", error)
-    return NextResponse.json({ error: "POS order placement failed" }, { status: 500 })
+
+  } catch (error: any) {
+    console.error("POS Orders Checkout Transaction Failed:", error)
+    // Unlock on failure to permit safe retry attempt
+    await queueConnection.del(lockKey).catch(() => {})
+
+    return NextResponse.json({ 
+      error: "POS transaction rejected", 
+      message: error.message 
+    }, { status: error.message.includes("Insufficient stock") ? 409 : 500 })
   }
-}
+}, { requireAdmin: true, rateLimitNamespace: "pos_orders" })

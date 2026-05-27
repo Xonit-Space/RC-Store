@@ -1,4 +1,4 @@
-"use"
+"use server"
 
 import { db } from "@/lib/db"
 import { ReviewSchema, CmsProductSchema, CmsProductVariantSchema } from "@/validators/product"
@@ -137,5 +137,29 @@ export async function adminAddVariant(
   } catch (error) {
     console.error("CMS Variant Create Action Error:", error)
     return { success: false, error: "Failed to create SKU variant" }
+  }
+}
+
+export async function adminDeleteProduct(adminId: string, productId: string): Promise<ActionResponse> {
+  try {
+    await db.$transaction(async (tx) => {
+      await tx.product.delete({
+        where: { id: productId },
+      })
+
+      await tx.auditLog.create({
+        data: {
+          userId: adminId,
+          action: "PRODUCT_DELETE",
+          entity: "Product",
+          entityId: productId,
+        },
+      })
+    })
+
+    return { success: true }
+  } catch (error) {
+    console.error("CMS Product Delete Action Error:", error)
+    return { success: false, error: "Failed to delete product" }
   }
 }

@@ -1,4 +1,4 @@
-"use"
+"use server"
 
 import { db } from "@/lib/db"
 import { AiService } from "@/services/ai"

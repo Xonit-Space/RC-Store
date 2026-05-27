@@ -16,3 +16,4 @@ export const emailQueue = new Queue("email", { connection: queueConnection, defa
 export const analyticsQueue = new Queue("analytics", { connection: queueConnection, defaultJobOptions })
 export const inventoryQueue = new Queue("inventory", { connection: queueConnection, defaultJobOptions })
 export const webhookQueue = new Queue("webhook", { connection: queueConnection, defaultJobOptions })
+export const dlqQueue = new Queue("dlq", { connection: queueConnection, defaultJobOptions })

@@ -144,6 +144,7 @@ export function POSManagement() {
   // 6. Submit POS sale checkout
   const handleProcessPayment = async () => {
     try {
+      const idempotencyKey = `pos_tx_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
       const checkoutPayload = {
         customerId: selectedCustomer?.id || undefined,
         items: orderItems.map((it) => ({
@@ -157,7 +158,8 @@ export function POSManagement() {
           cashReceived: paymentMethod === "CASH" ? Number(cashReceived) || total : 0,
           changeToGive: paymentMethod === "CASH" ? Math.max(0, (Number(cashReceived) || total) - total) : 0
         },
-        note: `POS Store Sale - Method: ${paymentMethod}`
+        note: `POS Store Sale - Method: ${paymentMethod}`,
+        idempotencyKey
       }
 
       const res = await fetch("/api/pos/orders", {

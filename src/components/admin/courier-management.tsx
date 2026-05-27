@@ -354,7 +354,7 @@ export function CourierManagement() {
 
             <form onSubmit={handleAddCourierSubmit} className="space-y-4">
               <div>
-                <label className="text-xs font-bold text-slate-500 block mb-1">Driver's Name</label>
+                <label className="text-xs font-bold text-slate-500 block mb-1">Driver&apos;s Name</label>
                 <input
                   value={courierName}
                   onChange={(e) => setCourierName(e.target.value)}

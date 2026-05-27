@@ -5,14 +5,16 @@ import { db } from "@/lib/db"
 import { createOrder, updatePaymentStatus } from "@/repositories/order"
 import { addAddress } from "@/repositories/user"
 import { PaymentStatus } from "@prisma/client"
+import { withApiHandler } from "@/lib/api-middleware"
+import { sendToDLQ } from "@/services/dlq"
 
-export async function POST(req: Request) {
+export const POST = withApiHandler(async (req: Request) => {
   const body = await req.text()
   const signature = headers().get("Stripe-Signature") || ""
 
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
   if (!webhookSecret) {
-    return NextResponse.json({ error: "Webhook secret not configured" }, { status: 500 })
+    throw new Error("Webhook secret not configured")
   }
 
   let event: any
@@ -24,28 +26,72 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid webhook signature" }, { status: 400 })
   }
 
+  // ===========================================================
+  // PHASE 1: WEBHOOK ORDERING GUARANTEE
+  // Store event in DB BEFORE processing.
+  // Unique constraint on stripeEventId ensures exactly-once.
+  // ===========================================================
+  let webhookRecord: { id: string } | null = null
+  try {
+    webhookRecord = await db.webhookEvent.create({
+      data: {
+        stripeEventId: event.id,
+        stripeCreated: event.created,
+        eventType: event.type,
+        payload: body,
+        status: "PENDING",
+      },
+      select: { id: true },
+    })
+  } catch (err: any) {
+    // P2002 = unique constraint violation = already stored = already processed or in-flight
+    if (err.code === "P2002") {
+      console.info(`[Webhook] Event ${event.id} already stored (duplicate delivery). Returning 200.`)
+      return NextResponse.json({ received: true, status: "already_processed" }, { status: 200 })
+    }
+    throw err
+  }
+
   const session = event.data.object
 
-  // 1. Process successful payment checkouts
+  // ===========================================================
+  // PHASE 2: PROCESS checkout.session.completed
+  // ===========================================================
   if (event.type === "checkout.session.completed") {
     const metadata = session.metadata
     if (!metadata || !metadata.userId || !metadata.orderNumber) {
+      await db.webhookEvent.update({
+        where: { id: webhookRecord.id },
+        data: { status: "FAILED", errorMessage: "Missing session metadata", processedAt: new Date() },
+      })
       return NextResponse.json({ error: "Missing session tracking metadata" }, { status: 400 })
+    }
+
+    // ORDER-LEVEL idempotency guard (second layer after event-level above)
+    const existingOrder = await db.order.findUnique({
+      where: { orderNumber: metadata.orderNumber },
+      select: { id: true },
+    })
+    if (existingOrder) {
+      console.info(`[Webhook] Order ${metadata.orderNumber} already exists. Idempotent skip.`)
+      await db.webhookEvent.update({
+        where: { id: webhookRecord.id },
+        data: { status: "PROCESSED", processedAt: new Date() },
+      })
+      return NextResponse.json({ received: true, status: "already_processed" }, { status: 200 })
     }
 
     try {
       const { userId, orderNumber, variantMapping } = metadata
       const items = JSON.parse(variantMapping)
 
-      // Retrieve customer shipping details from Stripe session payload
       const stripeShipping = session.shipping_details
-      const stripeBilling = session.customer_details
 
       if (!stripeShipping || !stripeShipping.address) {
-        throw new Error("Missing shipping addresses details in Stripe receipt")
+        throw new Error("Missing shipping address details in Stripe session")
       }
 
-      // 1. Write shipping address into DB
+      // 1. Write shipping address
       const shippingAddress = await addAddress(userId, {
         title: "Shipping Address (Checkout)",
         line1: stripeShipping.address.line1 || "",
@@ -59,7 +105,7 @@ export async function POST(req: Request) {
         isDefaultBilling: false,
       })
 
-      // 2. Write billing address into DB
+      // 2. Write billing address
       const billingAddress = await addAddress(userId, {
         title: "Billing Address (Checkout)",
         line1: session.customer_details?.address?.line1 || stripeShipping.address.line1 || "",
@@ -73,16 +119,14 @@ export async function POST(req: Request) {
         isDefaultBilling: false,
       })
 
-      // 3. Reconstruct snapshot items for DB order writing
+      // 3. Reconstruct order items from variant snapshot
       const orderItems = []
       for (const item of items) {
         const variant = await db.productVariant.findUnique({
           where: { id: item.variantId },
           include: { product: true },
         })
-
         if (!variant) throw new Error(`Product SKU variant ${item.variantId} not found`)
-
         orderItems.push({
           variantId: item.variantId,
           quantity: item.quantity,
@@ -90,14 +134,19 @@ export async function POST(req: Request) {
         })
       }
 
-      // Calculate checkout pricing snapshots
       const subtotal = session.amount_subtotal ? session.amount_subtotal / 100 : 0
       const total = session.amount_total ? session.amount_total / 100 : 0
-      const shippingCost = session.shipping_cost?.amount_subtotal ? session.shipping_cost.amount_subtotal / 100 : 0
-      const discount = session.total_details?.amount_discount ? session.total_details.amount_discount / 100 : 0
-      const tax = session.total_details?.amount_tax ? session.total_details.amount_tax / 100 : 0
+      const shippingCost = session.shipping_cost?.amount_subtotal
+        ? session.shipping_cost.amount_subtotal / 100
+        : 0
+      const discount = session.total_details?.amount_discount
+        ? session.total_details.amount_discount / 100
+        : 0
+      const tax = session.total_details?.amount_tax
+        ? session.total_details.amount_tax / 100
+        : 0
 
-      // 4. Create Order inside isolated inventory transaction
+      // 4. Create order (atomic inventory transaction inside)
       const order = await createOrder({
         orderNumber,
         userId,
@@ -111,22 +160,22 @@ export async function POST(req: Request) {
         total,
       })
 
-      // 5. Update Payment parameters & order billing statuses
+      // 5. Update payment status through state machine
       await updatePaymentStatus(
         order.id,
-        session.payment_intent as string || session.id,
+        (session.payment_intent as string) || session.id,
         PaymentStatus.COMPLETED,
         session.payment_method_details?.card?.brand || "Visa",
         session.payment_method_details?.card?.last4 || "4242"
       )
 
-      // 6. Purge active shopping carts
+      // 6. Purge checkout cart
       const cart = await db.cart.findUnique({ where: { userId } })
       if (cart) {
         await db.cartItem.deleteMany({ where: { cartId: cart.id } })
       }
 
-      // 7. Write audit log entries
+      // 7. Immutable audit log
       await db.auditLog.create({
         data: {
           userId,
@@ -136,11 +185,48 @@ export async function POST(req: Request) {
         },
       })
 
+      // 8. Mark webhook event as processed
+      await db.webhookEvent.update({
+        where: { id: webhookRecord.id },
+        data: { status: "PROCESSED", processedAt: new Date() },
+      })
+
     } catch (checkoutError: any) {
-      console.error("Critical webhook checkout operation failure:", checkoutError)
-      return NextResponse.json({ error: "Webhook processing transaction failed" }, { status: 500 })
+      console.error("[Webhook] Critical checkout failure:", checkoutError.message)
+
+      // Mark webhook event as failed
+      await db.webhookEvent.update({
+        where: { id: webhookRecord.id },
+        data: {
+          status: "FAILED",
+          errorMessage: checkoutError.message,
+          processedAt: new Date(),
+        },
+      }).catch(() => {})
+
+      // Route to Dead Letter Queue for retry/escalation
+      await sendToDLQ(
+        event.id,
+        "stripe_webhook",
+        { eventType: event.type, sessionId: session.id, metadata: session.metadata },
+        checkoutError.message
+      ).catch((dlqErr) => {
+        console.error("[Webhook] Failed to write to DLQ:", dlqErr.message)
+      })
+
+      // Return 200 to Stripe — do NOT let Stripe keep retrying (DLQ handles retry)
+      return NextResponse.json(
+        { received: true, status: "failed_routed_to_dlq" },
+        { status: 200 }
+      )
     }
+  } else {
+    // Non-checkout events: mark as processed immediately
+    await db.webhookEvent.update({
+      where: { id: webhookRecord.id },
+      data: { status: "PROCESSED", processedAt: new Date() },
+    })
   }
 
   return NextResponse.json({ received: true }, { status: 200 })
-}
+}, { rateLimitNamespace: "stripe_webhook", rateLimit: { limit: 100, windowMs: 10000 } })

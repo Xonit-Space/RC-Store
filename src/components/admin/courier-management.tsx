@@ -122,19 +122,19 @@ export function CourierManagement() {
       {/* Upper header section */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-800">Logistics & Courier Dashboard</h2>
-          <p className="text-xs text-slate-400 font-medium">Manage driver rosters, track shipments and issue waybills</p>
+          <h2 className="text-xl font-bold text-foreground">Logistics & Courier Dashboard</h2>
+          <p className="text-xs text-muted-foreground font-medium">Manage driver rosters, track shipments and issue waybills</p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={() => setIsAddCourierOpen(true)}
-            className="h-10 px-4 bg-blue-600 hover:bg-blue-700 active:scale-95 transition text-white font-bold text-xs rounded-xl flex items-center gap-2 shadow-sm"
+            className="h-10 px-4 bg-foreground hover:bg-foreground active:scale-95 transition text-white font-bold text-xs rounded-none flex items-center gap-2 shadow-sm"
           >
             <Plus className="w-4 h-4" /> Add Courier Driver
           </button>
           <button
             onClick={handleRefresh}
-            className="h-10 px-4 border border-slate-200 bg-white hover:bg-slate-50 rounded-xl text-xs font-bold text-slate-600 flex items-center gap-2 active:scale-95 transition"
+            className="h-10 px-4 border border-border/40 bg-white hover:bg-muted/5 rounded-none text-xs font-bold text-foreground/70 flex items-center gap-2 active:scale-95 transition"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} /> Refresh
           </button>
@@ -143,52 +143,52 @@ export function CourierManagement() {
 
       {/* Stats Widget Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white border border-slate-100 p-4 rounded-2xl flex items-center shadow-sm">
-          <div className="h-10 w-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+        <div className="bg-white border border-muted/10 p-4 rounded-none flex items-center shadow-sm">
+          <div className="h-10 w-10 rounded-none bg-foreground text-foreground flex items-center justify-center shrink-0">
             <Truck className="h-5 w-5" />
           </div>
           <div className="ml-3 min-w-0">
-            <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider truncate">Registered Drivers</p>
-            <p className="text-xl font-extrabold text-slate-800 mt-0.5">{stats.totalC}</p>
+            <p className="text-[10px] text-muted-foreground font-extrabold uppercase tracking-wider truncate">Registered Drivers</p>
+            <p className="text-xl font-extrabold text-foreground mt-0.5">{stats.totalC}</p>
           </div>
         </div>
 
-        <div className="bg-white border border-slate-100 p-4 rounded-2xl flex items-center shadow-sm">
-          <div className="h-10 w-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+        <div className="bg-white border border-muted/10 p-4 rounded-none flex items-center shadow-sm">
+          <div className="h-10 w-10 rounded-none bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
             <UserCheck className="h-5 w-5" />
           </div>
           <div className="ml-3 min-w-0">
-            <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider truncate">Active Roster</p>
-            <p className="text-xl font-extrabold text-slate-800 mt-0.5">{stats.activeC}</p>
+            <p className="text-[10px] text-muted-foreground font-extrabold uppercase tracking-wider truncate">Active Roster</p>
+            <p className="text-xl font-extrabold text-foreground mt-0.5">{stats.activeC}</p>
           </div>
         </div>
 
-        <div className="bg-white border border-slate-100 p-4 rounded-2xl flex items-center shadow-sm">
-          <div className="h-10 w-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+        <div className="bg-white border border-muted/10 p-4 rounded-none flex items-center shadow-sm">
+          <div className="h-10 w-10 rounded-none bg-foreground text-foreground flex items-center justify-center shrink-0">
             <Package className="h-5 w-5" />
           </div>
           <div className="ml-3 min-w-0">
-            <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider truncate">Total Packages</p>
-            <p className="text-xl font-extrabold text-slate-800 mt-0.5">{stats.totalD}</p>
+            <p className="text-[10px] text-muted-foreground font-extrabold uppercase tracking-wider truncate">Total Packages</p>
+            <p className="text-xl font-extrabold text-foreground mt-0.5">{stats.totalD}</p>
           </div>
         </div>
 
-        <div className="bg-white border border-slate-100 p-4 rounded-2xl flex items-center shadow-sm">
-          <div className="h-10 w-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+        <div className="bg-white border border-muted/10 p-4 rounded-none flex items-center shadow-sm">
+          <div className="h-10 w-10 rounded-none bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
             <Clock className="h-5 w-5" />
           </div>
           <div className="ml-3 min-w-0">
-            <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider truncate">Pending Dispatches</p>
-            <p className="text-xl font-extrabold text-slate-800 mt-0.5">{stats.pendingD}</p>
+            <p className="text-[10px] text-muted-foreground font-extrabold uppercase tracking-wider truncate">Pending Dispatches</p>
+            <p className="text-xl font-extrabold text-foreground mt-0.5">{stats.pendingD}</p>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {/* Active Couriers Drivers List */}
-        <div className="xl:col-span-1 bg-white border border-slate-100 rounded-2xl p-4 shadow-sm flex flex-col h-[520px]">
-          <h3 className="text-sm font-bold text-slate-800 mb-3 flex items-center gap-1.5">
-            <UserCheck className="h-4.5 w-4.5 text-blue-600" />
+        <div className="xl:col-span-1 bg-white border border-muted/10 rounded-none p-4 shadow-sm flex flex-col h-[520px]">
+          <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-1.5">
+            <UserCheck className="h-4.5 w-4.5 text-foreground" />
             <span>Delivery Roster</span>
           </h3>
 
@@ -199,13 +199,13 @@ export function CourierManagement() {
                 placeholder="Search driver..."
                 value={courierSearch}
                 onChange={(e) => setCourierSearch(e.target.value)}
-                className="pl-8 h-9 w-full bg-slate-50 border border-slate-100 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-primary/20 outline-none"
+                className="pl-8 h-9 w-full bg-muted/5 border border-muted/10 rounded-none text-xs font-semibold focus:ring-2 focus:ring-primary/20 outline-none"
               />
             </div>
             <select
               value={courierFilter}
               onChange={(e) => setCourierFilter(e.target.value)}
-              className="h-9 border border-slate-100 bg-slate-50 text-xs font-semibold px-2 rounded-lg outline-none"
+              className="h-9 border border-muted/10 bg-muted/5 text-xs font-semibold px-2 rounded-none outline-none"
             >
               <option value="all">All</option>
               <option value="ACTIVE">Active</option>
@@ -215,31 +215,31 @@ export function CourierManagement() {
 
           <div className="flex-1 overflow-y-auto space-y-2 pr-1">
             {filteredCouriers.map((c) => (
-              <div key={c.id} className="border border-slate-50 bg-slate-50/50 p-3 rounded-xl flex items-center justify-between hover:bg-slate-50 transition">
+              <div key={c.id} className="border border-muted/5 bg-muted/5/50 p-3 rounded-none flex items-center justify-between hover:bg-muted/5 transition">
                 <div className="min-w-0">
-                  <p className="font-bold text-slate-800 text-xs truncate">{c.name}</p>
-                  <p className="text-[10px] text-slate-400 font-bold mt-0.5">📞 {c.phone}</p>
+                  <p className="font-bold text-foreground text-xs truncate">{c.name}</p>
+                  <p className="text-[10px] text-muted-foreground font-bold mt-0.5">📞 {c.phone}</p>
                   <div className="flex items-center gap-2 mt-1">
                     <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full ${
-                      c.status === "ACTIVE" ? "bg-emerald-100 text-emerald-800" : "bg-slate-100 text-slate-800"
+                      c.status === "ACTIVE" ? "bg-emerald-100 text-emerald-800" : "bg-muted/10 text-foreground"
                     }`}>
                       {c.status}
                     </span>
-                    <span className="text-[9px] text-slate-400 font-bold">⭐ {c.rating} ({c.totalDeliveries} trips)</span>
+                    <span className="text-[9px] text-muted-foreground font-bold">⭐ {c.rating} ({c.totalDeliveries} trips)</span>
                   </div>
                 </div>
               </div>
             ))}
             {filteredCouriers.length === 0 && (
-              <p className="text-center text-xs font-bold text-slate-400 py-12">No drivers registered</p>
+              <p className="text-center text-xs font-bold text-muted-foreground py-12">No drivers registered</p>
             )}
           </div>
         </div>
 
         {/* Deliveries Dispatch Log Table */}
-        <div className="xl:col-span-2 bg-white border border-slate-100 rounded-2xl p-4 shadow-sm flex flex-col h-[520px]">
-          <h3 className="text-sm font-bold text-slate-800 mb-3 flex items-center gap-1.5">
-            <Package className="h-4.5 w-4.5 text-purple-600" />
+        <div className="xl:col-span-2 bg-white border border-muted/10 rounded-none p-4 shadow-sm flex flex-col h-[520px]">
+          <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-1.5">
+            <Package className="h-4.5 w-4.5 text-foreground" />
             <span>Active Dispatch Log</span>
           </h3>
 
@@ -250,7 +250,7 @@ export function CourierManagement() {
                 placeholder="Search Order Number or Customer..."
                 value={deliverySearch}
                 onChange={(e) => setDeliverySearch(e.target.value)}
-                className="pl-8 h-9 w-full bg-slate-50 border border-slate-100 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-primary/20 outline-none"
+                className="pl-8 h-9 w-full bg-muted/5 border border-muted/10 rounded-none text-xs font-semibold focus:ring-2 focus:ring-primary/20 outline-none"
               />
             </div>
 
@@ -259,10 +259,10 @@ export function CourierManagement() {
                 <button
                   key={status}
                   onClick={() => setDeliveryFilter(status)}
-                  className={`px-3 py-1.5 text-[10px] font-extrabold rounded-lg border capitalize transition ${
+                  className={`px-3 py-1.5 text-[10px] font-extrabold rounded-none border capitalize transition ${
                     deliveryFilter === status
-                      ? "bg-slate-900 text-white border-slate-900"
-                      : "bg-white hover:bg-slate-50 border-slate-200 text-slate-600"
+                      ? "bg-foreground text-white border-foreground"
+                      : "bg-white hover:bg-muted/5 border-border/40 text-foreground/70"
                   }`}
                 >
                   {status === "all" ? "All Shipments" : status.toLowerCase()}
@@ -274,7 +274,7 @@ export function CourierManagement() {
           <div className="flex-1 overflow-x-auto overflow-y-auto pr-1">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-slate-100 text-[10px] font-extrabold text-slate-400 uppercase">
+                <tr className="border-b border-muted/10 text-[10px] font-extrabold text-muted-foreground uppercase">
                   <th className="py-2.5 font-extrabold">Order / Code</th>
                   <th className="py-2.5 font-extrabold">Recipient</th>
                   <th className="py-2.5 font-extrabold">Courier Driver</th>
@@ -282,25 +282,25 @@ export function CourierManagement() {
                   <th className="py-2.5 font-extrabold text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
+              <tbody className="divide-y divide-muted/5">
                 {filteredDeliveries.map((d) => (
-                  <tr key={d.id} className="hover:bg-slate-50/50 transition">
+                  <tr key={d.id} className="hover:bg-muted/5/50 transition">
                     <td className="py-3 pr-2">
-                      <p className="font-extrabold text-slate-800">{d.orderNumber}</p>
-                      <p className="text-[9px] text-slate-400 font-bold mt-0.5 truncate max-w-28">{d.trackingNumber}</p>
+                      <p className="font-extrabold text-foreground">{d.orderNumber}</p>
+                      <p className="text-[9px] text-muted-foreground font-bold mt-0.5 truncate max-w-28">{d.trackingNumber}</p>
                     </td>
                     <td className="py-3 pr-2">
-                      <p className="font-bold text-slate-800">{d.customerName}</p>
-                      <p className="text-[9px] text-slate-400 font-bold mt-0.5 truncate max-w-32">📍 {d.address}</p>
+                      <p className="font-bold text-foreground">{d.customerName}</p>
+                      <p className="text-[9px] text-muted-foreground font-bold mt-0.5 truncate max-w-32">📍 {d.address}</p>
                     </td>
-                    <td className="py-3 pr-2 font-semibold text-slate-600">
+                    <td className="py-3 pr-2 font-semibold text-foreground/70">
                       {d.courierName ? (
                         <div className="flex items-center gap-1">
-                          <Truck className="h-3 w-3 text-slate-400" />
+                          <Truck className="h-3 w-3 text-muted-foreground" />
                           <span>{d.courierName}</span>
                         </div>
                       ) : (
-                        <span className="text-[10px] text-slate-400 font-bold italic">Unassigned</span>
+                        <span className="text-[10px] text-muted-foreground font-bold italic">Unassigned</span>
                       )}
                     </td>
                     <td className="py-3 pr-2 text-center">
@@ -308,7 +308,7 @@ export function CourierManagement() {
                         d.status === "DELIVERED"
                           ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
                           : d.status === "DISPATCHED"
-                          ? "bg-blue-50 text-blue-700 border border-blue-100"
+                          ? "bg-foreground text-foreground border border-foreground"
                           : "bg-amber-50 text-amber-700 border border-amber-100"
                       }`}>
                         {d.status}
@@ -317,7 +317,7 @@ export function CourierManagement() {
                     <td className="py-3 text-right">
                       <button
                         onClick={() => setSelectedDeliveryForWaybill(d)}
-                        className="h-7 w-7 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 inline-flex items-center justify-center active:scale-95 transition"
+                        className="h-7 w-7 rounded-none border border-border/40 text-foreground/70 hover:bg-muted/5 inline-flex items-center justify-center active:scale-95 transition"
                         title="Print Waybill Label"
                       >
                         <Printer className="h-3.5 w-3.5" />
@@ -327,7 +327,7 @@ export function CourierManagement() {
                 ))}
                 {filteredDeliveries.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="py-12 text-center text-xs font-bold text-slate-400">
+                    <td colSpan={5} className="py-12 text-center text-xs font-bold text-muted-foreground">
                       No active shipments matching filters
                     </td>
                   </tr>
@@ -341,12 +341,12 @@ export function CourierManagement() {
       {/* ── ADD COURIER MODAL ── */}
       {isAddCourierOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl animate-in scale-in duration-200">
+          <div className="bg-white rounded-none p-6 w-full max-w-md shadow-2xl animate-in scale-in duration-200">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-bold text-slate-800">Add New Courier Driver</h3>
+              <h3 className="text-lg font-bold text-foreground">Add New Courier Driver</h3>
               <button
                 onClick={() => setIsAddCourierOpen(false)}
-                className="h-8 w-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 transition"
+                className="h-8 w-8 rounded-full hover:bg-muted/10 flex items-center justify-center text-muted/50 transition"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -354,44 +354,44 @@ export function CourierManagement() {
 
             <form onSubmit={handleAddCourierSubmit} className="space-y-4">
               <div>
-                <label className="text-xs font-bold text-slate-500 block mb-1">Driver&apos;s Name</label>
+                <label className="text-xs font-bold text-muted/50 block mb-1">Driver&apos;s Name</label>
                 <input
                   value={courierName}
                   onChange={(e) => setCourierName(e.target.value)}
                   required
-                  className="h-11 w-full border border-slate-200 px-3 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 text-sm font-medium"
+                  className="h-11 w-full border border-border/40 px-3 rounded-none outline-none focus:ring-2 focus:ring-primary/20 text-sm font-medium"
                   placeholder="Enter full name"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-500 block mb-1">Phone Number</label>
+                <label className="text-xs font-bold text-muted/50 block mb-1">Phone Number</label>
                 <input
                   value={courierPhone}
                   onChange={(e) => setCourierPhone(e.target.value)}
                   required
-                  className="h-11 w-full border border-slate-200 px-3 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 text-sm font-medium"
+                  className="h-11 w-full border border-border/40 px-3 rounded-none outline-none focus:ring-2 focus:ring-primary/20 text-sm font-medium"
                   placeholder="e.g. +94 77 987 6543"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-500 block mb-1">Email Address</label>
+                <label className="text-xs font-bold text-muted/50 block mb-1">Email Address</label>
                 <input
                   value={courierEmail}
                   onChange={(e) => setCourierEmail(e.target.value)}
                   type="email"
-                  className="h-11 w-full border border-slate-200 px-3 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 text-sm font-medium"
+                  className="h-11 w-full border border-border/40 px-3 rounded-none outline-none focus:ring-2 focus:ring-primary/20 text-sm font-medium"
                   placeholder="driver@couriers.com"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-500 block mb-1">Roster Status</label>
+                <label className="text-xs font-bold text-muted/50 block mb-1">Roster Status</label>
                 <select
                   value={courierStatus}
                   onChange={(e) => setCourierStatus(e.target.value)}
-                  className="h-11 w-full border border-slate-200 px-3 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 text-sm font-semibold"
+                  className="h-11 w-full border border-border/40 px-3 rounded-none outline-none focus:ring-2 focus:ring-primary/20 text-sm font-semibold"
                 >
                   <option value="ACTIVE">Active (On Call)</option>
                   <option value="INACTIVE">Inactive (Off Roster)</option>
@@ -400,7 +400,7 @@ export function CourierManagement() {
 
               <button
                 type="submit"
-                className="w-full h-12 bg-primary text-white rounded-xl text-xs font-bold hover:bg-primary/95 transition mt-6 active:scale-95 shadow"
+                className="w-full h-12 bg-primary text-white rounded-none text-xs font-bold hover:bg-primary/95 transition mt-6 active:scale-95 shadow"
               >
                 Save Driver Profile
               </button>
@@ -412,81 +412,81 @@ export function CourierManagement() {
       {/* ── PRINTABLE THERMAL WAYBILL MODAL ── */}
       {selectedDeliveryForWaybill && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl flex flex-col animate-in scale-in duration-200">
+          <div className="bg-white rounded-none w-full max-w-sm overflow-hidden shadow-2xl flex flex-col animate-in scale-in duration-200">
             {/* Header toolbar */}
             <div className="flex justify-between items-center p-4 border-b">
-              <h4 className="text-xs font-extrabold text-slate-700 uppercase tracking-wide">Waybill Thermal Preview</h4>
+              <h4 className="text-xs font-extrabold text-foreground uppercase tracking-wide">Waybill Thermal Preview</h4>
               <button
                 onClick={() => setSelectedDeliveryForWaybill(null)}
-                className="h-7 w-7 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 transition"
+                className="h-7 w-7 rounded-full hover:bg-muted/10 flex items-center justify-center text-muted/50 transition"
               >
                 <X className="h-4.5 w-4.5" />
               </button>
             </div>
 
             {/* Thermal Slip Content */}
-            <div className="p-6 bg-slate-50 overflow-y-auto max-h-[380px]">
-              <div className="bg-white border-2 border-slate-200 p-4 rounded-xl shadow-inner font-mono text-[11px] text-slate-800 space-y-4">
+            <div className="p-6 bg-muted/5 overflow-y-auto max-h-[380px]">
+              <div className="bg-white border-2 border-border/40 p-4 rounded-none shadow-inner font-mono text-[11px] text-foreground space-y-4">
                 <div className="text-center space-y-1">
-                  <h3 className="font-extrabold text-sm uppercase tracking-widest text-slate-900">NEOSHOP LOGISTICS</h3>
-                  <p className="text-[9px] text-slate-400 font-bold">1 Waybill Ave, Colombo, LK</p>
+                  <h3 className="font-extrabold text-sm uppercase tracking-widest text-foreground">NEOSHOP LOGISTICS</h3>
+                  <p className="text-[9px] text-muted-foreground font-bold">1 Waybill Ave, Colombo, LK</p>
                   <p className="text-[10px] font-extrabold pt-2">TRACKING SLIP PREVIEW</p>
                 </div>
 
-                <div className="border-t border-dashed border-slate-200 pt-3 space-y-1.5">
+                <div className="border-t border-dashed border-border/40 pt-3 space-y-1.5">
                   <div className="flex justify-between">
-                    <span className="text-slate-400">ORDER NO:</span>
+                    <span className="text-muted-foreground">ORDER NO:</span>
                     <span className="font-bold">{selectedDeliveryForWaybill.orderNumber}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">WAYBILL:</span>
+                    <span className="text-muted-foreground">WAYBILL:</span>
                     <span className="font-bold text-[10px]">{selectedDeliveryForWaybill.trackingNumber || "PENDING"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">DATE:</span>
+                    <span className="text-muted-foreground">DATE:</span>
                     <span className="font-bold">2026-05-27</span>
                   </div>
                 </div>
 
-                <div className="border-t border-dashed border-slate-200 pt-3 space-y-1">
-                  <p className="text-slate-400 font-extrabold">DELIVER TO RECIPIENT:</p>
-                  <p className="font-extrabold text-slate-900 text-xs">{selectedDeliveryForWaybill.customerName}</p>
-                  <p className="text-slate-500 leading-tight text-[10px] font-bold">{selectedDeliveryForWaybill.address}</p>
-                  <p className="text-slate-500 text-[10px] font-bold">📞 {selectedDeliveryForWaybill.customerPhone}</p>
+                <div className="border-t border-dashed border-border/40 pt-3 space-y-1">
+                  <p className="text-muted-foreground font-extrabold">DELIVER TO RECIPIENT:</p>
+                  <p className="font-extrabold text-foreground text-xs">{selectedDeliveryForWaybill.customerName}</p>
+                  <p className="text-muted/50 leading-tight text-[10px] font-bold">{selectedDeliveryForWaybill.address}</p>
+                  <p className="text-muted/50 text-[10px] font-bold">📞 {selectedDeliveryForWaybill.customerPhone}</p>
                 </div>
 
-                <div className="border-t border-dashed border-slate-200 pt-3 space-y-1">
+                <div className="border-t border-dashed border-border/40 pt-3 space-y-1">
                   <div className="flex justify-between">
-                    <span className="text-slate-400">DISPATCHED BY:</span>
+                    <span className="text-muted-foreground">DISPATCHED BY:</span>
                     <span className="font-bold">{selectedDeliveryForWaybill.courierName || "General Logistics"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">DISPATCH NOTES:</span>
+                    <span className="text-muted-foreground">DISPATCH NOTES:</span>
                     <span className="font-bold">{selectedDeliveryForWaybill.notes || "Fragile Care"}</span>
                   </div>
                 </div>
 
-                <div className="border-t-2 border-dashed border-slate-300 pt-4 flex flex-col items-center justify-center space-y-1">
+                <div className="border-t-2 border-dashed border-muted-foreground/30 pt-4 flex flex-col items-center justify-center space-y-1">
                   {/* Mock Barcode Block */}
-                  <div className="w-48 h-8 bg-slate-900 flex items-center justify-center text-white text-[9px] tracking-[6px] font-extrabold">
+                  <div className="w-48 h-8 bg-foreground flex items-center justify-center text-white text-[9px] tracking-[6px] font-extrabold">
                     *SL123456789*
                   </div>
-                  <p className="text-[8px] text-slate-400 font-bold uppercase tracking-wider">Scan waybill upon delivery arrival</p>
+                  <p className="text-[8px] text-muted-foreground font-bold uppercase tracking-wider">Scan waybill upon delivery arrival</p>
                 </div>
               </div>
             </div>
 
             {/* Print trigger */}
-            <div className="p-4 border-t bg-slate-50/50 flex gap-3">
+            <div className="p-4 border-t bg-muted/5/50 flex gap-3">
               <button
                 onClick={() => setSelectedDeliveryForWaybill(null)}
-                className="flex-1 h-11 border border-slate-200 hover:bg-slate-100 rounded-xl text-xs font-bold text-slate-600 transition"
+                className="flex-1 h-11 border border-border/40 hover:bg-muted/10 rounded-none text-xs font-bold text-foreground/70 transition"
               >
                 Close Preview
               </button>
               <button
                 onClick={() => window.print()}
-                className="flex-1 h-11 bg-slate-900 text-white hover:bg-slate-800 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95 shadow"
+                className="flex-1 h-11 bg-foreground text-white hover:bg-foreground rounded-none text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95 shadow"
               >
                 <Printer className="h-4 w-4" /> Print Thermal
               </button>

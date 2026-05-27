@@ -4,9 +4,7 @@ import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Plus, Trash2, Search, Package, RefreshCw, X, Coins } from "lucide-react"
+import { Plus, Trash2, Search, Package, RefreshCw, X } from "lucide-react"
 import { toast } from "sonner"
 import { adminCreateProduct, adminDeleteProduct } from "@/actions/product"
 
@@ -116,128 +114,127 @@ export default function AdminProductsPage() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center p-12 h-64">
-        <RefreshCw className="h-8 w-8 text-primary animate-spin" />
-        <span className="text-xs font-bold text-slate-400 mt-2">Loading products catalog...</span>
+        <RefreshCw className="h-8 w-8 text-foreground animate-spin" />
+        <span className="text-[10px] uppercase tracking-widest text-muted-foreground mt-4 font-bold">Loading Catalog...</span>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6 font-sans">
-      <div className="flex items-center justify-between pb-4 border-b">
+    <div className="space-y-8 font-sans">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-border/40">
         <div>
-          <h2 className="text-2xl font-extrabold text-slate-800 tracking-tight leading-snug">Product Catalog Management</h2>
-          <p className="text-xs text-slate-400 font-semibold mt-0.5">Add, edit, or delete storefront catalog listings.</p>
+          <p className="text-[10px] tracking-[0.25em] uppercase text-muted-foreground mb-1">
+            Inventory
+          </p>
+          <h2 className="font-sans text-3xl font-light text-foreground leading-none">
+            Product Catalog
+          </h2>
         </div>
         <Button
           onClick={() => setIsOpen(true)}
-          className="h-11 px-5 rounded-xl bg-primary text-white font-bold"
+          className="h-12 px-6 rounded-none bg-foreground text-background font-bold text-xs tracking-widest uppercase hover:bg-foreground/90 transition-colors"
         >
-          <Plus className="h-4.5 w-4.5 mr-2" /> Add Product
+          <Plus className="h-4 w-4 mr-2" /> Add Product
         </Button>
       </div>
 
       <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Search products..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pl-9 h-11 border-slate-200 focus:border-primary rounded-xl text-sm outline-none"
+          className="pl-12 h-12 bg-transparent border-border/40 rounded-none focus-visible:ring-0 focus-visible:border-foreground transition-colors placeholder:uppercase placeholder:tracking-wider placeholder:text-[10px]"
         />
       </div>
 
       {filteredProducts.length === 0 ? (
-        <Card className="border border-dashed p-12 text-center rounded-2xl">
-          <Package className="h-12 w-12 text-slate-300 mx-auto mb-2" />
-          <p className="text-sm font-bold text-slate-700">No products found</p>
-        </Card>
+        <div className="border border-border/40 p-12 text-center bg-background">
+          <Package className="h-10 w-10 text-muted-foreground/30 mx-auto mb-4" />
+          <p className="text-xs uppercase tracking-widest font-bold text-muted-foreground">No products found</p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.map((p) => (
-            <Card key={p.id} className="border border-slate-100 rounded-2xl shadow-sm bg-card overflow-hidden flex flex-col justify-between">
-              <div className="p-5 space-y-4">
-                <div className="flex justify-between items-start">
+            <div key={p.id} className="border border-border/40 bg-background flex flex-col justify-between group transition-colors hover:border-foreground/30">
+              <div className="p-6 space-y-4">
+                <div className="flex justify-between items-start gap-4">
                   <div>
-                    <h3 className="text-sm font-extrabold text-slate-800 line-clamp-1">{p.name}</h3>
-                    <Badge variant="secondary" className="text-[9px] font-extrabold bg-slate-100 text-slate-500 uppercase mt-1">
+                    <h3 className="font-sans text-lg font-light text-foreground line-clamp-2 leading-tight mb-2">{p.name}</h3>
+                    <span className="inline-block text-[9px] font-bold tracking-[0.2em] text-muted-foreground uppercase border border-border/40 px-2 py-1">
                       {p.gender}
-                    </Badge>
+                    </span>
                   </div>
-                  <span className="text-sm font-extrabold text-primary">Rs. {p.price.toFixed(2)}</span>
+                  <span className="text-sm font-bold text-foreground whitespace-nowrap">Rs. {p.price.toFixed(2)}</span>
                 </div>
-                <p className="text-xs text-slate-400 font-semibold line-clamp-2 leading-relaxed">{p.description}</p>
+                <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">{p.description}</p>
               </div>
 
-              <div className="bg-slate-50/50 border-t border-slate-100 p-4 flex justify-end">
-                <Button
+              <div className="border-t border-border/40 p-4 flex justify-end bg-muted/5">
+                <button
                   onClick={() => handleDelete(p.id)}
-                  variant="outline"
-                  size="sm"
-                  className="rounded-lg border-red-100 hover:bg-red-50 text-red-500 text-xs font-bold"
+                  className="flex items-center text-[10px] uppercase tracking-widest font-bold text-terracotta hover:text-red-700 transition-colors px-3 py-2"
                 >
-                  <Trash2 className="w-4 h-4 mr-1.5" /> Delete
-                </Button>
+                  <Trash2 className="w-3.5 h-3.5 mr-2" /> Remove
+                </button>
               </div>
-            </Card>
+            </div>
           ))}
         </div>
       )}
 
-      {/* Add Product Modal Overlay */}
+      {/* Add Product Modal */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 bg-[#0e0918]/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-white border border-slate-100 shadow-2xl rounded-2xl p-6 relative animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-background border border-border shadow-2xl p-8 relative">
             <button
               onClick={() => setIsOpen(false)}
-              className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition"
+              className="absolute right-6 top-6 text-muted-foreground hover:text-foreground transition"
             >
               <X className="h-5 w-5" />
             </button>
 
-            <h3 className="text-lg font-bold text-slate-800 mb-1">Add New Catalog Product</h3>
-            <p className="text-xs text-slate-400 mb-6 font-semibold">Enter the platform parameters for the new inventory item.</p>
+            <h3 className="font-sans text-2xl font-light text-foreground mb-2">New Product</h3>
+            <p className="text-[10px] tracking-widest uppercase text-muted-foreground mb-8">Define catalog item parameters</p>
 
-            <form onSubmit={handleCreate} className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Product Name</label>
+            <form onSubmit={handleCreate} className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">Product Name</label>
                 <Input
                   type="text"
-                  placeholder="e.g. Premium Leather Jacket"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="h-10 border-slate-200 rounded-xl"
+                  className="h-12 bg-transparent border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-foreground"
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Description</label>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">Description</label>
                 <Input
                   type="text"
-                  placeholder="Product catalog description details..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="h-10 border-slate-200 rounded-xl"
+                  className="h-12 bg-transparent border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-foreground"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Price (Rs.)</label>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">Price (Rs.)</label>
                   <Input
                     type="number"
-                    placeholder="999.00"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
-                    className="h-10 border-slate-200 rounded-xl"
+                    className="h-12 bg-transparent border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-foreground"
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Category</label>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">Category</label>
                   <select
                     value={categoryId}
                     onChange={(e) => setCategoryId(e.target.value)}
-                    className="h-10 border border-slate-200 rounded-xl w-full text-xs font-bold text-slate-600 px-3 outline-none"
+                    className="h-12 bg-transparent border border-border/60 rounded-none w-full text-xs text-foreground px-3 outline-none focus:border-foreground"
                   >
                     {categories.map((cat) => (
                       <option key={cat.id} value={cat.id}>
@@ -248,12 +245,12 @@ export default function AdminProductsPage() {
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Gender Target</label>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">Target Group</label>
                 <select
                   value={gender}
                   onChange={(e) => setGender(e.target.value as any)}
-                  className="h-10 border border-slate-200 rounded-xl w-full text-xs font-bold text-slate-600 px-3 outline-none"
+                  className="h-12 bg-transparent border border-border/60 rounded-none w-full text-xs text-foreground px-3 outline-none focus:border-foreground"
                 >
                   <option value="UNISEX">Unisex</option>
                   <option value="MEN">Men</option>
@@ -262,21 +259,21 @@ export default function AdminProductsPage() {
                 </select>
               </div>
 
-              <div className="flex gap-3 justify-end pt-4 border-t">
+              <div className="flex gap-4 justify-end pt-6 border-t border-border/40 mt-8">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setIsOpen(false)}
-                  className="h-10 rounded-xl text-xs font-bold"
+                  className="h-12 rounded-none border-border/60 text-foreground text-xs font-bold uppercase tracking-widest"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="h-10 rounded-xl bg-primary text-white text-xs font-bold"
+                  className="h-12 rounded-none bg-foreground text-background text-xs font-bold uppercase tracking-widest px-8"
                 >
-                  {isSubmitting ? "Creating..." : "Create Product"}
+                  {isSubmitting ? "Creating..." : "Save"}
                 </Button>
               </div>
             </form>

@@ -83,7 +83,7 @@ export default function CustomerProfilePage() {
         <div className="flex-grow flex items-center justify-center p-12">
           <div className="flex flex-col items-center gap-2">
             <RefreshCw className="h-10 w-10 text-primary animate-spin" />
-            <span className="text-sm font-bold text-slate-500">Loading profile details...</span>
+            <span className="text-sm font-bold text-muted/50">Loading profile details...</span>
           </div>
         </div>
         <Footer />
@@ -92,61 +92,61 @@ export default function CustomerProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col justify-between text-slate-800 font-sans">
+    <div className="min-h-screen bg-background flex flex-col justify-between text-foreground font-sans">
       <Header />
 
       <main className="flex-grow container mx-auto px-4 py-8 space-y-6">
         {/* Navigation Breadcrumb */}
-        <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+        <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
           <a href="/customer" className="hover:text-primary transition flex items-center gap-1"><Home className="w-3.5 h-3.5" /> Dashboard</a>
           <ChevronRight className="w-3 h-3" />
-          <span className="text-slate-600">Profile Settings</span>
+          <span className="text-foreground/70">Profile Settings</span>
         </div>
 
         <div className="flex items-center justify-between pb-4 border-b">
           <div>
-            <h2 className="text-2xl font-extrabold text-slate-800 tracking-tight leading-snug">Profile Settings</h2>
-            <p className="text-xs text-slate-400 font-semibold mt-0.5">Manage your personal identification details.</p>
+            <h2 className="text-2xl font-extrabold text-foreground tracking-tight leading-snug">Profile Settings</h2>
+            <p className="text-xs text-muted-foreground font-semibold mt-0.5">Manage your personal identification details.</p>
           </div>
           <User className="w-8 h-8 text-primary" />
         </div>
 
         <div className="max-w-2xl">
-          <Card className="border border-slate-100 rounded-2xl shadow-sm bg-card overflow-hidden">
-            <CardHeader className="bg-slate-50 border-b border-slate-100 p-6">
-              <CardTitle className="text-sm font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+          <Card className="border border-muted/10 rounded-none shadow-sm bg-card overflow-hidden">
+            <CardHeader className="bg-muted/5 border-b border-muted/10 p-6">
+              <CardTitle className="text-sm font-extrabold text-foreground uppercase tracking-wider flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-emerald-500" /> Account Security Profile
               </CardTitle>
-              <CardDescription className="text-xs text-slate-400 font-bold">
+              <CardDescription className="text-xs text-muted-foreground font-bold">
                 Keep your details updated to secure your transactions.
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6">
               <form onSubmit={handleSaveProfile} className="space-y-6">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Full Name</label>
+                  <label className="text-xs font-bold text-muted/50 uppercase tracking-wider block">Full Name</label>
                   <Input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="h-11 border-slate-200 focus:border-primary rounded-xl outline-none focus:ring-2 focus:ring-primary/10 text-sm font-medium transition"
+                    className="h-11 border-border/40 focus:border-primary rounded-none outline-none focus:ring-2 focus:ring-primary/10 text-sm font-medium transition"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Email Address (Read-only)</label>
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">Email Address (Read-only)</label>
                   <Input
                     type="email"
                     value={profile?.email || ""}
                     disabled
-                    className="h-11 border-slate-200 bg-slate-50 text-slate-400 rounded-xl outline-none text-sm font-bold cursor-not-allowed"
+                    className="h-11 border-border/40 bg-muted/5 text-muted-foreground rounded-none outline-none text-sm font-bold cursor-not-allowed"
                   />
                 </div>
 
                 <Button
                   type="submit"
                   disabled={saving}
-                  className="h-11 px-6 rounded-xl bg-primary hover:bg-primary/95 text-white text-xs font-bold transition active:scale-95 shadow-md shadow-primary/10"
+                  className="h-11 px-6 rounded-none bg-primary hover:bg-primary/95 text-white text-xs font-bold transition active:scale-95 shadow-md shadow-primary/10"
                 >
                   {saving ? "Saving Changes..." : "Save Changes"}
                 </Button>

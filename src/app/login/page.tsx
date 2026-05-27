@@ -6,8 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Mail, Lock, AlertCircle, Sparkles } from "lucide-react"
+import { AlertCircle, Sparkles } from "lucide-react"
 import { toast } from "sonner"
 
 export default function LoginPage() {
@@ -35,9 +34,9 @@ export default function LoginPage() {
 
       if (result?.error) {
         setError(result.error)
-        toast.error(result.error)
+        toast.error("Invalid credentials")
       } else {
-        toast.success("Successfully logged in!")
+        toast.success("Authentication successful")
         router.push(callbackUrl)
         router.refresh()
       }
@@ -49,114 +48,129 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-background to-background p-4">
-      <div className="absolute inset-0 bg-grid-white/[0.02] -z-10" />
+    <div className="min-h-screen flex flex-col font-sans bg-background">
+      <div className="flex-1 flex flex-col justify-center items-center px-6 py-12 lg:px-8">
+        
+        <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-10">
+          <Link href="/" className="inline-block">
+            <h1 className="text-3xl font-serif tracking-tight text-foreground font-light">NEOSHOP ULTRA</h1>
+          </Link>
+          <p className="mt-4 text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-bold">
+            Client Authentication
+          </p>
+        </div>
 
-      <Card className="w-full max-w-md bg-card/60 backdrop-blur-xl border-slate-200/50 shadow-2xl animate-in fade-in duration-300">
-        <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            NEOSHOP ULTRA
-          </CardTitle>
-          <CardDescription className="text-sm font-semibold">
-            Sign in to check out products, manage carts, or track rosters
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <div className="flex items-center gap-2.5 p-3.5 bg-red-50 border border-red-200 text-red-700 text-xs font-bold rounded-xl animate-in slide-in-from-top-1">
-                <AlertCircle className="h-4.5 w-4.5 shrink-0" />
-                <p>{error}</p>
-              </div>
-            )}
+        <div className="sm:mx-auto sm:w-full sm:max-w-[400px]">
+          <div className="bg-background py-10 px-8 md:px-10 border border-border/40 shadow-sm">
+            <form className="space-y-6" onSubmit={handleSubmit}>
+              {error && (
+                <div className="flex items-center gap-3 p-4 bg-red-50/50 border border-red-100 text-red-900 text-xs font-medium">
+                  <AlertCircle className="h-4 w-4 shrink-0 text-red-600" />
+                  <p>{error}</p>
+                </div>
+              )}
 
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 block">Email Address</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-muted-foreground" />
+              <div className="space-y-2">
+                <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-foreground">
+                  Email Address
+                </label>
                 <Input
                   type="email"
-                  placeholder="hello@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="pl-10 h-11 bg-muted/30 border-slate-200 rounded-xl"
+                  className="h-12 bg-transparent border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-foreground transition-colors"
                 />
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <label className="text-xs font-bold text-slate-500 block">Password</label>
-                <Link href="#" className="text-xs font-bold text-blue-600 hover:text-blue-800">
-                  Forgot?
-                </Link>
-              </div>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-muted-foreground" />
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-foreground">
+                    Password
+                  </label>
+                  <Link href="/forgot-password" className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground hover:text-foreground transition-colors">
+                    Reset
+                  </Link>
+                </div>
                 <Input
                   type="password"
-                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="pl-10 h-11 bg-muted/30 border-slate-200 rounded-xl"
+                  className="h-12 bg-transparent border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-foreground transition-colors"
                 />
               </div>
-            </div>
 
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full h-11 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 font-bold rounded-xl shadow-lg active:scale-95 transition mt-2"
-            >
-              {loading ? "Authenticating session..." : "Sign In"}
-            </Button>
-
-            <div className="my-4 border-t border-dashed border-slate-200/50" />
-
-            {/* Quick Demo Credentials Assistant */}
-            <div className="p-3 bg-muted/30 border border-slate-200/50 rounded-xl space-y-1.5 text-xs text-muted-foreground">
-              <span className="font-bold flex items-center gap-1 text-slate-700">
-                <Sparkles className="h-3.5 w-3.5 text-yellow-500 animate-pulse" /> Quick Access Demo Accounts:
-              </span>
-              <div className="grid grid-cols-2 gap-2 text-[10px] font-semibold">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEmail("demo@neoshop.com")
-                    setPassword("neoshop_secure_password_2026")
-                  }}
-                  className="p-1.5 border border-slate-200 bg-white rounded-lg text-left hover:bg-slate-50 transition"
+              <div>
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 rounded-none font-bold text-xs tracking-widest uppercase transition-all"
                 >
-                  <span className="font-extrabold text-blue-600 block">Customer</span>
-                  demo@neoshop.com
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEmail("admin@neoshop.com")
-                    setPassword("neoshop_secure_password_2026")
-                  }}
-                  className="p-1.5 border border-slate-200 bg-white rounded-lg text-left hover:bg-slate-50 transition"
-                >
-                  <span className="font-extrabold text-purple-600 block">Admin ERP</span>
-                  admin@neoshop.com
-                </button>
+                  {loading ? "Authenticating..." : "Sign In"}
+                </Button>
               </div>
-            </div>
 
-            <div className="text-center pt-2">
-              <span className="text-xs text-muted-foreground font-semibold">
-                Don&apos;t have an account?{" "}
-                <Link href="/register" className="text-blue-600 hover:text-blue-800 font-bold">
-                  Sign Up
-                </Link>
-              </span>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+              <div className="mt-8 border-t border-border/40 pt-6">
+                <div className="flex flex-col space-y-4">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Sparkles className="h-3 w-3 text-muted-foreground" />
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                      Demo Access
+                    </span>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEmail("customer@neoshop.com")
+                        setPassword("Customer123!")
+                      }}
+                      className="p-3 border border-border/40 bg-muted/10 hover:bg-muted/30 transition-colors text-left group"
+                    >
+                      <span className="block text-[10px] font-bold uppercase tracking-wider text-foreground mb-1">Customer</span>
+                      <span className="block text-xs text-muted-foreground group-hover:text-foreground transition-colors truncate">customer@neoshop.com</span>
+                    </button>
+                    
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEmail("admin@neoshop.com")
+                        setPassword("Admin123!")
+                      }}
+                      className="p-3 border border-border/40 bg-muted/10 hover:bg-muted/30 transition-colors text-left group"
+                    >
+                      <span className="block text-[10px] font-bold uppercase tracking-wider text-foreground mb-1">Administrator</span>
+                      <span className="block text-xs text-muted-foreground group-hover:text-foreground transition-colors truncate">admin@neoshop.com</span>
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 mt-0 pt-0">
+                    <button
+                        type="button"
+                        onClick={() => {
+                          setEmail("staff@neoshop.com")
+                          setPassword("Staff123!")
+                        }}
+                        className="p-3 border border-border/40 bg-muted/10 hover:bg-muted/30 transition-colors text-left group"
+                      >
+                        <span className="block text-[10px] font-bold uppercase tracking-wider text-foreground mb-1">Staff Member</span>
+                        <span className="block text-xs text-muted-foreground group-hover:text-foreground transition-colors truncate">staff@neoshop.com</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <p className="mt-8 text-center text-[10px] uppercase tracking-[0.1em] text-muted-foreground">
+            Don't have an account?{" "}
+            <Link href="/register" className="font-bold text-foreground border-b border-foreground/30 hover:border-foreground transition-colors pb-0.5">
+              Create Account
+            </Link>
+          </p>
+        </div>
+      </div>
     </div>
   )
 }

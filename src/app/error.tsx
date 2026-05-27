@@ -16,7 +16,7 @@ export default function Error({ error, reset }: ErrorProps) {
 
   return (
     <div className="min-h-screen bg-[#0e0918] flex items-center justify-center p-6 text-white font-sans">
-      <div className="relative max-w-md w-full rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl p-8 text-center shadow-2xl overflow-hidden">
+      <div className="relative max-w-md w-full rounded-none bg-white/5 border border-white/10 backdrop-blur-xl p-8 text-center shadow-2xl overflow-hidden">
         {/* Decorative subtle ambient glows */}
         <div className="absolute -top-24 -left-24 w-48 h-48 rounded-full bg-[#8b5cf6]/20 blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -right-24 w-48 h-48 rounded-full bg-[#ec4899]/20 blur-3xl pointer-events-none" />
@@ -33,7 +33,7 @@ export default function Error({ error, reset }: ErrorProps) {
         <div className="flex flex-col sm:flex-row items-center gap-3 justify-center">
           <button
             onClick={() => reset()}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#8b5cf6] hover:bg-[#7c3aed] text-white font-medium text-sm transition-all shadow-lg shadow-[#8b5cf6]/20"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-none bg-[#8b5cf6] hover:bg-[#7c3aed] text-white font-medium text-sm transition-all shadow-lg shadow-[#8b5cf6]/20"
           >
             <RefreshCw className="w-4 h-4" />
             Try again
@@ -41,7 +41,7 @@ export default function Error({ error, reset }: ErrorProps) {
           
           <a
             href="/"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-medium text-sm transition-all border border-white/5"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-none bg-white/10 hover:bg-white/15 text-white font-medium text-sm transition-all border border-white/5"
           >
             <Home className="w-4 h-4" />
             Go Home

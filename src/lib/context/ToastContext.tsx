@@ -49,12 +49,12 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             key={t.id}
             role="status"
             className={[
-              "pointer-events-auto rounded-2xl border px-4 py-3 text-sm font-semibold shadow-premium transition-all duration-300 animate-in slide-in-from-bottom-5",
+              "pointer-events-auto rounded-none border px-4 py-3 text-sm font-semibold shadow-premium transition-all duration-300 animate-in slide-in-from-bottom-5",
               t.variant === "success" &&
                 "border-emerald-200 bg-emerald-50 text-emerald-900",
               t.variant === "error" && "border-red-200 bg-red-50 text-red-900",
               t.variant === "info" &&
-                "border-slate-200 bg-white text-slate-900",
+                "border-border/40 bg-white text-foreground",
             ].filter(Boolean).join(" ")}
           >
             {t.message}

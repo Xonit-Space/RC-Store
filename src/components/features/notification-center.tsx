@@ -13,19 +13,19 @@ import { useNotifications } from "@/notifications/hooks/use-notifications"
 function getNotificationIcon(type: string): React.ReactNode {
   switch (type.toLowerCase()) {
     case "order":
-      return <Package className="h-4 w-4 text-blue-500" />
+      return <Package className="h-4 w-4 text-foreground" />
     case "payment":
       return <CreditCard className="h-4 w-4 text-emerald-500" />
     case "inventory":
       return <ShieldAlert className="h-4 w-4 text-amber-500" />
     case "promotion":
     case "promo":
-      return <Tag className="h-4 w-4 text-purple-500" />
+      return <Tag className="h-4 w-4 text-foreground" />
     case "wishlist":
       return <Heart className="h-4 w-4 text-rose-500" />
     case "system":
     default:
-      return <Bell className="h-4 w-4 text-slate-500" />
+      return <Bell className="h-4 w-4 text-muted/50" />
   }
 }
 
@@ -60,7 +60,7 @@ export function NotificationCenter() {
                 <Card
                   key={notification.id}
                   className={`p-3 mb-2 cursor-pointer transition-all duration-200 hover:bg-muted ${
-                    !notification.read ? "bg-blue-50/50 dark:bg-blue-950/10 border-l-2 border-l-blue-500" : ""
+                    !notification.read ? "bg-foreground/50 dark:bg-foreground/10 border-l-2 border-l-foreground" : ""
                   }`}
                   onClick={() => markAsRead(notification.id)}
                 >

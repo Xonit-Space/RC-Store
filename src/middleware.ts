@@ -7,21 +7,27 @@ export default withAuth(
     const token = req.nextauth.token
     const path = req.nextUrl.pathname
 
-    // 1. Admin Routes protection (/admin/...)
-    if (path.startsWith("/admin")) {
+    // 1. Admin Routes protection (/admin/... and /api/admin/...)
+    if (path.startsWith("/admin") || path.startsWith("/api/admin")) {
       const isAdmin = token?.role === UserRole.SUPER_ADMIN || token?.role === UserRole.ADMIN
-      const isActive = token?.isActive !== false // Assuming we might inject isActive into JWT
+      const isActive = token?.isActive !== false
       
       if (!isAdmin || !isActive) {
         console.warn(`[Security] Unauthorized admin access attempt to ${path}`)
+        if (path.startsWith("/api/")) {
+          return new NextResponse("Unauthorized", { status: 401 })
+        }
         return NextResponse.redirect(new URL("/", req.url))
       }
     }
 
-    // 2. Customer Routes protection (/customer/...)
-    if (path.startsWith("/customer")) {
+    // 2. Customer Routes protection (/customer/... and /api/customer/...)
+    if (path.startsWith("/customer") || path.startsWith("/api/customer")) {
       const isCustomer = !!token
       if (!isCustomer) {
+        if (path.startsWith("/api/")) {
+          return new NextResponse("Unauthorized", { status: 401 })
+        }
         return NextResponse.redirect(new URL("/login", req.url))
       }
     }
@@ -50,5 +56,7 @@ export const config = {
   matcher: [
     "/admin/:path*",
     "/customer/:path*",
+    "/api/admin/:path*",
+    "/api/customer/:path*",
   ],
 }

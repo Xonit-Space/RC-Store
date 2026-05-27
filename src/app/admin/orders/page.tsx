@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { RefreshCw, Search, ShoppingBag, Eye, Calendar, AlertCircle } from "lucide-react"
+import { RefreshCw, Search, ShoppingBag } from "lucide-react"
 import { toast } from "sonner"
 import { adminUpdateOrderStatus } from "@/actions/order"
 import { OrderStatus } from "@prisma/client"
@@ -60,56 +58,59 @@ export default function AdminOrdersPage() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center p-12 h-64">
-        <RefreshCw className="h-8 w-8 text-primary animate-spin" />
-        <span className="text-xs font-bold text-slate-400 mt-2">Loading transactions feed...</span>
+        <RefreshCw className="h-8 w-8 text-foreground animate-spin" />
+        <span className="text-[10px] uppercase tracking-widest text-muted-foreground mt-4 font-bold">Loading Transactions...</span>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6 font-sans">
-      <div className="pb-4 border-b">
-        <h2 className="text-2xl font-extrabold text-slate-800 tracking-tight leading-snug">Order Fulfilment Management</h2>
-        <p className="text-xs text-slate-400 font-semibold mt-0.5">Track shipping channels and update customer order transitions.</p>
+    <div className="space-y-8 font-sans">
+      <div className="pb-6 border-b border-border/40">
+        <p className="text-[10px] tracking-[0.25em] uppercase text-muted-foreground mb-1">
+          Fulfillment
+        </p>
+        <h2 className="font-sans text-3xl font-light text-foreground leading-none">
+          Order Management
+        </h2>
       </div>
 
       <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <input
           placeholder="Search by Order # or Customer..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pl-9 h-11 w-full bg-white border border-slate-200 focus:border-primary rounded-xl text-sm outline-none font-medium transition"
+          className="pl-12 h-12 w-full bg-transparent border border-border/40 rounded-none focus:border-foreground focus:outline-none transition-colors placeholder:uppercase placeholder:tracking-wider placeholder:text-[10px]"
         />
       </div>
 
       {filteredOrders.length === 0 ? (
-        <Card className="border border-dashed p-12 text-center rounded-2xl">
-          <ShoppingBag className="h-12 w-12 text-slate-300 mx-auto mb-2 animate-pulse" />
-          <p className="text-sm font-bold text-slate-700">No transactions recorded yet</p>
-        </Card>
+        <div className="border border-border/40 p-12 text-center bg-background">
+          <ShoppingBag className="h-10 w-10 text-muted-foreground/30 mx-auto mb-4" />
+          <p className="text-xs uppercase tracking-widest font-bold text-muted-foreground">No transactions recorded</p>
+        </div>
       ) : (
         <div className="space-y-4">
           {filteredOrders.map((o) => (
-            <Card key={o.id} className="border border-slate-100 rounded-2xl shadow-sm bg-card overflow-hidden transition hover:border-slate-200">
-              <div className="flex flex-col md:flex-row justify-between bg-slate-50/50 border-b border-slate-100 p-4 gap-4">
+            <div key={o.id} className="border border-border/40 bg-background transition-colors hover:border-foreground/30">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-muted/5 border-b border-border/40 p-6 gap-6">
                 <div>
-                  <p className="font-extrabold text-slate-800 text-xs uppercase tracking-wide">
-                    ORDER #{o.orderNumber}
+                  <p className="font-sans text-lg text-foreground mb-1">
+                    Order #{o.orderNumber}
                   </p>
-                  <p className="text-[10px] text-slate-400 font-bold mt-0.5">
-                    Customer: {o.user.name || o.user.email} | {new Date(o.createdAt).toLocaleDateString()}
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
+                    {o.user.name || o.user.email} <span className="mx-2 text-border">|</span> {new Date(o.createdAt).toLocaleDateString()}
                   </p>
                 </div>
 
-                <div className="flex items-center gap-4">
-                  <span className="text-xs font-extrabold text-slate-800">Rs. {o.total.toFixed(2)}</span>
+                <div className="flex items-center gap-6 w-full md:w-auto">
+                  <span className="text-sm font-bold text-foreground">Rs. {o.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                   
-                  {/* Status Dropdown conforming to state transitions */}
                   <select
                     value={o.status}
                     onChange={(e) => handleStatusChange(o.id, e.target.value as OrderStatus)}
-                    className="h-8 border border-slate-200 rounded-lg text-[10px] font-extrabold text-slate-600 px-2 outline-none uppercase bg-white cursor-pointer"
+                    className="h-10 border border-border/40 bg-transparent text-[10px] font-bold text-foreground px-3 outline-none uppercase tracking-widest cursor-pointer focus:border-foreground ml-auto md:ml-0"
                   >
                     <option value={OrderStatus.PENDING}>Pending</option>
                     <option value={OrderStatus.PAID}>Paid</option>
@@ -122,18 +123,20 @@ export default function AdminOrdersPage() {
                 </div>
               </div>
 
-              <div className="p-4 space-y-3">
-                <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Order Items:</div>
-                {o.items?.map((item: any) => (
-                  <div key={item.id} className="flex justify-between items-center text-xs font-semibold text-slate-600 py-1 border-b last:border-0 border-slate-100">
-                    <p className="line-clamp-1">{item.variant?.product?.name || "Product SKU variant"}</p>
-                    <p className="text-slate-400 shrink-0 ml-4">
-                      Qty: {item.quantity} × Rs. {item.price}
-                    </p>
-                  </div>
-                ))}
+              <div className="p-6">
+                <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-[0.2em] mb-4">Order Manifest</div>
+                <div className="space-y-3">
+                  {o.items?.map((item: any) => (
+                    <div key={item.id} className="flex justify-between items-center text-sm text-foreground">
+                      <p className="line-clamp-1">{item.variant?.product?.name || "Product SKU variant"}</p>
+                      <p className="text-muted-foreground shrink-0 ml-4 font-bold">
+                        {item.quantity} <span className="font-normal text-xs mx-1">×</span> Rs. {item.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </Card>
+            </div>
           ))}
         </div>
       )}

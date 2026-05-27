@@ -11,7 +11,7 @@ export function BrandStorySection() {
           <div className="md:col-span-7 relative">
             <div className="aspect-[4/5] md:aspect-[3/4] bg-muted overflow-hidden">
               <img
-                src="/placeholder.svg?height=900&width=700"
+                src="https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=800&q=80"
                 alt="Brand Story"
                 className="w-full h-full object-cover"
                 loading="lazy"

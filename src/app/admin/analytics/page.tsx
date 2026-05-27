@@ -1,80 +1,126 @@
-"use client"
+import { db } from "@/lib/db"
+import { TrendingUp, DollarSign, Users, BarChart2 } from "lucide-react"
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { RefreshCw, TrendingUp, DollarSign, Calendar, BarChart2 } from "lucide-react"
+export const dynamic = "force-dynamic"
 
-export default function AdminAnalyticsPage() {
-  const [stats, setStats] = useState<any>({
-    totalRevenue: 124530,
-    totalOrders: 2350,
-    avgBasketValue: 53.00,
-  })
-  const [loading, setLoading] = useState(false)
+export default async function AdminAnalyticsPage() {
+  // Real DB aggregations
+  const [totalRevenue, totalOrders, totalUsers, recentOrders] = await Promise.all([
+    db.order.aggregate({
+      _sum: { total: true },
+      where: { status: { notIn: ["CANCELLED", "REFUNDED"] } }
+    }),
+    db.order.count({
+      where: { status: { notIn: ["CANCELLED", "REFUNDED"] } }
+    }),
+    db.user.count({
+      where: { role: "CUSTOMER" }
+    }),
+    db.order.findMany({
+      take: 12,
+      orderBy: { createdAt: "desc" },
+      select: { id: true, total: true, createdAt: true }
+    })
+  ])
 
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center p-12 h-64">
-        <RefreshCw className="h-8 w-8 text-primary animate-spin" />
-        <span className="text-xs font-bold text-slate-400 mt-2">Loading telemetry...</span>
-      </div>
-    )
-  }
+  const revenue = totalRevenue._sum.total || 0
+  const avgBasket = totalOrders > 0 ? revenue / totalOrders : 0
+  const annualized = revenue > 0 ? revenue * 12 : 0
 
   return (
-    <div className="space-y-6 font-sans">
-      <div className="pb-4 border-b">
-        <h2 className="text-2xl font-extrabold text-slate-800 tracking-tight leading-snug">Telemetry Analytics Canvas</h2>
-        <p className="text-xs text-slate-400 font-semibold mt-0.5">Visualize transaction distributions and platform revenue streams.</p>
+    <div className="space-y-12">
+      <div>
+        <p className="text-[10px] tracking-[0.25em] uppercase text-muted-foreground mb-3">
+          Telemetry
+        </p>
+        <h2 className="font-sans text-3xl md:text-5xl font-light text-foreground leading-none">
+          Analytics
+        </h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="border border-slate-100 rounded-2xl shadow-sm bg-card p-5">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-0">
-            <CardTitle className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Average Basket Value</CardTitle>
-            <DollarSign className="w-5 h-5 text-primary" />
-          </CardHeader>
-          <CardContent className="p-0 pt-3">
-            <div className="text-2xl font-extrabold text-slate-800 tracking-tight">Rs. {stats.avgBasketValue.toFixed(2)}</div>
-            <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase tracking-wide">Per unique transaction</p>
-          </CardContent>
-        </Card>
+        <div className="p-8 border border-border/40 bg-background transition-colors hover:border-accent">
+          <div className="flex justify-between items-start mb-12">
+            <div className="h-10 w-10 bg-brass/5 flex items-center justify-center">
+              <DollarSign strokeWidth={1} className="h-5 w-5 text-brass" />
+            </div>
+          </div>
+          <div>
+            <p className="text-[9px] tracking-[0.3em] uppercase text-muted-foreground mb-2">
+              Average Basket Value
+            </p>
+            <p className="font-sans text-3xl font-light text-foreground tracking-tight">
+              Rs. {avgBasket.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </p>
+          </div>
+        </div>
 
-        <Card className="border border-slate-100 rounded-2xl shadow-sm bg-card p-5">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-0">
-            <CardTitle className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Revenues Run-Rate</CardTitle>
-            <TrendingUp className="w-5 h-5 text-green-500 animate-pulse" />
-          </CardHeader>
-          <CardContent className="p-0 pt-3">
-            <div className="text-2xl font-extrabold text-slate-800 tracking-tight">Rs. {(stats.totalRevenue * 12).toLocaleString()}</div>
-            <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase tracking-wide">Projected Annualised Rate</p>
-          </CardContent>
-        </Card>
+        <div className="p-8 border border-border/40 bg-background transition-colors hover:border-accent">
+          <div className="flex justify-between items-start mb-12">
+            <div className="h-10 w-10 bg-forest/5 flex items-center justify-center">
+              <TrendingUp strokeWidth={1} className="h-5 w-5 text-forest" />
+            </div>
+          </div>
+          <div>
+            <p className="text-[9px] tracking-[0.3em] uppercase text-muted-foreground mb-2">
+              Annualized Run Rate
+            </p>
+            <p className="font-sans text-3xl font-light text-foreground tracking-tight">
+              Rs. {annualized.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </p>
+          </div>
+        </div>
 
-        <Card className="border border-slate-100 rounded-2xl shadow-sm bg-card p-5">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-0">
-            <CardTitle className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Active Subscribers</CardTitle>
-            <BarChart2 className="w-5 h-5 text-blue-500" />
-          </CardHeader>
-          <CardContent className="p-0 pt-3">
-            <div className="text-2xl font-extrabold text-slate-800 tracking-tight">8,549 Accounts</div>
-            <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase tracking-wide">98.5% Active status checking</p>
-          </CardContent>
-        </Card>
+        <div className="p-8 border border-border/40 bg-background transition-colors hover:border-accent">
+          <div className="flex justify-between items-start mb-12">
+            <div className="h-10 w-10 bg-charcoal/5 flex items-center justify-center">
+              <Users strokeWidth={1} className="h-5 w-5 text-charcoal" />
+            </div>
+          </div>
+          <div>
+            <p className="text-[9px] tracking-[0.3em] uppercase text-muted-foreground mb-2">
+              Registered Clients
+            </p>
+            <p className="font-sans text-3xl font-light text-foreground tracking-tight">
+              {totalUsers.toLocaleString()} Accounts
+            </p>
+          </div>
+        </div>
       </div>
 
-      <Card className="border border-slate-100 rounded-2xl shadow-sm bg-card overflow-hidden">
-        <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-5">
-          <CardTitle className="text-sm font-extrabold text-slate-800 uppercase tracking-wide">Hourly Conversions distribution</CardTitle>
-        </CardHeader>
-        <CardContent className="p-6">
-          <div className="h-64 bg-slate-50 border border-slate-100 border-dashed rounded-xl flex flex-col items-center justify-center p-6 text-center">
-            <TrendingUp className="h-10 w-10 text-slate-300 mb-2" />
-            <p className="text-xs font-bold text-slate-600">Hourly Distribution graph</p>
-            <span className="text-[10px] text-slate-400 mt-0.5">Integrations to standard analytical engines are live and streaming metrics to dashboards.</span>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="border border-border/40 bg-background">
+        <div className="border-b border-border/40 p-6 md:p-8">
+          <h3 className="font-sans text-2xl font-light text-foreground">Revenue Activity</h3>
+          <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground mt-2">Latest 12 Transactions</p>
+        </div>
+        <div className="p-6 md:p-8">
+          {recentOrders.length === 0 ? (
+            <div className="h-48 flex flex-col items-center justify-center text-center">
+              <BarChart2 strokeWidth={1} className="h-10 w-10 text-muted-foreground/30 mb-4" />
+              <p className="text-xs text-muted-foreground font-semibold">No recent transactions recorded</p>
+            </div>
+          ) : (
+            <div className="flex items-end gap-2 h-48 w-full">
+              {recentOrders.reverse().map((order, i) => {
+                const maxTotal = Math.max(...recentOrders.map(o => o.total), 1)
+                const heightPct = Math.max((order.total / maxTotal) * 100, 5)
+                
+                return (
+                  <div key={order.id} className="flex-1 flex flex-col items-center gap-2 group">
+                    <div 
+                      className="w-full bg-forest/20 group-hover:bg-forest/50 transition-colors"
+                      style={{ height: `${heightPct}%` }}
+                    />
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute mt-[-2rem] bg-foreground text-background text-[9px] px-2 py-1 rounded">
+                      Rs.{order.total.toLocaleString()}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   )
 }

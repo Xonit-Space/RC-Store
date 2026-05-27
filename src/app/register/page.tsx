@@ -6,8 +6,7 @@ import { useRouter } from "next/navigation"
 import { registerUser } from "@/actions/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Mail, Lock, User, CheckCircle2, AlertCircle } from "lucide-react"
+import { AlertCircle, CheckCircle2 } from "lucide-react"
 import { toast } from "sonner"
 
 export default function RegisterPage() {
@@ -49,100 +48,103 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-background to-background p-4">
-      <div className="absolute inset-0 bg-grid-white/[0.02] -z-10" />
-      
-      <Card className="w-full max-w-md bg-card/60 backdrop-blur-xl border-slate-200/50 shadow-2xl animate-in fade-in duration-300">
-        <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            NEOSHOP ULTRA
-          </CardTitle>
-          <CardDescription className="text-sm font-semibold">
-            Create an account to start shopping premium streetwear
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isSuccess ? (
-            <div className="flex flex-col items-center justify-center py-8 text-center space-y-3 animate-in zoom-in duration-300">
-              <CheckCircle2 className="h-16 w-16 text-emerald-500 animate-bounce" />
-              <h3 className="font-extrabold text-xl">Registration Successful!</h3>
-              <p className="text-xs text-muted-foreground font-semibold">
-                Provisioning empty cart and wishlist... Redirecting you to login.
-              </p>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <div className="flex items-center gap-2.5 p-3.5 bg-red-50 border border-red-200 text-red-700 text-xs font-bold rounded-xl animate-in slide-in-from-top-1">
-                  <AlertCircle className="h-4.5 w-4.5 shrink-0" />
-                  <p>{error}</p>
-                </div>
-              )}
+    <div className="min-h-screen flex flex-col font-sans bg-background">
+      <div className="flex-1 flex flex-col justify-center items-center px-6 py-12 lg:px-8">
+        
+        <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-10">
+          <Link href="/" className="inline-block">
+            <h1 className="text-3xl font-serif tracking-tight text-foreground font-light">NEOSHOP ULTRA</h1>
+          </Link>
+          <p className="mt-4 text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-bold">
+            Client Registration
+          </p>
+        </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 block">Full Name</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-muted-foreground" />
+        <div className="sm:mx-auto sm:w-full sm:max-w-[400px]">
+          <div className="bg-background py-10 px-8 md:px-10 border border-border/40 shadow-sm">
+            {isSuccess ? (
+              <div className="flex flex-col items-center justify-center py-8 text-center space-y-6">
+                <div className="w-16 h-16 rounded-full border border-foreground flex items-center justify-center">
+                  <CheckCircle2 className="h-8 w-8 text-foreground" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="font-serif text-xl font-light text-foreground">Welcome to NeoShop Ultra</h3>
+                  <p className="text-xs text-muted-foreground uppercase tracking-widest leading-relaxed">
+                    Account provisioned.<br/>Redirecting to authentication...
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <form className="space-y-6" onSubmit={handleSubmit}>
+                {error && (
+                  <div className="flex items-center gap-3 p-4 bg-red-50/50 border border-red-100 text-red-900 text-xs font-medium">
+                    <AlertCircle className="h-4 w-4 shrink-0 text-red-600" />
+                    <p>{error}</p>
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-foreground">
+                    Full Name
+                  </label>
                   <Input
-                    placeholder="Marcus Vance"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    className="pl-10 h-11 bg-muted/30 border-slate-200 rounded-xl"
+                    className="h-12 bg-transparent border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-foreground transition-colors"
                   />
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 block">Email Address</label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-muted-foreground" />
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-foreground">
+                    Email Address
+                  </label>
                   <Input
                     type="email"
-                    placeholder="marcus@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="pl-10 h-11 bg-muted/30 border-slate-200 rounded-xl"
+                    className="h-12 bg-transparent border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-foreground transition-colors"
                   />
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 block">Password</label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-muted-foreground" />
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-foreground">
+                    Password
+                  </label>
                   <Input
                     type="password"
-                    placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="pl-10 h-11 bg-muted/30 border-slate-200 rounded-xl"
+                    className="h-12 bg-transparent border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-foreground transition-colors"
                   />
+                  <p className="text-[10px] text-muted-foreground pt-1">Must be at least 6 characters</p>
                 </div>
-              </div>
 
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full h-11 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 font-bold rounded-xl shadow-lg active:scale-95 transition mt-2"
-              >
-                {loading ? "Registering account..." : "Sign Up"}
-              </Button>
+                <div>
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 rounded-none font-bold text-xs tracking-widest uppercase transition-all mt-4"
+                  >
+                    {loading ? "Creating Profile..." : "Create Account"}
+                  </Button>
+                </div>
+              </form>
+            )}
+          </div>
 
-              <div className="text-center pt-2">
-                <span className="text-xs text-muted-foreground font-semibold">
-                  Already have an account?{" "}
-                  <Link href="/login" className="text-blue-600 hover:text-blue-800 font-bold">
-                    Sign In
-                  </Link>
-                </span>
-              </div>
-            </form>
+          {!isSuccess && (
+            <p className="mt-8 text-center text-[10px] uppercase tracking-[0.1em] text-muted-foreground">
+              Already have an account?{" "}
+              <Link href="/login" className="font-bold text-foreground border-b border-foreground/30 hover:border-foreground transition-colors pb-0.5">
+                Sign In
+              </Link>
+            </p>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }

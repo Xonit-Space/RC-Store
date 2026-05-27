@@ -25,14 +25,14 @@ export function AdminDashboard() {
       value: "2,350",
       change: "+180.1%",
       icon: ShoppingCart,
-      color: "text-blue-600",
+      color: "text-foreground",
     },
     {
       title: "Products",
       value: "12,234",
       change: "+19%",
       icon: Package,
-      color: "text-purple-600",
+      color: "text-foreground",
     },
     {
       title: "Customers",
@@ -132,7 +132,7 @@ export function AdminDashboard() {
                     <CardTitle>Revenue Analytics</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="h-64 bg-muted/20 rounded-lg flex items-center justify-center">
+                    <div className="h-64 bg-muted/20 rounded-none flex items-center justify-center">
                       <p className="text-muted-foreground">Chart Component Here</p>
                     </div>
                   </CardContent>
@@ -145,7 +145,7 @@ export function AdminDashboard() {
                   <CardContent>
                     <div className="space-y-4">
                       {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div key={i} className="flex items-center justify-between p-3 border rounded-none">
                           <div>
                             <p className="font-medium">Order #{1000 + i}</p>
                             <p className="text-sm text-muted-foreground">Customer {i}</p>

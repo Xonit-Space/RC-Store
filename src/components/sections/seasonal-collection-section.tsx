@@ -5,23 +5,23 @@ const collections = [
   {
     id: 1,
     title: "The Linen Edit",
-    season: "Summer 2025",
-    image: "/placeholder.svg?height=700&width=560",
-    href: "/collections/linen-edit",
+    season: "Summer 2026",
+    image: "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=800&q=80",
+    href: "/products?collection=linen-edit",
   },
   {
     id: 2,
     title: "Terrain",
-    season: "Summer 2025",
-    image: "/placeholder.svg?height=700&width=560",
-    href: "/collections/terrain",
+    season: "Summer 2026",
+    image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=800&q=80",
+    href: "/products?collection=terrain",
   },
   {
     id: 3,
     title: "Nocturne",
-    season: "Summer 2025",
-    image: "/placeholder.svg?height=700&width=560",
-    href: "/collections/nocturne",
+    season: "Summer 2026",
+    image: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=800&q=80",
+    href: "/products?collection=nocturne",
   },
 ]
 
@@ -34,7 +34,7 @@ export function SeasonalCollectionSection() {
         <div className="flex items-end justify-between mb-16 md:mb-24">
           <div>
             <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-3">
-              Summer 2025
+              Summer 2026
             </p>
             <h2 className="font-serif text-4xl md:text-6xl font-light leading-none tracking-tight text-foreground">
               Collections

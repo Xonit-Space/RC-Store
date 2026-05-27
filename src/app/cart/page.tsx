@@ -53,7 +53,7 @@ export default function CartPage() {
       <div className="min-h-screen bg-background flex flex-col justify-between animate-pulse">
         <Header />
         <div className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
-          <Info className="h-10 w-10 text-slate-300 animate-spin" />
+          <Info className="h-10 w-10 text-muted-foreground/30 animate-spin" />
         </div>
         <Footer />
       </div>
@@ -70,21 +70,21 @@ export default function CartPage() {
     <div className="min-h-screen bg-background flex flex-col justify-between">
       <Header />
 
-      <main className="flex-grow container mx-auto px-4 py-8">
-        <h1 className="text-2xl font-extrabold text-slate-900 mb-6 flex items-center gap-2">
+      <main className="flex-grow container mx-auto px-4 md:px-12 max-w-6xl pt-32 pb-24">
+        <h1 className="text-2xl font-extrabold text-foreground mb-6 flex items-center gap-2">
           <ShoppingCart className="h-6 w-6 text-primary" /> Your Shopping Bag
         </h1>
 
         {items.length === 0 ? (
-          <Card className="border border-dashed border-slate-200 p-12 text-center max-w-xl mx-auto rounded-3xl mt-6">
+          <Card className="border border-dashed border-border/40 p-12 text-center max-w-xl mx-auto  mt-6">
             <CardContent className="space-y-4 pt-6">
-              <ShoppingCart className="h-16 w-16 mx-auto text-slate-300" />
-              <h3 className="font-extrabold text-lg text-slate-800">Your bag is currently empty</h3>
+              <ShoppingCart className="h-16 w-16 mx-auto text-muted-foreground/30" />
+              <h3 className="font-extrabold text-lg text-foreground">Your bag is currently empty</h3>
               <p className="text-xs text-muted-foreground font-semibold">
                 Looks like you haven&apos;t added any premium designer items to your checkout cart yet.
               </p>
               <Link href="/products" className="inline-block">
-                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 font-bold rounded-xl active:scale-95 transition">
+                <Button className="bg-gradient-to-r from-foreground to-foreground hover:from-foreground hover:to-foreground font-bold  active:scale-95 transition">
                   Browse Catalog
                 </Button>
               </Link>
@@ -98,10 +98,10 @@ export default function CartPage() {
               {items.map((item) => (
                 <div
                   key={item.id}
-                  className="flex flex-col sm:flex-row gap-4 p-4 bg-card border border-slate-100 rounded-2xl shadow-sm hover:shadow-md transition items-center"
+                  className="flex flex-col sm:flex-row gap-4 p-4 bg-background border border-border/40   hover: transition items-center"
                 >
                   {/* Photo thumbnail */}
-                  <div className="h-24 w-24 shrink-0 bg-slate-50 border border-slate-100 rounded-xl overflow-hidden">
+                  <div className="h-24 w-24 shrink-0 bg-background border border-muted/10  overflow-hidden">
                     <img
                       src={item.product.imageUrl || "/placeholder.svg"}
                       alt={item.product.name}
@@ -111,10 +111,10 @@ export default function CartPage() {
 
                   {/* Garment details */}
                   <div className="flex-1 min-w-0 text-center sm:text-left space-y-1.5">
-                    <h3 className="font-bold text-slate-800 text-sm truncate">
+                    <h3 className="font-bold text-foreground text-sm truncate">
                       {item.product.name}
                     </h3>
-                    <div className="flex flex-wrap gap-1.5 justify-center sm:justify-start text-[10px] font-bold text-slate-500">
+                    <div className="flex flex-wrap gap-1.5 justify-center sm:justify-start text-[10px] font-bold text-muted/50">
                       <Badge variant="outline" className="text-[9px] py-0 px-2 uppercase">
                         Size: {item.product.size}
                       </Badge>
@@ -123,25 +123,25 @@ export default function CartPage() {
                         Color
                       </Badge>
                     </div>
-                    <p className="text-sm font-extrabold text-blue-600">
+                    <p className="text-sm font-extrabold text-foreground">
                       Rs. {item.product.price.toLocaleString()}
                     </p>
                   </div>
 
                   {/* Quantity adjustment meters */}
-                  <div className="flex items-center gap-2 shrink-0 border border-slate-200/60 p-1.5 bg-slate-50/50 rounded-xl">
+                  <div className="flex items-center gap-2 shrink-0 border border-border/40/60 p-1.5 bg-background ">
                     <button
                       onClick={() => handleUpdateQty(item.id, item.quantity - 1)}
-                      className="h-7 w-7 rounded-lg hover:bg-slate-200 text-slate-700 font-extrabold flex items-center justify-center active:scale-95 transition"
+                      className="h-7 w-7  hover:bg-border/40 text-foreground font-extrabold flex items-center justify-center active:scale-95 transition"
                     >
                       <Minus className="h-3.5 w-3.5" />
                     </button>
-                    <span className="text-xs font-extrabold text-slate-800 w-6 text-center">
+                    <span className="text-xs font-extrabold text-foreground w-6 text-center">
                       {item.quantity}
                     </span>
                     <button
                       onClick={() => handleUpdateQty(item.id, item.quantity + 1)}
-                      className="h-7 w-7 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-extrabold flex items-center justify-center active:scale-95 transition"
+                      className="h-7 w-7 bg-foreground hover:bg-foreground text-white  font-extrabold flex items-center justify-center active:scale-95 transition"
                     >
                       <Plus className="h-3.5 w-3.5" />
                     </button>
@@ -150,7 +150,7 @@ export default function CartPage() {
                   {/* Remove action */}
                   <button
                     onClick={() => handleRemoveItem(item.id)}
-                    className="h-9 w-9 rounded-xl border border-red-100 text-red-500 hover:bg-red-50 flex items-center justify-center shrink-0 transition"
+                    className="h-9 w-9  border border-red-100 text-red-500 hover:bg-red-50 flex items-center justify-center shrink-0 transition"
                   >
                     <Trash2 className="h-4.5 w-4.5" />
                   </button>
@@ -159,25 +159,25 @@ export default function CartPage() {
             </div>
 
             {/* ── RIGHT: SUMMARY ORDER LEDGER ── */}
-            <div className="lg:col-span-4 bg-card border border-slate-100 p-5 rounded-2xl shadow-sm h-fit space-y-5">
-              <h3 className="font-extrabold text-slate-800 text-sm pb-3 border-b uppercase tracking-wide">
+            <div className="lg:col-span-4 bg-background border border-border/40 p-5   h-fit space-y-5">
+              <h3 className="font-extrabold text-foreground text-sm pb-3 border-b uppercase tracking-wide">
                 Order Summary
               </h3>
 
-              <div className="space-y-3.5 pt-1 text-xs font-semibold text-slate-500">
+              <div className="space-y-3.5 pt-1 text-xs font-semibold text-muted/50">
                 <div className="flex justify-between">
                   <span>Bag Subtotal</span>
-                  <span className="font-bold text-slate-700">Rs. {subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                  <span className="font-bold text-foreground">Rs. {subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>GST Tax (8%)</span>
-                  <span className="font-bold text-slate-700">Rs. {tax.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                  <span className="font-bold text-foreground">Rs. {tax.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="flex items-center gap-1">
-                    <Truck className="h-4 w-4 text-slate-400" /> Ground Shipping
+                    <Truck className="h-4 w-4 text-muted-foreground" /> Ground Shipping
                   </span>
-                  <span className="font-bold text-slate-700">
+                  <span className="font-bold text-foreground">
                     {shipping === 0 ? (
                       <span className="text-emerald-600 font-extrabold">FREE</span>
                     ) : (
@@ -187,7 +187,7 @@ export default function CartPage() {
                 </div>
 
                 {subtotal < 150 && (
-                  <div className="p-3 bg-blue-50 border border-blue-100 text-blue-800 text-[10px] font-bold rounded-xl flex items-center gap-1.5">
+                  <div className="p-3 bg-foreground border border-foreground text-foreground text-[10px] font-bold  flex items-center gap-1.5">
                     <Info className="h-4 w-4 shrink-0" />
                     <span>Spend Rs. {(150 - subtotal).toFixed(2)} more to unlock FREE SHIPPING!</span>
                   </div>
@@ -196,22 +196,22 @@ export default function CartPage() {
 
               <div className="my-4 border-t border-dashed" />
 
-              <div className="flex justify-between font-extrabold text-slate-900 text-base pt-1">
+              <div className="flex justify-between font-extrabold text-foreground text-base pt-1">
                 <span>Total Amount Due</span>
-                <span className="text-blue-600">Rs. {grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                <span className="text-foreground">Rs. {grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
               </div>
 
               {/* Promo input field */}
               <div className="flex gap-2">
-                <Input placeholder="PROMO CODE" className="h-9 text-xs rounded-xl bg-slate-50/50" />
-                <Button variant="outline" size="sm" className="h-9 rounded-xl font-bold">
+                <Input placeholder="PROMO CODE" className="h-9 text-xs  bg-background" />
+                <Button variant="outline" size="sm" className="h-9  font-bold">
                   Apply
                 </Button>
               </div>
 
               {/* Checkout CTA */}
               <Link href="/checkout" className="block pt-2">
-                <Button className="w-full h-11 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 font-bold rounded-xl shadow-lg active:scale-95 transition">
+                <Button className="w-full h-11 bg-gradient-to-r from-foreground to-foreground hover:from-foreground hover:to-foreground font-bold   active:scale-95 transition">
                   PROCEED TO SECURE CHECKOUT <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>

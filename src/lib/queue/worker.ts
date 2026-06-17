@@ -11,7 +11,7 @@ export function createWorker<T, R>(
   options?: Omit<WorkerOptions, "connection">
 ): Worker<T, R> {
   const worker = new Worker<T, R>(queueName, processor, {
-    connection: queueConnection,
+    connection: queueConnection as any,
     ...options,
   })
 

@@ -12,8 +12,8 @@ const defaultJobOptions: DefaultJobOptions = {
   removeOnFail: 100, // Keep last 100 failed jobs for inspection
 }
 
-export const emailQueue = new Queue("email", { connection: queueConnection, defaultJobOptions })
-export const analyticsQueue = new Queue("analytics", { connection: queueConnection, defaultJobOptions })
-export const inventoryQueue = new Queue("inventory", { connection: queueConnection, defaultJobOptions })
-export const webhookQueue = new Queue("webhook", { connection: queueConnection, defaultJobOptions })
-export const dlqQueue = new Queue("dlq", { connection: queueConnection, defaultJobOptions })
+export const emailQueue = new Queue("email", { connection: queueConnection as any, defaultJobOptions })
+export const analyticsQueue = new Queue("analytics", { connection: queueConnection as any, defaultJobOptions })
+export const inventoryQueue = new Queue("inventory", { connection: queueConnection as any, defaultJobOptions })
+export const webhookQueue = new Queue("webhook", { connection: queueConnection as any, defaultJobOptions })
+export const dlqQueue = new Queue("dlq", { connection: queueConnection as any, defaultJobOptions })

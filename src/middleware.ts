@@ -1,6 +1,11 @@
 import { withAuth } from "next-auth/middleware"
 import { NextResponse } from "next/server"
-import { UserRole } from "@prisma/client"
+
+const UserRole = {
+  SUPER_ADMIN: "SUPER_ADMIN",
+  ADMIN: "ADMIN",
+  CUSTOMER: "CUSTOMER",
+} as const;
 
 export default withAuth(
   function middleware(req) {

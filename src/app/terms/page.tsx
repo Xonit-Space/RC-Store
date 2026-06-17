@@ -16,7 +16,7 @@ export default function TermsPage() {
         <div className="space-y-12 text-sm text-muted-foreground leading-relaxed">
           <section className="space-y-4">
             <p>
-              Welcome to NeoShop Ultra. These Terms of Service ("Terms") govern your use of the NeoShop Ultra website and the purchase of our products. By accessing our website or placing an order, you agree to be bound by these Terms.
+              Welcome to NeoShop Ultra. These Terms of Service (&quot;Terms&quot;) govern your use of the NeoShop Ultra website and the purchase of our products. By accessing our website or placing an order, you agree to be bound by these Terms.
             </p>
           </section>
 

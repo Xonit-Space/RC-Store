@@ -20,7 +20,7 @@ export function BrandStorySection() {
             {/* Floating accent quote */}
             <div className="hidden md:block absolute -bottom-10 -right-12 bg-sand p-8 max-w-xs">
               <p className="font-serif italic text-xl text-forest leading-relaxed">
-                "Crafted with intention.<br />Worn with purpose."
+                &quot;Crafted with intention.<br />Worn with purpose.&quot;
               </p>
             </div>
           </div>

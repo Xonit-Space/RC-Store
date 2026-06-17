@@ -16,7 +16,7 @@ export default function PrivacyPage() {
         <div className="space-y-12 text-sm text-muted-foreground leading-relaxed">
           <section className="space-y-4">
             <p>
-              NeoShop Ultra ("we", "our", or "us") respects your privacy and is committed to protecting your personal data. This privacy policy informs you about how we look after your personal data when you visit our website (regardless of where you visit it from) and tells you about your privacy rights and how the law protects you.
+              NeoShop Ultra (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;) respects your privacy and is committed to protecting your personal data. This privacy policy informs you about how we look after your personal data when you visit our website (regardless of where you visit it from) and tells you about your privacy rights and how the law protects you.
             </p>
           </section>
 

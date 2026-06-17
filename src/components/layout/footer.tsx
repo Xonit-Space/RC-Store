@@ -13,7 +13,7 @@ export function Footer() {
               NEOSHOP
             </Link>
             <p className="text-sm md:text-base leading-relaxed text-muted-foreground max-w-md font-serif italic">
-              Crafting timeless digital commerce. A curation of the world's most exceptional products, presented with architectural precision and quiet luxury.
+              Crafting timeless digital commerce. A curation of the world&apos;s most exceptional products, presented with architectural precision and quiet luxury.
             </p>
           </div>
 

@@ -43,7 +43,7 @@ export default function AboutPage() {
               Our Philosophy
             </h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              We believe that true luxury is quiet. It doesn't shout. It is felt in the weight of a brass zipper, the drape of heavy organic cotton, and the precision of a hidden seam. Every piece in our collection is an exploration of form and function, designed to endure rather than follow seasonal trends.
+              We believe that true luxury is quiet. It doesn&apos;t shout. It is felt in the weight of a brass zipper, the drape of heavy organic cotton, and the precision of a hidden seam. Every piece in our collection is an exploration of form and function, designed to endure rather than follow seasonal trends.
             </p>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Our atelier operates on principles of absolute transparency and uncompromising quality. We source our materials from historic mills and work with artisans who share our obsession with detail.

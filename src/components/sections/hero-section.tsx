@@ -57,7 +57,7 @@ export function HeroSection() {
           {/* Subline + CTA row */}
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-8">
             <p className="text-sm md:text-base text-sand/80 max-w-sm leading-relaxed font-light">
-              Timeless silhouettes crafted from the world's finest materials.
+              Timeless silhouettes crafted from the world&apos;s finest materials.
               Designed to be worn — and remembered.
             </p>
 

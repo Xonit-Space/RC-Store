@@ -2,11 +2,9 @@ import Stripe from "stripe"
 import { reserveStock } from "@/services/inventory"
 import { inventoryQueue } from "@/lib/queue/queues"
 
-if (!process.env.STRIPE_API_KEY) {
-  throw new Error("Missing STRIPE_API_KEY environment variable")
-}
+const stripeApiKey = process.env.STRIPE_API_KEY || "dummy_key_for_build"
 
-export const stripe = new Stripe(process.env.STRIPE_API_KEY, {
+export const stripe = new Stripe(stripeApiKey, {
   apiVersion: "2024-04-10" as any, // Target stable Stripe API version
   typescript: true,
 })

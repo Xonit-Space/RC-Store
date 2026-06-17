@@ -5,7 +5,8 @@ const redisUrl = process.env.REDIS_URL || "redis://127.0.0.1:6379"
 // BullMQ requires maxRetriesPerRequest: null to work properly with blocking commands
 export const queueConnection = new Redis(redisUrl, { 
   maxRetriesPerRequest: null,
-  enableReadyCheck: false
+  enableReadyCheck: false,
+  lazyConnect: true
 })
 
 queueConnection.on("error", (err) => {

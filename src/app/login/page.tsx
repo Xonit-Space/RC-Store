@@ -124,20 +124,20 @@ export default function LoginPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        setEmail("customer@neoshop.com")
-                        setPassword("Customer123!")
+                        setEmail("demo@neoshop.com")
+                        setPassword("neoshop_secure_password_2026")
                       }}
                       className="p-3 border border-border/40 bg-muted/10 hover:bg-muted/30 transition-colors text-left group"
                     >
                       <span className="block text-[10px] font-bold uppercase tracking-wider text-foreground mb-1">Customer</span>
-                      <span className="block text-xs text-muted-foreground group-hover:text-foreground transition-colors truncate">customer@neoshop.com</span>
+                      <span className="block text-xs text-muted-foreground group-hover:text-foreground transition-colors truncate">demo@neoshop.com</span>
                     </button>
                     
                     <button
                       type="button"
                       onClick={() => {
                         setEmail("admin@neoshop.com")
-                        setPassword("Admin123!")
+                        setPassword("neoshop_secure_password_2026")
                       }}
                       className="p-3 border border-border/40 bg-muted/10 hover:bg-muted/30 transition-colors text-left group"
                     >
@@ -149,13 +149,13 @@ export default function LoginPage() {
                     <button
                         type="button"
                         onClick={() => {
-                          setEmail("staff@neoshop.com")
-                          setPassword("Staff123!")
+                          setEmail("superadmin@neoshop.com")
+                          setPassword("neoshop_secure_password_2026")
                         }}
                         className="p-3 border border-border/40 bg-muted/10 hover:bg-muted/30 transition-colors text-left group"
                       >
-                        <span className="block text-[10px] font-bold uppercase tracking-wider text-foreground mb-1">Staff Member</span>
-                        <span className="block text-xs text-muted-foreground group-hover:text-foreground transition-colors truncate">staff@neoshop.com</span>
+                        <span className="block text-[10px] font-bold uppercase tracking-wider text-foreground mb-1">Super Admin</span>
+                        <span className="block text-xs text-muted-foreground group-hover:text-foreground transition-colors truncate">superadmin@neoshop.com</span>
                     </button>
                   </div>
                 </div>

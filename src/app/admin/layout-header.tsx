@@ -1,7 +1,8 @@
 "use client"
 
-import { Home } from "lucide-react"
+import { Home, LogOut } from "lucide-react"
 import Link from "next/link"
+import { signOut } from "next-auth/react"
 
 interface HeaderProps {
   user: any
@@ -30,6 +31,13 @@ export function Header({ user }: HeaderProps) {
         <div className="h-9 w-9 bg-muted border border-border/60 flex items-center justify-center text-[11px] uppercase text-foreground tracking-widest">
           {user.name?.[0] || "A"}
         </div>
+        <button
+          onClick={() => signOut({ callbackUrl: "/login" })}
+          title="Sign Out"
+          className="h-9 w-9 flex items-center justify-center border border-border/40 hover:border-destructive/50 hover:bg-destructive/5 text-muted-foreground hover:text-destructive transition-colors group"
+        >
+          <LogOut strokeWidth={1.5} className="w-4 h-4" />
+        </button>
       </div>
     </header>
   )

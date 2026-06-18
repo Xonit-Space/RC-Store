@@ -209,7 +209,7 @@ export function POSManagement() {
                 className={`px-4 py-2 text-xs font-bold rounded-none border capitalize transition active:scale-95 ${
                   categoryFilter === cat
                     ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-white hover:bg-muted/5 border-border/40 text-foreground/70"
+                    : "bg-card hover:bg-muted/50 border-border/40 text-foreground/70"
                 }`}
               >
                 {cat}s
@@ -244,7 +244,7 @@ export function POSManagement() {
                 <div
                   key={p.id}
                   onClick={() => addItem(p)}
-                  className="group bg-white hover:bg-muted/5/50 border border-muted/10 rounded-none p-3 flex flex-col justify-between cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5"
+                  className="group bg-card hover:bg-muted/40 border border-border/40 rounded-none p-3 flex flex-col justify-between cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5"
                 >
                   <div className="aspect-square bg-muted/5 rounded-none overflow-hidden mb-3 relative flex items-center justify-center">
                     {p.image ? (
@@ -264,7 +264,7 @@ export function POSManagement() {
                       <span className="font-extrabold text-foreground text-sm">
                         Rs. {p.price.toLocaleString()}
                       </span>
-                      <div className="h-7 w-7 rounded-none bg-foreground text-foreground flex items-center justify-center group-hover:bg-primary group-hover:text-white transition">
+                      <div className="h-7 w-7 rounded-none bg-muted text-foreground flex items-center justify-center group-hover:bg-primary group-hover:text-white transition">
                         <Plus className="h-4 w-4" />
                       </div>
                     </div>
@@ -297,7 +297,7 @@ export function POSManagement() {
               </div>
               <button
                 onClick={() => setSelectedCustomer(null)}
-                className="text-xs text-red-500 hover:text-red-700 font-bold border border-red-200 bg-white px-3 py-1 rounded-none transition"
+                className="text-xs text-red-500 hover:text-red-700 font-bold border border-red-200 bg-card px-3 py-1 rounded-none transition"
               >
                 Clear
               </button>
@@ -305,7 +305,7 @@ export function POSManagement() {
           ) : (
             <button
               onClick={() => setIsCustomerModalOpen(true)}
-              className="w-full h-12 flex items-center justify-center gap-2 rounded-none border border-dashed border-muted-foreground/30 hover:border-primary/50 text-muted/50 hover:text-primary transition font-bold text-sm bg-white"
+              className="w-full h-12 flex items-center justify-center gap-2 rounded-none border border-dashed border-muted-foreground/30 hover:border-primary/50 text-muted-foreground hover:text-primary transition font-bold text-sm bg-card"
             >
               <Users className="h-4 w-4" />
               Add or Select Customer
@@ -397,7 +397,7 @@ export function POSManagement() {
       {/* ── CUSTOMER SELECTOR MODAL ── */}
       {isCustomerModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-none p-6 w-full max-w-lg shadow-2xl animate-in scale-in duration-200">
+          <div className="bg-card border border-border/40 rounded-none p-6 w-full max-w-lg shadow-2xl animate-in scale-in duration-200">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-bold text-foreground">
                 {isNewCustomerOpen ? "Register New Customer" : "Select Customer Profile"}
@@ -497,7 +497,7 @@ export function POSManagement() {
 
                 <button
                   onClick={() => setIsNewCustomerOpen(true)}
-                  className="w-full h-11 bg-foreground text-foreground rounded-none font-bold text-xs hover:bg-foreground/80 transition"
+                  className="w-full h-11 bg-foreground text-background rounded-none font-bold text-xs hover:bg-foreground/80 transition"
                 >
                   Create New Customer Account
                 </button>
@@ -510,7 +510,7 @@ export function POSManagement() {
       {/* ── PAYMENT CALCULATOR MODAL ── */}
       {isPaymentModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-none p-6 w-full max-w-md shadow-2xl animate-in scale-in duration-200">
+          <div className="bg-card border border-border/40 rounded-none p-6 w-full max-w-md shadow-2xl animate-in scale-in duration-200">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                 <Calculator className="h-5 w-5 text-foreground" />
@@ -539,8 +539,8 @@ export function POSManagement() {
                   onClick={() => setPaymentMethod(method as any)}
                   className={`h-11 rounded-none text-xs font-bold border transition ${
                     paymentMethod === method
-                      ? "bg-foreground text-white border-foreground"
-                      : "bg-white hover:bg-muted/5 text-foreground/70 border-border/40"
+                      ? "bg-foreground text-background border-foreground"
+                      : "bg-card hover:bg-muted/50 text-foreground/70 border-border/40"
                   }`}
                 >
                   {method}
@@ -608,7 +608,7 @@ export function POSManagement() {
       {/* ── ORDER COMPLETE POPUP ── */}
       {isCompleteOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-none p-8 w-full max-w-sm text-center shadow-2xl animate-in scale-in duration-200">
+          <div className="bg-card border border-border/40 rounded-none p-8 w-full max-w-sm text-center shadow-2xl animate-in scale-in duration-200">
             <div className="h-16 w-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <Check className="h-8 w-8" />
             </div>
@@ -623,7 +623,7 @@ export function POSManagement() {
 
             <button
               onClick={() => setIsCompleteOpen(false)}
-              className="mt-6 w-full h-11 bg-foreground hover:bg-foreground text-white rounded-none text-xs font-bold transition active:scale-95"
+              className="mt-6 w-full h-11 bg-foreground hover:bg-foreground/90 text-background rounded-none text-xs font-bold transition active:scale-95"
             >
               Continue Checkout
             </button>

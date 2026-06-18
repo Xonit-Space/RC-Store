@@ -128,13 +128,13 @@ export function CourierManagement() {
         <div className="flex gap-2">
           <button
             onClick={() => setIsAddCourierOpen(true)}
-            className="h-10 px-4 bg-foreground hover:bg-foreground active:scale-95 transition text-white font-bold text-xs rounded-none flex items-center gap-2 shadow-sm"
+            className="h-10 px-4 bg-foreground hover:opacity-90 active:scale-95 transition text-background font-bold text-xs rounded-none flex items-center gap-2 shadow-sm"
           >
             <Plus className="w-4 h-4" /> Add Courier Driver
           </button>
           <button
             onClick={handleRefresh}
-            className="h-10 px-4 border border-border/40 bg-white hover:bg-muted/5 rounded-none text-xs font-bold text-foreground/70 flex items-center gap-2 active:scale-95 transition"
+            className="h-10 px-4 border border-border/40 bg-card hover:bg-muted/50 rounded-none text-xs font-bold text-foreground/70 flex items-center gap-2 active:scale-95 transition"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} /> Refresh
           </button>
@@ -143,8 +143,8 @@ export function CourierManagement() {
 
       {/* Stats Widget Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white border border-muted/10 p-4 rounded-none flex items-center shadow-sm">
-          <div className="h-10 w-10 rounded-none bg-foreground text-foreground flex items-center justify-center shrink-0">
+        <div className="bg-card border border-border/40 p-4 rounded-none flex items-center shadow-sm">
+          <div className="h-10 w-10 rounded-none bg-muted text-foreground flex items-center justify-center shrink-0">
             <Truck className="h-5 w-5" />
           </div>
           <div className="ml-3 min-w-0">
@@ -153,7 +153,7 @@ export function CourierManagement() {
           </div>
         </div>
 
-        <div className="bg-white border border-muted/10 p-4 rounded-none flex items-center shadow-sm">
+        <div className="bg-card border border-border/40 p-4 rounded-none flex items-center shadow-sm">
           <div className="h-10 w-10 rounded-none bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
             <UserCheck className="h-5 w-5" />
           </div>
@@ -163,8 +163,8 @@ export function CourierManagement() {
           </div>
         </div>
 
-        <div className="bg-white border border-muted/10 p-4 rounded-none flex items-center shadow-sm">
-          <div className="h-10 w-10 rounded-none bg-foreground text-foreground flex items-center justify-center shrink-0">
+        <div className="bg-card border border-border/40 p-4 rounded-none flex items-center shadow-sm">
+          <div className="h-10 w-10 rounded-none bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
             <Package className="h-5 w-5" />
           </div>
           <div className="ml-3 min-w-0">
@@ -173,7 +173,7 @@ export function CourierManagement() {
           </div>
         </div>
 
-        <div className="bg-white border border-muted/10 p-4 rounded-none flex items-center shadow-sm">
+        <div className="bg-card border border-border/40 p-4 rounded-none flex items-center shadow-sm">
           <div className="h-10 w-10 rounded-none bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
             <Clock className="h-5 w-5" />
           </div>
@@ -186,7 +186,7 @@ export function CourierManagement() {
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {/* Active Couriers Drivers List */}
-        <div className="xl:col-span-1 bg-white border border-muted/10 rounded-none p-4 shadow-sm flex flex-col h-[520px]">
+        <div className="xl:col-span-1 bg-card border border-border/40 rounded-none p-4 shadow-sm flex flex-col h-[520px]">
           <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-1.5">
             <UserCheck className="h-4.5 w-4.5 text-foreground" />
             <span>Delivery Roster</span>
@@ -237,7 +237,7 @@ export function CourierManagement() {
         </div>
 
         {/* Deliveries Dispatch Log Table */}
-        <div className="xl:col-span-2 bg-white border border-muted/10 rounded-none p-4 shadow-sm flex flex-col h-[520px]">
+        <div className="xl:col-span-2 bg-card border border-border/40 rounded-none p-4 shadow-sm flex flex-col h-[520px]">
           <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-1.5">
             <Package className="h-4.5 w-4.5 text-foreground" />
             <span>Active Dispatch Log</span>
@@ -261,8 +261,8 @@ export function CourierManagement() {
                   onClick={() => setDeliveryFilter(status)}
                   className={`px-3 py-1.5 text-[10px] font-extrabold rounded-none border capitalize transition ${
                     deliveryFilter === status
-                      ? "bg-foreground text-white border-foreground"
-                      : "bg-white hover:bg-muted/5 border-border/40 text-foreground/70"
+                      ? "bg-foreground text-background border-foreground"
+                      : "bg-card hover:bg-muted/50 border-border/40 text-foreground/70"
                   }`}
                 >
                   {status === "all" ? "All Shipments" : status.toLowerCase()}
@@ -308,7 +308,7 @@ export function CourierManagement() {
                         d.status === "DELIVERED"
                           ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
                           : d.status === "DISPATCHED"
-                          ? "bg-foreground text-foreground border border-foreground"
+                          ? "bg-blue-50 text-blue-700 border border-blue-100"
                           : "bg-amber-50 text-amber-700 border border-amber-100"
                       }`}>
                         {d.status}
@@ -341,7 +341,7 @@ export function CourierManagement() {
       {/* ── ADD COURIER MODAL ── */}
       {isAddCourierOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-none p-6 w-full max-w-md shadow-2xl animate-in scale-in duration-200">
+          <div className="bg-card border border-border/40 rounded-none p-6 w-full max-w-md shadow-2xl animate-in scale-in duration-200">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-bold text-foreground">Add New Courier Driver</h3>
               <button
@@ -412,7 +412,7 @@ export function CourierManagement() {
       {/* ── PRINTABLE THERMAL WAYBILL MODAL ── */}
       {selectedDeliveryForWaybill && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-none w-full max-w-sm overflow-hidden shadow-2xl flex flex-col animate-in scale-in duration-200">
+          <div className="bg-card border border-border/40 rounded-none w-full max-w-sm overflow-hidden shadow-2xl flex flex-col animate-in scale-in duration-200">
             {/* Header toolbar */}
             <div className="flex justify-between items-center p-4 border-b">
               <h4 className="text-xs font-extrabold text-foreground uppercase tracking-wide">Waybill Thermal Preview</h4>
@@ -426,7 +426,7 @@ export function CourierManagement() {
 
             {/* Thermal Slip Content */}
             <div className="p-6 bg-muted/5 overflow-y-auto max-h-[380px]">
-              <div className="bg-white border-2 border-border/40 p-4 rounded-none shadow-inner font-mono text-[11px] text-foreground space-y-4">
+              <div className="bg-background border-2 border-border/40 p-4 rounded-none shadow-inner font-mono text-[11px] text-foreground space-y-4">
                 <div className="text-center space-y-1">
                   <h3 className="font-extrabold text-sm uppercase tracking-widest text-foreground">NEOSHOP LOGISTICS</h3>
                   <p className="text-[9px] text-muted-foreground font-bold">1 Waybill Ave, Colombo, LK</p>

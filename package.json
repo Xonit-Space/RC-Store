@@ -85,6 +85,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^10.4.0",
+    "@next/bundle-analyzer": "^16.2.9",
     "@playwright/test": "^1.60.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/ioredis": "^4.28.10",

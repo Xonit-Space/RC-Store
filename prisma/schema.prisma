@@ -1,10 +1,12 @@
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearchPostgres"]
 }
 
 // ==========================================
@@ -202,6 +204,9 @@ model Product {
   @@index([categoryId])
   @@index([brandId])
   @@index([collectionId])
+  @@index([isFeatured, isActive])
+  @@index([categoryId, isActive])
+  @@index([categoryId, price])
   @@map("products")
 }
 
@@ -430,6 +435,7 @@ model Order {
   @@index([billingAddressId])
   @@index([status])
   @@index([createdAt])
+  @@index([userId, createdAt])
   @@map("orders")
 }
 
@@ -1012,6 +1018,7 @@ model Review {
 
   @@index([userId])
   @@index([productId])
+  @@index([productId, rating])
   @@map("reviews")
 }
 

@@ -5,9 +5,10 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4.17-38bdf8?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
 [![Prisma ORM](https://img.shields.io/badge/Prisma-Latest-123547?style=for-the-badge&logo=prisma)](https://www.prisma.io/)
-[![SQLite](https://img.shields.io/badge/SQLite-3-003b57?style=for-the-badge&logo=sqlite)](https://www.sqlite.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-316192?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
 
-**Neoshop Ultra** is an ultra-premium, full-stack e-commerce store built using Next.js 14 App Router, React 18, Tailwind CSS, Prisma, and SQLite. The application is styled with a modern, responsive design using custom-tailored Radix UI micro-interactions, features real-time search logic, simulated AI recommendation engines, dynamic notifications, and a feature-rich admin dashboard portal.
+**Neoshop Ultra** is an ultra-premium, full-stack e-commerce store built using Next.js 14 App Router, React 18, Tailwind CSS, Prisma, and Supabase PostgreSQL. The application is styled with a modern, responsive design using custom-tailored Radix UI micro-interactions, features real-time search logic, simulated AI recommendation engines, dynamic notifications, and a feature-rich admin dashboard portal.
 
 ---
 
@@ -35,6 +36,7 @@
     - [3. Seed Mock Data](#3-seed-mock-data)
     - [4. Spin up the Development Server](#4-spin-up-the-development-server)
     - [5. Visualizing Database with Prisma Studio](#5-visualizing-database-with-prisma-studio)
+  - [⚡ Performance Optimization Roadmap](#-performance-optimization-roadmap)
 
 ---
 
@@ -45,7 +47,7 @@
 | **Framework** | **Next.js 14.2.16** | Client/Server rendering (App Router), static generation, and high-performance server actions/routing. |
 | **UI Components** | **Radix UI Primitives** | Fully accessible UI blocks styled via **shadcn/ui** configurations (Dialogs, Popovers, Tabs, Accordions, Toasts). |
 | **Styling & Motion**| **Tailwind CSS + Animate** | Premium utility-first styling with keyframe micro-animations and custom transitions. |
-| **Database & ORM** | **Prisma ORM & SQLite** | Type-safe queries, database schema migration management, and local file SQLite storage. |
+| **Database & ORM** | **Prisma ORM & Supabase** | Type-safe queries, database schema migration management, and cloud PostgreSQL storage via Supabase. |
 | **Data Validation** | **Zod** | Rigid runtime typing, client-side/server-side form and API payload schema validation. |
 | **Form Management** | **React Hook Form** | Performant, flexible, and extensible form validation and submit states. |
 | **Data Charts** | **Recharts** | Fully customizable responsive graphs and data visualizations inside the admin dashboard. |
@@ -76,7 +78,6 @@ neoshop-ultra/
 │   ├── seed.ts               # Database Mock-data seeder script
 │   └── utils.ts              # Class name mergers (clsx, tailwind-merge helper)
 ├── prisma/                   # Prisma Configuration
-│   ├── dev.db                # SQLite Local Database File
 │   └── schema.prisma         # Database Models, Enums, and Relations
 └── public/                   # Static assets, fonts, icons, placeholders
 ```
@@ -113,9 +114,9 @@ neoshop-ultra/
 
 ### 4. Featured Products Showcase
 * **File location:** [components/sections/featured-products.tsx](file:///Users/asithalakmal/Documents/web/neoshop-ultra/components/sections/featured-products.tsx)
-* **Description:** A primary storefront display rendering promotional and high-priority store inventory fetched directly from the SQLite database.
+* **Description:** A primary storefront display rendering promotional and high-priority store inventory fetched directly from the PostgreSQL database.
 * **Key Features:**
-  * **Prisma Dynamic Querying**: Pulls active, featured products from the SQLite database with fallback average-review aggregation algorithms.
+  * **Prisma Dynamic Querying**: Pulls active, featured products from the PostgreSQL database with fallback average-review aggregation algorithms.
   * **Interactive Hover Overlays**: Images scale subtly on hover. Actions like "Quick Wishlist Toggle" (pulsing visual status) and "Quick Eye Preview" fade in, sliding up from the bottom boundary.
   * **Smart Tag Indicators**: Automatically processes inventory metadata tags to display high-contrast contextual labels like "New" (pulsing green) or calculate discount percentages (e.g., "-10% Sale" in red).
   * **UX Skeleton Shimmers**: Integrates dynamic `<ProductGridSkeleton />` loading placeholder blocks, preventing layout shift while fetching from the database.
@@ -173,7 +174,7 @@ neoshop-ultra/
 
 ## 🗄️ Database & Schema Relations
 
-Neoshop Ultra leverages an SQLite local database, managed with type-safe relational schemas via Prisma ORM.
+Neoshop Ultra leverages a Supabase PostgreSQL database, managed with type-safe relational schemas via Prisma ORM.
 
 ### Prisma Entity-Relationship Diagram
 
@@ -302,17 +303,22 @@ npm install
 ```
 
 ### 2. Setup Database & Run Migrations
-Synchronize your local Prisma Schema definitions with the SQLite database file:
+Synchronize your local Prisma Schema definitions with the Supabase PostgreSQL database:
 ```bash
-# Push schema schemas directly to SQLite file
+# Push schema definitions directly to the database
 npx prisma db push
 ```
 
 ### 3. Seed Mock Data
-Inject rich sample products (iPhone 15 Pro Max, MacBook Air M3, AirPods Pro 2, iPad Pro 12.9"), category paths, and a default demo user account (`demo@neoshop.com`):
+Inject rich sample products (e.g. premium streetwear garments), category paths, and default demo user accounts:
+- **Super Admin**: `superadmin@neoshop.com`
+- **Admin**: `admin@neoshop.com`
+- **Customer**: `demo@neoshop.com`
+*(Password for all accounts: `neoshop_secure_password_2026`)*
+
 ```bash
 # Execute the database seeder script
-npx tsx lib/seed.ts
+npx tsx src/lib/seed.ts
 ```
 
 ### 4. Spin up the Development Server
@@ -331,3 +337,9 @@ Manage data models, products, reviews, categories, and active carts visually in 
 npm run db:studio
 ```
 Prisma Studio will load at [http://localhost:5555](http://localhost:5555) automatically!
+
+---
+
+## ⚡ Performance Optimization Roadmap
+
+We are actively optimizing Neoshop Ultra to handle 100K+ monthly users efficiently. See our comprehensive [Performance Optimization Roadmap](PERFORMANCE.md) detailing the ongoing transition from Client Components to Server Components, PostgreSQL tuning, streaming, and caching strategies.

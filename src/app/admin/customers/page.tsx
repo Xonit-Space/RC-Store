@@ -1,33 +1,56 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { RefreshCw, Shield, User } from "lucide-react"
+import { useState, useEffect, useCallback } from "react"
+import { useRouter, useSearchParams, usePathname } from "next/navigation"
+import { RefreshCw, Shield, User, ChevronLeft, ChevronRight } from "lucide-react"
 import { toast } from "sonner"
 
+const PAGE_SIZE = 24
+
 export default function AdminCustomersPage() {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  const currentPage = parseInt(searchParams.get("page") || "1", 10)
   const [users, setUsers] = useState<any[]>([])
+  const [totalPages, setTotalPages] = useState(1)
+  const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
 
-  const fetchUsers = async () => {
+  // Phase 9: Fetch paginated customers from server
+  const fetchUsers = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await fetch("/api/pos/customers")
+      const params = new URLSearchParams({
+        page: String(currentPage),
+        limit: String(PAGE_SIZE),
+      })
+      const res = await fetch(`/api/pos/customers?${params}`)
       if (res.ok) {
         const data = await res.json()
         setUsers(data.data || [])
+        setTotalPages(data.totalPages || 1)
+        setTotal(data.total || 0)
       } else {
         toast.error("Failed to load user accounts registry")
       }
-    } catch (err) {
+    } catch {
       toast.error("Failed to execute database lookup")
     } finally {
       setLoading(false)
     }
-  }
+  }, [currentPage])
 
   useEffect(() => {
     fetchUsers()
-  }, [])
+  }, [fetchUsers])
+
+  const navigatePage = useCallback((newPage: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("page", String(newPage))
+    router.push(`${pathname}?${params.toString()}`)
+  }, [searchParams, pathname, router])
 
   if (loading) {
     return (
@@ -47,6 +70,9 @@ export default function AdminCustomersPage() {
         <h2 className="font-sans text-3xl font-light text-foreground leading-none">
           User Accounts
         </h2>
+        <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-2">
+          {total.toLocaleString()} registered accounts
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -78,6 +104,31 @@ export default function AdminCustomersPage() {
           </div>
         ))}
       </div>
+
+      {/* Phase 9: Pagination controls */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between pt-4 border-t border-border/40">
+          <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
+            Page {currentPage} of {totalPages}
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => navigatePage(currentPage - 1)}
+              disabled={currentPage <= 1}
+              className="flex items-center gap-2 px-4 py-2 border border-border/40 text-[10px] uppercase tracking-widest font-bold text-foreground disabled:opacity-30 hover:border-foreground transition-colors"
+            >
+              <ChevronLeft className="h-3 w-3" /> Prev
+            </button>
+            <button
+              onClick={() => navigatePage(currentPage + 1)}
+              disabled={currentPage >= totalPages}
+              className="flex items-center gap-2 px-4 py-2 border border-border/40 text-[10px] uppercase tracking-widest font-bold text-foreground disabled:opacity-30 hover:border-foreground transition-colors"
+            >
+              Next <ChevronRight className="h-3 w-3" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

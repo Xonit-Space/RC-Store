@@ -1,31 +1,20 @@
-"use client"
-
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
-import { useEffect, useRef } from "react"
 
 export function HeroSection() {
-  const videoRef = useRef<HTMLVideoElement>(null)
-
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.play().catch(() => {
-        // Autoplay may be blocked by the browser; that is acceptable
-      })
-    }
-  }, [])
 
   return (
     <section className="relative w-full h-screen min-h-[600px] overflow-hidden bg-charcoal">
       {/* Cinematic Video Background */}
       <video
-        ref={videoRef}
         src="/hero-product.mov"
         poster="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1600&q=80"
         autoPlay
         muted
         loop
         playsInline
+        preload="auto"
+        {...{ fetchPriority: "high" }}
         className="absolute inset-0 w-full h-full object-cover opacity-60"
         aria-hidden="true"
       />

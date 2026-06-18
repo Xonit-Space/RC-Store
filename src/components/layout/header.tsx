@@ -8,6 +8,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { useCartStore } from "@/store/cart"
 import { signOut, useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import { useDebounce } from "@/hooks/use-debounce"
 
 export function Header() {
   const { data: session } = useSession()
@@ -19,6 +20,9 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [mounted, setMounted] = useState(false)
   
+  // Phase 4: Debounce the search input to prevent API spam
+  const debouncedSearchQuery = useDebounce(searchQuery, 500)
+
   const cartCount = cartStore.getItemCount()
 
   useEffect(() => {
@@ -30,6 +34,12 @@ export function Header() {
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
+
+  useEffect(() => {
+    if (debouncedSearchQuery.trim()) {
+      router.push(`/products?query=${encodeURIComponent(debouncedSearchQuery)}`)
+    }
+  }, [debouncedSearchQuery, router])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()

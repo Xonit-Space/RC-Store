@@ -7,16 +7,34 @@ import { PosCustomerCreateSchema } from "@/validators/pos"
 export const dynamic = "force-dynamic"
 
 export const GET = withApiHandler(async (req: NextRequest) => {
-  const customers = await db.user.findMany({
-    where: { role: UserRole.CUSTOMER },
-    include: {
-      loyaltyPoint: true,
-      storeCredits: true,
-      addresses: {
-        take: 1
-      }
-    }
-  })
+  const { searchParams } = new URL(req.url)
+  const page   = Math.max(1, parseInt(searchParams.get("page")  || "1", 10))
+  const limit  = Math.min(100, parseInt(searchParams.get("limit") || "24", 10))
+  const search = searchParams.get("search") || ""
+  const skip   = (page - 1) * limit
+
+  const where: any = { role: UserRole.CUSTOMER }
+  if (search) {
+    where.OR = [
+      { name: { contains: search, mode: "insensitive" } },
+      { email: { contains: search, mode: "insensitive" } },
+    ]
+  }
+
+  const [customers, total] = await Promise.all([
+    db.user.findMany({
+      where,
+      skip,
+      take: limit,
+      include: {
+        loyaltyPoint: true,
+        storeCredits: true,
+        addresses: { take: 1 }
+      },
+      orderBy: { createdAt: "desc" }
+    }),
+    db.user.count({ where })
+  ])
 
   const posCustomers = customers.map((c: any) => {
     const address = c.addresses[0]
@@ -35,7 +53,14 @@ export const GET = withApiHandler(async (req: NextRequest) => {
     }
   })
 
-  return NextResponse.json({ success: true, data: posCustomers })
+  return NextResponse.json({
+    success: true,
+    data: posCustomers,
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
+  })
 }, { requireAdmin: true, rateLimitNamespace: "pos_customers" })
 
 export const POST = withApiHandler(async (req: NextRequest) => {

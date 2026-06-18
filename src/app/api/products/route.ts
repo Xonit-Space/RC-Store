@@ -29,9 +29,11 @@ export const GET = withApiHandler(async (req: NextRequest) => {
   if (brand) where.brand = { slug: brand }
   if (featured) where.isFeatured = true
   if (q) {
+    // Phase 4: Full-Text Search (FTS) using PostgreSQL
+    const searchQuery = q.split(/\s+/).filter(Boolean).join(" | ")
     where.OR = [
-      { name: { contains: q, mode: "insensitive" } },
-      { description: { contains: q, mode: "insensitive" } },
+      { name: { search: searchQuery } },
+      { description: { search: searchQuery } },
     ]
   }
 
@@ -40,25 +42,38 @@ export const GET = withApiHandler(async (req: NextRequest) => {
       where,
       skip: (page - 1) * limit,
       take: limit,
-      include: {
-        images: { orderBy: { sortOrder: "asc" } },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        price: true,
+        originalPrice: true,
+        createdAt: true,
+        images: {
+          orderBy: { sortOrder: "asc" },
+          select: { url: true }
+        },
         brand: { select: { name: true, slug: true } },
         category: { select: { name: true, slug: true } },
-        variants: { select: { id: true, size: true, color: true, price: true } },
-        reviews: { select: { rating: true } },
+        variants: {
+          where: { isActive: true },
+          select: { id: true, size: true, color: true, price: true }
+        },
+        _count: {
+          select: { reviews: true }
+        }
       },
       orderBy: { createdAt: "desc" },
     }),
     db.product.count({ where }),
   ])
 
-  // Normalize images include query parameter behavior to support both formats
+  // Format to standard product object signature
   const formattedProducts = products.map((p) => {
-    // If the image query failed or is missing, fallback to empty array
-    const imgs = p.images || []
     return {
       ...p,
-      images: imgs,
+      images: p.images || [],
+      reviewCount: p._count.reviews
     }
   })
 

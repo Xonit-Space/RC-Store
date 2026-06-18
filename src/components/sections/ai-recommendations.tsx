@@ -1,160 +1,64 @@
-"use client"
-
-import { useState, useEffect } from "react"
-import { Sparkles, TrendingUp, Clock, User, ShoppingCart } from "lucide-react"
+import { Sparkles, TrendingUp, Clock, User } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ProductGridSkeleton } from "@/components/ui/loading-skeleton"
-import { useLoading } from "@/components/providers/loading-provider"
 import { getRecommendations } from "@/lib/api"
-import { useCartStore } from "@/store/cart"
-import { useSession } from "next-auth/react"
-import { toast } from "sonner"
 import Link from "next/link"
+import Image from "next/image"
+import { AddToCartClientButton } from "@/components/product/add-to-cart-button"
 
-interface RecommendedProduct {
-  id: string
-  name: string
-  price: number
-  slug: string
-  images: string[]
-  category: {
-    name: string
-  }
-  variants?: any[]
-}
+export async function AIRecommendations() {
+  // Fetch recommendations on the server
+  const recommendations = await getRecommendations()
 
-interface Recommendations {
-  personalized: RecommendedProduct[]
-  trending: RecommendedProduct[]
-  recentlyViewed: RecommendedProduct[]
-}
-
-export function AIRecommendations() {
-  const { data: session } = useSession()
-  const cartStore = useCartStore()
-  const [recommendations, setRecommendations] = useState<Recommendations>({
-    personalized: [],
-    trending: [],
-    recentlyViewed: [],
-  })
-  const [loading, setLoading] = useState(true)
-  const { withLoading } = useLoading()
-
-  useEffect(() => {
-    const fetchRecommendations = async () => {
-      try {
-        const data = await withLoading(getRecommendations())
-        setRecommendations(data)
-      } catch (error) {
-        console.error("Failed to fetch recommendations:", error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchRecommendations()
-  }, [withLoading])
-
-  const addToCart = async (productId: string) => {
-    // Look up product in any of the categories
-    const allRecs = [
-      ...recommendations.personalized,
-      ...recommendations.trending,
-      ...recommendations.recentlyViewed
-    ]
-    const product = allRecs.find((p) => p.id === productId)
-    if (!product) return
-
+  const RecommendationCard = ({ product }: { product: any }) => {
     const defaultVariant = product.variants?.[0]
-    if (!defaultVariant) {
-      toast.error("No active variants available for this item")
-      return
-    }
+    const variantId = defaultVariant?.id || ""
+    const size = defaultVariant?.size || "M"
+    const color = defaultVariant?.color || "#000000"
 
-    try {
-      await withLoading(
-        cartStore.addItem(
-          {
-            variantId: defaultVariant.id,
-            quantity: 1,
-            product: {
-              id: product.id,
-              name: product.name,
-              price: product.price,
-              imageUrl: product.images?.[0] || "/placeholder.svg",
-              size: defaultVariant.size || "M",
-              color: defaultVariant.color || "#000000",
-            },
-          },
-          session?.user?.id
-        )
-      )
-      toast.success(`Successfully added ${product.name} to your shopping bag!`)
-    } catch (err) {
-      toast.error("Failed to add garment to cart")
-    }
-  }
-
-  const RecommendationCard = ({ product }: { product: RecommendedProduct }) => (
-    <Card className="group hover:shadow-md transition-all duration-300 hover:-translate-y-1 border border-muted/10 rounded-none bg-card overflow-hidden">
-      <CardContent className="p-4">
-        <div className="aspect-square mb-3 overflow-hidden rounded-none bg-muted/5 relative">
-          <Link href={`/products/${product.slug}`} className="block w-full h-full">
-            <img
-              src={product.images[0] || "/placeholder.svg"}
-              alt={product.name}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              loading="lazy"
-            />
-          </Link>
-        </div>
-        <div className="space-y-2">
-          <h4 className="font-extrabold text-foreground text-sm line-clamp-2 leading-snug group-hover:text-primary transition min-h-10">
-            <Link href={`/products/${product.slug}`}>
-              {product.name}
-            </Link>
-          </h4>
-          <Badge variant="outline" className="text-[10px] font-extrabold text-foreground uppercase tracking-widest bg-foreground border border-foreground px-2 py-0.5 rounded">
-            {product.category.name}
-          </Badge>
-          <div className="flex items-center justify-between pt-1">
-            <span className="text-sm font-extrabold text-foreground">Rs. {product.price.toLocaleString()}</span>
-            <Badge variant="secondary" className="text-[9px] font-extrabold uppercase bg-foreground text-foreground border-foreground animate-pulse">
-              AI Pick
-            </Badge>
-          </div>
-          <Button
-            size="sm"
-            className="w-full bg-foreground text-white font-bold rounded-none h-9.5 text-xs shadow-md mt-2 hover:bg-foreground active:scale-95 transition"
-            onClick={() => addToCart(product.id)}
-          >
-            <ShoppingCart className="h-4 w-4 mr-1.5" />
-            Add to Cart
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  )
-
-  if (loading) {
     return (
-      <section className="py-16 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Sparkles className="h-6 w-6 text-foreground animate-pulse" />
-              <h2 className="text-3xl md:text-4xl font-bold">AI-Powered Recommendations</h2>
-            </div>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Our advanced AI analyzes your preferences and behavior to suggest products you&apos;ll love
-            </p>
+      <Card className="group hover:shadow-md transition-all duration-300 hover:-translate-y-1 border border-muted/10 rounded-none bg-card overflow-hidden">
+        <CardContent className="p-4">
+          <div className="aspect-square mb-3 overflow-hidden rounded-none bg-muted/5 relative">
+            <Link href={`/products/${product.slug}`} className="block w-full h-full relative">
+              <Image
+                src={product.images[0] || "/placeholder.svg"}
+                alt={product.name}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            </Link>
           </div>
-          <ProductGridSkeleton count={4} />
-        </div>
-      </section>
+          <div className="space-y-2">
+            <h4 className="font-extrabold text-foreground text-sm line-clamp-2 leading-snug group-hover:text-primary transition min-h-10">
+              <Link href={`/products/${product.slug}`}>
+                {product.name}
+              </Link>
+            </h4>
+            <Badge variant="outline" className="text-[10px] font-extrabold text-foreground uppercase tracking-widest bg-foreground border border-foreground px-2 py-0.5 rounded">
+              {product.category?.name || "Apparel"}
+            </Badge>
+            <div className="flex items-center justify-between pt-1">
+              <span className="text-sm font-extrabold text-foreground">Rs. {product.price.toLocaleString()}</span>
+              <Badge variant="secondary" className="text-[9px] font-extrabold uppercase bg-foreground text-foreground border-foreground animate-pulse">
+                AI Pick
+              </Badge>
+            </div>
+            
+            <AddToCartClientButton
+              productId={product.id}
+              productName={product.name}
+              price={product.price}
+              imageUrl={product.images?.[0] || "/placeholder.svg"}
+              variantId={variantId}
+              size={size}
+              color={color}
+            />
+          </div>
+        </CardContent>
+      </Card>
     )
   }
 
@@ -197,7 +101,7 @@ export function AIRecommendations() {
               </CardHeader>
               <CardContent className="px-0 pb-0">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {recommendations.personalized.map((product) => (
+                  {recommendations.personalized?.map((product: any) => (
                     <RecommendationCard key={product.id} product={product} />
                   ))}
                 </div>
@@ -215,7 +119,7 @@ export function AIRecommendations() {
               </CardHeader>
               <CardContent className="px-0 pb-0">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {recommendations.trending.map((product) => (
+                  {recommendations.trending?.map((product: any) => (
                     <RecommendationCard key={product.id} product={product} />
                   ))}
                 </div>
@@ -233,7 +137,7 @@ export function AIRecommendations() {
               </CardHeader>
               <CardContent className="px-0 pb-0">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {recommendations.recentlyViewed.map((product) => (
+                  {recommendations.recentlyViewed?.map((product: any) => (
                     <RecommendationCard key={product.id} product={product} />
                   ))}
                 </div>

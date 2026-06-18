@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 import { Search, Mic, Camera, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -9,7 +9,7 @@ import { Card } from "@/components/ui/card"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { useLoading } from "@/components/providers/loading-provider"
 import { getProducts } from "@/lib/api"
-import { debounce } from "lodash"
+import { useDebounce } from "@/hooks/use-debounce"
 import { toast } from "sonner"
 
 interface SearchSuggestion {
@@ -27,19 +27,20 @@ export function SmartSearch() {
   const [isSearching, setIsSearching] = useState(false)
   const { withLoading } = useLoading()
 
-  // Debounced search function
-  const debouncedSearch = useCallback(
-    debounce(async (searchQuery: string) => {
-      if (searchQuery.length < 2) {
-        setSuggestions([])
-        setShowSuggestions(false)
-        setIsSearching(false)
-        return
-      }
+  // Phase 6: Use our native useDebounce hook instead of lodash
+  const debouncedQuery = useDebounce(query, 300)
 
-      setIsSearching(true)
-      try {
-        const products = await getProducts({ search: searchQuery, limit: 5 })
+  useEffect(() => {
+    if (debouncedQuery.length < 2) {
+      setSuggestions([])
+      setShowSuggestions(false)
+      setIsSearching(false)
+      return
+    }
+
+    setIsSearching(true)
+    getProducts({ search: debouncedQuery, limit: 5 })
+      .then((products) => {
         const mockSuggestions: SearchSuggestion[] = [
           ...products.map((product: any) => ({
             id: product.id,
@@ -60,24 +61,16 @@ export function SmartSearch() {
             count: 89,
           },
         ]
-
         setSuggestions(mockSuggestions.slice(0, 6))
         setShowSuggestions(true)
-      } catch (error) {
+      })
+      .catch((error) => {
         console.error("Search failed:", error)
-      } finally {
+      })
+      .finally(() => {
         setIsSearching(false)
-      }
-    }, 300),
-    [],
-  )
-
-  useEffect(() => {
-    debouncedSearch(query)
-    return () => {
-      debouncedSearch.cancel()
-    }
-  }, [query, debouncedSearch])
+      })
+  }, [debouncedQuery])
 
   const handleVoiceSearch = () => {
     setIsListening(true)

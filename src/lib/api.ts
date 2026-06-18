@@ -1,5 +1,7 @@
 // Client-safe API Client for browser components (no direct Prisma/db imports)
 
+import { getCachedProducts, getCachedCategories } from "@/lib/services/product-service"
+
 export async function getProducts(options?: {
   featured?: boolean
   categoryId?: string
@@ -13,6 +15,12 @@ export async function getProducts(options?: {
   page?: number
   gender?: string
 }) {
+  if (typeof window === "undefined") {
+    // Phase 2: Query DB directly via cached service if on the server
+    return await getCachedProducts(options || {})
+  }
+
+  // Fallback to API route if called from client
   const { featured, categoryId, limit, search, category, brand, minPrice, maxPrice, sort, page, gender } = options || {}
 
   const params = new URLSearchParams()
@@ -49,8 +57,13 @@ export async function getProducts(options?: {
 }
 
 export async function getCategories() {
+  if (typeof window === "undefined") {
+    // Phase 2: Query DB directly via cached service if on the server
+    return await getCachedCategories()
+  }
+
   const baseUrl = typeof window === "undefined" ? "http://localhost:3000" : ""
-  // We can call /api/products/categories (which we will create next)
+  // We can call /api/products/categories
   const res = await fetch(`${baseUrl}/api/products/categories`, {
     cache: "no-store",
   })

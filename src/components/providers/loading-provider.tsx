@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, type ReactNode } from "react"
+import { createContext, useContext, useState, useMemo, useCallback, type ReactNode } from "react"
 import { PageLoader } from "@/components/ui/loading-spinner"
 
 interface LoadingContextType {
@@ -14,22 +14,31 @@ const LoadingContext = createContext<LoadingContextType | undefined>(undefined)
 export function LoadingProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(false)
 
-  const setLoading = (loading: boolean) => {
+  // Phase 8: useCallback ensures these function references are stable across renders
+  // This prevents React.memo'd consumers from re-rendering due to new function identity
+  const setLoading = useCallback((loading: boolean) => {
     setIsLoading(loading)
-  }
+  }, [])
 
-  const withLoading = async <T,>(promise: Promise<T>): Promise<T> => {
-    setLoading(true)
+  const withLoading = useCallback(async <T,>(promise: Promise<T>): Promise<T> => {
+    setIsLoading(true)
     try {
       const result = await promise
       return result
     } finally {
-      setLoading(false)
+      setIsLoading(false)
     }
-  }
+  }, [])
+
+  // Phase 8: useMemo prevents new object identity on every render, which would
+  // cause every useLoading() consumer to re-render even when isLoading hasn't changed
+  const value = useMemo(
+    () => ({ isLoading, setLoading, withLoading }),
+    [isLoading, setLoading, withLoading]
+  )
 
   return (
-    <LoadingContext.Provider value={{ isLoading, setLoading, withLoading }}>
+    <LoadingContext.Provider value={value}>
       {children}
       {isLoading && <PageLoader />}
     </LoadingContext.Provider>

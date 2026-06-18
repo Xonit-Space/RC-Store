@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Image from "next/image"
 import { submitReview } from "@/actions/product"
 import { Heart } from "lucide-react"
 import { useCartStore } from "@/store/cart"
@@ -91,13 +92,14 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
         <div className="flex flex-col">
           {product.images?.length > 0 ? (
             product.images.map((img: string, idx: number) => (
-              <div key={idx} className="w-full min-h-screen md:min-h-[120vh]">
-                <img
+              <div key={idx} className="w-full min-h-screen md:min-h-[120vh] relative">
+                <Image
                   src={img}
                   alt={`${product.name} - View ${idx + 1}`}
-                  className="w-full h-full object-cover"
-                  loading={idx === 0 ? "eager" : "lazy"}
-                  fetchPriority={idx === 0 ? "high" : "auto"}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 58vw"
+                  className="object-cover"
+                  priority={idx === 0}
                 />
               </div>
             ))

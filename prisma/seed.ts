@@ -397,28 +397,50 @@ async function main() {
   }
   console.log(`✅ ${productCount} products created with variants & inventory.`)
 
-  // ── ADMIN & CUSTOMER USERS ──────────────────────────────────────────────────
-  const passwordHash = await bcrypt.hash("password123", 12)
+  const passwordHash = await bcrypt.hash("neoshop_secure_password_2026", 12)
+
+  const superadmin = await prisma.user.create({
+    data: {
+      email: "superadmin@neoshop.com",
+      passwordHash,
+      name: "Super Admin",
+      role: "SUPER_ADMIN",
+      isActive: true,
+      emailVerified: new Date(),
+    },
+  })
 
   const admin = await prisma.user.create({
     data: {
       email: "admin@neoshop.com",
       passwordHash,
-      name: "Sophie Laurent",
+      name: "Admin User",
       role: "ADMIN",
       isActive: true,
       emailVerified: new Date(),
     },
   })
 
+  const demoCustomer = await prisma.user.create({
+    data: {
+      email: "demo@neoshop.com",
+      passwordHash,
+      name: "Demo Customer",
+      role: "CUSTOMER",
+      isActive: true,
+      emailVerified: new Date(),
+    },
+  })
+
   const customers = await Promise.all([
+    demoCustomer,
     prisma.user.create({ data: { email: "emma@example.com", passwordHash, name: "Emma Clarke", role: "CUSTOMER", isActive: true, emailVerified: new Date() } }),
     prisma.user.create({ data: { email: "isabella@example.com", passwordHash, name: "Isabella Fontaine", role: "CUSTOMER", isActive: true, emailVerified: new Date() } }),
     prisma.user.create({ data: { email: "olivia@example.com", passwordHash, name: "Olivia Bennett", role: "CUSTOMER", isActive: true, emailVerified: new Date() } }),
     prisma.user.create({ data: { email: "charlotte@example.com", passwordHash, name: "Charlotte Moreau", role: "CUSTOMER", isActive: true, emailVerified: new Date() } }),
     prisma.user.create({ data: { email: "amelia@example.com", passwordHash, name: "Amelia Ross", role: "CUSTOMER", isActive: true, emailVerified: new Date() } }),
   ])
-  console.log(`👩 ${customers.length + 1} users created (1 admin + ${customers.length} customers).`)
+  console.log(`👩 ${customers.length + 2} users created (2 admins + ${customers.length} customers).`)
 
   // ── ADDRESSES ───────────────────────────────────────────────────────────────
   const addressesData = [
@@ -594,9 +616,11 @@ async function main() {
   console.log("\n🎉 ════════════════════════════════════════════════")
   console.log("   NeoShop Ultra seed complete!")
   console.log(`   📦 ${productCount} luxury women's fashion products`)
-  console.log(`   👥 ${customers.length + 1} users  |  📋 20 orders  |  🎟️  5 coupons`)
-  console.log("   Login: admin@neoshop.com / password123")
-  console.log("   Login: emma@example.com / password123")
+  console.log(`   👥 ${customers.length + 2} users  |  📋 20 orders  |  🎟️  5 coupons`)
+  console.log("   ─── Demo Credentials (password: neoshop_secure_password_2026) ───")
+  console.log("   Super Admin : superadmin@neoshop.com")
+  console.log("   Admin       : admin@neoshop.com")
+  console.log("   Customer    : demo@neoshop.com")
   console.log("════════════════════════════════════════════════\n")
 }
 

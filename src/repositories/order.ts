@@ -1,6 +1,7 @@
 import { db } from "@/lib/db"
-import { OrderStatus, PaymentStatus } from "@prisma/client"
+import { OrderStatus, PaymentStatus, InventoryMovementType } from "@prisma/client"
 import { validateOrderTransition } from "@/lib/security/state-machine"
+import { unstable_cache } from "next/cache"
 
 export interface OrderItemInput {
   variantId: string
@@ -25,6 +26,9 @@ export interface CreateOrderInput {
 export async function createOrder(input: CreateOrderInput) {
   return db.$transaction(async (tx) => {
     // 1. Verify and lock inventory stock first using raw pessimistic row locks
+    // Collect movement data for batch insert after locking phase
+    const movementBatch: { inventoryId: string; quantity: number; type: InventoryMovementType; reason: string }[] = []
+
     for (const item of input.items) {
       const inventories = await tx.$queryRaw<any[]>`
         SELECT id, quantity, reserved FROM inventory
@@ -51,15 +55,18 @@ export async function createOrder(input: CreateOrderInput) {
         },
       })
 
-      // Write inventory movement log
-      await tx.inventoryMovement.create({
-        data: {
-          inventoryId: inventory.id,
-          quantity: -item.quantity,
-          type: "SHIPMENT",
-          reason: `Stripe online checkout: ${input.orderNumber}`
-        }
+      // Accumulate movement log entries for batch insert
+      movementBatch.push({
+        inventoryId: inventory.id,
+        quantity: -item.quantity,
+        type: InventoryMovementType.SHIPMENT,
+        reason: `Stripe online checkout: ${input.orderNumber}`
       })
+    }
+
+    // Batch-insert all inventory movements in one query instead of N sequential creates
+    if (movementBatch.length > 0) {
+      await tx.inventoryMovement.createMany({ data: movementBatch })
     }
 
     // 2. Increment coupon used count if any
@@ -118,23 +125,43 @@ export async function createOrder(input: CreateOrderInput) {
   })
 }
 
-export async function getOrdersByUserId(userId: string) {
+export async function getOrdersByUserId(userId: string, take = 20) {
   return db.order.findMany({
     where: { userId },
-    include: {
-      items: {
-        include: {
-          variant: {
-            include: {
-              product: {
-                include: { images: true },
-              },
-            },
-          },
-        },
-      },
-    },
+    take,
     orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      orderNumber: true,
+      status: true,
+      total: true,
+      createdAt: true,
+      items: {
+        take: 10,
+        select: {
+          id: true,
+          quantity: true,
+          price: true,
+          variant: {
+            select: {
+              size: true,
+              color: true,
+              product: {
+                select: {
+                  name: true,
+                  // Only the first image needed for the order item thumbnail
+                  images: {
+                    take: 1,
+                    orderBy: { sortOrder: "asc" },
+                    select: { url: true }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
   })
 }
 
@@ -221,9 +248,10 @@ export async function updatePaymentStatus(orderId: string, transactionId: string
 
 /**
  * Enterprise Dashboard Analytics:
- * Aggregates monthly revenues and dynamic order statistics for chart canvases
+ * Aggregates monthly revenues and dynamic order statistics for chart canvases.
+ * Cached for 60 seconds — admin stats don't need per-second freshness.
  */
-export async function getOrderStats() {
+async function fetchOrderStats() {
   const [totalRevenueResult, totalOrders, pendingOrders, completedOrders] = await Promise.all([
     db.payment.aggregate({
       where: { status: PaymentStatus.COMPLETED },
@@ -241,3 +269,9 @@ export async function getOrderStats() {
     completedOrders,
   }
 }
+
+export const getOrderStats = unstable_cache(
+  fetchOrderStats,
+  ["admin-order-stats"],
+  { revalidate: 60, tags: ["orders", "payments"] }
+)

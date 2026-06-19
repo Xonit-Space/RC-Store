@@ -138,45 +138,49 @@ export async function getProducts(filters: GetProductsFilters) {
 }
 
 export async function getProductBySlug(slug: string) {
-  const product = await db.product.findUnique({
-    where: { slug },
-    include: {
-      category: {
-        include: { parent: true },
-      },
-      brand: true,
-      collection: true,
-      images: {
-        orderBy: { sortOrder: "asc" },
-      },
-      variants: {
-        where: { isActive: true },
-        include: { inventory: true },
-      },
-      attributes: true,
-      reviews: {
-        include: {
-          user: {
-            select: { name: true, avatar: true },
-          },
+  const [product, reviewStats] = await Promise.all([
+    db.product.findUnique({
+      where: { slug },
+      include: {
+        category: {
+          include: { parent: true },
         },
-        orderBy: { createdAt: "desc" },
+        brand: true,
+        collection: true,
+        images: {
+          orderBy: { sortOrder: "asc" },
+        },
+        variants: {
+          where: { isActive: true },
+          include: { inventory: true },
+        },
+        attributes: true,
+        // Limit reviews to most recent 20 — avoids full table load on high-review products
+        reviews: {
+          take: 20,
+          include: {
+            user: {
+              select: { name: true, avatar: true },
+            },
+          },
+          orderBy: { createdAt: "desc" },
+        },
       },
-    },
-  })
+    }),
+    // Use aggregate for accurate rating across ALL reviews, not just the 20 loaded
+    db.review.aggregate({
+      where: { product: { slug } },
+      _avg: { rating: true },
+      _count: { id: true },
+    }),
+  ])
 
   if (!product) return null
 
-  const totalReviews = product.reviews.length
-  const averageRating =
-    totalReviews > 0
-      ? product.reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews
-      : 0
-
   return {
     ...product,
-    averageRating,
-    reviewCount: totalReviews,
+    averageRating: reviewStats._avg.rating ?? 0,
+    reviewCount: reviewStats._count.id,
   }
 }
 
@@ -191,13 +195,32 @@ export async function createProductReview(productId: string, userId: string, rat
   })
 }
 
-export async function getCategoriesTree() {
-  return db.category.findMany({
-    where: { parentId: null },
-    include: {
-      children: {
-        include: { children: true },
+// Cached for 1 hour — category trees change on admin action, not continuously
+import { unstable_cache } from "next/cache"
+
+export const getCategoriesTree = unstable_cache(
+  async () => {
+    return db.category.findMany({
+      where: { parentId: null },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        image: true,
+        children: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            children: {
+              select: { id: true, name: true, slug: true }
+            }
+          }
+        }
       },
-    },
-  })
-}
+    })
+  },
+  ["categories-tree"],
+  { revalidate: 3600, tags: ["categories"] }
+)

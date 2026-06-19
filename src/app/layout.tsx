@@ -13,7 +13,7 @@ import { WebVitals } from "@/components/performance/web-vitals"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" })
 const cormorant = Cormorant_Garamond({ 
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["300", "400"],
   subsets: ["latin"], 
   variable: "--font-cormorant",
   display: "swap"
@@ -21,8 +21,7 @@ const cormorant = Cormorant_Garamond({
 
 export const metadata: Metadata = {
   title: "NEOSHOP ULTRA - Smart E-Commerce Platform",
-  description: "The most customizable and scalable e-commerce platform",
-  generator: 'v0.dev'
+  description: "The most customizable and scalable e-commerce platform"
 }
 
 export default function RootLayout({

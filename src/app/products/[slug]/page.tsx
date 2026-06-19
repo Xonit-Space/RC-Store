@@ -5,8 +5,8 @@ import { ProductDetailClient } from "./product-detail-client"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 
-export const dynamic = "force-dynamic"
-export const revalidate = 0
+// ISR: product detail pages revalidate every 5 minutes
+export const revalidate = 300
 
 interface ProductDetailPageProps {
   params: { slug: string }

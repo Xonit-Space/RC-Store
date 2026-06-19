@@ -1,19 +1,12 @@
 import { NextResponse } from "next/server"
 import { withApiHandler } from "@/lib/api-middleware"
-import { db } from "@/lib/db"
+import { getCachedCategories } from "@/lib/services/product-service"
 
-export const dynamic = "force-dynamic"
+// Categories are near-static \u2014 cache for 1 hour on Vercel CDN
+export const revalidate = 3600
 
 export const GET = withApiHandler(async () => {
-  const categories = await db.category.findMany({
-    include: {
-      children: {
-        include: { children: true },
-      },
-      _count: {
-        select: { products: true },
-      },
-    },
-  })
+  // Use the shared cached service instead of a raw DB query
+  const categories = await getCachedCategories()
   return NextResponse.json(categories)
 }, { rateLimitNamespace: "api_categories", rateLimit: { limit: 100, windowMs: 60000 } })

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import { UserRole } from "@prisma/client"
 import { Header } from "./layout-header"
 import { Sidebar } from "./layout-sidebar"
+import { logger } from "@/lib/logger"
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -19,7 +20,10 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
 
   const role = session.user.role as UserRole
   if (role !== UserRole.ADMIN && role !== UserRole.SUPER_ADMIN) {
-    console.warn(`[Security Alert] Non-administrative account ${session.user.email} attempted admin page access logs.`)
+    logger.warn({
+      message: "Security Alert: Non-administrative account attempted admin access",
+      context: { email: session.user.email, role }
+    })
     redirect("/")
   }
 

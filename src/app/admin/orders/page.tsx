@@ -18,7 +18,8 @@ export default function AdminOrdersPage() {
   const searchParams = useSearchParams()
 
   const currentPage = parseInt(searchParams.get("page") || "1", 10)
-  const [search, setSearch] = useState(searchParams.get("search") || "")
+  const currentSearch = searchParams.get("search") || ""
+  const [search, setSearch] = useState(currentSearch)
   const [orders, setOrders] = useState<any[]>([])
   const [totalPages, setTotalPages] = useState(1)
   const [total, setTotal] = useState(0)
@@ -46,7 +47,7 @@ export default function AdminOrdersPage() {
       const params = new URLSearchParams({
         page: String(currentPage),
         limit: String(PAGE_SIZE),
-        ...(searchParams.get("search") ? { search: searchParams.get("search")! } : {}),
+        ...(currentSearch ? { search: currentSearch } : {}),
       })
       const res = await fetch(`/api/admin/orders?${params}`)
       if (res.ok) {
@@ -62,7 +63,7 @@ export default function AdminOrdersPage() {
     } finally {
       setLoading(false)
     }
-  }, [currentPage, searchParams])
+  }, [currentPage, currentSearch])
 
   useEffect(() => {
     loadOrders()

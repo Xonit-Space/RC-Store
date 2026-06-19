@@ -7,8 +7,8 @@ import { ProductCard } from "@/components/product/product-card"
 import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 
-export const dynamic = "force-dynamic"
-export const revalidate = 0
+// ISR: revalidate catalog every 60 seconds
+export const revalidate = 60
 
 interface PageProps {
   searchParams: { [key: string]: string | string[] | undefined }

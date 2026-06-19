@@ -39,7 +39,7 @@ async function getProductsFromDb(options: GetProductsOptions = {}) {
 
   const skip = (page - 1) * limit
   
-  // Phase 2: Use select instead of include to prevent N+1 and massive payloads
+  // Use select instead of include to prevent over-fetching
   const products = await db.product.findMany({
     where,
     skip,
@@ -53,14 +53,18 @@ async function getProductsFromDb(options: GetProductsOptions = {}) {
       createdAt: true,
       images: {
         orderBy: { sortOrder: "asc" },
+        take: 3,
         select: { url: true }
       },
       category: {
         select: { name: true, slug: true }
       },
+      brand: {
+        select: { name: true, slug: true }
+      },
       variants: {
         where: { isActive: true },
-        select: { id: true, size: true, color: true, price: true }
+        select: { id: true, size: true, color: true, colorName: true, price: true }
       },
       _count: {
         select: { reviews: true }
@@ -78,47 +82,20 @@ async function getProductsFromDb(options: GetProductsOptions = {}) {
   }))
 }
 
-// Cached version of getProducts
+/**
+ * Module-level cached wrapper — defined ONCE at module scope so Next.js
+ * data cache can correctly deduplicate across serverless invocations.
+ * Previously this was inside getCachedProducts() which recreated the cache
+ * registration on every call, silently defeating caching entirely.
+ */
+const getProductsFromDbCached = unstable_cache(
+  getProductsFromDb,
+  ["products-catalog"],
+  { revalidate: 300, tags: ["products"] } // 5 min cache
+)
+
 export async function getCachedProducts(options: GetProductsOptions = {}) {
-  const {
-    featured = false,
-    categoryId = "",
-    limit = 24,
-    search = "",
-    category = "",
-    brand = "",
-    minPrice = 0,
-    maxPrice = 999999,
-    sort = "",
-    page = 1,
-    gender = "",
-  } = options
-
-  const keyParts = [
-    "products-catalog",
-    `featured-${featured}`,
-    `categoryId-${categoryId}`,
-    `limit-${limit}`,
-    `search-${search}`,
-    `category-${category}`,
-    `brand-${brand}`,
-    `minPrice-${minPrice}`,
-    `maxPrice-${maxPrice}`,
-    `sort-${sort}`,
-    `page-${page}`,
-    `gender-${gender}`,
-  ]
-
-  const fetcher = unstable_cache(
-    async () => getProductsFromDb(options),
-    keyParts,
-    {
-      revalidate: 60 * 5, // Cache for 5 minutes
-      tags: ['products']
-    }
-  )
-
-  return fetcher()
+  return getProductsFromDbCached(options)
 }
 
 export const getCachedCategories = unstable_cache(

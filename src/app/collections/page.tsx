@@ -4,12 +4,18 @@ import { db } from "@/lib/db"
 import Link from "next/link"
 import Image from "next/image"
 
-export const dynamic = "force-dynamic"
+// ISR: collections change rarely, cache for 1 hour
+export const revalidate = 3600
 
 export default async function CollectionsPage() {
   const collections = await db.collection.findMany({
     where: { isActive: true },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      description: true,
+      image: true,
       _count: {
         select: { products: true }
       }

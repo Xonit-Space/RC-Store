@@ -1,8 +1,10 @@
-export const dynamic = "force-dynamic"
+// ISR: rebuild homepage every 5 minutes — removes per-request cold starts
+export const revalidate = 300
 
 import { Suspense } from "react"
 import nextDynamic from "next/dynamic"
 import { Header } from "@/components/layout/header"
+// HeroSection is the LCP element — must be SSR'd, not lazy-loaded
 import { HeroSection } from "@/components/sections/hero-section"
 import { ProductGridSkeleton } from "@/components/ui/loading-skeleton"
 

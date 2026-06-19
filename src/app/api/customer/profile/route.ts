@@ -1,34 +1,54 @@
 import { NextRequest, NextResponse } from "next/server"
-import { withApiHandler } from "@/lib/api-middleware"
+import { withApiHandler, ApiHandlerContext } from "@/lib/api-middleware"
 import { db } from "@/lib/db"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
 
 export const dynamic = "force-dynamic"
 
-export const GET = withApiHandler(async () => {
-  const session = await getServerSession(authOptions)
-  if (!session || !session.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
+export const GET = withApiHandler(async (_req: NextRequest, context: ApiHandlerContext) => {
+  // Session pre-resolved by withApiHandler \u2014 no redundant getServerSession() call
+  const session = context.session!
 
   const profile = await db.user.findUnique({
     where: { id: session.user.id },
-    include: {
-      addresses: true,
-      loyaltyPoint: true,
-      storeCredits: true,
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      avatar: true,
+      role: true,
+      createdAt: true,
+      addresses: {
+        select: {
+          id: true,
+          title: true,
+          line1: true,
+          line2: true,
+          city: true,
+          state: true,
+          postalCode: true,
+          country: true,
+          phone: true,
+          isDefaultShipping: true,
+          isDefaultBilling: true,
+        }
+      },
+      loyaltyPoint: {
+        select: { pointsBalance: true }
+      },
+      storeCredits: {
+        where: { balance: { gt: 0 } },
+        select: { balance: true },
+        take: 1,
+      },
     },
   })
 
   return NextResponse.json(profile)
 }, { requireAuth: true, rateLimitNamespace: "api_customer_profile", rateLimit: { limit: 50, windowMs: 60000 } })
 
-export const POST = withApiHandler(async (req: NextRequest) => {
-  const session = await getServerSession(authOptions)
-  if (!session || !session.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
+export const POST = withApiHandler(async (req: NextRequest, context: ApiHandlerContext) => {
+  // Session pre-resolved by withApiHandler
+  const session = context.session!
 
   const body = await req.json()
   const { name } = body

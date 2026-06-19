@@ -101,22 +101,24 @@ export default async function AdminAnalyticsPage() {
             </div>
           ) : (
             <div className="flex items-end gap-2 h-48 w-full">
-              {recentOrders.reverse().map((order, i) => {
+              {(() => {
                 const maxTotal = Math.max(...recentOrders.map(o => o.total), 1)
-                const heightPct = Math.max((order.total / maxTotal) * 100, 5)
-                
-                return (
-                  <div key={order.id} className="flex-1 flex flex-col items-center gap-2 group">
-                    <div 
-                      className="w-full bg-forest/20 group-hover:bg-forest/50 transition-colors"
-                      style={{ height: `${heightPct}%` }}
-                    />
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute mt-[-2rem] bg-foreground text-background text-[9px] px-2 py-1 rounded">
-                      Rs.{order.total.toLocaleString()}
+                return [...recentOrders].reverse().map((order) => {
+                  const heightPct = Math.max((order.total / maxTotal) * 100, 5)
+                  
+                  return (
+                    <div key={order.id} className="flex-1 flex flex-col items-center gap-2 group relative">
+                      <div 
+                        className="w-full bg-forest/20 group-hover:bg-forest/50 transition-colors"
+                        style={{ height: `${heightPct}%` }}
+                      />
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute mt-[-2rem] bg-foreground text-background text-[9px] px-2 py-1 rounded">
+                        Rs.{order.total.toLocaleString()}
+                      </div>
                     </div>
-                  </div>
-                )
-              })}
+                  )
+                })
+              })()}
             </div>
           )}
         </div>

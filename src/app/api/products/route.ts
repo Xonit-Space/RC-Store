@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { withApiHandler } from "@/lib/api-middleware"
 import { db } from "@/lib/db"
 
-export const dynamic = "force-dynamic"
+// API responses cached 60 seconds on Vercel CDN \u2014 products don't change per-second
+export const revalidate = 60
 
 /**
  * GET /api/products

@@ -9,6 +9,7 @@ import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { ShoppingBag, RefreshCw, Calendar, ChevronRight, Home, CreditCard } from "lucide-react"
+import Image from "next/image"
 
 export default function CustomerOrdersPage() {
   const router = useRouter()
@@ -115,9 +116,9 @@ export default function CustomerOrdersPage() {
                   {order.items?.map((item: any) => (
                     <div key={item.id} className="flex items-center justify-between py-2 border-b last:border-0 border-muted/10">
                       <div className="flex items-center gap-3">
-                        <div className="h-12 w-12 rounded-none bg-muted/10 flex items-center justify-center shrink-0 overflow-hidden border border-border/40">
+                        <div className="relative h-12 w-12 rounded-none bg-muted/10 flex items-center justify-center shrink-0 overflow-hidden border border-border/40">
                           {item.variant?.product?.images?.[0]?.url ? (
-                            <img src={item.variant.product.images[0].url} alt="" className="object-cover h-full w-full" />
+                            <Image src={item.variant.product.images[0].url} alt={item.variant?.product?.name || "Product"} fill sizes="48px" className="object-cover" />
                           ) : (
                             <ShoppingBag className="w-5 h-5 text-muted-foreground" />
                           )}

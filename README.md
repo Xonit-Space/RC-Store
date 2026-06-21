@@ -1,4 +1,4 @@
-# 🌌 Neoshop Ultra
+# 🌌 RC Store Ultra
 
 [![Next.js](https://img.shields.io/badge/Next.js-14.2.16-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-18-blue?style=for-the-badge&logo=react)](https://react.dev/)
@@ -8,13 +8,13 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-316192?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
 
-**Neoshop Ultra** is an ultra-premium, full-stack e-commerce store built using Next.js 14 App Router, React 18, Tailwind CSS, Prisma, and Supabase PostgreSQL. The application is styled with a modern, responsive design using custom-tailored Radix UI micro-interactions, features real-time search logic, simulated AI recommendation engines, dynamic notifications, and a feature-rich admin dashboard portal.
+**RC Store Ultra** is an ultra-premium, full-stack e-commerce store built using Next.js 14 App Router, React 18, Tailwind CSS, Prisma, and Supabase PostgreSQL. The application is styled with a modern, responsive design using custom-tailored Radix UI micro-interactions, features real-time search logic, simulated AI recommendation engines, dynamic notifications, and a feature-rich admin dashboard portal.
 
 ---
 
 ## 📖 Table of Contents
 
-- [🌌 Neoshop Ultra](#-neoshop-ultra)
+- [🌌 RC Store Ultra](#-rc-store)
   - [📖 Table of Contents](#-table-of-contents)
   - [🛠️ Core Technology Stack](#️-core-technology-stack)
   - [🏗️ Project Architecture](#️-project-architecture)
@@ -58,7 +58,7 @@
 ## 🏗️ Project Architecture
 
 ```
-neoshop-ultra/
+rc-store/
 ├── app/                      # Next.js App Router (Pages, layouts, global CSS)
 │   ├── admin/                # Admin Panel Route Entry
 │   ├── globals.css           # Custom global CSS styling
@@ -87,7 +87,7 @@ neoshop-ultra/
 ## ✨ Feature-by-Feature Breakdown
 
 ### 1. Global Navigation & Header Toolbar
-* **File location:** [components/layout/header.tsx](file:///Users/asithalakmal/Documents/web/neoshop-ultra/components/layout/header.tsx)
+* **File location:** [components/layout/header.tsx](file:///Users/asithalakmal/Documents/web/rc-store/components/layout/header.tsx)
 * **Description:** Represents the sticky storefront top navigation bar. Engineered with `backdrop-filter: blur` to support translucent glassy visual layouts on scroll. 
 * **Key Features:**
   * **Brand Identity**: Custom visual icon matching standard modern styles with a blue-to-purple background gradient.
@@ -96,7 +96,7 @@ neoshop-ultra/
   * **Adaptive Mobile Layout**: Hidden side burger menu on smaller devices keeping the header fully responsive.
 
 ### 2. Global UX Transition & Loading Context
-* **File location:** [components/providers/loading-provider.tsx](file:///Users/asithalakmal/Documents/web/neoshop-ultra/components/providers/loading-provider.tsx)
+* **File location:** [components/providers/loading-provider.tsx](file:///Users/asithalakmal/Documents/web/rc-store/components/providers/loading-provider.tsx)
 * **Description:** Prevents flash-of-unstyled-content and raw database delay stutters by implementing a global React context wrapper managing asynchronous latency gracefully.
 * **Key Features:**
   * **Promise-Based Interceptor**: Exposes a generic `withLoading` function wrapper that hooks into any Promise (DB fetches, addition requests, image queries) to lock loading states.
@@ -104,7 +104,7 @@ neoshop-ultra/
   * **Safe Boundary Execution**: Guarantees recovery from state locks using structured `try...finally` hooks to release visual locks even if api requests fail.
 
 ### 3. Dynamic Autoplay Hero Slider
-* **File location:** [components/sections/hero-section.tsx](file:///Users/asithalakmal/Documents/web/neoshop-ultra/components/sections/hero-section.tsx)
+* **File location:** [components/sections/hero-section.tsx](file:///Users/asithalakmal/Documents/web/rc-store/components/sections/hero-section.tsx)
 * **Description:** Implements a visually arresting, interactive sliding hero banner showing promotional highlights on the home screen.
 * **Key Features:**
   * **Autoplay Mechanism**: Standard custom `setInterval` timer (configured to auto-cycle slides every 5 seconds) paired with cleanup events on unmount to prevent browser memory leaks.
@@ -113,7 +113,7 @@ neoshop-ultra/
   * **Micro-Animations**: Hover translation slide effects moving the primary buttons and sliding product mockups.
 
 ### 4. Featured Products Showcase
-* **File location:** [components/sections/featured-products.tsx](file:///Users/asithalakmal/Documents/web/neoshop-ultra/components/sections/featured-products.tsx)
+* **File location:** [components/sections/featured-products.tsx](file:///Users/asithalakmal/Documents/web/rc-store/components/sections/featured-products.tsx)
 * **Description:** A primary storefront display rendering promotional and high-priority store inventory fetched directly from the PostgreSQL database.
 * **Key Features:**
   * **Prisma Dynamic Querying**: Pulls active, featured products from the PostgreSQL database with fallback average-review aggregation algorithms.
@@ -122,7 +122,7 @@ neoshop-ultra/
   * **UX Skeleton Shimmers**: Integrates dynamic `<ProductGridSkeleton />` loading placeholder blocks, preventing layout shift while fetching from the database.
 
 ### 5. Simulated AI Recommendation Engine
-* **File location:** [components/sections/ai-recommendations.tsx](file:///Users/asithalakmal/Documents/web/neoshop-ultra/components/sections/ai-recommendations.tsx)
+* **File location:** [components/sections/ai-recommendations.tsx](file:///Users/asithalakmal/Documents/web/rc-store/components/sections/ai-recommendations.tsx)
 * **Description:** The centerpiece feature showing smart product selections filtered by user habits and simulated machine learning weights.
 * **Key Features:**
   * **Tabbed Navigation Matrix**: Splits recommendation algorithms into three separate views:
@@ -133,7 +133,7 @@ neoshop-ultra/
   * **Smooth Tab Transitions**: Leverages Tailwind's `animate-in fade-in` classes to ensure tabs switch seamlessly.
 
 ### 6. Intelligent Search (SmartSearch)
-* **File location:** [components/features/smart-search.tsx](file:///Users/asithalakmal/Documents/web/neoshop-ultra/components/features/smart-search.tsx)
+* **File location:** [components/features/smart-search.tsx](file:///Users/asithalakmal/Documents/web/rc-store/components/features/smart-search.tsx)
 * **Description:** An advanced search utility designed for instant, zero-page-refresh navigation queries.
 * **Key Features:**
   * **Debounced Key Input**: Uses a 300ms `lodash/debounce` callback. Only hits the Prisma DB if query inputs are 2 or more characters, keeping processing footprints minimal.
@@ -145,7 +145,7 @@ neoshop-ultra/
   * **Visual Image Lookup**: Native camera trigger button placeholder to support automated image upload analysis.
 
 ### 7. Interactive Notification Center
-* **File location:** [components/features/notification-center.tsx](file:///Users/asithalakmal/Documents/web/neoshop-ultra/components/features/notification-center.tsx)
+* **File location:** [components/features/notification-center.tsx](file:///Users/asithalakmal/Documents/web/rc-store/components/features/notification-center.tsx)
 * **Description:** Keeps users informed of changes in their shopping workflow through an elegant drop-down card portal.
 * **Key Features:**
   * **Categorized Alerts**: Maps events into distinct visual templates matching icons:
@@ -157,8 +157,8 @@ neoshop-ultra/
 
 ### 8. Elite Administration Portal Dashboard
 * **File locations:** 
-  * [app/admin/page.tsx](file:///Users/asithalakmal/Documents/web/neoshop-ultra/app/admin/page.tsx)
-  * [components/admin/admin-dashboard.tsx](file:///Users/asithalakmal/Documents/web/neoshop-ultra/components/admin/admin-dashboard.tsx)
+  * [app/admin/page.tsx](file:///Users/asithalakmal/Documents/web/rc-store/app/admin/page.tsx)
+  * [components/admin/admin-dashboard.tsx](file:///Users/asithalakmal/Documents/web/rc-store/components/admin/admin-dashboard.tsx)
 * **Description:** A dedicated, clean, back-office administration panel providing complete visibility of the shop's key performance metrics.
 * **Key Features:**
   * **Sidebar Navigation Router**: Single-page navigation controller switching panels between *Overview*, *Products*, *Orders*, *Customers*, and *Settings*.
@@ -174,7 +174,7 @@ neoshop-ultra/
 
 ## 🗄️ Database & Schema Relations
 
-Neoshop Ultra leverages a Supabase PostgreSQL database, managed with type-safe relational schemas via Prisma ORM.
+RC Store Ultra leverages a Supabase PostgreSQL database, managed with type-safe relational schemas via Prisma ORM.
 
 ### Prisma Entity-Relationship Diagram
 
@@ -293,7 +293,7 @@ erDiagram
 
 ## 🚀 Installation & Local Setup
 
-Get Neoshop Ultra running on your local machine by following this setup guide.
+Get RC Store Ultra running on your local machine by following this setup guide.
 
 ### 1. Clone & Install Dependencies
 First, ensure you have **Node.js (v18+)** installed. In your terminal, run:
@@ -310,15 +310,15 @@ npx prisma db push
 ```
 
 ### 3. Seed Mock Data
-Inject rich sample products (e.g. premium streetwear garments), category paths, and default demo user accounts:
-- **Super Admin**: `superadmin@neoshop.com`
-- **Admin**: `admin@neoshop.com`
-- **Customer**: `demo@neoshop.com`
-*(Password for all accounts: `neoshop_secure_password_2026`)*
+Inject rich sample products (e.g. premium high-performance RC cars and parts), category paths, and default demo user accounts:
+- **Super Admin**: `superadmin@rcstore.com`
+- **Admin**: `admin@rcstore.com`
+- **Customer**: `demo@rcstore.com`
+*(Password for all accounts: `rc_secure_password_2026`)*
 
 ```bash
 # Execute the database seeder script
-npx tsx src/lib/seed.ts
+npx prisma db seed
 ```
 
 ### 4. Spin up the Development Server
@@ -342,4 +342,4 @@ Prisma Studio will load at [http://localhost:5555](http://localhost:5555) automa
 
 ## ⚡ Performance Optimization Roadmap
 
-We are actively optimizing Neoshop Ultra to handle 100K+ monthly users efficiently. See our comprehensive [Performance Optimization Roadmap](PERFORMANCE.md) detailing the ongoing transition from Client Components to Server Components, PostgreSQL tuning, streaming, and caching strategies.
+We are actively optimizing RC Store Ultra to handle 100K+ monthly users efficiently. See our comprehensive [Performance Optimization Roadmap](PERFORMANCE.md) detailing the ongoing transition from Client Components to Server Components, PostgreSQL tuning, streaming, and caching strategies.

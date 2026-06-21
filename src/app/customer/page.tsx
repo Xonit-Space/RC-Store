@@ -39,7 +39,8 @@ export default function CustomerDashboardPage() {
     try {
       const ordRes = await fetch("/api/customer/orders")
       if (ordRes.ok) {
-        setOrders(await ordRes.json())
+        const json = await ordRes.json()
+        setOrders(json.data || (Array.isArray(json) ? json : []))
       } else {
         toast.error("Failed to load orders")
       }

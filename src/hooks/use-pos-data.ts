@@ -7,7 +7,7 @@ export function usePosProducts() {
       const res = await fetch("/api/pos/products")
       if (!res.ok) throw new Error("Failed to fetch POS catalog")
       const json = await res.json()
-      return json.items || json.data || json
+      return json.data || []
     }
   })
 }

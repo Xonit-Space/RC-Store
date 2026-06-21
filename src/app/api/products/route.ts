@@ -81,7 +81,8 @@ export const GET = withApiHandler(async (req: NextRequest) => {
   })
 
   return NextResponse.json({
-    products: formattedProducts,
+    success: true,
+    data: formattedProducts,
     pagination: {
       page,
       limit,

@@ -17,8 +17,8 @@ export default function AdminCustomersPage() {
   const { data: customerData, isLoading: loading } = useAdminCustomers(currentPage, PAGE_SIZE)
   
   const users = customerData?.data || []
-  const totalPages = customerData?.totalPages || 1
-  const total = customerData?.total || 0
+  const totalPages = customerData?.pagination?.totalPages || 1
+  const total = customerData?.pagination?.total || 0
 
   const navigatePage = useCallback((newPage: number) => {
     const params = new URLSearchParams(searchParams.toString())

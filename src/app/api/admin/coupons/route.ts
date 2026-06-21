@@ -8,7 +8,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
   const coupons = await db.coupon.findMany({
     orderBy: { createdAt: "desc" }
   })
-  return NextResponse.json(coupons)
+  return NextResponse.json({ success: true, data: coupons })
 }, { requireAdmin: true, rateLimitNamespace: "admin_coupons_list" })
 
 export const POST = withApiHandler(async (req: NextRequest) => {

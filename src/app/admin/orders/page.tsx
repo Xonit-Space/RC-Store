@@ -41,9 +41,9 @@ export default function AdminOrdersPage() {
 
   const { data: ordersData, isLoading: loading, refetch } = useAdminOrders(currentPage, PAGE_SIZE, debouncedSearch)
 
-  const orders = ordersData?.orders || []
-  const totalPages = ordersData?.totalPages || 1
-  const total = ordersData?.total || 0
+  const orders = ordersData?.data || []
+  const totalPages = ordersData?.pagination?.totalPages || 1
+  const total = ordersData?.pagination?.total || 0
 
   const handleStatusChange = useCallback(async (orderId: string, newStatus: OrderStatus) => {
     try {

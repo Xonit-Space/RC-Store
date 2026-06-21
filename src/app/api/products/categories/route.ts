@@ -9,5 +9,5 @@ export const dynamic = "force-dynamic"
 export const GET = withApiHandler(async () => {
   // Use the shared cached service instead of a raw DB query
   const categories = await getCachedCategories()
-  return NextResponse.json(categories)
+  return NextResponse.json({ success: true, data: categories })
 }, { rateLimitNamespace: "api_categories", rateLimit: { limit: 100, windowMs: 60000 } })

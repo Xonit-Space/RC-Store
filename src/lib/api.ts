@@ -64,7 +64,7 @@ export async function getProducts(options?: {
   const data = await res.json()
   
   // Format to standard product object signature with images as a string array
-  return (data.products || []).map((product: ApiProduct) => ({
+  return (data.data || []).map((product: ApiProduct) => ({
     ...product,
     images: product.images?.map((img: ProductImage) => img.url) || ["/placeholder.svg"],
     tags: product.createdAt && (new Date(product.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) ? ["new"] : [],
@@ -87,7 +87,8 @@ export async function getCategories() {
     next: { revalidate: 3600 },
   })
   if (!res.ok) return []
-  return await res.json()
+  const data = await res.json()
+  return data.data || []
 }
 
 export async function getProductBySlug(slug: string) {

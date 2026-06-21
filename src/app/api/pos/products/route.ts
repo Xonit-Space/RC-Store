@@ -67,10 +67,13 @@ export const GET = withApiHandler(async (req: NextRequest) => {
   })
 
   return NextResponse.json({
-    items: posProducts,
-    total,
-    page,
-    limit,
-    totalPages: Math.ceil(total / limit)
+    success: true,
+    data: posProducts,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    }
   })
 }, { requireAdmin: true, rateLimitNamespace: "pos_products", rateLimit: { limit: 120, windowMs: 60000 } })

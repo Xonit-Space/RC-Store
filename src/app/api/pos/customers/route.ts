@@ -56,10 +56,12 @@ export const GET = withApiHandler(async (req: NextRequest) => {
   return NextResponse.json({
     success: true,
     data: posCustomers,
-    total,
-    page,
-    limit,
-    totalPages: Math.ceil(total / limit),
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    }
   })
 }, { requireAdmin: true, rateLimitNamespace: "pos_customers" })
 

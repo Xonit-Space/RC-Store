@@ -41,10 +41,13 @@ export const GET = withApiHandler(async (req: NextRequest) => {
   ])
 
   return NextResponse.json({
-    orders,
-    total,
-    page,
-    limit,
-    totalPages: Math.ceil(total / limit),
+    success: true,
+    data: orders,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    }
   })
 }, { requireAdmin: true, rateLimitNamespace: "admin_orders_list" })

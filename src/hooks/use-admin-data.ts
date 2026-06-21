@@ -7,7 +7,7 @@ export function useAdminInventory() {
       const res = await fetch("/api/admin/inventory")
       if (!res.ok) throw new Error("Failed to load inventory allocations")
       const json = await res.json()
-      return json.items || json.data || json.products || json
+      return json.data || []
     }
   })
 }
@@ -18,7 +18,8 @@ export function useAdminCoupons() {
     queryFn: async () => {
       const res = await fetch("/api/admin/coupons")
       if (!res.ok) throw new Error("Failed to load coupons")
-      return res.json()
+      const json = await res.json()
+      return json.data || []
     }
   })
 }
@@ -50,7 +51,7 @@ export function useAdminProducts() {
       const res = await fetch("/api/products")
       if (!res.ok) throw new Error("Failed to load products")
       const json = await res.json()
-      return json.items || json.data || json.products || json
+      return json.data || []
     }
   })
 }
@@ -61,7 +62,8 @@ export function useAdminCategories() {
     queryFn: async () => {
       const res = await fetch("/api/products/categories")
       if (!res.ok) throw new Error("Failed to load categories")
-      return res.json()
+      const json = await res.json()
+      return json.data || []
     }
   })
 }

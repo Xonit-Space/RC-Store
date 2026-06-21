@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo, useCallback } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { RefreshCw, Search, ShoppingBag, ChevronLeft, ChevronRight } from "lucide-react"
@@ -8,6 +8,8 @@ import { toast } from "sonner"
 import { adminUpdateOrderStatus } from "@/actions/order"
 import { OrderStatus } from "@prisma/client"
 import { useDebounce } from "@/hooks/use-debounce"
+import { useAdminOrders } from "@/hooks/use-admin-data"
+import { useQueryClient } from "@tanstack/react-query"
 
 const PAGE_SIZE = 20
 
@@ -20,10 +22,7 @@ export default function AdminOrdersPage() {
   const currentPage = parseInt(searchParams.get("page") || "1", 10)
   const currentSearch = searchParams.get("search") || ""
   const [search, setSearch] = useState(currentSearch)
-  const [orders, setOrders] = useState<any[]>([])
-  const [totalPages, setTotalPages] = useState(1)
-  const [total, setTotal] = useState(0)
-  const [loading, setLoading] = useState(true)
+  const queryClient = useQueryClient()
 
   // Phase 9: Debounce the search input before URL navigation
   const debouncedSearch = useDebounce(search, 400)
@@ -40,48 +39,25 @@ export default function AdminOrdersPage() {
     router.replace(`${pathname}?${params.toString()}`)
   }, [debouncedSearch]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Phase 9: Fetch paginated data from server
-  const loadOrders = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({
-        page: String(currentPage),
-        limit: String(PAGE_SIZE),
-        ...(currentSearch ? { search: currentSearch } : {}),
-      })
-      const res = await fetch(`/api/admin/orders?${params}`)
-      if (res.ok) {
-        const data = await res.json()
-        setOrders(data.orders || [])
-        setTotalPages(data.totalPages || 1)
-        setTotal(data.total || 0)
-      } else {
-        toast.error("Failed to load platform orders")
-      }
-    } catch {
-      toast.error("Failed to execute database fetch")
-    } finally {
-      setLoading(false)
-    }
-  }, [currentPage, currentSearch])
+  const { data: ordersData, isLoading: loading, refetch } = useAdminOrders(currentPage, PAGE_SIZE, debouncedSearch)
 
-  useEffect(() => {
-    loadOrders()
-  }, [loadOrders])
+  const orders = ordersData?.orders || []
+  const totalPages = ordersData?.totalPages || 1
+  const total = ordersData?.total || 0
 
   const handleStatusChange = useCallback(async (orderId: string, newStatus: OrderStatus) => {
     try {
       const res = await adminUpdateOrderStatus(session?.user?.id || "", orderId, newStatus)
       if (res.success) {
         toast.success("Order status updated successfully!")
-        await loadOrders()
+        queryClient.invalidateQueries({ queryKey: ["admin", "orders"] })
       } else {
         toast.error(res.error || "Transition update rejected")
       }
     } catch (err: any) {
       toast.error(err.message || "Failed to update status")
     }
-  }, [session?.user?.id, loadOrders])
+  }, [session?.user?.id, queryClient])
 
   const navigatePage = useCallback((newPage: number) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -130,7 +106,7 @@ export default function AdminOrdersPage() {
       ) : (
         <>
           <div className="space-y-4">
-            {orders.map((o) => (
+            {orders.map((o: any) => (
               <div key={o.id} className="border border-border/40 bg-background transition-colors hover:border-foreground/30">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-muted/5 border-b border-border/40 p-6 gap-6">
                   <div>

@@ -4,7 +4,7 @@ type CacheItem<T> = {
 }
 
 // In-memory cache store (falls back to local memory if Redis is unconfigured)
-const memoryCache = new Map<string, CacheItem<any>>()
+const memoryCache = new Map<string, CacheItem<unknown>>()
 
 export async function cacheSet<T>(key: string, value: T, ttlSeconds = 300): Promise<void> {
   const expiresAt = Date.now() + ttlSeconds * 1000

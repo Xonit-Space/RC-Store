@@ -7,11 +7,11 @@ export const DomainEventEnvelopeSchema = z.object({
   eventId: z.string(),
   eventType: z.string(),
   timestamp: z.date(),
-  payload: z.any(),
+  payload: z.unknown(),
   signature: z.string().optional(),
 })
 
-export type DomainEventEnvelope<T = any> = z.infer<typeof DomainEventEnvelopeSchema> & {
+export type DomainEventEnvelope<T = unknown> = z.infer<typeof DomainEventEnvelopeSchema> & {
   payload: T
 }
 

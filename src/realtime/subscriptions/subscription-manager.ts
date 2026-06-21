@@ -124,7 +124,7 @@ class SubscriptionManager {
    */
   private broadcastEventBusMessage(eventType: EventType, envelope: DomainEventEnvelope): void {
     const targetChannels = new Set<string>()
-    const payload = envelope.payload
+    const payload = envelope.payload as any
 
     // Admin dashboard streams all events
     targetChannels.add("admin:dashboard")

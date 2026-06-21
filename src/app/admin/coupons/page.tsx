@@ -1,14 +1,15 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { RefreshCw, Coins, Plus, X } from "lucide-react"
 import { toast } from "sonner"
+import { useAdminCoupons, useAdminCreateCoupon } from "@/hooks/use-admin-data"
 
 export default function AdminCouponsPage() {
-  const [coupons, setCoupons] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+  const { data: coupons = [], isLoading: loading } = useAdminCoupons()
+  const createCouponMutation = useAdminCreateCoupon()
 
   // Add Coupon form state
   const [isOpen, setIsOpen] = useState(false)
@@ -16,28 +17,6 @@ export default function AdminCouponsPage() {
   const [discountType, setDiscountType] = useState<"PERCENTAGE" | "FIXED_AMOUNT">("PERCENTAGE")
   const [discountValue, setDiscountValue] = useState("")
   const [minOrder, setMinOrder] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-  const loadCoupons = async () => {
-    setLoading(true)
-    try {
-      const res = await fetch("/api/admin/coupons")
-      if (res.ok) {
-        const data = await res.json()
-        setCoupons(data || [])
-      } else {
-        toast.error("Failed to load discount coupons")
-      }
-    } catch (err) {
-      toast.error("Failed to execute database fetch")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    loadCoupons()
-  }, [])
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -46,33 +25,21 @@ export default function AdminCouponsPage() {
       return
     }
 
-    setIsSubmitting(true)
     try {
-      const res = await fetch("/api/admin/coupons", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          code,
-          discountType,
-          discountValue: Number(discountValue),
-          minOrderAmount: minOrder ? Number(minOrder) : 0,
-        }),
+      await createCouponMutation.mutateAsync({
+        code,
+        discountType,
+        discountValue: Number(discountValue),
+        minOrderAmount: minOrder ? Number(minOrder) : 0,
       })
 
-      if (res.ok) {
-        toast.success("Successfully registered new discount coupon!")
-        setIsOpen(false)
-        setCode("")
-        setDiscountValue("")
-        setMinOrder("")
-        await loadCoupons()
-      } else {
-        toast.error("Failed to register coupon code")
-      }
-    } catch (err) {
-      toast.error("An unexpected system exception occurred")
-    } finally {
-      setIsSubmitting(false)
+      toast.success("Successfully registered new discount coupon!")
+      setIsOpen(false)
+      setCode("")
+      setDiscountValue("")
+      setMinOrder("")
+    } catch (err: any) {
+      toast.error(err.message || "Failed to register coupon code")
     }
   }
 
@@ -105,7 +72,7 @@ export default function AdminCouponsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {coupons.map((c) => (
+        {coupons.map((c: any) => (
           <div key={c.id} className="border border-border/40 bg-background flex flex-col justify-between group transition-colors hover:border-foreground/30">
             <div className="p-6 space-y-6">
               <div className="flex justify-between items-start gap-4">
@@ -211,10 +178,10 @@ export default function AdminCouponsPage() {
                 </Button>
                 <Button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={createCouponMutation.isPending}
                   className="h-12 rounded-none bg-foreground text-background text-xs font-bold uppercase tracking-widest px-8"
                 >
-                  {isSubmitting ? "Saving..." : "Save"}
+                  {createCouponMutation.isPending ? "Saving..." : "Save"}
                 </Button>
               </div>
             </form>

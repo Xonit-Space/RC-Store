@@ -11,14 +11,15 @@ import { addCustomerAddress } from "@/actions/auth"
 import { Plus, X, ArrowRight } from "lucide-react"
 import { toast } from "sonner"
 import { useLoading } from "@/components/providers/loading-provider"
+import { useCustomer } from "@/components/providers/customer-provider"
 import { AddressSchema } from "@/validators/auth"
 
 export default function CustomerDashboardPage() {
   const router = useRouter()
   const { data: session, status } = useSession()
   const { withLoading } = useLoading()
+  const { profile } = useCustomer()
 
-  const [profile, setProfile] = useState<any>(null)
   const [orders, setOrders] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   
@@ -36,15 +37,11 @@ export default function CustomerDashboardPage() {
   const loadDashboardData = async () => {
     setLoading(true)
     try {
-      const [profRes, ordRes] = await Promise.all([
-        fetch("/api/customer/profile"),
-        fetch("/api/customer/orders"),
-      ])
-      if (profRes.ok && ordRes.ok) {
-        setProfile(await profRes.json())
+      const ordRes = await fetch("/api/customer/orders")
+      if (ordRes.ok) {
         setOrders(await ordRes.json())
       } else {
-        toast.error("Failed to load profile details")
+        toast.error("Failed to load orders")
       }
     } catch (error) {
       console.error(error)

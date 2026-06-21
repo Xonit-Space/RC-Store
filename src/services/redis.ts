@@ -29,7 +29,7 @@ type CacheItem<T> = {
 }
 
 class MemoryRedisMock {
-  private cache = new Map<string, CacheItem<any>>()
+  private cache = new Map<string, CacheItem<unknown>>()
   private subscribers = new Map<string, Array<(message: string) => void>>()
 
   async get(key: string): Promise<string | null> {
@@ -126,7 +126,7 @@ export async function redisDel(key: string): Promise<void> {
   }
 }
 
-export async function redisPublish(channel: string, message: any): Promise<number> {
+export async function redisPublish(channel: string, message: unknown): Promise<number> {
   const payload = typeof message === "string" ? message : JSON.stringify(message)
   
   if (redisPub) {

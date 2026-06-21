@@ -21,11 +21,7 @@ export function HeroSection() {
 
       {/* Gradient overlay — top and bottom fade for editorial legibility */}
       <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "linear-gradient(to bottom, rgba(28,28,26,0.35) 0%, rgba(28,28,26,0) 40%, rgba(28,28,26,0) 60%, rgba(28,28,26,0.65) 100%)",
-        }}
+        className="absolute inset-0 pointer-events-none bg-gradient-to-b from-charcoal/35 from-0% via-charcoal/0 via-[40%] to-charcoal/65 to-100%"
         aria-hidden="true"
       />
 

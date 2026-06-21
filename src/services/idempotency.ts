@@ -53,7 +53,7 @@ export async function checkIdempotency<T = unknown>(
     if (cached.status === "PROCESSING") {
       return { hit: true, status: "PROCESSING" }
     }
-    return { hit: true, status: cached.status as any, result: cached.result }
+    return { hit: true, status: cached.status as IdempotencyResult["status"], result: cached.result }
   }
 
   // Fallback: DB (handles Redis crash scenario)
@@ -73,7 +73,7 @@ export async function checkIdempotency<T = unknown>(
     const result = record.resultJson ? (JSON.parse(record.resultJson) as T) : undefined
     // Backfill Redis from DB
     await redisSet(redisKey, { status: record.status, result }, DEFAULT_TTL_SECONDS)
-    return { hit: true, status: record.status as any, result }
+    return { hit: true, status: record.status as IdempotencyResult["status"], result }
   }
 
   return null
@@ -91,7 +91,7 @@ export async function claimIdempotencyKey(
   const redisKey = `idempotency:${key}`
 
   // Attempt atomic SET NX (only set if not exists)
-  const rawClient = (globalThis as any).__redisRawClient
+  const rawClient = (globalThis as Record<string, unknown>).__redisRawClient as { set: (...args: unknown[]) => Promise<string> } | undefined
   let claimed = false
 
   if (rawClient) {

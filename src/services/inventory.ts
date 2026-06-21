@@ -15,7 +15,7 @@ export async function reserveStock(input: ReserveStockInput) {
 
   return db.$transaction(async (tx) => {
     // Pessimistic Lock: SELECT FOR UPDATE
-    const inventories = await tx.$queryRaw<any[]>`
+    const inventories = await tx.$queryRaw<Array<{ id: string, quantity: number, reserved: number }>>`
       SELECT id, quantity, reserved FROM inventory
       WHERE "variantId" = ${variantId}
       FOR UPDATE
@@ -44,7 +44,7 @@ export async function reserveStock(input: ReserveStockInput) {
 export async function releaseStock(variantId: string, quantity: number) {
   return db.$transaction(async (tx) => {
     // Pessimistic Lock: SELECT FOR UPDATE
-    const inventories = await tx.$queryRaw<any[]>`
+    const inventories = await tx.$queryRaw<Array<{ id: string, quantity: number, reserved: number }>>`
       SELECT id, quantity, reserved FROM inventory
       WHERE "variantId" = ${variantId}
       FOR UPDATE
@@ -66,7 +66,7 @@ export async function releaseStock(variantId: string, quantity: number) {
 export async function commitStock(variantId: string, quantity: number, userId?: string) {
   return db.$transaction(async (tx) => {
     // Pessimistic Lock: SELECT FOR UPDATE
-    const inventories = await tx.$queryRaw<any[]>`
+    const inventories = await tx.$queryRaw<Array<{ id: string, quantity: number, reserved: number }>>`
       SELECT id, quantity, reserved FROM inventory
       WHERE "variantId" = ${variantId}
       FOR UPDATE
@@ -103,7 +103,7 @@ export async function commitStock(variantId: string, quantity: number, userId?: 
 export async function addStock(variantId: string, quantity: number, userId?: string, reason?: string) {
   return db.$transaction(async (tx) => {
     // Pessimistic Lock: SELECT FOR UPDATE
-    const inventories = await tx.$queryRaw<any[]>`
+    const inventories = await tx.$queryRaw<Array<{ id: string, quantity: number, reserved: number }>>`
       SELECT id, quantity, reserved FROM inventory
       WHERE "variantId" = ${variantId}
       FOR UPDATE

@@ -1,33 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { RefreshCw, Package, ArrowUpRight, ArrowDownRight } from "lucide-react"
 import { toast } from "sonner"
+import { useAdminInventory } from "@/hooks/use-admin-data"
 
 export default function AdminInventoryPage() {
-  const [inventory, setInventory] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-
-  const loadInventory = async () => {
-    setLoading(true)
-    try {
-      const res = await fetch("/api/admin/inventory")
-      if (res.ok) {
-        const data = await res.json()
-        setInventory(data || [])
-      } else {
-        toast.error("Failed to load inventory allocations")
-      }
-    } catch (err) {
-      toast.error("Failed to execute database lookup")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    loadInventory()
-  }, [])
+  const { data: inventory = [], isLoading: loading } = useAdminInventory()
 
   if (loading) {
     return (
@@ -69,7 +48,7 @@ export default function AdminInventoryPage() {
                   </td>
                 </tr>
               ) : (
-                inventory.map((item) => {
+                inventory.map((item: any) => {
                   const available = item.quantity - item.reserved
                   const statusColor = available > 10 ? "text-forest" : available > 0 ? "text-brass" : "text-terracotta"
 

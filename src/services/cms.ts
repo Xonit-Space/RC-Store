@@ -1,18 +1,19 @@
 import { db } from "@/lib/db"
 import { cacheGet, cacheSet } from "./cache"
+import { Prisma } from "@prisma/client"
 
 export interface CmsSection {
   type: string // "hero" | "banner-grid" | "featured-products" | "newsletter"
   title?: string
   subtitle?: string
-  settings?: Record<string, any>
-  items?: Array<Record<string, any>>
+  settings?: Record<string, unknown>
+  items?: Array<Record<string, unknown>>
 }
 
 export async function getCMSPageBySlug(slug: string) {
   const cacheKey = `cms_page_${slug}`
-  const cached = await cacheGet<any>(cacheKey)
-  if (cached) return cached
+  const cached = await cacheGet<unknown>(cacheKey)
+  if (cached) return cached as NonNullable<Awaited<ReturnType<typeof db.cMSPage.findUnique>>> & { sections: CmsSection[] }
 
   const page = await db.cMSPage.findUnique({
     where: { slug, published: true },
@@ -41,7 +42,7 @@ export async function getBlogPosts(options?: GetBlogPostsOptions) {
   const { categorySlug, tagSlug, search, page = 1, limit = 10 } = options || {}
   const skip = (page - 1) * limit
 
-  const where: any = {
+  const where: Prisma.BlogPostWhereInput = {
     published: true,
     ...(categorySlug && { category: { slug: categorySlug } }),
     ...(tagSlug && { tags: { some: { slug: tagSlug } } }),
@@ -79,8 +80,8 @@ export async function getBlogPosts(options?: GetBlogPostsOptions) {
 
 export async function getBlogPostBySlug(slug: string) {
   const cacheKey = `blog_post_${slug}`
-  const cached = await cacheGet<any>(cacheKey)
-  if (cached) return cached
+  const cached = await cacheGet<unknown>(cacheKey)
+  if (cached) return cached as NonNullable<Awaited<ReturnType<typeof db.blogPost.findUnique>>>
 
   const post = await db.blogPost.findUnique({
     where: { slug, published: true },
@@ -99,8 +100,8 @@ export async function getBlogPostBySlug(slug: string) {
 
 export async function getNavigationMenu(location: "HEADER" | "FOOTER") {
   const cacheKey = `nav_menu_${location}`
-  const cached = await cacheGet<any>(cacheKey)
-  if (cached) return cached
+  const cached = await cacheGet<unknown>(cacheKey)
+  if (cached) return cached as NonNullable<Awaited<ReturnType<typeof db.navigationMenu.findUnique>>> & { items: unknown[] }
 
   const menu = await db.navigationMenu.findUnique({
     where: { location },

@@ -12,12 +12,12 @@ import { toast } from "sonner"
 import { MapPin, RefreshCw, ChevronRight, Home, Plus, Trash2, ShieldAlert } from "lucide-react"
 import { addCustomerAddress } from "@/actions/auth"
 import { AddressSchema } from "@/validators/auth"
+import { useCustomer } from "@/components/providers/customer-provider"
 
 export default function CustomerAddressesPage() {
   const router = useRouter()
   const { data: session, status } = useSession()
-  const [profile, setProfile] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const { profile } = useCustomer()
 
   // Address form modal
   const [isAddAddressOpen, setIsAddAddressOpen] = useState(false)
@@ -31,28 +31,9 @@ export default function CustomerAddressesPage() {
   const [phone, setPhone] = useState("")
   const [addressLoading, setAddressLoading] = useState(false)
 
-  const fetchProfile = async () => {
-    setLoading(true)
-    try {
-      const res = await fetch("/api/customer/profile")
-      if (res.ok) {
-        const data = await res.json()
-        setProfile(data)
-      } else {
-        toast.error("Failed to load customer profile details")
-      }
-    } catch (err) {
-      console.error(err)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login?callbackUrl=/customer/addresses")
-    } else if (status === "authenticated") {
-      fetchProfile()
     }
   }, [status])
 
@@ -92,7 +73,7 @@ export default function CustomerAddressesPage() {
         setAddrState("")
         setPostalCode("")
         setPhone("")
-        await fetchProfile()
+        router.refresh()
       } else {
         toast.error(response.error || "Failed to register address")
       }
@@ -103,7 +84,7 @@ export default function CustomerAddressesPage() {
     }
   }
 
-  if (status === "loading" || loading) {
+  if (status === "loading") {
     return (
       <div className="min-h-screen bg-background flex flex-col justify-between">
         <Header />
@@ -188,8 +169,8 @@ export default function CustomerAddressesPage() {
 
         {/* ── ADD ADDRESS MODAL OVERLAY ── */}
         {isAddAddressOpen && (
-          <div className="fixed inset-0 z-50 bg-[#0e0918]/60 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="max-w-lg w-full rounded-none border border-muted/10 bg-white shadow-2xl p-6 relative animate-in fade-in zoom-in duration-200">
+          <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="max-w-lg w-full rounded-none border border-muted/10 bg-card shadow-2xl p-6 relative animate-in fade-in zoom-in duration-200">
               <button
                 onClick={() => setIsAddAddressOpen(false)}
                 className="absolute right-4 top-4 text-muted-foreground hover:text-foreground/70 transition"

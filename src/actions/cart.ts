@@ -2,6 +2,21 @@
 
 import { db } from "@/lib/db"
 import { ActionResponse } from "./auth"
+import { z } from "zod"
+
+const AddCartItemSchema = z.object({
+  variantId: z.string().min(1, "Variant ID is required"),
+  quantity: z.number().int().positive("Quantity must be a positive integer"),
+  userId: z.string().optional(),
+  guestSessionId: z.string().optional()
+}).refine(data => data.userId || data.guestSessionId, {
+  message: "Either User ID or Guest Session ID is required"
+})
+
+const UpdateQtySchema = z.object({
+  cartItemId: z.string().min(1, "Cart item ID is required"),
+  quantity: z.number().int().min(0, "Quantity cannot be negative")
+})
 
 export async function getCart(userId?: string, guestSessionId?: string) {
   if (!userId && !guestSessionId) return null
@@ -35,6 +50,11 @@ export async function addCartItem(
   userId?: string,
   guestSessionId?: string
 ): Promise<ActionResponse> {
+  const parsed = AddCartItemSchema.safeParse({ variantId, quantity, userId, guestSessionId })
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.errors[0].message }
+  }
+
   try {
     // 1. Verify stock limits first
     const inventory = await db.inventory.findUnique({ where: { variantId } })
@@ -86,6 +106,11 @@ export async function updateCartItemQty(
   cartItemId: string,
   quantity: number
 ): Promise<ActionResponse> {
+  const parsed = UpdateQtySchema.safeParse({ cartItemId, quantity })
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.errors[0].message }
+  }
+
   if (quantity <= 0) {
     return deleteCartItem(cartItemId)
   }
@@ -117,6 +142,8 @@ export async function updateCartItemQty(
 }
 
 export async function deleteCartItem(cartItemId: string): Promise<ActionResponse> {
+  if (!cartItemId) return { success: false, error: "Cart item ID is required" }
+  
   try {
     await db.cartItem.delete({ where: { id: cartItemId } })
     return { success: true }

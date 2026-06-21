@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
 import { withApiHandler } from "@/lib/api-middleware"
 import { db } from "@/lib/db"
+import { Prisma } from "@prisma/client"
 
-// API responses cached 60 seconds on Vercel CDN \u2014 products don't change per-second
-export const revalidate = 60
+// API responses cached 60 seconds on Vercel CDN — products don't change per-second
+// Using force-dynamic because withApiHandler reads headers for rate limiting
+export const dynamic = "force-dynamic"
 
 /**
  * GET /api/products
@@ -21,7 +23,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
   const minPrice = parseFloat(searchParams.get("minPrice") || "0")
   const maxPrice = parseFloat(searchParams.get("maxPrice") || "999999")
 
-  const where: any = {
+  const where: Prisma.ProductWhereInput = {
     isActive: true,
     price: { gte: minPrice, lte: maxPrice },
   }

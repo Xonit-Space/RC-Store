@@ -77,22 +77,22 @@ export async function AIRecommendations() {
 
         <Tabs defaultValue="personalized" className="w-full">
           <TabsList className="grid w-full grid-cols-3 max-w-md mx-auto mb-8 bg-muted/10 p-1 rounded-none">
-            <TabsTrigger value="personalized" className="flex items-center justify-center gap-2 text-xs font-bold py-2 rounded-none data-[state=active]:bg-white data-[state=active]:shadow-sm">
+            <TabsTrigger value="personalized" className="flex items-center justify-center gap-2 text-xs font-bold py-2 rounded-none data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
               <User className="h-4 w-4" />
               For You
             </TabsTrigger>
-            <TabsTrigger value="trending" className="flex items-center justify-center gap-2 text-xs font-bold py-2 rounded-none data-[state=active]:bg-white data-[state=active]:shadow-sm">
+            <TabsTrigger value="trending" className="flex items-center justify-center gap-2 text-xs font-bold py-2 rounded-none data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
               <TrendingUp className="h-4 w-4" />
               Trending
             </TabsTrigger>
-            <TabsTrigger value="recent" className="flex items-center justify-center gap-2 text-xs font-bold py-2 rounded-none data-[state=active]:bg-white data-[state=active]:shadow-sm">
+            <TabsTrigger value="recent" className="flex items-center justify-center gap-2 text-xs font-bold py-2 rounded-none data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
               <Clock className="h-4 w-4" />
               Recent
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="personalized" className="animate-in fade-in-50 duration-300 outline-none">
-            <Card className="border border-muted/10 shadow-sm rounded-3xl p-6 bg-white">
+            <Card className="border border-muted/10 shadow-sm rounded-3xl p-6 bg-card">
               <CardHeader className="px-0 pt-0 pb-6 flex flex-row items-center gap-2">
                 <Sparkles className="h-5 w-5 text-foreground" />
                 <div>
@@ -110,9 +110,9 @@ export async function AIRecommendations() {
           </TabsContent>
 
           <TabsContent value="trending" className="animate-in fade-in-50 duration-300 outline-none">
-            <Card className="border border-muted/10 shadow-sm rounded-3xl p-6 bg-white">
+            <Card className="border border-muted/10 shadow-sm rounded-3xl p-6 bg-card">
               <CardHeader className="px-0 pt-0 pb-6 flex flex-row items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-green-600" />
+                <TrendingUp className="h-5 w-5 text-primary" />
                 <div>
                   <CardTitle className="text-sm font-extrabold text-foreground uppercase tracking-wider">Trending Now</CardTitle>
                 </div>
@@ -128,7 +128,7 @@ export async function AIRecommendations() {
           </TabsContent>
 
           <TabsContent value="recent" className="animate-in fade-in-50 duration-300 outline-none">
-            <Card className="border border-muted/10 shadow-sm rounded-3xl p-6 bg-white">
+            <Card className="border border-muted/10 shadow-sm rounded-3xl p-6 bg-card">
               <CardHeader className="px-0 pt-0 pb-6 flex flex-row items-center gap-2">
                 <Clock className="h-5 w-5 text-foreground" />
                 <div>

@@ -2,6 +2,25 @@
 
 import { getCachedProducts, getCachedCategories } from "@/lib/services/product-service"
 
+export interface ProductImage {
+  url: string;
+}
+
+export interface ProductReview {
+  rating: number;
+}
+
+export interface ApiProduct {
+  id: string;
+  name: string;
+  price: number;
+  slug: string;
+  images?: ProductImage[];
+  createdAt?: string;
+  reviews?: ProductReview[];
+  [key: string]: unknown;
+}
+
 export async function getProducts(options?: {
   featured?: boolean
   categoryId?: string
@@ -38,19 +57,19 @@ export async function getProducts(options?: {
 
   const baseUrl = typeof window === "undefined" ? "http://localhost:3000" : ""
   const res = await fetch(`${baseUrl}/api/products?${params.toString()}`, {
-    cache: "no-store",
+    next: { revalidate: 60 },
   })
   if (!res.ok) throw new Error("Failed to fetch products catalog")
 
   const data = await res.json()
   
   // Format to standard product object signature with images as a string array
-  return (data.products || []).map((product: any) => ({
+  return (data.products || []).map((product: ApiProduct) => ({
     ...product,
-    images: product.images?.map((img: any) => img.url) || ["/placeholder.svg"],
+    images: product.images?.map((img: ProductImage) => img.url) || ["/placeholder.svg"],
     tags: product.createdAt && (new Date(product.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) ? ["new"] : [],
-    averageRating: product.reviews?.length > 0
-      ? product.reviews.reduce((sum: number, r: any) => sum + r.rating, 0) / product.reviews.length
+    averageRating: product.reviews && product.reviews.length > 0
+      ? product.reviews.reduce((sum: number, r: ProductReview) => sum + r.rating, 0) / product.reviews.length
       : 0,
     reviewCount: product.reviews?.length || 0,
   }))
@@ -65,7 +84,7 @@ export async function getCategories() {
   const baseUrl = typeof window === "undefined" ? "http://localhost:3000" : ""
   // We can call /api/products/categories
   const res = await fetch(`${baseUrl}/api/products/categories`, {
-    cache: "no-store",
+    next: { revalidate: 3600 },
   })
   if (!res.ok) return []
   return await res.json()
@@ -74,7 +93,7 @@ export async function getCategories() {
 export async function getProductBySlug(slug: string) {
   const baseUrl = typeof window === "undefined" ? "http://localhost:3000" : ""
   const res = await fetch(`${baseUrl}/api/products/slug/${slug}`, {
-    cache: "no-store",
+    next: { revalidate: 60 },
   })
   if (!res.ok) return null
   return await res.json()

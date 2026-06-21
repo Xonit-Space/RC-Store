@@ -14,7 +14,8 @@ export interface NormalizedNotification {
  * Normalizes asynchronous domain event envelopes into unified, consistent e-commerce notifications.
  */
 export function mapEventToNotification(envelope: DomainEventEnvelope): NormalizedNotification | null {
-  const { eventType, payload } = envelope
+  const { eventType, payload: rawPayload } = envelope
+  const payload = rawPayload as any
 
   switch (eventType as EventType) {
     case "ORDER_CREATED":

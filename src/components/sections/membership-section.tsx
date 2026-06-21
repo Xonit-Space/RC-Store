@@ -17,7 +17,7 @@ export function MembershipSection() {
       <div
         className="absolute inset-0 opacity-[0.04] pointer-events-none"
         style={{
-          backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 24px, rgba(246,243,238,0.5) 24px, rgba(246,243,238,0.5) 25px)`,
+          backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 24px, theme('colors.off-white') 24px, theme('colors.off-white') 25px)`,
         }}
         aria-hidden="true"
       />

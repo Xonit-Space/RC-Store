@@ -9,41 +9,21 @@ import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Star, RefreshCw, ChevronRight, Home, ShoppingCart, Trash2 } from "lucide-react"
+import { useCustomer } from "@/components/providers/customer-provider"
 
 export default function CustomerWishlistPage() {
   const router = useRouter()
   const { data: session, status } = useSession()
-  const [wishlist, setWishlist] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-
-  const fetchWishlist = async () => {
-    setLoading(true)
-    try {
-      // Fetch user's profile which contains the wishlist relation
-      const res = await fetch("/api/customer/profile")
-      if (res.ok) {
-        const data = await res.json()
-        // Simulated wishlist items for display (or query if seeded)
-        setWishlist(data.wishlist?.items || [])
-      } else {
-        toast.error("Failed to load customer profile logs")
-      }
-    } catch (err) {
-      console.error(err)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const { profile } = useCustomer()
+  const wishlist = profile?.wishlist?.items || []
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login?callbackUrl=/customer/wishlist")
-    } else if (status === "authenticated") {
-      fetchWishlist()
     }
   }, [status])
 
-  if (status === "loading" || loading) {
+  if (status === "loading") {
     return (
       <div className="min-h-screen bg-background flex flex-col justify-between">
         <Header />
@@ -79,19 +59,22 @@ export default function CustomerWishlistPage() {
         </div>
 
         {wishlist.length === 0 ? (
-          <Card className="border border-dashed border-border/40 p-12 text-center rounded-none">
-            <CardContent className="pt-6">
-              <Star className="h-14 w-14 mx-auto text-muted-foreground/30 mb-3" />
-              <p className="text-sm font-bold text-foreground">Wishlist is currently empty</p>
-              <p className="text-xs text-muted-foreground pt-1 mb-6">Discover premium styles and star them in our storefront catalogs.</p>
-              <a href="/products" className="inline-flex h-11 items-center justify-center px-6 rounded-none bg-primary hover:bg-primary/95 text-white text-xs font-bold transition">
-                Browse Products
-              </a>
-            </CardContent>
-          </Card>
+          <div className="text-center py-24 px-4 bg-muted/5 border border-border/40 rounded-none border-dashed mb-16">
+            <Star className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+            <h2 className="text-2xl font-light text-foreground mb-2">Your wishlist is empty</h2>
+            <p className="text-muted-foreground font-bold text-xs uppercase tracking-widest max-w-md mx-auto mb-8">
+              Discover pieces you love and save them here for later.
+            </p>
+            <button
+              onClick={() => router.push("/shop")}
+              className="h-12 bg-foreground text-background px-8 font-bold text-xs uppercase tracking-widest hover:bg-foreground/90 transition-colors"
+            >
+              Explore Collection
+            </button>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {wishlist.map((item) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+            {wishlist.map((item: any) => (
               <Card key={item.id} className="border border-muted/10 rounded-none shadow-sm bg-card overflow-hidden transition hover:border-border/40 flex flex-col justify-between">
                 <div className="relative aspect-square w-full bg-muted/10 border-b border-muted/10 overflow-hidden flex items-center justify-center">
                   {item.product?.images?.[0]?.url ? (

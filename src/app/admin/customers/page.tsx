@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useCallback } from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { RefreshCw, Shield, User, ChevronLeft, ChevronRight } from "lucide-react"
-import { toast } from "sonner"
+import { useAdminCustomers } from "@/hooks/use-admin-data"
 
 const PAGE_SIZE = 24
 
@@ -13,38 +13,12 @@ export default function AdminCustomersPage() {
   const searchParams = useSearchParams()
 
   const currentPage = parseInt(searchParams.get("page") || "1", 10)
-  const [users, setUsers] = useState<any[]>([])
-  const [totalPages, setTotalPages] = useState(1)
-  const [total, setTotal] = useState(0)
-  const [loading, setLoading] = useState(true)
-
-  // Phase 9: Fetch paginated customers from server
-  const fetchUsers = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({
-        page: String(currentPage),
-        limit: String(PAGE_SIZE),
-      })
-      const res = await fetch(`/api/pos/customers?${params}`)
-      if (res.ok) {
-        const data = await res.json()
-        setUsers(data.data || [])
-        setTotalPages(data.totalPages || 1)
-        setTotal(data.total || 0)
-      } else {
-        toast.error("Failed to load user accounts registry")
-      }
-    } catch {
-      toast.error("Failed to execute database lookup")
-    } finally {
-      setLoading(false)
-    }
-  }, [currentPage])
-
-  useEffect(() => {
-    fetchUsers()
-  }, [fetchUsers])
+  
+  const { data: customerData, isLoading: loading } = useAdminCustomers(currentPage, PAGE_SIZE)
+  
+  const users = customerData?.data || []
+  const totalPages = customerData?.totalPages || 1
+  const total = customerData?.total || 0
 
   const navigatePage = useCallback((newPage: number) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -76,7 +50,7 @@ export default function AdminCustomersPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {users.map((u) => (
+        {users.map((u: any) => (
           <div key={u.id} className="border border-border/40 bg-background transition-colors hover:border-foreground/30">
             <div className="p-6 flex items-start gap-5">
               <div className="h-12 w-12 bg-muted/10 border border-border/40 flex items-center justify-center text-muted-foreground shrink-0">

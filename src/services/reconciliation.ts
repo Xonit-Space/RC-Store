@@ -11,6 +11,7 @@
  * Safe strategy: NEVER re-charges. ONLY identifies gaps for manual/automated rehydration.
  */
 
+import Stripe from "stripe"
 import { db } from "@/lib/db"
 import { stripe } from "@/services/stripe"
 import { PaymentStatus } from "@prisma/client"
@@ -70,7 +71,7 @@ export async function runReconciliation(input: ReconciliationInput = {}): Promis
 
   // 2. Fetch Stripe PaymentIntents for the date range
   // Note: Stripe list is paginated; we fetch up to 100 per day (adjust limit for high-volume)
-  let stripePaymentIntents: any[] = []
+  let stripePaymentIntents: unknown[] = []
   try {
     const stripeList = await stripe.paymentIntents.list({
       created: {
@@ -79,14 +80,14 @@ export async function runReconciliation(input: ReconciliationInput = {}): Promis
       },
       limit: 100,
     })
-    stripePaymentIntents = stripeList.data.filter((pi: any) => pi.status === "succeeded")
-  } catch (err: any) {
-    console.warn("[Reconciliation] Stripe API unavailable — using DB-only data:", err.message)
+    stripePaymentIntents = stripeList.data.filter((pi: Stripe.PaymentIntent) => pi.status === "succeeded")
+  } catch (err: unknown) {
+    console.warn("[Reconciliation] Stripe API unavailable — using DB-only data:", (err as any).message)
     // Graceful degradation: still produce partial report
   }
 
-  const stripeByIntentId = new Map(
-    stripePaymentIntents.map((pi: any) => [pi.id, pi])
+  const stripeByIntentId = new Map<string, Stripe.PaymentIntent>(
+    (stripePaymentIntents as Stripe.PaymentIntent[]).map((pi: Stripe.PaymentIntent) => [pi.id, pi])
   )
 
   // 3. Identify gaps

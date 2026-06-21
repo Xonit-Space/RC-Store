@@ -4,6 +4,8 @@ import { db } from "@/lib/db"
 import { ReviewSchema, CmsProductSchema, CmsProductVariantSchema } from "@/validators/product"
 import { createProductReview } from "@/repositories/product"
 import { ActionResponse } from "./auth"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
 
 export async function submitReview(
   productId: string,
@@ -33,6 +35,11 @@ export async function submitReview(
 }
 
 export async function adminCreateProduct(adminId: string, formData: any): Promise<ActionResponse> {
+  const session = await getServerSession(authOptions)
+  if (!session?.user || session.user.role !== "ADMIN") {
+    return { success: false, error: "Unauthorized access" }
+  }
+
   const result = CmsProductSchema.safeParse(formData)
 
   if (!result.success) {
@@ -92,6 +99,11 @@ export async function adminAddVariant(
   productId: string,
   variantData: any
 ): Promise<ActionResponse> {
+  const session = await getServerSession(authOptions)
+  if (!session?.user || session.user.role !== "ADMIN") {
+    return { success: false, error: "Unauthorized access" }
+  }
+
   const result = CmsProductVariantSchema.safeParse(variantData)
 
   if (!result.success) {
@@ -141,6 +153,11 @@ export async function adminAddVariant(
 }
 
 export async function adminDeleteProduct(adminId: string, productId: string): Promise<ActionResponse> {
+  const session = await getServerSession(authOptions)
+  if (!session?.user || session.user.role !== "ADMIN") {
+    return { success: false, error: "Unauthorized access" }
+  }
+
   try {
     await db.$transaction(async (tx) => {
       await tx.product.delete({

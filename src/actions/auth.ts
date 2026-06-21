@@ -1,9 +1,10 @@
 "use server"
 
 import { RegisterSchema, AddressSchema } from "@/validators/auth"
-import { createUser, getUserByEmail, addAddress } from "@/repositories/user"
+import { createUser, getUserByEmail, addAddress, updateUserProfile } from "@/repositories/user"
 import bcrypt from "bcryptjs"
 import { db } from "@/lib/db"
+import { z } from "zod"
 
 export type ActionResponse<T = any> = {
   success: boolean
@@ -70,5 +71,25 @@ export async function addCustomerAddress(userId: string, addressData: any): Prom
   } catch (error: any) {
     console.error("Add Address Server Error:", error)
     return { success: false, error: "Failed to add address record" }
+  }
+}
+
+const UpdateProfileSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+})
+
+export async function updateCustomerProfile(userId: string, data: { name: string }): Promise<ActionResponse> {
+  const result = UpdateProfileSchema.safeParse(data)
+  if (!result.success) {
+    const errorMsg = result.error.errors.map((e) => e.message).join(", ")
+    return { success: false, error: errorMsg }
+  }
+
+  try {
+    const updated = await updateUserProfile(userId, { name: result.data.name })
+    return { success: true, data: updated }
+  } catch (error: any) {
+    console.error("Update Profile Error:", error)
+    return { success: false, error: "Failed to update profile details" }
   }
 }

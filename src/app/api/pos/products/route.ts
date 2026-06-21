@@ -13,23 +13,33 @@ interface PosProductItem {
 }
 
 export const GET = withApiHandler(async (req: NextRequest) => {
-  const products = await db.product.findMany({
-    where: { isActive: true },
-    include: {
-      variants: {
-        where: { isActive: true },
-        include: {
-          inventory: true
-        }
-      },
-      images: {
-        orderBy: { sortOrder: 'asc' },
-        take: 1
-      }
-    }
-  })
+  const { searchParams } = new URL(req.url)
+  const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10))
+  const limit = Math.min(500, parseInt(searchParams.get("limit") || "100", 10))
+  const skip = (page - 1) * limit
 
-  const posProducts: PosProductItem[] = products.flatMap((p: any) => {
+  const [products, total] = await Promise.all([
+    db.product.findMany({
+      where: { isActive: true },
+      skip,
+      take: limit,
+      include: {
+        variants: {
+          where: { isActive: true },
+          include: {
+            inventory: true
+          }
+        },
+        images: {
+          orderBy: { sortOrder: 'asc' },
+          take: 1
+        }
+      }
+    }),
+    db.product.count({ where: { isActive: true } })
+  ])
+
+  const posProducts: PosProductItem[] = products.flatMap((p) => {
     const imageUrl = p.images[0]?.url || ""
     
     // If there are no variants, return the product itself as a flat item
@@ -44,7 +54,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
     }
 
     // Return all variants mapped to scan-able flat items
-    return p.variants.map((v: any) => {
+    return p.variants.map((v) => {
       const optionString = `${v.colorName || v.color} - ${v.size}`
       return {
         id: v.id,
@@ -56,5 +66,11 @@ export const GET = withApiHandler(async (req: NextRequest) => {
     })
   })
 
-  return NextResponse.json(posProducts)
+  return NextResponse.json({
+    items: posProducts,
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit)
+  })
 }, { requireAdmin: true, rateLimitNamespace: "pos_products", rateLimit: { limit: 120, windowMs: 60000 } })

@@ -3,14 +3,18 @@
 import React, { useState, useEffect, useMemo } from "react"
 import { usePosStore, OrderItem } from "@/store/usePosStore"
 import { Search, Plus, Trash2, Users, Coins, Calculator, Check, X, ShieldAlert, MonitorDot, AlertCircle } from "lucide-react"
+import { usePosProducts, usePosCustomers, usePosCheckout, usePosCreateCustomer } from "@/hooks/use-pos-data"
 
 export function POSManagement() {
   const { orderItems, addItem, increaseQty, decreaseQty, setQty, clearCart } = usePosStore()
   
-  const [products, setProducts] = useState<any[]>([])
-  const [customers, setCustomers] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { data: products = [], isLoading: loadingProducts, error: productsError, refetch: refetchProducts } = usePosProducts()
+  const { data: customers = [], isLoading: loadingCustomers, error: customersError } = usePosCustomers()
+  const checkoutMutation = usePosCheckout()
+  const createCustomerMutation = usePosCreateCustomer()
+
+  const loading = loadingProducts || loadingCustomers
+  const error = productsError?.message || customersError?.message || null
   
   const [searchQuery, setSearchQuery] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("all")
@@ -30,31 +34,6 @@ export function POSManagement() {
   const [newCustPhone, setNewCustPhone] = useState("")
   const [newCustEmail, setNewCustEmail] = useState("")
 
-  // 1. Fetch initial POS products and customer records
-  const fetchPosData = async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const prodRes = await fetch("/api/pos/products")
-      if (!prodRes.ok) throw new Error("Failed to fetch POS catalog")
-      const prodData = await prodRes.json()
-      setProducts(prodData || [])
-
-      const custRes = await fetch("/api/pos/customers")
-      if (!custRes.ok) throw new Error("Failed to fetch customer accounts")
-      const custData = await custRes.json()
-      setCustomers(custData.data || [])
-    } catch (err: any) {
-      setError(err.message || "Failed to load database resources")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    fetchPosData()
-  }, [])
-
   // 2. Barcode scanner physical event hook
   useEffect(() => {
     let barcodeString = ""
@@ -63,7 +42,7 @@ export function POSManagement() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Enter") {
         if (barcodeString.length > 0) {
-          const matchedItem = products.find((p) => p.barcode === barcodeString)
+          const matchedItem = products.find((p: any) => p.barcode === barcodeString)
           if (matchedItem) {
             addItem(matchedItem)
           }
@@ -98,7 +77,7 @@ export function POSManagement() {
 
   // 4. Filtering criteria
   const filteredProducts = useMemo(() => {
-    return products.filter((p) => {
+    return products.filter((p: any) => {
       const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                             (p.barcode && p.barcode.toLowerCase().includes(searchQuery.toLowerCase()))
       const matchesCategory = categoryFilter === "all" || 
@@ -109,7 +88,7 @@ export function POSManagement() {
   }, [products, searchQuery, categoryFilter])
 
   const filteredCustomers = useMemo(() => {
-    return customers.filter((c) => {
+    return customers.filter((c: any) => {
       const q = customerSearchQuery.toLowerCase()
       return c.name.toLowerCase().includes(q) || c.phone.includes(q) || c.email.toLowerCase().includes(q)
     })
@@ -120,22 +99,13 @@ export function POSManagement() {
     e.preventDefault()
     if (!newCustName) return
     try {
-      const response = await fetch("/api/pos/customers", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newCustName, phone: newCustPhone, email: newCustEmail })
-      })
-      if (!response.ok) throw new Error("Failed to register customer")
-      const result = await response.json()
-      if (result.success) {
-        setSelectedCustomer(result.data)
-        setCustomers([result.data, ...customers])
-        setIsNewCustomerOpen(false)
-        setIsCustomerModalOpen(false)
-        setNewCustName("")
-        setNewCustPhone("")
-        setNewCustEmail("")
-      }
+      const newCustomer = await createCustomerMutation.mutateAsync({ name: newCustName, phone: newCustPhone, email: newCustEmail })
+      setSelectedCustomer(newCustomer)
+      setIsNewCustomerOpen(false)
+      setIsCustomerModalOpen(false)
+      setNewCustName("")
+      setNewCustPhone("")
+      setNewCustEmail("")
     } catch (err) {
       console.error(err)
     }
@@ -162,25 +132,16 @@ export function POSManagement() {
         idempotencyKey
       }
 
-      const res = await fetch("/api/pos/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(checkoutPayload)
-      })
-
-      if (!res.ok) throw new Error("Checkout transaction failed")
-      const result = await res.json()
+      const result = await checkoutMutation.mutateAsync(checkoutPayload)
       
-      if (result.success) {
-        setCompletedOrderNo(result.data.orderNumber)
-        clearCart()
-        setSelectedCustomer(null)
-        setCashReceived("")
-        setIsPaymentModalOpen(false)
-        setIsCompleteOpen(true)
-        // Refresh products list to show decremented stocks
-        fetchPosData()
-      }
+      setCompletedOrderNo(result.data.orderNumber)
+      clearCart()
+      setSelectedCustomer(null)
+      setCashReceived("")
+      setIsPaymentModalOpen(false)
+      setIsCompleteOpen(true)
+      // Refresh products list to show decremented stocks
+      refetchProducts()
     } catch (error) {
       console.error(error)
     }
@@ -228,7 +189,7 @@ export function POSManagement() {
           <div className="flex-grow flex flex-col items-center justify-center text-center p-6">
             <ShieldAlert className="h-12 w-12 text-red-500 mb-2" />
             <p className="text-sm font-semibold text-foreground">{error}</p>
-            <button onClick={fetchPosData} className="mt-4 px-4 py-2 bg-primary text-white text-xs font-bold rounded-none">
+            <button onClick={() => { refetchProducts() }} className="mt-4 px-4 py-2 bg-primary text-white text-xs font-bold rounded-none">
               Retry Load
             </button>
           </div>
@@ -240,7 +201,7 @@ export function POSManagement() {
         ) : (
           <div className="flex-grow overflow-y-auto pr-1">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-              {filteredProducts.map((p) => (
+              {filteredProducts.map((p: any) => (
                 <div
                   key={p.id}
                   onClick={() => addItem(p)}
@@ -472,7 +433,7 @@ export function POSManagement() {
                 />
 
                 <div className="max-h-60 overflow-y-auto space-y-2 pr-1">
-                  {filteredCustomers.map((cust) => (
+                  {filteredCustomers.map((cust: any) => (
                     <div
                       key={cust.id}
                       onClick={() => {
@@ -596,10 +557,10 @@ export function POSManagement() {
 
             <button
               onClick={handleProcessPayment}
-              disabled={paymentMethod === "CASH" && Number(cashReceived) < total}
+              disabled={(paymentMethod === "CASH" && Number(cashReceived) < total) || checkoutMutation.isPending}
               className="w-full h-12 bg-primary text-white hover:bg-primary/95 disabled:opacity-50 transition rounded-none text-xs font-bold mt-6 active:scale-95 shadow"
             >
-              Confirm Checkout Payment
+              {checkoutMutation.isPending ? "Processing..." : "Confirm Checkout Payment"}
             </button>
           </div>
         </div>

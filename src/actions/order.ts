@@ -4,6 +4,8 @@ import { db } from "@/lib/db"
 import { getCart } from "./cart"
 import { createCheckoutSession, CheckoutItem } from "@/services/stripe"
 import { ActionResponse } from "./auth"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
 
 export async function checkCoupon(code: string, subtotal: number): Promise<ActionResponse> {
   try {
@@ -118,6 +120,11 @@ export async function adminUpdateOrderStatus(
   orderId: string,
   status: OrderStatus
 ): Promise<ActionResponse> {
+  const session = await getServerSession(authOptions)
+  if (!session?.user || session.user.role !== "ADMIN") {
+    return { success: false, error: "Unauthorized access" }
+  }
+
   try {
     const updated = await updateOrderStatus(orderId, status)
     

@@ -25,7 +25,7 @@ export interface EventData {
   productId?: string
   orderId?: string
   campaignId?: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 /**
@@ -82,7 +82,7 @@ export async function trackEvent(eventType: EventType, data: EventData) {
 // STRUCTURED LOGGERS & ALERTS LOGS
 // ==========================================
 
-export function logInfo(message: string, context?: Record<string, any>) {
+export function logInfo(message: string, context?: Record<string, unknown>) {
   console.log(
     JSON.stringify({
       level: "INFO",
@@ -93,7 +93,7 @@ export function logInfo(message: string, context?: Record<string, any>) {
   )
 }
 
-export function logWarn(message: string, context?: Record<string, any>) {
+export function logWarn(message: string, context?: Record<string, unknown>) {
   console.warn(
     JSON.stringify({
       level: "WARN",
@@ -104,14 +104,14 @@ export function logWarn(message: string, context?: Record<string, any>) {
   )
 }
 
-export function logError(message: string, error?: any, context?: Record<string, any>) {
+export function logError(message: string, error?: unknown, context?: Record<string, unknown>) {
   console.error(
     JSON.stringify({
       level: "ERROR",
       timestamp: new Date().toISOString(),
       message,
-      errorMessage: error?.message || String(error),
-      errorStack: error?.stack,
+      errorMessage: error instanceof Error ? error.message : String(error),
+      errorStack: error instanceof Error ? error.stack : undefined,
       context,
     })
   )
@@ -134,9 +134,9 @@ export async function traceRequest<T>(
       const result = await operation(span)
       span.setStatus({ code: 1 }) // 1 = OK status
       return result
-    } catch (err: any) {
-      span.recordException(err)
-      span.setStatus({ code: 2, message: err.message }) // 2 = ERROR status
+    } catch (err: unknown) {
+      span.recordException(err as Error)
+      span.setStatus({ code: 2, message: (err as Error).message }) // 2 = ERROR status
       throw err
     } finally {
       span.end()

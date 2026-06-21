@@ -32,7 +32,7 @@ export async function createReservation(input: ReservationInput) {
 
   return db.$transaction(async (tx) => {
     // 1. Pessimistic lock on inventory row
-    const inventories = await tx.$queryRaw<any[]>`
+    const inventories = await tx.$queryRaw<Array<{ id: string, quantity: number, reserved: number }>>`
       SELECT id, quantity, reserved FROM inventory
       WHERE "variantId" = ${variantId}
       FOR UPDATE
@@ -77,7 +77,7 @@ export async function createReservation(input: ReservationInput) {
 export async function commitReservation(reservationId: string) {
   return db.$transaction(async (tx) => {
     // 1. Lock the reservation row
-    const reservations = await tx.$queryRaw<any[]>`
+    const reservations = await tx.$queryRaw<Array<{ id: string, variantId: string, quantity: number, status: string, expiresAt: Date, checkoutId: string }>>`
       SELECT id, "variantId", quantity, status FROM inventory_reservations
       WHERE id = ${reservationId}
       FOR UPDATE
@@ -99,7 +99,7 @@ export async function commitReservation(reservationId: string) {
     }
 
     // 2. Lock inventory and verify quantities
-    const inventories = await tx.$queryRaw<any[]>`
+    const inventories = await tx.$queryRaw<Array<{ id: string, quantity: number, reserved: number }>>`
       SELECT id, quantity, reserved FROM inventory
       WHERE "variantId" = ${reservation.variantId}
       FOR UPDATE
@@ -145,7 +145,7 @@ export async function commitReservation(reservationId: string) {
 export async function releaseReservation(reservationId: string) {
   return db.$transaction(async (tx) => {
     // 1. Lock reservation row
-    const reservations = await tx.$queryRaw<any[]>`
+    const reservations = await tx.$queryRaw<Array<{ id: string, variantId: string, quantity: number, status: string }>>`
       SELECT id, "variantId", quantity, status FROM inventory_reservations
       WHERE id = ${reservationId}
       FOR UPDATE
@@ -160,7 +160,7 @@ export async function releaseReservation(reservationId: string) {
     }
 
     // 2. Lock inventory
-    const inventories = await tx.$queryRaw<any[]>`
+    const inventories = await tx.$queryRaw<Array<{ id: string, reserved: number, quantity: number }>>`
       SELECT id, reserved FROM inventory
       WHERE "variantId" = ${reservation.variantId}
       FOR UPDATE
@@ -209,8 +209,8 @@ export async function releaseExpiredReservations(): Promise<number> {
       await releaseReservation(id)
       released++
       console.log(`[ReservationEngine] Released expired reservation: ${id}`)
-    } catch (err: any) {
-      console.error(`[ReservationEngine] Failed to release ${id}:`, err.message)
+    } catch (err: unknown) {
+      console.error(`[ReservationEngine] Release failed for ${id}:`, (err as Error).message)
     }
   }
 
@@ -235,8 +235,8 @@ export async function releaseCheckoutReservations(checkoutId: string): Promise<n
     try {
       await releaseReservation(id)
       released++
-    } catch (err: any) {
-      console.error(`[ReservationEngine] Release failed for ${id}:`, err.message)
+    } catch (err: unknown) {
+      console.error(`[ReservationEngine] Release failed for ${id}:`, (err as Error).message)
     }
   }
 

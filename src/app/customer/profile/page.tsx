@@ -10,38 +10,25 @@ import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { User, RefreshCw, ChevronRight, Home, ShieldCheck } from "lucide-react"
+import { useCustomer } from "@/components/providers/customer-provider"
+import { updateCustomerProfile } from "@/actions/auth"
 
 export default function CustomerProfilePage() {
   const router = useRouter()
   const { data: session, status, update } = useSession()
-  const [profile, setProfile] = useState<any>(null)
-  const [name, setName] = useState("")
-  const [loading, setLoading] = useState(true)
+  const { profile } = useCustomer()
+  const [name, setName] = useState(profile?.name || "")
   const [saving, setSaving] = useState(false)
 
-  const fetchProfile = async () => {
-    setLoading(true)
-    try {
-      const res = await fetch("/api/customer/profile")
-      if (res.ok) {
-        const data = await res.json()
-        setProfile(data)
-        setName(data.name || "")
-      } else {
-        toast.error("Failed to load customer profile details")
-      }
-    } catch (err) {
-      console.error(err)
-    } finally {
-      setLoading(false)
+  useEffect(() => {
+    if (profile?.name) {
+      setName(profile.name)
     }
-  }
+  }, [profile?.name])
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login?callbackUrl=/customer/profile")
-    } else if (status === "authenticated") {
-      fetchProfile()
     }
   }, [status])
 
@@ -54,20 +41,20 @@ export default function CustomerProfilePage() {
 
     setSaving(true)
     try {
-      // In NextAuth credentials we can call update session profile endpoints
-      const res = await fetch("/api/customer/profile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name }),
-      })
+      if (!session?.user?.id) {
+        toast.error("User session missing")
+        return
+      }
 
-      if (res.ok) {
+      const res = await updateCustomerProfile(session.user.id, { name })
+
+      if (res.success) {
         toast.success("Successfully updated profile credentials!")
         // Update live JWT session cache
         await update({ name })
-        await fetchProfile()
+        router.refresh()
       } else {
-        toast.error("Failed to update profile logs")
+        toast.error(res.error || "Failed to update profile logs")
       }
     } catch (err) {
       toast.error("Failed to execute save command")
@@ -76,7 +63,7 @@ export default function CustomerProfilePage() {
     }
   }
 
-  if (status === "loading" || loading) {
+  if (status === "loading") {
     return (
       <div className="min-h-screen bg-background flex flex-col justify-between">
         <Header />

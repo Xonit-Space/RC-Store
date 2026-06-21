@@ -46,12 +46,12 @@ export async function sendEmail(options: EmailOptions) {
 export async function sendWelcomeEmail(to: string, name: string) {
   const html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
-      <h2 style="color: #4f46e5; text-align: center;">Welcome to Neoshop Ultra</h2>
+      <h2 style="color: #1C1C1A; text-align: center;">Welcome to Neoshop Ultra</h2>
       <p>Hello ${name},</p>
       <p>Thank you for creating an account with Neoshop Ultra—the next generation of fashion streetwear.</p>
       <p>We are thrilled to accompany you on your fashion journey. Discover limited-edition drops and explore collections curated specifically for you.</p>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="http://localhost:3000/shop" style="background-color: #4f46e5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Explore Collections</a>
+        <a href="http://localhost:3000/shop" style="background-color: #1C1C1A; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Explore Collections</a>
       </div>
       <p>Best regards,<br>The Neoshop Team</p>
     </div>
@@ -65,9 +65,9 @@ export async function sendOrderConfirmation(to: string, orderNumber: string, tot
       <h2 style="color: #10b981; text-align: center;">Order Confirmed!</h2>
       <p>Thank you for your purchase.</p>
       <p>We have successfully received your payment for order <strong>#${orderNumber}</strong> and our team is prepping it for shipment.</p>
-      <div style="background-color: #f9fafb; padding: 15px; border-radius: 6px; margin: 20px 0;">
+      <div style="background-color: #F6F3EE; padding: 15px; border-radius: 6px; margin: 20px 0;">
         <p style="margin: 0; font-size: 14px; color: #4b5563;">Order Total:</p>
-        <h3 style="margin: 5px 0 0 0; color: #111827;">$${total.toFixed(2)}</h3>
+        <h3 style="margin: 5px 0 0 0; color: #1C1C1A;">$${total.toFixed(2)}</h3>
       </div>
       <p>We will email you a tracking code as soon as your premium streetwear is in transit.</p>
       <p>Best regards,<br>The Neoshop Team</p>
@@ -79,11 +79,11 @@ export async function sendOrderConfirmation(to: string, orderNumber: string, tot
 export async function sendAbandonedCartRecovery(to: string, name: string, checkoutUrl: string) {
   const html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
-      <h2 style="color: #4f46e5; text-align: center;">We saved your cart!</h2>
+      <h2 style="color: #1C1C1A; text-align: center;">We saved your cart!</h2>
       <p>Hello ${name},</p>
       <p>We noticed you left some designer streetwear items in your shopping bag. Don't let your favorites slip away—limited inventory is selling out quickly!</p>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="${checkoutUrl}" style="background-color: #111827; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Complete Checkout</a>
+        <a href="${checkoutUrl}" style="background-color: #1C1C1A; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Complete Checkout</a>
       </div>
       <p>Need assistance? Replying directly to this email hooks you up with our elite customer support agents.</p>
       <p>Best regards,<br>The Neoshop Team</p>

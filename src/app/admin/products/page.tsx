@@ -1,19 +1,23 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Plus, Trash2, Search, Package, RefreshCw, X } from "lucide-react"
 import { toast } from "sonner"
 import { adminCreateProduct, adminDeleteProduct } from "@/actions/product"
+import { useAdminProducts, useAdminCategories } from "@/hooks/use-admin-data"
+import { useQueryClient } from "@tanstack/react-query"
 
 export default function AdminProductsPage() {
   const { data: session } = useSession()
+  const queryClient = useQueryClient()
 
-  const [products, setProducts] = useState<any[]>([])
-  const [categories, setCategories] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+  const { data: products = [], isLoading: isLoadingProducts } = useAdminProducts()
+  const { data: categories = [], isLoading: isLoadingCategories } = useAdminCategories()
+  const loading = isLoadingProducts || isLoadingCategories
+
   const [search, setSearch] = useState("")
 
   // Add Product form state
@@ -25,33 +29,7 @@ export default function AdminProductsPage() {
   const [categoryId, setCategoryId] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const loadData = async () => {
-    setLoading(true)
-    try {
-      const [prodRes, catRes] = await Promise.all([
-        fetch("/api/products"),
-        fetch("/api/products/categories"),
-      ])
-
-      if (prodRes.ok && catRes.ok) {
-        const prodData = await prodRes.json()
-        const catData = await catRes.json()
-        setProducts(prodData || [])
-        setCategories(catData || [])
-        if (catData && catData.length > 0) {
-          setCategoryId(catData[0].id)
-        }
-      }
-    } catch (err) {
-      toast.error("Failed to load catalog data")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    loadData()
-  }, [])
+  // Removed manual loadData and useEffect in favor of React Query hooks
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -80,7 +58,7 @@ export default function AdminProductsPage() {
         setName("")
         setDescription("")
         setPrice("")
-        await loadData()
+        queryClient.invalidateQueries({ queryKey: ["admin", "products"] })
       } else {
         toast.error(res.error || "Failed to create product")
       }
@@ -98,7 +76,7 @@ export default function AdminProductsPage() {
       const res = await adminDeleteProduct(session?.user?.id || "", productId)
       if (res.success) {
         toast.success("Product successfully deleted!")
-        await loadData()
+        queryClient.invalidateQueries({ queryKey: ["admin", "products"] })
       } else {
         toast.error(res.error || "Failed to delete product")
       }
@@ -107,7 +85,7 @@ export default function AdminProductsPage() {
     }
   }
 
-  const filteredProducts = products.filter((p) =>
+  const filteredProducts = products.filter((p: any) =>
     p.name.toLowerCase().includes(search.toLowerCase())
   )
 
@@ -156,7 +134,7 @@ export default function AdminProductsPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProducts.map((p) => (
+          {filteredProducts.map((p: any) => (
             <div key={p.id} className="border border-border/40 bg-background flex flex-col justify-between group transition-colors hover:border-foreground/30">
               <div className="p-6 space-y-4">
                 <div className="flex justify-between items-start gap-4">
@@ -236,7 +214,7 @@ export default function AdminProductsPage() {
                     onChange={(e) => setCategoryId(e.target.value)}
                     className="h-12 bg-transparent border border-border/60 rounded-none w-full text-xs text-foreground px-3 outline-none focus:border-foreground"
                   >
-                    {categories.map((cat) => (
+                    {categories.map((cat: any) => (
                       <option key={cat.id} value={cat.id}>
                         {cat.name}
                       </option>

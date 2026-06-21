@@ -1,99 +1,104 @@
 import Link from "next/link"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, Zap } from "lucide-react"
 
 export function Footer() {
   return (
-    <footer className="bg-background pt-24 pb-12 border-t border-border/40">
-      <div className="container mx-auto px-6 md:px-12">
+    <footer className="bg-carbon-dark pt-24 pb-12 border-t-2 border-racing-red/20 relative overflow-hidden">
+      {/* Decorative background grid */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+
+      <div className="container mx-auto px-6 md:px-12 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-16 md:gap-8 mb-24">
           
           {/* Brand Manifesto */}
           <div className="md:col-span-5 space-y-8">
-            <Link href="/" className="font-serif text-3xl md:text-5xl tracking-widest text-foreground block">
-              NEOSHOP
+            <Link href="/" className="font-heading font-black text-3xl md:text-5xl tracking-widest text-white block drop-shadow-[0_0_10px_rgba(255,30,30,0.5)]">
+              NEOSHOP <span className="text-racing-red">ULTRA</span>
             </Link>
-            <p className="text-sm md:text-base leading-relaxed text-muted-foreground max-w-md font-serif italic">
-              Crafting timeless digital commerce. A curation of the world&apos;s most exceptional products, presented with architectural precision and quiet luxury.
+            <p className="text-sm md:text-base leading-relaxed text-gray-400 max-w-md font-mono uppercase">
+              High-performance remote control racing systems. Precision engineered for the ultimate track experience and raw mechanical power.
             </p>
           </div>
 
           {/* Curated Links */}
           <div className="md:col-span-3 space-y-6">
-            <h3 className="text-[10px] font-bold tracking-[0.2em] uppercase text-foreground mb-8">Boutique</h3>
+            <h3 className="text-[10px] font-mono font-bold tracking-[0.2em] uppercase text-white mb-8 border-b border-white/10 pb-2">Garage</h3>
             <ul className="space-y-4">
               <li>
-                <Link href="/products" className="text-sm text-muted-foreground hover:text-accent transition-colors">
-                  The Catalog
+                <Link href="/products" className="text-sm font-mono text-gray-400 hover:text-racing-red transition-colors">
+                  All Models
                 </Link>
               </li>
               <li>
-                <Link href="/collections" className="text-sm text-muted-foreground hover:text-accent transition-colors">
-                  Seasonal Collections
+                <Link href="/collections" className="text-sm font-mono text-gray-400 hover:text-racing-red transition-colors">
+                  Racing Ecosystem
                 </Link>
               </li>
               <li>
-                <Link href="/campaigns" className="text-sm text-muted-foreground hover:text-accent transition-colors">
-                  Campaigns
+                <Link href="/campaigns" className="text-sm font-mono text-gray-400 hover:text-racing-red transition-colors">
+                  Pro League Events
                 </Link>
               </li>
               <li>
-                <Link href="/materials" className="text-sm text-muted-foreground hover:text-accent transition-colors">
-                  Signature Materials
+                <Link href="/materials" className="text-sm font-mono text-gray-400 hover:text-racing-red transition-colors">
+                  Performance Parts
                 </Link>
               </li>
             </ul>
           </div>
 
           <div className="md:col-span-4 space-y-6">
-            <h3 className="text-[10px] font-bold tracking-[0.2em] uppercase text-foreground mb-8">Client Services</h3>
+            <h3 className="text-[10px] font-mono font-bold tracking-[0.2em] uppercase text-white mb-8 border-b border-white/10 pb-2">Pit Crew</h3>
             <ul className="space-y-4">
               <li>
-                <Link href="/contact" className="text-sm text-muted-foreground hover:text-accent transition-colors">
-                  Contact an Advisor
+                <Link href="/contact" className="text-sm font-mono text-gray-400 hover:text-racing-red transition-colors">
+                  Contact Technician
                 </Link>
               </li>
               <li>
-                <Link href="/shipping" className="text-sm text-muted-foreground hover:text-accent transition-colors">
-                  Shipping & Returns
+                <Link href="/shipping" className="text-sm font-mono text-gray-400 hover:text-racing-red transition-colors">
+                  Logistics & Returns
                 </Link>
               </li>
               <li>
-                <Link href="/faq" className="text-sm text-muted-foreground hover:text-accent transition-colors">
-                  FAQ
+                <Link href="/faq" className="text-sm font-mono text-gray-400 hover:text-racing-red transition-colors">
+                  Telemetry Manual (FAQ)
                 </Link>
               </li>
             </ul>
             
             {/* Minimal Newsletter */}
             <div className="pt-8">
-              <h3 className="text-[10px] font-bold tracking-[0.2em] uppercase text-foreground mb-4">The Newsletter</h3>
+              <h3 className="text-[10px] font-mono font-bold tracking-[0.2em] uppercase text-racing-red mb-4 flex items-center gap-2">
+                <Zap className="w-3 h-3" /> System Updates
+              </h3>
               <div className="relative group">
                 <input 
                   type="email" 
-                  placeholder="Email Address" 
-                  className="w-full bg-transparent border-b border-border/50 pb-2 text-sm text-foreground focus:outline-none focus:border-accent transition-colors placeholder:text-muted-foreground/50"
+                  placeholder="DRIVER EMAIL" 
+                  className="w-full bg-transparent border-b-2 border-white/10 pb-2 text-sm font-mono text-white focus:outline-none focus:border-racing-red transition-colors placeholder:text-gray-600"
                 />
-                <button className="absolute right-0 top-0 bottom-2 text-muted-foreground group-hover:text-accent transition-colors">
-                  <ArrowRight strokeWidth={1} className="w-5 h-5" />
+                <button className="absolute right-0 top-0 bottom-2 text-gray-500 group-hover:text-racing-red transition-colors">
+                  <ArrowRight strokeWidth={2} className="w-5 h-5" />
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="border-t border-border/40 pt-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <p className="text-[10px] tracking-[0.1em] text-muted-foreground uppercase">
-            © {new Date().getFullYear()} NEOSHOP ULTRA. ALL RIGHTS RESERVED.
+        <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <p className="text-[10px] font-mono tracking-[0.2em] text-gray-500 uppercase">
+            © {new Date().getFullYear()} NEOSHOP ULTRA. ALL SYSTEMS OPERATIONAL.
           </p>
           <div className="flex space-x-8">
-            <Link href="/privacy" className="text-[10px] tracking-[0.1em] text-muted-foreground hover:text-foreground uppercase transition-colors">
-              Privacy
+            <Link href="/privacy" className="text-[10px] font-mono tracking-[0.1em] text-gray-500 hover:text-racing-red uppercase transition-colors">
+              Data Policy
             </Link>
-            <Link href="/terms" className="text-[10px] tracking-[0.1em] text-muted-foreground hover:text-foreground uppercase transition-colors">
-              Terms
+            <Link href="/terms" className="text-[10px] font-mono tracking-[0.1em] text-gray-500 hover:text-racing-red uppercase transition-colors">
+              Track Rules
             </Link>
-            <a href="https://instagram.com" target="_blank" rel="noreferrer" className="text-[10px] tracking-[0.1em] text-muted-foreground hover:text-foreground uppercase transition-colors">
-              Instagram
+            <a href="https://instagram.com" target="_blank" rel="noreferrer" className="text-[10px] font-mono tracking-[0.1em] text-gray-500 hover:text-racing-red uppercase transition-colors">
+              Comms Link
             </a>
           </div>
         </div>

@@ -45,14 +45,14 @@ const config: Config = {
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',
-        /* Luxury explicit aliases */
-        charcoal: '#1C1C1A',
-        'off-white': '#F6F3EE',
-        forest: '#1F3A33',
-        brass: '#B08D57',
-        terracotta: '#A05C3B',
-        sand: '#D8C3A5',
-        olive: '#5C6B4F',
+        /* Racing UI explicit aliases */
+        'carbon-dark': '#0a0a0a',
+        'carbon-gray': '#1c1c1c',
+        'racing-red': '#ff1e1e',
+        'racing-red-glow': 'rgba(255, 30, 30, 0.5)',
+        'neon-red': '#e10600',
+        'smoke-dark': '#121212',
+        'graphite': '#2a2a2a',
   			sidebar: {
   				DEFAULT: 'hsl(var(--sidebar-background))',
   				foreground: 'hsl(var(--sidebar-foreground))',
@@ -66,7 +66,7 @@ const config: Config = {
   		},
       fontFamily: {
         sans: ['var(--font-inter)', 'sans-serif'],
-        serif: ['var(--font-cormorant)', 'serif'],
+        heading: ['var(--font-orbitron)', 'sans-serif'],
       },
   		borderRadius: {
   			lg: 'var(--radius)',
@@ -75,25 +75,32 @@ const config: Config = {
   		},
   		keyframes: {
   			'accordion-down': {
-  				from: {
-  					height: '0'
-  				},
-  				to: {
-  					height: 'var(--radix-accordion-content-height)'
-  				}
+  				from: { height: '0' },
+  				to: { height: 'var(--radix-accordion-content-height)' }
   			},
   			'accordion-up': {
-  				from: {
-  					height: 'var(--radix-accordion-content-height)'
-  				},
-  				to: {
-  					height: '0'
-  				}
-  			}
+  				from: { height: 'var(--radix-accordion-content-height)' },
+  				to: { height: '0' }
+  			},
+        'pulse-glow': {
+          '0%, 100%': { boxShadow: '0 0 10px rgba(255, 30, 30, 0.4)' },
+          '50%': { boxShadow: '0 0 25px rgba(255, 30, 30, 0.8)' },
+        },
+        'radar-scan': {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' }
+        },
+        'fade-in-scale': {
+          '0%': { opacity: '0', transform: 'scale(0.95)' },
+          '100%': { opacity: '1', transform: 'scale(1)' }
+        }
   		},
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
-  			'accordion-up': 'accordion-up 0.2s ease-out'
+  			'accordion-up': 'accordion-up 0.2s ease-out',
+        'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'radar-scan': 'radar-scan 4s linear infinite',
+        'fade-in-scale': 'fade-in-scale 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards'
   		}
   	}
   },

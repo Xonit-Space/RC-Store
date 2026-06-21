@@ -1,87 +1,92 @@
 import Link from "next/link"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, Crosshair } from "lucide-react"
 
 const collections = [
   {
     id: 1,
-    title: "The Linen Edit",
-    season: "Summer 2026",
-    image: "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=800&q=80",
-    href: "/products?collection=linen-edit",
+    title: "Off-Road RC Trucks",
+    season: "All-Terrain Series",
+    image: "https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=800&q=80",
+    href: "/products?collection=off-road",
   },
   {
     id: 2,
-    title: "Terrain",
-    season: "Summer 2026",
-    image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=800&q=80",
-    href: "/products?collection=terrain",
+    title: "Drift RC Cars",
+    season: "Precision Control",
+    image: "https://images.unsplash.com/photo-1594911772125-07fc7a2d8d9f?w=800&q=80",
+    href: "/products?collection=drift",
   },
   {
     id: 3,
-    title: "Nocturne",
-    season: "Summer 2026",
-    image: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=800&q=80",
-    href: "/products?collection=nocturne",
+    title: "Speed Racing Cars",
+    season: "Track Dominance",
+    image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=800&q=80",
+    href: "/products?collection=speed",
   },
 ]
 
 export function SeasonalCollectionSection() {
   return (
-    <section className="py-24 md:py-40 bg-sand/20">
-      <div className="container mx-auto px-6 md:px-12">
+    <section className="py-24 md:py-40 bg-carbon-dark relative border-t border-white/5">
+      <div className="container mx-auto px-6 md:px-12 relative z-10">
 
         {/* Header */}
-        <div className="flex items-end justify-between mb-16 md:mb-24">
+        <div className="flex items-end justify-between mb-16 md:mb-24 fade-up-section visible">
           <div>
-            <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-3">
-              Summer 2026
-            </p>
-            <h2 className="font-serif text-4xl md:text-6xl font-light leading-none tracking-tight text-foreground">
-              Collections
+            <div className="flex items-center gap-2 mb-3">
+              <Crosshair className="w-4 h-4 text-racing-red animate-pulse" />
+              <p className="text-[12px] font-heading font-bold tracking-[0.3em] uppercase text-racing-red">
+                Racing Ecosystem
+              </p>
+            </div>
+            <h2 className="font-heading text-4xl md:text-6xl font-black leading-none tracking-tighter text-white uppercase drop-shadow-[0_0_15px_rgba(255,30,30,0.3)]">
+              RC Categories
             </h2>
           </div>
           <Link
             href="/collections"
-            className="hidden md:flex items-center gap-2 text-[11px] tracking-[0.2em] uppercase text-muted-foreground hover:text-accent transition-colors group"
+            className="hidden md:flex items-center gap-2 text-[12px] font-heading font-bold tracking-[0.2em] uppercase text-gray-400 hover:text-racing-red hover:drop-shadow-[0_0_8px_rgba(255,30,30,0.8)] transition-all group"
           >
-            All Collections
-            <ArrowRight strokeWidth={1} className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            All Categories
+            <ArrowRight strokeWidth={2} className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
         {/* Collections grid — asymmetric with large first tile */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
 
           {/* Large featured collection */}
-          <Link href={collections[0].href} className="md:col-span-7 group relative overflow-hidden block aspect-[3/4] md:aspect-auto md:h-[680px]">
+          <Link href={collections[0].href} className="md:col-span-7 group relative overflow-hidden block aspect-[3/4] md:aspect-auto md:h-[680px] border border-white/10 hover:border-racing-red hover:shadow-[0_0_30px_rgba(255,30,30,0.3)] transition-all duration-500 fade-up-section visible">
             <img
               src={collections[0].image}
               alt={collections[0].title}
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 filter contrast-125 saturate-50 group-hover:saturate-100"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-charcoal/60 via-transparent to-transparent" />
-            <div className="absolute bottom-8 left-8">
-              <p className="text-[9px] tracking-[0.3em] uppercase text-sand/70 mb-2">{collections[0].season}</p>
-              <h3 className="font-serif text-3xl md:text-4xl font-light text-off-white">{collections[0].title}</h3>
+            <div className="absolute inset-0 bg-gradient-to-t from-carbon-dark via-carbon-dark/40 to-transparent" />
+            <div className="absolute bottom-8 left-8 z-10">
+              <p className="text-[10px] font-heading tracking-[0.4em] uppercase text-racing-red mb-2">{collections[0].season}</p>
+              <h3 className="font-heading text-3xl md:text-5xl font-black text-white uppercase tracking-tighter">{collections[0].title}</h3>
             </div>
-            <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <ArrowRight strokeWidth={1} className="w-6 h-6 text-off-white" />
+            <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+              <div className="bg-racing-red p-3 flex items-center justify-center">
+                <ArrowRight strokeWidth={2} className="w-6 h-6 text-white" />
+              </div>
             </div>
           </Link>
 
           {/* Two smaller collections stacked */}
-          <div className="md:col-span-5 flex flex-col gap-4 md:gap-6">
-            {collections.slice(1).map((col) => (
-              <Link key={col.id} href={col.href} className="group relative overflow-hidden block aspect-[4/3] md:flex-1 md:aspect-auto">
+          <div className="md:col-span-5 flex flex-col gap-6 md:gap-8">
+            {collections.slice(1).map((col, i) => (
+              <Link key={col.id} href={col.href} className="group relative overflow-hidden block aspect-[4/3] md:flex-1 md:aspect-auto border border-white/10 hover:border-racing-red hover:shadow-[0_0_30px_rgba(255,30,30,0.3)] transition-all duration-500 fade-up-section visible" style={{ transitionDelay: `${(i+1)*0.2}s` }}>
                 <img
                   src={col.image}
                   alt={col.title}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 filter contrast-125 saturate-50 group-hover:saturate-100"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-charcoal/50 via-transparent to-transparent" />
-                <div className="absolute bottom-6 left-6">
-                  <p className="text-[9px] tracking-[0.3em] uppercase text-sand/70 mb-1">{col.season}</p>
-                  <h3 className="font-serif text-xl md:text-2xl font-light text-off-white">{col.title}</h3>
+                <div className="absolute inset-0 bg-gradient-to-t from-carbon-dark via-carbon-dark/40 to-transparent" />
+                <div className="absolute bottom-6 left-6 z-10">
+                  <p className="text-[9px] font-heading tracking-[0.3em] uppercase text-racing-red mb-1">{col.season}</p>
+                  <h3 className="font-heading text-xl md:text-3xl font-black text-white uppercase tracking-tighter">{col.title}</h3>
                 </div>
               </Link>
             ))}

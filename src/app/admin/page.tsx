@@ -1,6 +1,6 @@
 import { db } from "@/lib/db"
 import { getOrderStats as fetchStats } from "@/repositories/order"
-import { TrendingUp, ShoppingCart, Package, Users } from "lucide-react"
+import { TrendingUp, ShoppingCart, Package, Users, Activity, Radar, Cpu } from "lucide-react"
 
 export const dynamic = "force-dynamic"
 
@@ -18,68 +18,82 @@ export default async function AdminOverviewPage() {
 
   const statsCards = [
     {
-      title: "Gross Revenue",
+      title: "Revenue Output",
       value: `Rs. ${stats.totalRevenue.toLocaleString()}`,
-      change: "+12.5%",
+      change: "+12.5% THRUST",
       icon: TrendingUp,
-      color: "text-forest",
-      bgColor: "bg-forest/5"
+      color: "text-racing-red",
+      bgColor: "bg-racing-red/10"
     },
     {
-      title: "Total Orders",
+      title: "Active Orders",
       value: stats.totalOrders.toString(),
-      change: "+8.2%",
+      change: "+8.2% ONLINE",
       icon: ShoppingCart,
-      color: "text-brass",
-      bgColor: "bg-brass/5"
+      color: "text-white",
+      bgColor: "bg-white/5"
     },
     {
       title: "Pending Fulfillment",
       value: stats.pendingOrders.toString(),
-      change: "Action Required",
+      change: "WARNING: ACTION REQ",
       icon: Package,
-      color: "text-terracotta",
-      bgColor: "bg-terracotta/5"
+      color: "text-racing-red animate-pulse",
+      bgColor: "bg-racing-red/20 border border-racing-red"
     },
     {
-      title: "Completed",
+      title: "System Users",
       value: stats.completedOrders.toString(),
-      change: "+9.1%",
+      change: "+9.1% CONNECTED",
       icon: Users,
-      color: "text-charcoal",
-      bgColor: "bg-charcoal/5"
+      color: "text-gray-400",
+      bgColor: "bg-gray-800"
     },
   ]
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-12 fade-up-section visible">
       {/* Header */}
-      <div>
-        <p className="text-[10px] tracking-[0.25em] uppercase text-muted-foreground mb-3">
-          Overview
-        </p>
-        <h2 className="font-sans text-3xl md:text-5xl font-light text-foreground leading-none">
-          Dashboard
-        </h2>
+      <div className="border-b border-white/10 pb-6 mb-8 flex items-end justify-between">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Activity className="w-4 h-4 text-racing-red animate-pulse" />
+            <p className="text-[10px] tracking-[0.4em] uppercase text-racing-red font-mono font-bold">
+              SYSTEM ONLINE // TERMINAL: ALPHA
+            </p>
+          </div>
+          <h2 className="font-heading text-4xl md:text-5xl font-black text-white leading-none uppercase tracking-tighter drop-shadow-[0_0_15px_rgba(255,30,30,0.3)]">
+            Control Center
+          </h2>
+        </div>
+        <div className="hidden md:block">
+          <p className="font-mono text-xs text-gray-500 uppercase tracking-widest text-right">
+            Status: <span className="text-green-500 font-bold">NOMINAL</span>
+          </p>
+          <p className="font-mono text-xs text-gray-500 uppercase tracking-widest text-right">
+            Uptime: <span className="text-white">99.9%</span>
+          </p>
+        </div>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {statsCards.map((stat) => (
-          <div key={stat.title} className="p-6 md:p-8 border border-border/40 bg-background transition-colors hover:border-accent group">
-            <div className="flex justify-between items-start mb-12">
+          <div key={stat.title} className="p-6 md:p-8 border border-white/5 bg-carbon-dark transition-all hover:border-racing-red hover:shadow-[0_0_20px_rgba(255,30,30,0.15)] group relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-racing-red/10 to-transparent pointer-events-none" />
+            <div className="flex justify-between items-start mb-12 relative z-10">
               <div className={`h-10 w-10 ${stat.bgColor} flex items-center justify-center`}>
-                <stat.icon strokeWidth={1} className={`h-5 w-5 ${stat.color}`} />
+                <stat.icon strokeWidth={2} className={`h-5 w-5 ${stat.color}`} />
               </div>
-              <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground group-hover:text-foreground transition-colors">
+              <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-gray-500 group-hover:text-racing-red transition-colors">
                 {stat.change}
               </p>
             </div>
-            <div>
-              <p className="text-[9px] tracking-[0.3em] uppercase text-muted-foreground mb-2">
+            <div className="relative z-10">
+              <p className="text-[10px] font-mono tracking-[0.3em] uppercase text-gray-400 mb-2">
                 {stat.title}
               </p>
-              <p className="font-sans text-3xl font-light text-foreground tracking-tight">
+              <p className="font-heading text-3xl md:text-4xl font-black text-white tracking-tighter">
                 {stat.value}
               </p>
             </div>
@@ -92,31 +106,33 @@ export default async function AdminOverviewPage() {
         
         {/* System Analytics */}
         <div className="lg:col-span-7 space-y-6">
-          <h3 className="font-sans text-2xl font-light text-foreground border-b border-border/40 pb-4">
-            System Performance
+          <h3 className="font-heading text-2xl font-black text-white border-b border-white/10 pb-4 uppercase tracking-widest flex items-center gap-2">
+            <Radar className="w-5 h-5 text-racing-red" />
+            Telemetry Data
           </h3>
-          <div className="border border-border/40 bg-background overflow-hidden">
-            <div className="p-6 md:p-8 bg-muted/10 border-b border-border/40">
-               <div className="flex justify-between items-center">
+          <div className="border border-white/5 bg-carbon-dark overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+            <div className="p-6 md:p-8 bg-smoke-dark border-b border-white/5 relative">
+               <div className="absolute top-0 left-0 w-1 h-full bg-racing-red" />
+               <div className="flex justify-between items-center relative z-10">
                  <div>
-                   <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground mb-1">
-                     Monthly Volume
+                   <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-gray-400 mb-1">
+                     Gross Output Volume
                    </p>
-                   <p className="font-sans text-2xl text-foreground">
-                     {stats.totalOrders} Units
+                   <p className="font-heading text-2xl font-black text-white uppercase">
+                     {stats.totalOrders} UNITS DISPATCHED
                    </p>
                  </div>
-                 <TrendingUp strokeWidth={1} className="h-8 w-8 text-forest" />
+                 <Cpu strokeWidth={1} className="h-10 w-10 text-racing-red opacity-50" />
                </div>
             </div>
             <div className="p-6 md:p-8 grid grid-cols-2 gap-4">
                <div>
-                 <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground mb-1">Fulfillment Rate</p>
-                 <p className="font-sans text-xl text-foreground">98.5%</p>
+                 <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-gray-400 mb-1">Fulfillment Efficiency</p>
+                 <p className="font-heading text-xl font-bold text-white tracking-widest">98.5%</p>
                </div>
                <div>
-                 <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground mb-1">Avg Process Time</p>
-                 <p className="font-sans text-xl text-foreground">1.2 Hrs</p>
+                 <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-gray-400 mb-1">Avg Process Delay</p>
+                 <p className="font-heading text-xl font-bold text-white tracking-widest">1.2 HRS</p>
                </div>
             </div>
           </div>
@@ -124,32 +140,35 @@ export default async function AdminOverviewPage() {
 
         {/* Recent Orders */}
         <div className="lg:col-span-5 space-y-6">
-          <h3 className="font-sans text-2xl font-light text-foreground border-b border-border/40 pb-4">
-            Recent Transactions
+          <h3 className="font-heading text-2xl font-black text-white border-b border-white/10 pb-4 uppercase tracking-widest flex items-center gap-2">
+            <Activity className="w-5 h-5 text-racing-red" />
+            Recent Logs
           </h3>
-          <div className="border border-border/40 bg-background divide-y divide-border/40">
+          <div className="border border-white/5 bg-carbon-dark divide-y divide-white/5 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
             {recentOrders.length === 0 ? (
               <div className="p-12 text-center">
-                <p className="text-[11px] tracking-[0.2em] uppercase text-muted-foreground">
-                  No recent activity
+                <p className="text-[11px] font-mono tracking-[0.2em] uppercase text-gray-500">
+                  NO RECENT ACTIVITY DETECTED
                 </p>
               </div>
             ) : (
               recentOrders.map((order) => (
-                <div key={order.id} className="p-5 flex justify-between items-center hover:bg-muted/20 transition-colors">
+                <div key={order.id} className="p-5 flex justify-between items-center hover:bg-smoke-dark transition-colors group">
                   <div>
-                    <p className="text-[11px] tracking-widest uppercase text-foreground mb-1">
-                      Order #{order.orderNumber}
+                    <p className="text-[11px] font-mono font-bold tracking-widest uppercase text-white mb-1 group-hover:text-racing-red transition-colors">
+                      TRX_{order.orderNumber}
                     </p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm font-sans text-gray-400">
                       {order.user.name || order.user.email}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-foreground mb-1">
+                    <p className="text-sm font-mono font-bold text-white mb-1">
                       Rs. {order.total.toLocaleString()}
                     </p>
-                    <span className="text-[9px] tracking-[0.2em] uppercase text-accent border border-accent/30 px-2 py-0.5">
+                    <span className={`text-[9px] font-mono font-bold tracking-[0.2em] uppercase px-2 py-0.5 border ${
+                      order.status === "PENDING" ? "text-racing-red border-racing-red/50 bg-racing-red/10" : "text-green-500 border-green-500/50 bg-green-500/10"
+                    }`}>
                       {order.status}
                     </span>
                   </div>

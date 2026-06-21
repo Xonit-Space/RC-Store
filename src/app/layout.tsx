@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter, Cormorant_Garamond } from "next/font/google"
+import { Inter, Orbitron } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { LoadingProvider } from "@/components/providers/loading-provider"
@@ -12,16 +12,16 @@ import { HeaderSkeleton } from "@/components/ui/loading-skeleton"
 import { WebVitals } from "@/components/performance/web-vitals"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" })
-const cormorant = Cormorant_Garamond({ 
-  weight: ["300", "400"],
+const orbitron = Orbitron({ 
+  weight: ["400", "500", "700", "900"],
   subsets: ["latin"], 
-  variable: "--font-cormorant",
+  variable: "--font-orbitron",
   display: "swap"
 })
 
 export const metadata: Metadata = {
-  title: "NEOSHOP ULTRA - Smart E-Commerce Platform",
-  description: "The most customizable and scalable e-commerce platform"
+  title: "NEOSHOP ULTRA | Racing Control",
+  description: "Ultra-Premium RC Cars & Remote Racing Experience Platform"
 }
 
 export default function RootLayout({
@@ -31,11 +31,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${cormorant.variable} font-sans antialiased bg-background text-foreground selection:bg-brass/30 selection:text-forest`}>
+      <body className={`${inter.variable} ${orbitron.variable} font-sans antialiased bg-background text-foreground selection:bg-racing-red selection:text-white`}>
         <WebVitals />
         <SessionProvider>
           <QueryProvider>
-            <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+            {/* Force dark theme default for racing UI */}
+            <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
               <LoadingProvider>
                 <Suspense fallback={<HeaderSkeleton />}>{children}</Suspense>
                 <Toaster />

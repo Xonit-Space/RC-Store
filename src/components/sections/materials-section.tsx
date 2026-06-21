@@ -2,67 +2,71 @@ import Link from "next/link"
 
 const materials = [
   {
-    name: "Mongolian Cashmere",
-    origin: "Inner Mongolia",
-    description: "Hand-combed from free-ranging goats in the Gobi highlands. Each kilogram takes one goat an entire season to produce.",
-    texture: "bg-sand",
+    name: "Carbon Fiber Chassis",
+    origin: "Ultra-Lightweight",
+    description: "Aerospace-grade woven carbon fiber provides maximum rigidity while shedding crucial grams for explosive acceleration.",
+    texture: "bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] bg-carbon-dark",
   },
   {
-    name: "Washed Silk",
-    origin: "Lyon, France",
-    description: "Triple-washed to achieve an unparalleled drape and softness. Produced at the last artisan silk mill in Lyon.",
-    texture: "bg-muted",
+    name: "Brushless Motors",
+    origin: "High RPM Output",
+    description: "Sensored brushless technology delivering instantaneous torque and top speeds exceeding 100km/h.",
+    texture: "bg-smoke-dark",
   },
   {
-    name: "Merino Wool",
-    origin: "New Zealand",
-    description: "Ultra-fine 17.5-micron fibers, ethically sourced from farms with full traceability from pasture to garment.",
-    texture: "bg-olive/30",
+    name: "LiPo Batteries",
+    origin: "High-Discharge Power",
+    description: "Advanced Lithium Polymer cells with 100C discharge rates for sustained, fade-free racing performance.",
+    texture: "bg-graphite",
   },
   {
-    name: "Japanese Selvedge Denim",
-    origin: "Okayama, Japan",
-    description: "Shuttle-loom woven at a Showa-era mill. Natural indigo aged to develop a unique patina over years of wear.",
-    texture: "bg-forest/20",
+    name: "Aerospace Aluminum",
+    origin: "CNC Machined",
+    description: "7075-T6 aluminum suspension components offering bulletproof durability for off-road bashing and track racing.",
+    texture: "bg-carbon-gray",
   },
 ]
 
 export function MaterialsSection() {
   return (
-    <section className="py-24 md:py-40 bg-sand/30">
-      <div className="container mx-auto px-6 md:px-12">
+    <section className="py-24 md:py-40 bg-carbon-dark border-t border-white/5 relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-racing-red/5 to-transparent pointer-events-none" />
+      <div className="container mx-auto px-6 md:px-12 relative z-10">
 
         {/* Header */}
-        <div className="mb-16 md:mb-24 max-w-lg">
-          <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-4">
-            The Source
+        <div className="mb-16 md:mb-24 max-w-lg fade-up-section visible">
+          <p className="text-[12px] font-heading font-bold tracking-[0.3em] uppercase text-racing-red mb-4 flex items-center gap-2">
+            <span className="w-2 h-2 bg-racing-red rounded-full animate-ping" />
+            The Hardware
           </p>
-          <h2 className="font-serif text-4xl md:text-5xl font-light leading-tight text-foreground">
-            Signature<br />
-            <em style={{ fontStyle: "italic" }}>Materials</em>
+          <h2 className="font-heading text-4xl md:text-5xl font-black leading-tight text-white uppercase tracking-tighter">
+            Precision<br />
+            <span className="text-racing-red">Components</span>
           </h2>
         </div>
 
         {/* Materials Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border/30">
-          {materials.map((material) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-white/10 shadow-[0_0_30px_rgba(255,30,30,0.1)]">
+          {materials.map((material, i) => (
             <div
               key={material.name}
-              className={`${material.texture} p-10 md:p-14 group hover:bg-forest/10 transition-colors duration-500`}
+              className={`${material.texture} p-10 md:p-14 group hover:bg-racing-red/10 transition-colors duration-500 relative overflow-hidden fade-up-section visible`}
+              style={{ transitionDelay: `${i * 0.1}s` }}
             >
-              <div className="space-y-4">
+              <div className="absolute inset-0 bg-gradient-to-tr from-carbon-dark/80 to-transparent pointer-events-none" />
+              <div className="space-y-4 relative z-10">
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="text-[9px] tracking-[0.3em] uppercase text-muted-foreground mb-2">
-                      {material.origin}
+                    <p className="text-[10px] font-mono tracking-[0.3em] uppercase text-racing-red mb-2">
+                      SYS_SPEC // {material.origin}
                     </p>
-                    <h3 className="font-serif text-2xl md:text-3xl font-light text-foreground">
+                    <h3 className="font-heading text-2xl md:text-3xl font-black text-white uppercase tracking-tight group-hover:text-racing-red transition-colors">
                       {material.name}
                     </h3>
                   </div>
-                  <div className="w-8 h-px bg-border mt-4 group-hover:w-12 transition-all duration-500" />
+                  <div className="w-8 h-[2px] bg-white/20 mt-4 group-hover:w-16 group-hover:bg-racing-red transition-all duration-500 shadow-[0_0_10px_rgba(255,30,30,0)] group-hover:shadow-[0_0_10px_rgba(255,30,30,0.8)]" />
                 </div>
-                <p className="text-sm text-muted-foreground leading-relaxed max-w-sm">
+                <p className="text-sm text-gray-400 leading-relaxed max-w-sm font-sans">
                   {material.description}
                 </p>
               </div>
@@ -71,12 +75,12 @@ export function MaterialsSection() {
         </div>
 
         {/* Footer link */}
-        <div className="mt-16 text-center">
+        <div className="mt-16 text-center fade-up-section visible">
           <Link
             href="/materials"
-            className="inline-flex items-center gap-2 text-[11px] tracking-[0.25em] uppercase text-muted-foreground hover:text-accent transition-colors"
+            className="inline-flex items-center gap-3 text-[12px] font-heading font-bold tracking-[0.25em] uppercase text-gray-400 hover:text-racing-red hover:shadow-[0_0_15px_rgba(255,30,30,0.5)] transition-all bg-smoke-dark px-6 py-3 border border-white/10 hover:border-racing-red"
           >
-            Our Full Materials Guide →
+            Access Full Hardware Specs →
           </Link>
         </div>
       </div>

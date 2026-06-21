@@ -7,7 +7,7 @@ export async function FeaturedProducts() {
   const products = await getProducts({ featured: true, limit: 8 })
 
   return (
-    <section id="new-arrivals" className="py-24 md:py-32 bg-carbon-dark relative overflow-hidden">
+    <section id="new-arrivals" className="py-24 md:py-32 bg-background relative overflow-hidden">
       {/* Background styling for Garage */}
       <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20 pointer-events-none" />
       <div className="container mx-auto px-6 md:px-12 relative z-10">
@@ -18,18 +18,18 @@ export async function FeaturedProducts() {
             <div className="flex items-center gap-2 mb-3">
               <span className="w-8 h-px bg-racing-red inline-block" />
               <p className="text-[12px] font-heading font-bold tracking-[0.3em] uppercase text-racing-red">
-                Premium Fleet
+                Top Picks
               </p>
             </div>
-            <h2 className="font-heading text-4xl md:text-6xl font-black leading-none tracking-tighter text-white uppercase drop-shadow-[0_0_15px_rgba(255,30,30,0.3)]">
-              Garage Display Bays
+            <h2 className="font-heading text-4xl md:text-6xl font-black leading-none tracking-tighter text-foreground dark:text-white uppercase drop-shadow-[0_0_15px_rgba(255,30,30,0.3)]">
+              Featured Machines
             </h2>
           </div>
           <Link
             href="/products"
-            className="hidden md:flex items-center gap-2 text-[12px] font-heading font-bold tracking-[0.2em] uppercase text-gray-400 hover:text-racing-red hover:drop-shadow-[0_0_8px_rgba(255,30,30,0.8)] transition-all group fade-up-section visible"
+            className="hidden md:flex items-center gap-2 text-[12px] font-heading font-bold tracking-[0.2em] uppercase text-muted-foreground hover:text-racing-red hover:drop-shadow-[0_0_8px_rgba(255,30,30,0.8)] transition-all group fade-up-section visible"
           >
-            Access All Bays
+            Discover Machines
             <ArrowRight strokeWidth={2} className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
@@ -47,9 +47,9 @@ export async function FeaturedProducts() {
         <div className="mt-16 flex justify-center md:hidden fade-up-section visible">
           <Link
             href="/products"
-            className="flex items-center gap-2 text-[12px] font-heading font-bold tracking-[0.2em] uppercase text-gray-400 hover:text-racing-red transition-colors group border border-white/10 px-6 py-3 glass-dark"
+            className="flex items-center gap-2 text-[12px] font-heading font-bold tracking-[0.2em] uppercase text-muted-foreground hover:text-racing-red transition-colors group border border-border px-6 py-3 glass-dark"
           >
-            Access All Bays
+            Discover Machines
             <ArrowRight strokeWidth={2} className="w-4 h-4 group-hover:translate-x-1 transition-transform text-racing-red" />
           </Link>
         </div>

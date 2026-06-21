@@ -66,7 +66,7 @@ const config: Config = {
   		},
       fontFamily: {
         sans: ['var(--font-inter)', 'sans-serif'],
-        heading: ['var(--font-orbitron)', 'sans-serif'],
+        heading: ['var(--font-heading)', 'sans-serif'],
       },
   		borderRadius: {
   			lg: 'var(--radius)',

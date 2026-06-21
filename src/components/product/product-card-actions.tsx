@@ -61,14 +61,14 @@ export const ProductCardActions = memo(function ProductCardActions({ product }: 
         onClick={toggleWishlist}
         className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity"
       >
-        <Heart strokeWidth={1} className={`w-5 h-5 ${inWishlist ? "fill-terracotta text-terracotta" : "text-off-white"}`} />
+        <Heart strokeWidth={1} className={`w-5 h-5 ${inWishlist ? "fill-racing-red text-racing-red" : "text-foreground dark:text-white"}`} />
       </button>
 
       <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
         <button
           onClick={addToCart}
           disabled={isAdding}
-          className="w-full py-3 bg-background/95 text-[10px] tracking-[0.25em] uppercase text-foreground hover:bg-forest hover:text-off-white transition-colors duration-200"
+          className="w-full py-3 bg-background/95 text-[10px] tracking-[0.25em] uppercase text-foreground hover:bg-racing-red hover:text-white transition-colors duration-200"
         >
           {isAdding ? "Adding..." : "Add to Bag"}
         </button>

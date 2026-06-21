@@ -4,32 +4,29 @@ import { ArrowRight, Zap } from "lucide-react"
 export function HeroSection() {
 
   return (
-    <section className="relative w-full h-screen min-h-[700px] overflow-hidden bg-carbon-dark">
-      {/* Cinematic Garage/Track Background */}
-      <div 
-        className="absolute inset-0 w-full h-full bg-cover bg-center opacity-40 mix-blend-luminosity scale-105 cinematic-zoom"
-        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1583121274602-3e2820c69888?q=80&w=2070')" }}
-        aria-hidden="true"
-      />
+    <section className="relative w-full h-screen min-h-[700px] overflow-hidden bg-background">
+      {/* Cinematic Garage/Track Background (Video) */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover opacity-60 dark:mix-blend-luminosity scale-105 cinematic-zoom"
+        poster="https://images.unsplash.com/photo-1596484552993-80a56f08fb76?q=80&w=2070"
+      >
+        {/* Explicit RC Car Racing Video */}
+        <source src="/snaptik_7610286081623297294_v3.mp4" type="video/mp4" />
+        <div 
+          className="absolute inset-0 w-full h-full bg-cover bg-center"
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1596484552993-80a56f08fb76?q=80&w=2070')" }}
+        />
+      </video>
       
       {/* Motion Blur & Red Light Streak Overlays */}
       <div className="absolute inset-0 bg-gradient-to-tr from-racing-red/20 via-transparent to-transparent opacity-60 mix-blend-screen" />
       <div className="absolute top-1/4 left-0 right-0 h-32 bg-racing-red/10 blur-[100px] transform -skew-y-12" />
 
-      {/* Gradient overlay for text legibility */}
-      <div
-        className="absolute inset-0 pointer-events-none bg-gradient-to-b from-carbon-dark/80 from-0% via-carbon-dark/20 via-[40%] to-carbon-dark/95 to-100%"
-        aria-hidden="true"
-      />
 
-      {/* RC Car Parallax Image (Simulated) */}
-      <div className="absolute bottom-0 right-[-10%] md:right-0 w-[120%] md:w-[60%] h-[70%] z-10 pointer-events-none fade-up-section visible" style={{ transitionDelay: '0.2s' }}>
-         <img 
-           src="https://images.unsplash.com/photo-1594911772125-07fc7a2d8d9f?q=80&w=2070" 
-           alt="Premium RC Car" 
-           className="w-full h-full object-contain object-bottom drop-shadow-[0_-20px_50px_rgba(255,30,30,0.3)] filter contrast-125"
-         />
-      </div>
 
       {/* Hero Text Content */}
       <div className="absolute inset-0 flex flex-col justify-center pt-32 pb-20 px-6 md:px-16 lg:px-24 z-20">
@@ -43,13 +40,13 @@ export function HeroSection() {
           </div>
 
           {/* Editorial Headline */}
-          <h1 className="font-heading text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black leading-[0.85] tracking-tighter text-white mb-6 drop-shadow-2xl uppercase">
+          <h1 className="font-heading text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black leading-[0.85] tracking-tighter text-foreground dark:text-white mb-6 drop-shadow-xl dark:drop-shadow-2xl uppercase">
             Unleash<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-racing-red to-neon-red">RC Speed</span>
           </h1>
 
           {/* Subline */}
-          <p className="text-base md:text-lg text-gray-300 max-w-lg leading-relaxed font-sans mb-10 border-l-2 border-racing-red pl-4 glass-dark p-4 rounded-r-lg">
+          <p className="text-base md:text-lg text-muted-foreground dark:text-gray-300 max-w-lg leading-relaxed font-sans mb-10 border-l-2 border-racing-red pl-4">
             High-performance electric and nitro-powered machines built for ultimate dominance. Command the track with precision engineering.
           </p>
 
@@ -66,7 +63,7 @@ export function HeroSection() {
             
             <Link
               href="/build"
-              className="group w-full sm:w-auto flex items-center justify-center gap-3 bg-transparent text-white px-8 py-4 font-heading font-bold tracking-widest uppercase border border-white/20 hover:border-racing-red/80 hover:bg-racing-red/10 transition-all duration-300 glass-dark hover:scale-105"
+              className="group w-full sm:w-auto flex items-center justify-center gap-3 bg-transparent text-foreground dark:text-white px-8 py-4 font-heading font-bold tracking-widest uppercase border border-border hover:border-racing-red/80 hover:bg-racing-red/10 transition-all duration-300 glass-dark hover:scale-105"
             >
               <Zap strokeWidth={2} className="w-5 h-5 text-racing-red group-hover:animate-pulse" />
               Build Your Racer
@@ -75,13 +72,7 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* Custom Scroll indicator */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-20">
-        <span className="text-[10px] font-heading font-bold tracking-[0.3em] uppercase text-white/50">System Scan</span>
-        <div className="w-8 h-12 border-2 border-white/20 rounded-full relative flex justify-center p-1">
-          <div className="w-1.5 h-3 bg-racing-red rounded-full animate-bounce shadow-[0_0_8px_rgba(255,30,30,0.8)]" style={{ animationDuration: "1.5s" }} />
-        </div>
-      </div>
+
     </section>
   )
 }

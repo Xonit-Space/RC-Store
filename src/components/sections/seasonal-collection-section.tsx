@@ -6,28 +6,28 @@ const collections = [
     id: 1,
     title: "Off-Road RC Trucks",
     season: "All-Terrain Series",
-    image: "https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1514316454349-750a7fd3da3a?w=800&q=80",
     href: "/products?collection=off-road",
   },
   {
     id: 2,
     title: "Drift RC Cars",
     season: "Precision Control",
-    image: "https://images.unsplash.com/photo-1594911772125-07fc7a2d8d9f?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1581235720704-06d3acfcb36f?w=800&q=80",
     href: "/products?collection=drift",
   },
   {
     id: 3,
     title: "Speed Racing Cars",
     season: "Track Dominance",
-    image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1611821064430-0d40221e4c98?w=800&q=80",
     href: "/products?collection=speed",
   },
 ]
 
 export function SeasonalCollectionSection() {
   return (
-    <section className="py-24 md:py-40 bg-carbon-dark relative border-t border-white/5">
+    <section className="py-24 md:py-40 bg-background relative border-t border-border">
       <div className="container mx-auto px-6 md:px-12 relative z-10">
 
         {/* Header */}
@@ -39,13 +39,13 @@ export function SeasonalCollectionSection() {
                 Racing Ecosystem
               </p>
             </div>
-            <h2 className="font-heading text-4xl md:text-6xl font-black leading-none tracking-tighter text-white uppercase drop-shadow-[0_0_15px_rgba(255,30,30,0.3)]">
+            <h2 className="font-heading text-4xl md:text-6xl font-black leading-none tracking-tighter text-foreground dark:text-white uppercase drop-shadow-[0_0_15px_rgba(255,30,30,0.3)]">
               RC Categories
             </h2>
           </div>
           <Link
             href="/collections"
-            className="hidden md:flex items-center gap-2 text-[12px] font-heading font-bold tracking-[0.2em] uppercase text-gray-400 hover:text-racing-red hover:drop-shadow-[0_0_8px_rgba(255,30,30,0.8)] transition-all group"
+            className="hidden md:flex items-center gap-2 text-[12px] font-heading font-bold tracking-[0.2em] uppercase text-muted-foreground hover:text-racing-red hover:drop-shadow-[0_0_8px_rgba(255,30,30,0.8)] transition-all group"
           >
             All Categories
             <ArrowRight strokeWidth={2} className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -56,7 +56,7 @@ export function SeasonalCollectionSection() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
 
           {/* Large featured collection */}
-          <Link href={collections[0].href} className="md:col-span-7 group relative overflow-hidden block aspect-[3/4] md:aspect-auto md:h-[680px] border border-white/10 hover:border-racing-red hover:shadow-[0_0_30px_rgba(255,30,30,0.3)] transition-all duration-500 fade-up-section visible">
+          <Link href={collections[0].href} className="md:col-span-7 group relative overflow-hidden block aspect-[3/4] md:aspect-auto md:h-[680px] border border-border hover:border-racing-red hover:shadow-[0_0_30px_rgba(255,30,30,0.3)] transition-all duration-500 fade-up-section visible">
             <img
               src={collections[0].image}
               alt={collections[0].title}
@@ -65,11 +65,11 @@ export function SeasonalCollectionSection() {
             <div className="absolute inset-0 bg-gradient-to-t from-carbon-dark via-carbon-dark/40 to-transparent" />
             <div className="absolute bottom-8 left-8 z-10">
               <p className="text-[10px] font-heading tracking-[0.4em] uppercase text-racing-red mb-2">{collections[0].season}</p>
-              <h3 className="font-heading text-3xl md:text-5xl font-black text-white uppercase tracking-tighter">{collections[0].title}</h3>
+              <h3 className="font-heading text-3xl md:text-5xl font-black text-foreground dark:text-white uppercase tracking-tighter">{collections[0].title}</h3>
             </div>
             <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
               <div className="bg-racing-red p-3 flex items-center justify-center">
-                <ArrowRight strokeWidth={2} className="w-6 h-6 text-white" />
+                <ArrowRight strokeWidth={2} className="w-6 h-6 text-foreground dark:text-white" />
               </div>
             </div>
           </Link>
@@ -77,7 +77,7 @@ export function SeasonalCollectionSection() {
           {/* Two smaller collections stacked */}
           <div className="md:col-span-5 flex flex-col gap-6 md:gap-8">
             {collections.slice(1).map((col, i) => (
-              <Link key={col.id} href={col.href} className="group relative overflow-hidden block aspect-[4/3] md:flex-1 md:aspect-auto border border-white/10 hover:border-racing-red hover:shadow-[0_0_30px_rgba(255,30,30,0.3)] transition-all duration-500 fade-up-section visible" style={{ transitionDelay: `${(i+1)*0.2}s` }}>
+              <Link key={col.id} href={col.href} className="group relative overflow-hidden block aspect-[4/3] md:flex-1 md:aspect-auto border border-border hover:border-racing-red hover:shadow-[0_0_30px_rgba(255,30,30,0.3)] transition-all duration-500 fade-up-section visible" style={{ transitionDelay: `${(i+1)*0.2}s` }}>
                 <img
                   src={col.image}
                   alt={col.title}
@@ -86,7 +86,7 @@ export function SeasonalCollectionSection() {
                 <div className="absolute inset-0 bg-gradient-to-t from-carbon-dark via-carbon-dark/40 to-transparent" />
                 <div className="absolute bottom-6 left-6 z-10">
                   <p className="text-[9px] font-heading tracking-[0.3em] uppercase text-racing-red mb-1">{col.season}</p>
-                  <h3 className="font-heading text-xl md:text-3xl font-black text-white uppercase tracking-tighter">{col.title}</h3>
+                  <h3 className="font-heading text-xl md:text-3xl font-black text-foreground dark:text-white uppercase tracking-tighter">{col.title}</h3>
                 </div>
               </Link>
             ))}

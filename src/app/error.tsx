@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
-import { AlertOctagon, RefreshCw, Home } from "lucide-react"
+import { AlertOctagon, RefreshCw, Home, ShieldAlert } from "lucide-react"
 
 interface ErrorProps {
   error: Error & { digest?: string }
@@ -15,42 +15,43 @@ export default function Error({ error, reset }: ErrorProps) {
   }, [error])
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6 text-foreground font-sans">
-      <div className="relative max-w-md w-full rounded-none bg-white/5 border border-white/10 backdrop-blur-xl p-8 text-center shadow-2xl overflow-hidden">
-        {/* Decorative subtle ambient glows */}
-        <div className="absolute -top-24 -left-24 w-48 h-48 rounded-full bg-primary/20 blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -right-24 w-48 h-48 rounded-full bg-accent/20 blur-3xl pointer-events-none" />
+    <div className="min-h-screen bg-carbon-dark flex items-center justify-center p-6 text-white font-sans relative overflow-hidden">
+      {/* Decorative Grid */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
 
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 mb-6">
-          <AlertOctagon className="w-8 h-8" />
+      <div className="relative max-w-md w-full rounded-none glass-dark border border-racing-red/40 p-8 text-center shadow-[0_0_30px_rgba(255,30,30,0.15)] overflow-hidden z-10">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-racing-red to-transparent opacity-50" />
+
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-sm bg-racing-red/10 border border-racing-red/30 text-racing-red mb-6 animate-pulse">
+          <ShieldAlert className="w-8 h-8" />
         </div>
 
-        <h1 className="text-2xl font-bold tracking-tight mb-2">Something went wrong</h1>
-        <p className="text-gray-400 text-sm mb-8 leading-relaxed">
-          We encountered an unexpected error on our side. Please try reloading or head back to the homepage.
+        <h1 className="text-3xl font-heading font-black tracking-widest uppercase drop-shadow-[0_0_10px_rgba(255,30,30,0.5)] mb-2">System Failure</h1>
+        <p className="text-gray-400 font-mono text-sm mb-8 leading-relaxed uppercase">
+          Telemetry stream disrupted. We encountered an unexpected fault in the core logic board.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center gap-3 justify-center">
           <button
             onClick={() => reset()}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-none bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-sm transition-all shadow-lg shadow-primary/20"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-none bg-racing-red hover:bg-neon-red text-white font-heading font-black tracking-widest text-sm transition-all uppercase shadow-[0_0_15px_rgba(255,30,30,0.4)] hover:shadow-[0_0_30px_rgba(255,30,30,0.8)]"
           >
             <RefreshCw className="w-4 h-4" />
-            Try again
+            Reboot Link
           </button>
           
           <a
             href="/"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-none bg-white/10 hover:bg-white/15 text-white font-medium text-sm transition-all border border-white/5"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-none glass-dark hover:bg-white/5 text-white font-heading font-black tracking-widest text-sm transition-all border border-white/20 hover:border-racing-red/50 uppercase"
           >
-            <Home className="w-4 h-4" />
-            Go Home
+            <Home className="w-4 h-4 text-racing-red" />
+            Return to Base
           </a>
         </div>
 
         {error.digest && (
-          <div className="mt-8 pt-4 border-t border-white/5">
-            <span className="text-xs text-gray-500 font-mono">Trace ID: {error.digest}</span>
+          <div className="mt-8 pt-4 border-t border-white/10">
+            <span className="text-[10px] text-gray-500 font-mono uppercase tracking-[0.2em]">Diagnostic Code: {error.digest}</span>
           </div>
         )}
       </div>

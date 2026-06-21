@@ -69,17 +69,17 @@ export function Header() {
           </button>
           
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/products" className="text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-gray-300 hover:text-racing-red hover:drop-shadow-[0_0_8px_rgba(255,30,30,0.8)] transition-all">
+            <Link href="/products" className="text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-muted-foreground hover:text-racing-red hover:drop-shadow-[0_0_8px_rgba(255,30,30,0.8)] transition-all">
               Garage
             </Link>
-            <Link href="/collections" className="text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-gray-300 hover:text-racing-red hover:drop-shadow-[0_0_8px_rgba(255,30,30,0.8)] transition-all">
+            <Link href="/collections" className="text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-muted-foreground hover:text-racing-red hover:drop-shadow-[0_0_8px_rgba(255,30,30,0.8)] transition-all">
               Ecosystem
             </Link>
-            <Link href="/campaigns" className="text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-gray-300 hover:text-racing-red hover:drop-shadow-[0_0_8px_rgba(255,30,30,0.8)] transition-all">
+            <Link href="/campaigns" className="text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-muted-foreground hover:text-racing-red hover:drop-shadow-[0_0_8px_rgba(255,30,30,0.8)] transition-all">
               Pro League
             </Link>
             {session && (session.user.role === "SUPER_ADMIN" || session.user.role === "ADMIN") && (
-              <Link href="/admin" className="text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-racing-red hover:text-white transition-colors">
+              <Link href="/admin" className="text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-racing-red hover:text-foreground transition-colors">
                 Control Center
               </Link>
             )}
@@ -88,7 +88,7 @@ export function Header() {
 
         {/* Center: Brand Name */}
         <div className="flex-1 flex justify-center">
-          <Link href="/" className="font-heading font-black text-2xl md:text-3xl tracking-widest text-white uppercase drop-shadow-[0_0_10px_rgba(255,30,30,0.5)]">
+          <Link href="/" className="font-heading font-black text-2xl md:text-3xl tracking-widest text-foreground uppercase drop-shadow-[0_0_10px_rgba(255,30,30,0.5)]">
             NEOSHOP <span className="text-racing-red">ULTRA</span>
           </Link>
         </div>
@@ -99,7 +99,7 @@ export function Header() {
             <ThemeToggle />
           </div>
 
-          <Link href={accountUrl} className="hidden md:block text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-gray-300 hover:text-racing-red hover:drop-shadow-[0_0_8px_rgba(255,30,30,0.8)] transition-all">
+          <Link href={accountUrl} className="hidden md:block text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-muted-foreground hover:text-racing-red hover:drop-shadow-[0_0_8px_rgba(255,30,30,0.8)] transition-all">
             Driver ID
           </Link>
 
@@ -114,12 +114,12 @@ export function Header() {
 
           <button 
             onClick={() => setIsSearchOpen(true)}
-            className="hidden md:block text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-gray-300 hover:text-racing-red hover:drop-shadow-[0_0_8px_rgba(255,30,30,0.8)] transition-all"
+            className="hidden md:block text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-muted-foreground hover:text-racing-red hover:drop-shadow-[0_0_8px_rgba(255,30,30,0.8)] transition-all"
           >
             Scanner
           </button>
 
-          <Link href="/cart" className="text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-gray-300 hover:text-racing-red hover:drop-shadow-[0_0_8px_rgba(255,30,30,0.8)] transition-all">
+          <Link href="/cart" className="text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-muted-foreground hover:text-racing-red hover:drop-shadow-[0_0_8px_rgba(255,30,30,0.8)] transition-all">
             Bay {mounted && cartCount > 0 ? <span className="text-racing-red">({cartCount})</span> : null}
           </Link>
         </div>
@@ -128,17 +128,17 @@ export function Header() {
       {/* Mobile Fullscreen Menu overlay */}
       {isMenuOpen && (
         <div className="fixed inset-0 z-50 glass-dark flex flex-col items-center justify-center space-y-8 animate-in fade-in duration-300">
-          <button className="absolute top-6 left-6 text-white hover:text-racing-red transition-colors" onClick={() => setIsMenuOpen(false)}>
+          <button className="absolute top-6 left-6 text-foreground hover:text-racing-red transition-colors" onClick={() => setIsMenuOpen(false)}>
             <X strokeWidth={2} className="h-8 w-8" />
           </button>
           
-          <Link href="/products" onClick={() => setIsMenuOpen(false)} className="font-heading font-black uppercase text-4xl tracking-widest text-white hover:text-racing-red transition-colors">
+          <Link href="/products" onClick={() => setIsMenuOpen(false)} className="font-heading font-black uppercase text-4xl tracking-widest text-foreground hover:text-racing-red transition-colors">
             GARAGE
           </Link>
-          <Link href="/collections" onClick={() => setIsMenuOpen(false)} className="font-heading font-black uppercase text-4xl tracking-widest text-white hover:text-racing-red transition-colors">
+          <Link href="/collections" onClick={() => setIsMenuOpen(false)} className="font-heading font-black uppercase text-4xl tracking-widest text-foreground hover:text-racing-red transition-colors">
             ECOSYSTEM
           </Link>
-          <Link href={accountUrl} onClick={() => setIsMenuOpen(false)} className="font-heading font-black uppercase text-4xl tracking-widest text-white hover:text-racing-red transition-colors">
+          <Link href={accountUrl} onClick={() => setIsMenuOpen(false)} className="font-heading font-black uppercase text-4xl tracking-widest text-foreground hover:text-racing-red transition-colors">
             DRIVER ID
           </Link>
           {session && (
@@ -152,7 +152,7 @@ export function Header() {
       {/* Search Overlay */}
       {isSearchOpen && (
         <div className="fixed inset-0 z-50 glass-dark flex flex-col items-center justify-start pt-32 px-6 animate-in fade-in duration-300">
-          <button className="absolute top-6 right-6 md:right-12 text-white hover:text-racing-red transition-colors" onClick={() => setIsSearchOpen(false)}>
+          <button className="absolute top-6 right-6 md:right-12 text-foreground hover:text-racing-red transition-colors" onClick={() => setIsSearchOpen(false)}>
             <X strokeWidth={2} className="h-8 w-8" />
           </button>
           <form onSubmit={handleSearch} className="w-full max-w-2xl relative">
@@ -165,9 +165,9 @@ export function Header() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="SCAN FOR MODELS OR PARTS..." 
-              className="w-full bg-transparent border-b-2 border-racing-red text-2xl md:text-3xl font-heading font-black text-white pl-10 pb-4 outline-none placeholder:text-gray-600 uppercase tracking-widest"
+              className="w-full bg-transparent border-b-2 border-racing-red text-2xl md:text-3xl font-heading font-black text-foreground pl-10 pb-4 outline-none placeholder:text-muted-foreground uppercase tracking-widest"
             />
-            <button type="submit" className="absolute right-0 top-1/2 -translate-y-1/2 text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-racing-red hover:text-white transition-colors">
+            <button type="submit" className="absolute right-0 top-1/2 -translate-y-1/2 text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-racing-red hover:text-foreground transition-colors">
               Execute
             </button>
           </form>

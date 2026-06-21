@@ -12,7 +12,7 @@ const perks = [
 
 export function MembershipSection() {
   return (
-    <section className="py-24 md:py-40 bg-carbon-dark text-white overflow-hidden relative border-t border-white/10">
+    <section className="py-24 md:py-40 bg-background text-foreground dark:text-white overflow-hidden relative border-t border-border">
       {/* Dynamic Grid overlay */}
       <div
         className="absolute inset-0 opacity-[0.05] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"
@@ -38,14 +38,14 @@ export function MembershipSection() {
               </h2>
             </div>
 
-            <p className="text-sm md:text-base text-gray-400 leading-relaxed max-w-sm glass-dark p-4 border-l-2 border-racing-red">
+            <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-sm glass-dark p-4 border-l-2 border-racing-red">
               Reserved for pilots who demand the absolute best. Gain access to elite engineering support, beta firmware, and VIP track events.
             </p>
 
             <Link
               href="/membership"
               id="membership-cta"
-              className="inline-flex items-center justify-center gap-3 bg-racing-red text-white px-8 py-4 font-heading font-bold tracking-widest uppercase hover:bg-neon-red transition-all duration-300 shadow-[0_0_15px_rgba(255,30,30,0.4)] hover:shadow-[0_0_30px_rgba(255,30,30,0.8)] border border-racing-red hover:scale-105 group"
+              className="inline-flex items-center justify-center gap-3 bg-racing-red text-foreground dark:text-white px-8 py-4 font-heading font-bold tracking-widest uppercase hover:bg-neon-red transition-all duration-300 shadow-[0_0_15px_rgba(255,30,30,0.4)] hover:shadow-[0_0_30px_rgba(255,30,30,0.8)] border border-racing-red hover:scale-105 group"
             >
               Apply For Pro License
               <ArrowRight strokeWidth={2} className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
@@ -54,17 +54,17 @@ export function MembershipSection() {
 
           {/* Right — Perks List */}
           <div className="md:col-span-7 fade-up-section visible">
-            <div className="divide-y divide-white/10 glass-dark p-8 border border-white/5 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+            <div className="divide-y divide-white/10 glass-dark p-8 border border-border shadow-[0_0_50px_rgba(0,0,0,0.5)]">
               {perks.map((perk, i) => (
                 <div key={perk.label} className="py-6 flex gap-6 group cursor-default hover:bg-white/5 transition-colors p-4 -mx-4 rounded-lg">
                   <span className="text-[14px] font-heading font-black tracking-[0.2em] text-racing-red/50 mt-1 shrink-0 w-8 group-hover:text-racing-red transition-colors drop-shadow-[0_0_5px_rgba(255,30,30,0)] group-hover:drop-shadow-[0_0_10px_rgba(255,30,30,0.8)]">
                     0{i + 1}
                   </span>
                   <div>
-                    <h3 className="font-heading text-xl md:text-2xl font-bold mb-2 group-hover:text-white text-gray-200 uppercase tracking-tight transition-colors duration-300">
+                    <h3 className="font-heading text-xl md:text-2xl font-bold mb-2 group-hover:text-foreground dark:text-white text-gray-200 uppercase tracking-tight transition-colors duration-300">
                       {perk.label}
                     </h3>
-                    <p className="text-sm text-gray-400 leading-relaxed font-sans">
+                    <p className="text-sm text-muted-foreground leading-relaxed font-sans">
                       {perk.detail}
                     </p>
                   </div>

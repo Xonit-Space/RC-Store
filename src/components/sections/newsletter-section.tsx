@@ -14,9 +14,18 @@ export function NewsletterSection() {
   }
 
   return (
-    <section className="py-24 md:py-32 bg-smoke-dark border-t border-white/10 relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-t from-carbon-dark to-transparent pointer-events-none" />
+    <section className="py-24 md:py-32 bg-slate-100 dark:bg-smoke-dark border-t border-border relative overflow-hidden">
+      {/* Background Video */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none"
+      >
+        <source src="/snaptik_7558048161005194526_v3.mp4" type="video/mp4" />
+      </video>
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-100 dark:from-smoke-dark to-transparent pointer-events-none" />
 
       <div className="container mx-auto px-6 md:px-12 relative z-10">
         <div className="max-w-2xl mx-auto text-center space-y-10 fade-up-section visible">
@@ -28,25 +37,25 @@ export function NewsletterSection() {
                 Comms Link
               </p>
             </div>
-            <h2 className="font-heading text-4xl md:text-6xl font-black leading-tight text-white uppercase drop-shadow-[0_0_15px_rgba(255,30,30,0.3)]">
+            <h2 className="font-heading text-4xl md:text-6xl font-black leading-tight text-foreground dark:text-white uppercase drop-shadow-[0_0_15px_rgba(255,30,30,0.3)]">
               System Telemetry<br />
               <span className="text-racing-red">Updates</span>
             </h2>
           </div>
 
-          <p className="text-sm text-gray-400 leading-relaxed max-w-md mx-auto font-sans glass-dark p-4 border border-white/5">
+          <p className="text-sm text-muted-foreground leading-relaxed max-w-md mx-auto font-sans glass-dark p-4 border border-border">
             Receive exclusive part drops, firmware patch notes, and pro racing league announcements. 
             No spam — only high-octane data.
           </p>
 
           {submitted ? (
             <div className="py-8 border border-racing-red/50 bg-racing-red/10 animate-in fade-in zoom-in duration-500">
-              <p className="font-heading font-bold text-2xl text-white uppercase tracking-widest text-shadow-glow">Connection Established.</p>
-              <p className="text-sm text-gray-400 mt-2 font-mono">Standby for initial telemetry burst...</p>
+              <p className="font-heading font-bold text-2xl text-foreground dark:text-white uppercase tracking-widest text-shadow-glow">Connection Established.</p>
+              <p className="text-sm text-muted-foreground mt-2 font-mono">Standby for initial telemetry burst...</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="relative max-w-md mx-auto mt-8">
-              <div className="flex items-center border border-white/20 bg-carbon-dark focus-within:border-racing-red focus-within:shadow-[0_0_15px_rgba(255,30,30,0.4)] transition-all duration-300 p-1">
+              <div className="flex items-center border border-border bg-background focus-within:border-racing-red focus-within:shadow-[0_0_15px_rgba(255,30,30,0.4)] transition-all duration-300 p-1">
                 <input
                   id="newsletter-email"
                   type="email"
@@ -54,12 +63,12 @@ export function NewsletterSection() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="ENTER COMMS FREQUENCY (EMAIL)"
                   required
-                  className="flex-1 bg-transparent text-sm font-mono text-white focus:outline-none placeholder:text-gray-600 px-4 py-3 uppercase"
+                  className="flex-1 bg-transparent text-sm font-mono text-foreground dark:text-white focus:outline-none placeholder:text-gray-600 px-4 py-3 uppercase"
                 />
                 <button
                   type="submit"
                   aria-label="Subscribe to updates"
-                  className="bg-racing-red text-white p-3 hover:bg-neon-red hover:shadow-[0_0_10px_rgba(255,30,30,0.8)] transition-all"
+                  className="bg-racing-red text-foreground dark:text-white p-3 hover:bg-neon-red hover:shadow-[0_0_10px_rgba(255,30,30,0.8)] transition-all"
                 >
                   <ArrowRight strokeWidth={2.5} className="w-5 h-5" />
                 </button>

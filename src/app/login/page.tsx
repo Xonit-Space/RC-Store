@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { AlertCircle, Sparkles } from "lucide-react"
+import { AlertCircle, Zap, ShieldAlert } from "lucide-react"
 import { toast } from "sonner"
 
 export default function LoginPage() {
@@ -34,62 +34,66 @@ export default function LoginPage() {
 
       if (result?.error) {
         setError(result.error)
-        toast.error("Invalid credentials")
+        toast.error("CONNECTION DENIED")
       } else {
-        toast.success("Authentication successful")
+        toast.success("CONNECTION SECURED")
         router.push(callbackUrl)
         router.refresh()
       }
     } catch (err: any) {
-      setError("An unexpected error occurred. Please try again.")
+      setError("SYSTEM MALFUNCTION. RETRY CONNECTION.")
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex flex-col font-sans bg-background">
-      <div className="flex-1 flex flex-col justify-center items-center px-6 py-12 lg:px-8">
+    <div className="min-h-screen flex flex-col font-sans bg-carbon-dark relative overflow-hidden">
+      {/* Background Decor */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+
+      <div className="flex-1 flex flex-col justify-center items-center px-6 py-12 lg:px-8 relative z-10">
         
         <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-10">
           <Link href="/" className="inline-block">
-            <h1 className="text-3xl font-serif tracking-tight text-foreground font-light">NEOSHOP ULTRA</h1>
+            <h1 className="text-4xl font-heading font-black tracking-widest text-white uppercase drop-shadow-[0_0_10px_rgba(255,30,30,0.5)]">NEOSHOP <span className="text-racing-red">ULTRA</span></h1>
           </Link>
-          <p className="mt-4 text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-bold">
-            Client Authentication
+          <p className="mt-4 text-[10px] tracking-[0.4em] uppercase text-racing-red font-mono font-bold animate-pulse">
+            Driver Authentication
           </p>
         </div>
 
         <div className="sm:mx-auto sm:w-full sm:max-w-[400px]">
-          <div className="bg-background py-10 px-8 md:px-10 border border-border/40 shadow-sm">
+          <div className="glass-dark py-10 px-8 md:px-10 border border-racing-red/40 shadow-[0_0_30px_rgba(255,30,30,0.15)] relative">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-racing-red to-transparent opacity-50" />
             <form className="space-y-6" onSubmit={handleSubmit}>
               {error && (
-                <div className="flex items-center gap-3 p-4 bg-red-50/50 border border-red-100 text-red-900 text-xs font-medium">
-                  <AlertCircle className="h-4 w-4 shrink-0 text-red-600" />
+                <div className="flex items-center gap-3 p-4 bg-red-950/50 border border-red-500/50 text-red-400 text-xs font-mono font-bold uppercase tracking-wider">
+                  <ShieldAlert className="h-5 w-5 shrink-0 text-red-500 animate-pulse" />
                   <p>{error}</p>
                 </div>
               )}
 
               <div className="space-y-2">
-                <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-foreground">
-                  Email Address
+                <label className="block text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-gray-400">
+                  Driver Tag (Email)
                 </label>
                 <Input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="h-12 bg-transparent border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-foreground transition-colors"
+                  className="h-12 bg-smoke-dark border-white/10 rounded-none text-white focus-visible:ring-0 focus-visible:border-racing-red focus-visible:shadow-[0_0_10px_rgba(255,30,30,0.3)] transition-all font-mono"
                 />
               </div>
 
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-foreground">
-                    Password
+                  <label className="block text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-gray-400">
+                    Security Key
                   </label>
-                  <Link href="/forgot-password" className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground hover:text-foreground transition-colors">
-                    Reset
+                  <Link href="/forgot-password" className="text-[10px] font-mono font-bold uppercase tracking-[0.1em] text-gray-500 hover:text-racing-red transition-colors">
+                    Override
                   </Link>
                 </div>
                 <Input
@@ -97,7 +101,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="h-12 bg-transparent border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-foreground transition-colors"
+                  className="h-12 bg-smoke-dark border-white/10 rounded-none text-white focus-visible:ring-0 focus-visible:border-racing-red focus-visible:shadow-[0_0_10px_rgba(255,30,30,0.3)] transition-all font-mono"
                 />
               </div>
 
@@ -105,18 +109,18 @@ export default function LoginPage() {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 rounded-none font-bold text-xs tracking-widest uppercase transition-all"
+                  className="w-full h-12 bg-racing-red text-white hover:bg-neon-red hover:shadow-[0_0_20px_rgba(255,30,30,0.6)] rounded-none font-heading font-black text-sm tracking-[0.2em] uppercase transition-all"
                 >
-                  {loading ? "Authenticating..." : "Sign In"}
+                  {loading ? "Establishing Link..." : "Initialize Link"}
                 </Button>
               </div>
 
-              <div className="mt-8 border-t border-border/40 pt-6">
+              <div className="mt-8 border-t border-white/10 pt-6">
                 <div className="flex flex-col space-y-4">
                   <div className="flex items-center justify-center gap-2 mb-2">
-                    <Sparkles className="h-3 w-3 text-muted-foreground" />
-                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                      Demo Access
+                    <Zap className="h-4 w-4 text-racing-red" />
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-gray-400">
+                      Test Protocols
                     </span>
                   </div>
                   
@@ -127,10 +131,10 @@ export default function LoginPage() {
                         setEmail("demo@neoshop.com")
                         setPassword("neoshop_secure_password_2026")
                       }}
-                      className="p-3 border border-border/40 bg-muted/10 hover:bg-muted/30 transition-colors text-left group"
+                      className="p-3 border border-white/5 bg-smoke-dark hover:border-racing-red/50 hover:bg-white/5 transition-colors text-left group"
                     >
-                      <span className="block text-[10px] font-bold uppercase tracking-wider text-foreground mb-1">Customer</span>
-                      <span className="block text-xs text-muted-foreground group-hover:text-foreground transition-colors truncate">demo@neoshop.com</span>
+                      <span className="block text-[10px] font-mono font-bold uppercase tracking-wider text-white mb-1 group-hover:text-racing-red transition-colors">Pilot</span>
+                      <span className="block text-[10px] font-mono text-gray-500 truncate">demo@neoshop.com</span>
                     </button>
                     
                     <button
@@ -139,10 +143,10 @@ export default function LoginPage() {
                         setEmail("admin@neoshop.com")
                         setPassword("neoshop_secure_password_2026")
                       }}
-                      className="p-3 border border-border/40 bg-muted/10 hover:bg-muted/30 transition-colors text-left group"
+                      className="p-3 border border-white/5 bg-smoke-dark hover:border-racing-red/50 hover:bg-white/5 transition-colors text-left group"
                     >
-                      <span className="block text-[10px] font-bold uppercase tracking-wider text-foreground mb-1">Administrator</span>
-                      <span className="block text-xs text-muted-foreground group-hover:text-foreground transition-colors truncate">admin@neoshop.com</span>
+                      <span className="block text-[10px] font-mono font-bold uppercase tracking-wider text-white mb-1 group-hover:text-racing-red transition-colors">Crew Chief</span>
+                      <span className="block text-[10px] font-mono text-gray-500 truncate">admin@neoshop.com</span>
                     </button>
                   </div>
                   <div className="grid grid-cols-1 mt-0 pt-0">
@@ -152,10 +156,10 @@ export default function LoginPage() {
                           setEmail("superadmin@neoshop.com")
                           setPassword("neoshop_secure_password_2026")
                         }}
-                        className="p-3 border border-border/40 bg-muted/10 hover:bg-muted/30 transition-colors text-left group"
+                        className="p-3 border border-white/5 bg-smoke-dark hover:border-racing-red/50 hover:bg-white/5 transition-colors text-center group"
                       >
-                        <span className="block text-[10px] font-bold uppercase tracking-wider text-foreground mb-1">Super Admin</span>
-                        <span className="block text-xs text-muted-foreground group-hover:text-foreground transition-colors truncate">superadmin@neoshop.com</span>
+                        <span className="block text-[10px] font-mono font-bold uppercase tracking-wider text-white mb-1 group-hover:text-racing-red transition-colors">Track Owner (Super Admin)</span>
+                        <span className="block text-[10px] font-mono text-gray-500 truncate">superadmin@neoshop.com</span>
                     </button>
                   </div>
                 </div>
@@ -163,10 +167,10 @@ export default function LoginPage() {
             </form>
           </div>
 
-          <p className="mt-8 text-center text-[10px] uppercase tracking-[0.1em] text-muted-foreground">
-            Don&apos;t have an account?{" "}
-            <Link href="/register" className="font-bold text-foreground border-b border-foreground/30 hover:border-foreground transition-colors pb-0.5">
-              Create Account
+          <p className="mt-8 text-center text-[10px] font-mono uppercase tracking-[0.1em] text-gray-500">
+            No Driver Profile?{" "}
+            <Link href="/register" className="font-bold text-white border-b border-racing-red/50 hover:border-racing-red transition-colors pb-0.5">
+              Register Tag
             </Link>
           </p>
         </div>

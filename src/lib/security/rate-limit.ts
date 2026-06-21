@@ -25,6 +25,11 @@ export async function checkRateLimit(
 ): Promise<NextResponse | null> {
   const opts = { ...DEFAULT_OPTIONS, ...options }
   
+  // Fail-safe: if running in production but no real Redis is configured, bypass rate limits to avoid hanging
+  if (process.env.NODE_ENV === "production" && (!process.env.REDIS_URL || process.env.REDIS_URL.includes("localhost") || process.env.REDIS_URL.includes("127.0.0.1"))) {
+    return null
+  }
+
   // Use fingerprinting (IP + UserAgent) to identify the caller securely
   const fingerprint = generateClientFingerprint(req as any)
   const key = `ratelimit:${namespace}:${fingerprint}`

@@ -6,7 +6,8 @@ export function usePosProducts() {
     queryFn: async () => {
       const res = await fetch("/api/pos/products")
       if (!res.ok) throw new Error("Failed to fetch POS catalog")
-      return res.json()
+      const json = await res.json()
+      return json.items || json.data || json
     }
   })
 }

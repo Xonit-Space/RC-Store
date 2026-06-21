@@ -6,7 +6,8 @@ export function useAdminInventory() {
     queryFn: async () => {
       const res = await fetch("/api/admin/inventory")
       if (!res.ok) throw new Error("Failed to load inventory allocations")
-      return res.json()
+      const json = await res.json()
+      return json.items || json.data || json
     }
   })
 }
@@ -48,7 +49,8 @@ export function useAdminProducts() {
     queryFn: async () => {
       const res = await fetch("/api/products")
       if (!res.ok) throw new Error("Failed to load products")
-      return res.json()
+      const json = await res.json()
+      return json.items || json.data || json
     }
   })
 }

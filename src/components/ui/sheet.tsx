@@ -31,7 +31,7 @@ const SheetOverlay = React.forwardRef<
 SheetOverlay.displayName = SheetPrimitive.Overlay.displayName
 
 const sheetVariants = cva(
-  "fixed z-50 gap-4 glass-dark border-racing-red/40 p-6 shadow-[0_0_30px_rgba(255,30,30,0.15)] transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
+  "fixed z-50 gap-4 glass-dark border-racing-yellow/40 p-6 shadow-[0_0_30px_rgba(255, 204, 0,0.15)] transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
   {
     variants: {
       side: {
@@ -65,7 +65,7 @@ const SheetContent = React.forwardRef<
       {...props}
     >
       {children}
-      <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-all hover:opacity-100 hover:text-racing-red hover:shadow-[0_0_15px_rgba(255,30,30,0.5)] focus:outline-none focus:ring-2 focus:ring-racing-red focus:ring-offset-2 disabled:pointer-events-none p-1">
+      <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-all hover:opacity-100 hover:text-racing-yellow hover:shadow-[0_0_15px_rgba(255, 204, 0,0.5)] focus:outline-none focus:ring-2 focus:ring-racing-yellow focus:ring-offset-2 disabled:pointer-events-none p-1">
         <X className="h-4 w-4" />
         <span className="sr-only">Close</span>
       </SheetPrimitive.Close>

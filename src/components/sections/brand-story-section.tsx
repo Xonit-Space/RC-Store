@@ -28,23 +28,23 @@ export function BrandStorySection() {
           {/* Left: text content & reviews */}
           <div className="md:col-span-5 space-y-12 fade-up-section visible">
             <div>
-              <p className="text-[12px] font-heading font-bold tracking-[0.3em] uppercase text-racing-red mb-4 flex items-center gap-2">
-                <span className="w-4 h-px bg-racing-red inline-block" />
+              <p className="text-[12px] font-heading font-bold tracking-[0.3em] uppercase text-racing-yellow mb-4 flex items-center gap-2">
+                <span className="w-4 h-px bg-racing-yellow inline-block" />
                 Pro League Verified
               </p>
-              <h2 className="font-heading text-4xl md:text-5xl font-black leading-tight text-foreground dark:text-white uppercase tracking-tighter drop-shadow-[0_0_10px_rgba(255,30,30,0.2)]">
+              <h2 className="font-heading text-4xl md:text-5xl font-black leading-tight text-foreground dark:text-white uppercase tracking-tighter drop-shadow-[0_0_10px_rgba(255, 204, 0,0.2)]">
                 Track Tested<br />
-                <span className="text-racing-red">Pilot Approved</span>
+                <span className="text-racing-yellow">Pilot Approved</span>
               </h2>
             </div>
 
             <div className="space-y-6">
               {reviews.map(review => (
-                <div key={review.id} className="glass-dark p-6 border border-border hover:border-racing-red/40 transition-colors">
-                  <div className="flex gap-1 mb-3 text-racing-red">
+                <div key={review.id} className="glass-dark p-6 border border-border hover:border-racing-yellow/40 transition-colors">
+                  <div className="flex gap-1 mb-3 text-racing-yellow">
                     {[...Array(review.rating)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
                   </div>
-                  <p className="text-muted-foreground font-sans text-sm leading-relaxed mb-4">"{review.comment}"</p>
+                  <p className="text-muted-foreground font-sans text-sm leading-relaxed mb-4">&quot;{review.comment}&quot;</p>
                   <p className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">PILOT // {review.user}</p>
                 </div>
               ))}
@@ -52,7 +52,7 @@ export function BrandStorySection() {
 
             <Link
               href="/community"
-              className="inline-flex items-center gap-3 text-[12px] font-heading font-bold tracking-[0.25em] uppercase text-foreground dark:text-white border-b border-border pb-2 hover:border-racing-red hover:text-racing-red transition-all duration-300 group mt-4"
+              className="inline-flex items-center gap-3 text-[12px] font-heading font-bold tracking-[0.25em] uppercase text-foreground dark:text-white border-b border-border pb-2 hover:border-racing-yellow hover:text-racing-yellow transition-all duration-300 group mt-4"
             >
               Access Community Logs
               <ArrowRight strokeWidth={2} className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -74,12 +74,12 @@ export function BrandStorySection() {
                 </video>
                 <div className="absolute inset-0 bg-background/30 group-hover:bg-background/10 transition-colors" />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-12 h-12 rounded-full bg-racing-red/90 flex items-center justify-center group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(255,30,30,0.6)]">
+                  <div className="w-12 h-12 rounded-full bg-racing-yellow/90 flex items-center justify-center group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(255, 204, 0,0.6)]">
                     <Play className="w-5 h-5 text-foreground dark:text-white ml-1 fill-current" />
                   </div>
                 </div>
                 <div className="absolute bottom-4 left-4 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                  <span className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse" />
                   <span className="text-[10px] font-mono text-foreground dark:text-white tracking-widest">REC // TRACK_A</span>
                 </div>
               </div>
@@ -96,12 +96,12 @@ export function BrandStorySection() {
                 </video>
                 <div className="absolute inset-0 bg-background/30 group-hover:bg-background/10 transition-colors" />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-12 h-12 rounded-full bg-racing-red/90 flex items-center justify-center group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(255,30,30,0.6)]">
+                  <div className="w-12 h-12 rounded-full bg-racing-yellow/90 flex items-center justify-center group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(255, 204, 0,0.6)]">
                     <Play className="w-5 h-5 text-foreground dark:text-white ml-1 fill-current" />
                   </div>
                 </div>
                 <div className="absolute bottom-4 left-4 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                  <span className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse" />
                   <span className="text-[10px] font-mono text-foreground dark:text-white tracking-widest">REC // BASH_SITE</span>
                 </div>
               </div>

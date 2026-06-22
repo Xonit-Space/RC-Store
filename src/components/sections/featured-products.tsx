@@ -16,18 +16,18 @@ export async function FeaturedProducts() {
         <div className="flex items-end justify-between mb-16 md:mb-20">
           <div className="fade-up-section visible">
             <div className="flex items-center gap-2 mb-3">
-              <span className="w-8 h-px bg-racing-red inline-block" />
-              <p className="text-[12px] font-heading font-bold tracking-[0.3em] uppercase text-racing-red">
+              <span className="w-8 h-px bg-racing-yellow inline-block" />
+              <p className="text-[12px] font-heading font-bold tracking-[0.3em] uppercase text-racing-yellow">
                 Top Picks
               </p>
             </div>
-            <h2 className="font-heading text-4xl md:text-6xl font-black leading-none tracking-tighter text-foreground dark:text-white uppercase drop-shadow-[0_0_15px_rgba(255,30,30,0.3)]">
+            <h2 className="font-heading text-4xl md:text-6xl font-black leading-none tracking-tighter text-foreground dark:text-white uppercase drop-shadow-[0_0_15px_rgba(255, 204, 0,0.3)]">
               Featured Machines
             </h2>
           </div>
           <Link
             href="/products"
-            className="hidden md:flex items-center gap-2 text-[12px] font-heading font-bold tracking-[0.2em] uppercase text-muted-foreground hover:text-racing-red hover:drop-shadow-[0_0_8px_rgba(255,30,30,0.8)] transition-all group fade-up-section visible"
+            className="hidden md:flex items-center gap-2 text-[12px] font-heading font-bold tracking-[0.2em] uppercase text-muted-foreground hover:text-racing-yellow hover:drop-shadow-[0_0_8px_rgba(255, 204, 0,0.8)] transition-all group fade-up-section visible"
           >
             Discover Machines
             <ArrowRight strokeWidth={2} className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -47,10 +47,10 @@ export async function FeaturedProducts() {
         <div className="mt-16 flex justify-center md:hidden fade-up-section visible">
           <Link
             href="/products"
-            className="flex items-center gap-2 text-[12px] font-heading font-bold tracking-[0.2em] uppercase text-muted-foreground hover:text-racing-red transition-colors group border border-border px-6 py-3 glass-dark"
+            className="flex items-center gap-2 text-[12px] font-heading font-bold tracking-[0.2em] uppercase text-muted-foreground hover:text-racing-yellow transition-colors group border border-border px-6 py-3 glass-dark"
           >
             Discover Machines
-            <ArrowRight strokeWidth={2} className="w-4 h-4 group-hover:translate-x-1 transition-transform text-racing-red" />
+            <ArrowRight strokeWidth={2} className="w-4 h-4 group-hover:translate-x-1 transition-transform text-racing-yellow" />
           </Link>
         </div>
       </div>

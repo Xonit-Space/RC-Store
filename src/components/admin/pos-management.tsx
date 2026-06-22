@@ -187,7 +187,7 @@ export function POSManagement() {
           </div>
         ) : error ? (
           <div className="flex-grow flex flex-col items-center justify-center text-center p-6">
-            <ShieldAlert className="h-12 w-12 text-red-500 mb-2" />
+            <ShieldAlert className="h-12 w-12 text-yellow-500 mb-2" />
             <p className="text-sm font-semibold text-foreground">{error}</p>
             <button onClick={() => { refetchProducts() }} className="mt-4 px-4 py-2 bg-primary text-white text-xs font-bold rounded-none">
               Retry Load
@@ -258,7 +258,7 @@ export function POSManagement() {
               </div>
               <button
                 onClick={() => setSelectedCustomer(null)}
-                className="text-xs text-red-500 hover:text-red-700 font-bold border border-red-200 bg-card px-3 py-1 rounded-none transition"
+                className="text-xs text-yellow-500 hover:text-red-700 font-bold border border-red-200 bg-card px-3 py-1 rounded-none transition"
               >
                 Clear
               </button>
@@ -301,7 +301,7 @@ export function POSManagement() {
                 </button>
                 <button
                   onClick={() => setQty(item.id, 0)}
-                  className="h-8 w-8 rounded-none border border-red-100 text-red-500 hover:bg-red-50 flex items-center justify-center transition ml-1"
+                  className="h-8 w-8 rounded-none border border-red-100 text-yellow-500 hover:bg-red-50 flex items-center justify-center transition ml-1"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>

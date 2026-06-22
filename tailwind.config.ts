@@ -48,9 +48,9 @@ const config: Config = {
         /* Racing UI explicit aliases */
         'carbon-dark': '#0a0a0a',
         'carbon-gray': '#1c1c1c',
-        'racing-red': '#ff1e1e',
-        'racing-red-glow': 'rgba(255, 30, 30, 0.5)',
-        'neon-red': '#e10600',
+        'racing-yellow': '#ffcc00',
+        'racing-yellow-glow': 'rgba(255, 204, 0, 0.5)',
+        'neon-yellow': '#e6b800',
         'smoke-dark': '#121212',
         'graphite': '#2a2a2a',
   			sidebar: {
@@ -83,8 +83,8 @@ const config: Config = {
   				to: { height: '0' }
   			},
         'pulse-glow': {
-          '0%, 100%': { boxShadow: '0 0 10px rgba(255, 30, 30, 0.4)' },
-          '50%': { boxShadow: '0 0 25px rgba(255, 30, 30, 0.8)' },
+          '0%, 100%': { boxShadow: '0 0 10px rgba(255, 204, 0, 0.4)' },
+          '50%': { boxShadow: '0 0 25px rgba(255, 204, 0, 0.8)' },
         },
         'radar-scan': {
           '0%': { transform: 'rotate(0deg)' },

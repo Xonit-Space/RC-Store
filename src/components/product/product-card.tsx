@@ -24,10 +24,10 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
   const specs = generateSpecs(product.id || "default");
 
   return (
-    <article className="group relative glass-dark border border-border/10 dark:border-white/5 transition-all duration-300 hover:border-racing-red hover:shadow-[0_0_20px_rgba(255,30,30,0.3)] flex flex-col h-full overflow-hidden">
+    <article className="group relative glass-dark border border-border/10 dark:border-white/5 transition-all duration-300 hover:border-racing-yellow hover:shadow-[0_0_20px_rgba(255, 204, 0,0.3)] flex flex-col h-full overflow-hidden">
       
       {/* Top Red Bar indicator */}
-      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-racing-red to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-20" />
+      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-racing-yellow to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-20" />
       
       <div className="relative overflow-hidden bg-slate-100 dark:bg-smoke-dark aspect-[4/3] w-full flex items-center justify-center p-4">
         <Link href={`/products/${product.slug}`} className="block w-full h-full relative">
@@ -36,18 +36,18 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
             alt={product.name}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-            className="object-contain transition-transform duration-700 group-hover:scale-110 filter drop-shadow-[0_10px_15px_rgba(0,0,0,0.5)] group-hover:drop-shadow-[0_0_15px_rgba(255,30,30,0.4)]"
+            className="object-contain transition-transform duration-700 group-hover:scale-110 filter drop-shadow-[0_10px_15px_rgba(0,0,0,0.5)] group-hover:drop-shadow-[0_0_15px_rgba(255, 204, 0,0.4)]"
             priority={priority}
           />
         </Link>
 
         {product.originalPrice && (
-          <span className="absolute top-3 left-3 text-[10px] font-heading font-bold tracking-[0.2em] uppercase text-white bg-racing-red px-3 py-1 z-10">
+          <span className="absolute top-3 left-3 text-[10px] font-heading font-bold tracking-[0.2em] uppercase text-white bg-racing-yellow px-3 py-1 z-10">
             Clearance
           </span>
         )}
         {product.tags?.includes("new") && !product.originalPrice && (
-          <span className="absolute top-3 right-3 text-[10px] font-heading font-bold tracking-[0.2em] uppercase text-racing-red border border-racing-red bg-white/80 dark:bg-black/50 backdrop-blur-sm px-3 py-1 z-10 animate-pulse">
+          <span className="absolute top-3 right-3 text-[10px] font-heading font-bold tracking-[0.2em] uppercase text-racing-yellow border border-racing-yellow bg-white/80 dark:bg-black/50 backdrop-blur-sm px-3 py-1 z-10 animate-pulse">
             New Model
           </span>
         )}
@@ -60,13 +60,13 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
 
       <div className="p-5 flex flex-col flex-grow border-t border-border/10 dark:border-white/5 bg-background dark:bg-carbon-dark">
         <div className="flex justify-between items-start mb-2">
-          <p className="text-[10px] font-heading tracking-[0.3em] uppercase text-racing-red">
+          <p className="text-[10px] font-heading tracking-[0.3em] uppercase text-racing-yellow">
             {product.category?.name || "RACING MACHINE"}
           </p>
           <span className="text-[10px] text-gray-500 font-mono">SYS_ID:{product.id?.substring(0,6) || "X99"}</span>
         </div>
         
-        <h3 className="text-lg font-heading font-bold text-foreground dark:text-white leading-tight mb-4 group-hover:text-racing-red transition-colors">
+        <h3 className="text-lg font-heading font-bold text-foreground dark:text-white leading-tight mb-4 group-hover:text-racing-yellow transition-colors">
           <Link href={`/products/${product.slug}`}>
             {product.name}
           </Link>
@@ -75,19 +75,19 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
         {/* Machine Spec Sheet */}
         <div className="grid grid-cols-2 gap-y-3 gap-x-2 mb-6 mt-auto">
           <div className="flex items-center gap-2 text-[11px] text-gray-400 font-sans">
-            <Zap className="w-3 h-3 text-racing-red" />
+            <Zap className="w-3 h-3 text-racing-yellow" />
             <span>Top Speed: <span className="text-foreground dark:text-gray-200 font-medium">{specs.topSpeed}</span></span>
           </div>
           <div className="flex items-center gap-2 text-[11px] text-gray-400 font-sans">
-            <Battery className="w-3 h-3 text-racing-red" />
+            <Battery className="w-3 h-3 text-racing-yellow" />
             <span>Bat: <span className="text-foreground dark:text-gray-200 font-medium">{specs.battery}</span></span>
           </div>
           <div className="flex items-center gap-2 text-[11px] text-gray-400 font-sans">
-            <Activity className="w-3 h-3 text-racing-red" />
+            <Activity className="w-3 h-3 text-racing-yellow" />
             <span>Range: <span className="text-foreground dark:text-gray-200 font-medium">{specs.range}</span></span>
           </div>
           <div className="flex items-center gap-2 text-[11px] text-gray-400 font-sans">
-            <ShieldCheck className="w-3 h-3 text-racing-red" />
+            <ShieldCheck className="w-3 h-3 text-racing-yellow" />
             <span>Drive: <span className="text-foreground dark:text-gray-200 font-medium">{specs.drive}</span></span>
           </div>
         </div>
@@ -99,7 +99,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
             <div className="flex items-center gap-2">
               <span className="text-lg font-bold text-foreground dark:text-white font-mono">Rs. {product.price.toLocaleString()}</span>
               {product.originalPrice && (
-                <span className="text-xs text-racing-red line-through font-mono">Rs. {product.originalPrice.toLocaleString()}</span>
+                <span className="text-xs text-racing-yellow line-through font-mono">Rs. {product.originalPrice.toLocaleString()}</span>
               )}
             </div>
           </div>

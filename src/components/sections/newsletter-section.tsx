@@ -32,14 +32,14 @@ export function NewsletterSection() {
 
           <div className="space-y-4">
             <div className="flex items-center justify-center gap-2 mb-4">
-              <Radio className="w-5 h-5 text-racing-red animate-pulse" />
-              <p className="text-[12px] font-heading font-bold tracking-[0.35em] uppercase text-racing-red">
+              <Radio className="w-5 h-5 text-racing-yellow animate-pulse" />
+              <p className="text-[12px] font-heading font-bold tracking-[0.35em] uppercase text-racing-yellow">
                 Comms Link
               </p>
             </div>
-            <h2 className="font-heading text-4xl md:text-6xl font-black leading-tight text-foreground dark:text-white uppercase drop-shadow-[0_0_15px_rgba(255,30,30,0.3)]">
+            <h2 className="font-heading text-4xl md:text-6xl font-black leading-tight text-foreground dark:text-white uppercase drop-shadow-[0_0_15px_rgba(255, 204, 0,0.3)]">
               System Telemetry<br />
-              <span className="text-racing-red">Updates</span>
+              <span className="text-racing-yellow">Updates</span>
             </h2>
           </div>
 
@@ -49,13 +49,13 @@ export function NewsletterSection() {
           </p>
 
           {submitted ? (
-            <div className="py-8 border border-racing-red/50 bg-racing-red/10 animate-in fade-in zoom-in duration-500">
+            <div className="py-8 border border-racing-yellow/50 bg-racing-yellow/10 animate-in fade-in zoom-in duration-500">
               <p className="font-heading font-bold text-2xl text-foreground dark:text-white uppercase tracking-widest text-shadow-glow">Connection Established.</p>
               <p className="text-sm text-muted-foreground mt-2 font-mono">Standby for initial telemetry burst...</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="relative max-w-md mx-auto mt-8">
-              <div className="flex items-center border border-border bg-background focus-within:border-racing-red focus-within:shadow-[0_0_15px_rgba(255,30,30,0.4)] transition-all duration-300 p-1">
+              <div className="flex items-center border border-border bg-background focus-within:border-racing-yellow focus-within:shadow-[0_0_15px_rgba(255, 204, 0,0.4)] transition-all duration-300 p-1">
                 <input
                   id="newsletter-email"
                   type="email"
@@ -68,7 +68,7 @@ export function NewsletterSection() {
                 <button
                   type="submit"
                   aria-label="Subscribe to updates"
-                  className="bg-racing-red text-foreground dark:text-white p-3 hover:bg-neon-red hover:shadow-[0_0_10px_rgba(255,30,30,0.8)] transition-all"
+                  className="bg-racing-yellow text-foreground dark:text-white p-3 hover:bg-neon-yellow hover:shadow-[0_0_10px_rgba(255, 204, 0,0.8)] transition-all"
                 >
                   <ArrowRight strokeWidth={2.5} className="w-5 h-5" />
                 </button>

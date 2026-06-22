@@ -7,12 +7,13 @@ import { SlidersHorizontal, X } from "lucide-react"
 
 const CATEGORIES = [
   { name: "Everything", slug: "" },
-  { name: "Outerwear", slug: "outerwear" },
-  { name: "Knitwear", slug: "knitwear" },
-  { name: "Tailoring", slug: "tailoring" },
-  { name: "Shirts", slug: "shirts" },
-  { name: "Trousers", slug: "trousers" },
-  { name: "Accessories", slug: "accessories" },
+  { name: "Electric Cars", slug: "electric" },
+  { name: "Nitro Cars", slug: "nitro" },
+  { name: "Crawlers", slug: "crawlers" },
+  { name: "Drift", slug: "drift" },
+  { name: "Transmitters", slug: "transmitters" },
+  { name: "Batteries", slug: "batteries" },
+  { name: "Suspension", slug: "suspension" },
 ]
 
 export function SidebarFilters() {
@@ -24,7 +25,7 @@ export function SidebarFilters() {
   const [gender, setGender] = useState(searchParams.get("gender") || "")
   const [priceRange, setPriceRange] = useState<number[]>([
     Number(searchParams.get("minPrice")) || 0,
-    Number(searchParams.get("maxPrice")) || 500
+    Number(searchParams.get("maxPrice")) || 1500
   ])
   
   // Debounce updates to URL
@@ -35,7 +36,7 @@ export function SidebarFilters() {
       if (category) params.set("category", category)
       if (gender) params.set("gender", gender)
       if (priceRange[0] > 0) params.set("minPrice", priceRange[0].toString())
-      if (priceRange[1] < 500) params.set("maxPrice", priceRange[1].toString())
+      if (priceRange[1] < 1500) params.set("maxPrice", priceRange[1].toString())
       
       const sort = searchParams.get("sort")
       if (sort) params.set("sort", sort)
@@ -50,10 +51,10 @@ export function SidebarFilters() {
     setSearch("")
     setCategory("")
     setGender("")
-    setPriceRange([0, 500])
+    setPriceRange([0, 1500])
   }
 
-  const hasActiveFilters = search || category || gender || priceRange[0] > 0 || priceRange[1] < 500
+  const hasActiveFilters = search || category || gender || priceRange[0] > 0 || priceRange[1] < 1500
 
   return (
     <div className="sticky top-28 space-y-10">
@@ -73,24 +74,7 @@ export function SidebarFilters() {
         </div>
       </div>
 
-      {/* Department */}
-      <div className="space-y-4">
-        <label className="text-[10px] tracking-[0.25em] uppercase text-foreground font-medium block">
-          Department
-        </label>
-        <ul className="space-y-3">
-          {["MEN", "WOMEN", "UNISEX"].map((g) => (
-            <li key={g}>
-              <button
-                onClick={() => setGender(gender === g.toLowerCase() ? "" : g.toLowerCase())}
-                className={`text-sm transition-colors ${gender === g.toLowerCase() ? "text-accent font-medium" : "text-muted-foreground hover:text-foreground"}`}
-              >
-                {g.charAt(0) + g.slice(1).toLowerCase()}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
+
 
       {/* Categories */}
       <div className="space-y-4">
@@ -122,7 +106,7 @@ export function SidebarFilters() {
           </span>
         </div>
         <Slider
-          min={0} max={500} step={10}
+          min={0} max={1500} step={50}
           value={priceRange}
           onValueChange={(v) => setPriceRange(v)}
           className="accent-brass"

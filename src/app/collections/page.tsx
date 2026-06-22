@@ -37,11 +37,11 @@ export default async function CollectionsPage() {
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
         
         <div className="mb-16 relative z-10 fade-up-section visible">
-          <p className="text-[10px] font-heading tracking-[0.3em] uppercase text-racing-red mb-4 flex items-center gap-2">
-            <span className="w-4 h-px bg-racing-red inline-block" />
+          <p className="text-[10px] font-heading tracking-[0.3em] uppercase text-racing-yellow mb-4 flex items-center gap-2">
+            <span className="w-4 h-px bg-racing-yellow inline-block" />
             Machine Classification
           </p>
-          <h1 className="font-heading text-4xl md:text-6xl font-black text-foreground dark:text-white uppercase drop-shadow-[0_0_15px_rgba(255,30,30,0.3)]">Racing Ecosystem</h1>
+          <h1 className="font-heading text-4xl md:text-6xl font-black text-foreground dark:text-white uppercase drop-shadow-[0_0_15px_rgba(255, 204, 0,0.3)]">Racing Ecosystem</h1>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-16 relative z-10">
@@ -52,7 +52,7 @@ export default async function CollectionsPage() {
               className={`group flex flex-col ${index % 2 !== 0 ? 'md:mt-24' : ''} fade-up-section visible`}
               style={{ transitionDelay: `${index * 0.1}s` }}
             >
-              <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100 dark:bg-smoke-dark mb-6 border border-border group-hover:border-racing-red transition-colors duration-500 shadow-[0_0_20px_rgba(0,0,0,0.5)] group-hover:shadow-[0_0_30px_rgba(255,30,30,0.2)]">
+              <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100 dark:bg-smoke-dark mb-6 border border-border group-hover:border-racing-yellow transition-colors duration-500 shadow-[0_0_20px_rgba(0,0,0,0.5)] group-hover:shadow-[0_0_30px_rgba(255, 204, 0,0.2)]">
                 <Image
                   src={collection.image || "/placeholder.svg"}
                   alt={collection.name}
@@ -61,9 +61,9 @@ export default async function CollectionsPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-carbon-dark/80 to-transparent pointer-events-none" />
               </div>
-              <div className="space-y-3 glass-dark p-6 border-l-2 border-transparent group-hover:border-racing-red transition-all">
+              <div className="space-y-3 glass-dark p-6 border-l-2 border-transparent group-hover:border-racing-yellow transition-all">
                 <div className="flex justify-between items-baseline">
-                  <h2 className="font-heading text-2xl font-black text-foreground dark:text-white uppercase tracking-tight group-hover:text-racing-red transition-colors">{collection.name}</h2>
+                  <h2 className="font-heading text-2xl font-black text-foreground dark:text-white uppercase tracking-tight group-hover:text-racing-yellow transition-colors">{collection.name}</h2>
                   <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-gray-500">
                     {collection._count.products} MACHINES
                   </span>

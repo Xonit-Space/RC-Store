@@ -150,7 +150,7 @@ export default function CartPage() {
                   {/* Remove action */}
                   <button
                     onClick={() => handleRemoveItem(item.id)}
-                    className="h-9 w-9  border border-red-100 text-red-500 hover:bg-red-50 flex items-center justify-center shrink-0 transition"
+                    className="h-9 w-9  border border-red-100 text-yellow-500 hover:bg-red-50 flex items-center justify-center shrink-0 transition"
                   >
                     <Trash2 className="h-4.5 w-4.5" />
                   </button>

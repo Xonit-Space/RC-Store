@@ -18,7 +18,7 @@ export function MembershipSection() {
         className="absolute inset-0 opacity-[0.05] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"
         aria-hidden="true"
       />
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-racing-red/10 to-transparent pointer-events-none" />
+      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-racing-yellow/10 to-transparent pointer-events-none" />
 
       <div className="container mx-auto px-6 md:px-12 relative z-10">
         <div className="grid md:grid-cols-12 gap-12 md:gap-20 items-start">
@@ -27,25 +27,25 @@ export function MembershipSection() {
           <div className="md:col-span-5 space-y-10 fade-up-section visible">
             <div>
               <div className="flex items-center gap-2 mb-6">
-                <Trophy className="w-5 h-5 text-racing-red" />
-                <p className="text-[12px] font-heading font-bold tracking-[0.35em] uppercase text-racing-red">
+                <Trophy className="w-5 h-5 text-racing-yellow" />
+                <p className="text-[12px] font-heading font-bold tracking-[0.35em] uppercase text-racing-yellow">
                   Elite Access
                 </p>
               </div>
-              <h2 className="font-heading text-4xl md:text-6xl font-black leading-[1.05] tracking-tighter uppercase drop-shadow-[0_0_15px_rgba(255,30,30,0.3)]">
+              <h2 className="font-heading text-4xl md:text-6xl font-black leading-[1.05] tracking-tighter uppercase drop-shadow-[0_0_15px_rgba(255, 204, 0,0.3)]">
                 Pro Racing<br />
-                <span className="text-racing-red">League</span>
+                <span className="text-racing-yellow">League</span>
               </h2>
             </div>
 
-            <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-sm glass-dark p-4 border-l-2 border-racing-red">
+            <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-sm glass-dark p-4 border-l-2 border-racing-yellow">
               Reserved for pilots who demand the absolute best. Gain access to elite engineering support, beta firmware, and VIP track events.
             </p>
 
             <Link
               href="/membership"
               id="membership-cta"
-              className="inline-flex items-center justify-center gap-3 bg-racing-red text-foreground dark:text-white px-8 py-4 font-heading font-bold tracking-widest uppercase hover:bg-neon-red transition-all duration-300 shadow-[0_0_15px_rgba(255,30,30,0.4)] hover:shadow-[0_0_30px_rgba(255,30,30,0.8)] border border-racing-red hover:scale-105 group"
+              className="inline-flex items-center justify-center gap-3 bg-racing-yellow text-foreground dark:text-white px-8 py-4 font-heading font-bold tracking-widest uppercase hover:bg-neon-yellow transition-all duration-300 shadow-[0_0_15px_rgba(255, 204, 0,0.4)] hover:shadow-[0_0_30px_rgba(255, 204, 0,0.8)] border border-racing-yellow hover:scale-105 group"
             >
               Apply For Pro License
               <ArrowRight strokeWidth={2} className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
@@ -57,7 +57,7 @@ export function MembershipSection() {
             <div className="divide-y divide-white/10 glass-dark p-8 border border-border shadow-[0_0_50px_rgba(0,0,0,0.5)]">
               {perks.map((perk, i) => (
                 <div key={perk.label} className="py-6 flex gap-6 group cursor-default hover:bg-white/5 transition-colors p-4 -mx-4 rounded-lg">
-                  <span className="text-[14px] font-heading font-black tracking-[0.2em] text-racing-red/50 mt-1 shrink-0 w-8 group-hover:text-racing-red transition-colors drop-shadow-[0_0_5px_rgba(255,30,30,0)] group-hover:drop-shadow-[0_0_10px_rgba(255,30,30,0.8)]">
+                  <span className="text-[14px] font-heading font-black tracking-[0.2em] text-racing-yellow/50 mt-1 shrink-0 w-8 group-hover:text-racing-yellow transition-colors drop-shadow-[0_0_5px_rgba(255, 204, 0,0)] group-hover:drop-shadow-[0_0_10px_rgba(255, 204, 0,0.8)]">
                     0{i + 1}
                   </span>
                   <div>

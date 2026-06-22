@@ -130,7 +130,7 @@ export function SmartSearch() {
             </Button>
           )}
           <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleVoiceSearch} disabled={isListening}>
-            <Mic className={`h-3 w-3 ${isListening ? "text-red-500 animate-pulse" : ""}`} />
+            <Mic className={`h-3 w-3 ${isListening ? "text-yellow-500 animate-pulse" : ""}`} />
           </Button>
           <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleImageSearch}>
             <Camera className="h-3 w-3" />

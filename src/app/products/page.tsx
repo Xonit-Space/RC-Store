@@ -22,7 +22,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   const search = typeof params.search === "string" ? params.search : undefined
   const sort = typeof params.sort === "string" ? params.sort : "newest"
   const minPrice = typeof params.minPrice === "string" ? Number(params.minPrice) : 0
-  const maxPrice = typeof params.maxPrice === "string" ? Number(params.maxPrice) : 500
+  const maxPrice = typeof params.maxPrice === "string" ? Number(params.maxPrice) : 1500
   const page = typeof params.page === "string" ? Number(params.page) : 1
 
   const products = await getProducts({
@@ -42,7 +42,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   if (category) currentParams.set("category", category)
   if (gender) currentParams.set("gender", gender)
   if (minPrice > 0) currentParams.set("minPrice", minPrice.toString())
-  if (maxPrice < 500) currentParams.set("maxPrice", maxPrice.toString())
+  if (maxPrice < 1500) currentParams.set("maxPrice", maxPrice.toString())
   if (sort) currentParams.set("sort", sort)
 
   const prevParams = new URLSearchParams(currentParams.toString())

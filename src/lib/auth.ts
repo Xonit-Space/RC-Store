@@ -1,10 +1,12 @@
 import NextAuth, { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
+import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { db } from "@/lib/db"
 import bcrypt from "bcryptjs"
 import { UserRole } from "@prisma/client"
 
 export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(db),
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
@@ -57,7 +59,7 @@ export const authOptions: NextAuthOptions = {
         token.image = user.image
       }
 
-      // Handle session updates (e.g. updating profile details)
+      // Handle session updates
       if (trigger === "update" && session) {
         return { ...token, ...session }
       }
@@ -65,7 +67,7 @@ export const authOptions: NextAuthOptions = {
       return token
     },
     async session({ session, token }) {
-      if (token) {
+      if (token && session.user) {
         session.user.id = token.id as string
         session.user.role = token.role as UserRole
         session.user.image = token.image as string | null

@@ -23,8 +23,13 @@ export default function RegisterPage() {
     setError(null)
     setLoading(true)
 
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters long")
+    if (password.length < 12) {
+      setError("Password must be at least 12 characters long")
+      setLoading(false)
+      return
+    }
+    if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
+      setError("Password must contain uppercase, lowercase, number, and special character")
       setLoading(false)
       return
     }
@@ -119,7 +124,7 @@ export default function RegisterPage() {
                     required
                     className="h-12 bg-transparent border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-foreground transition-colors"
                   />
-                  <p className="text-[10px] text-muted-foreground pt-1">Must be at least 6 characters</p>
+                  <p className="text-[10px] text-muted-foreground pt-1">Must be at least 12 chars, include uppercase, lowercase, number, and special char.</p>
                 </div>
 
                 <div>

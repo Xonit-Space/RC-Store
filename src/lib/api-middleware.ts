@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { checkRateLimit } from "./security/rate-limit"
+import { rateLimit } from "./security/rate-limit"
 import { getServerSession, Session } from "next-auth"
 import { authOptions } from "./auth"
 import { logger } from "./logger"
@@ -38,12 +38,14 @@ export function withApiHandler(handler: NextApiHandler, config: ApiHandlerConfig
 
     try {
       // 1. Rate Limiting
-      const limitResponse = await checkRateLimit(
-        req,
-        config.rateLimitNamespace || "global",
-        config.rateLimit
+      const limitResponse = await rateLimit(
+        req.ip || "global",
+        config.rateLimit?.limit || 100,
+        config.rateLimit?.windowMs || 60000
       )
-      if (limitResponse) return limitResponse
+      if (!limitResponse.success) {
+        return NextResponse.json({ error: "Too Many Requests" }, { status: 429 })
+      }
 
       // 2. Authentication \u2014 resolved ONCE, injected into context for handler reuse
       let resolvedSession: Session | null = null

@@ -61,6 +61,8 @@ model User {
   security  UserSecurity?
   StaffPick StaffPick[]
 
+  deletedAt DateTime?
+
   @@index([email])
   @@map("users")
 }
@@ -68,7 +70,7 @@ model User {
 model Address {
   id                String   @id @default(cuid())
   userId            String
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User     @relation(fields: [userId], references: [id], onDelete: Restrict)
   title             String   @default("Home")
   line1             String
   line2             String?
@@ -133,7 +135,7 @@ model Account {
   id_token          String? @db.Text
   session_state     String?
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
 
   @@unique([provider, providerAccountId])
   @@map("accounts")
@@ -144,7 +146,7 @@ model Session {
   sessionToken String   @unique @map("session_token")
   userId       String   @map("user_id")
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Restrict)
 
   @@map("sessions")
 }
@@ -184,7 +186,7 @@ model LoginAttempt {
 model UserSecurity {
   id                String    @id @default(cuid())
   userId            String    @unique
-  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User      @relation(fields: [userId], references: [id], onDelete: Restrict)
   totpSecret        String?
   totpEnabled       Boolean   @default(false)
   recoveryCodes     String    @default("[]") // JSON array of hashed codes
@@ -219,6 +221,10 @@ model Category {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
+  deletedAt DateTime?
+  createdBy String?
+  updatedBy String?
+
   @@index([slug])
   @@index([parentId])
   @@map("categories")
@@ -233,6 +239,10 @@ model Brand {
   products    Product[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+
+  deletedAt DateTime?
+  createdBy String?
+  updatedBy String?
 
   @@index([slug])
   @@map("brands")
@@ -258,8 +268,8 @@ model Product {
   name          String
   slug          String        @unique
   description   String?
-  price         Float
-  originalPrice Float?
+  price         Decimal
+  originalPrice Decimal?
   gender        ProductGender @default(UNISEX)
   isActive      Boolean       @default(true)
   isFeatured    Boolean       @default(false)
@@ -289,6 +299,10 @@ model Product {
   staffPicks           StaffPick[]
   galleryImages        GalleryImage[]
 
+  deletedAt DateTime?
+  createdBy String?
+  updatedBy String?
+
   @@index([slug])
   @@index([categoryId])
   @@index([brandId])
@@ -304,7 +318,7 @@ model ProductVariant {
   productId String
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   sku       String   @unique
-  price     Float? // Optional variant-level override
+  price     Decimal? // Optional variant-level override
   size      String // XS, S, M, L, XL, XXL
   color     String // Hex code or visual name
   colorName String?
@@ -439,7 +453,7 @@ model CartItem {
 model Wishlist {
   id        String   @id @default(cuid())
   userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Restrict)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -498,11 +512,11 @@ model Order {
   userId            String
   user              User        @relation(fields: [userId], references: [id])
   status            OrderStatus @default(PENDING)
-  subtotal          Float
-  tax               Float
-  shippingCost      Float
-  discount          Float       @default(0)
-  total             Float
+  subtotal          Decimal
+  tax               Decimal
+  shippingCost      Decimal
+  discount          Decimal     @default(0)
+  total             Decimal
   shippingAddressId String
   shippingAddress   Address     @relation("ShippingAddress", fields: [shippingAddressId], references: [id])
   billingAddressId  String
@@ -517,6 +531,10 @@ model Order {
   shipment Shipment?
   returns  ReturnRequest[]
   refunds  Refund[]
+
+  deletedAt DateTime?
+  createdBy String?
+  updatedBy String?
 
   @@index([userId])
   @@index([orderNumber])
@@ -535,8 +553,8 @@ model OrderItem {
   variantId String
   variant   ProductVariant @relation(fields: [variantId], references: [id])
   quantity  Int
-  price     Float
-  total     Float
+  price     Decimal
+  total     Decimal
 
   @@index([orderId])
   @@index([variantId])
@@ -549,7 +567,7 @@ model Payment {
   order         Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
   gateway       String        @default("STRIPE")
   transactionId String        @unique
-  amount        Float
+  amount        Decimal
   status        PaymentStatus @default(PENDING)
   cardBrand     String?
   cardLast4     String?
@@ -599,7 +617,7 @@ model ReturnRequest {
   orderId   String
   order     Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
   userId    String
-  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User         @relation(fields: [userId], references: [id], onDelete: Restrict)
   reason    String
   status    ReturnStatus @default(PENDING)
   createdAt DateTime     @default(now())
@@ -621,7 +639,7 @@ model Refund {
   id               String       @id @default(cuid())
   orderId          String
   order            Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  amount           Float
+  amount           Decimal
   status           RefundStatus @default(PENDING)
   gatewayReference String?
   createdAt        DateTime     @default(now())
@@ -645,9 +663,9 @@ model Coupon {
   id                String   @id @default(cuid())
   code              String   @unique
   discountType      String // "PERCENTAGE", "FIXED_AMOUNT"
-  discountValue     Float
-  minOrderAmount    Float    @default(0)
-  maxDiscountAmount Float?
+  discountValue     Decimal
+  minOrderAmount    Decimal  @default(0)
+  maxDiscountAmount Decimal?
   startDate         DateTime
   endDate           DateTime
   usageLimit        Int?
@@ -658,6 +676,10 @@ model Coupon {
 
   orders Order[]
 
+  deletedAt DateTime?
+  createdBy String?
+  updatedBy String?
+
   @@index([code])
   @@map("coupons")
 }
@@ -667,7 +689,7 @@ model MarketingCampaign {
   title       String
   description String?
   code        String   @unique
-  discount    Float    @default(0)
+  discount    Decimal  @default(0)
   startDate   DateTime
   endDate     DateTime
   isActive    Boolean  @default(true)
@@ -714,8 +736,8 @@ model AbandonedCart {
 model GiftCard {
   id            String    @id @default(cuid())
   code          String    @unique
-  balance       Float
-  initialAmount Float
+  balance       Decimal
+  initialAmount Decimal
   expiresAt     DateTime?
   isActive      Boolean   @default(true)
   userId        String?
@@ -731,7 +753,7 @@ model GiftCard {
 model LoyaltyPoint {
   id            String   @id @default(cuid())
   userId        String   @unique
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Restrict)
   pointsBalance Int      @default(0)
   updatedAt     DateTime @updatedAt
 
@@ -755,8 +777,8 @@ model LoyaltyTransaction {
 model StoreCredit {
   id        String   @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  balance   Float    @default(0)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  balance   Decimal  @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -885,7 +907,7 @@ model StaffPick {
   productId String
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Restrict)
   roleTitle String // e.g., "Lead Technician"
   quote     String   @db.Text
   sortOrder Int      @default(0)
@@ -954,7 +976,7 @@ model HeroBanner {
 model FlashSale {
   id              String   @id @default(cuid())
   name            String
-  discountPercent Float
+  discountPercent Decimal
   startDate       DateTime
   endDate         DateTime
   isActive        Boolean  @default(true)
@@ -974,7 +996,7 @@ model Currency {
   id           String   @id @default(cuid())
   code         String   @unique // USD, EUR, GBP, LKR
   symbol       String
-  exchangeRate Float    @default(1.0) // Relative to USD base
+  exchangeRate Decimal  @default(1.0) // Relative to USD base
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -1004,7 +1026,7 @@ model Region {
 model TaxRate {
   id        String   @id @default(cuid())
   name      String
-  rate      Float // e.g. 0.08 for 8%
+  rate      Decimal // e.g. 0.08 for 8%
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1018,7 +1040,7 @@ model ShippingZone {
   id            String   @id @default(cuid())
   name          String
   countries     String // JSON array of strings
-  rate          Float
+  rate          Decimal
   estimatedDays String
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -1087,7 +1109,7 @@ model ProductQuestion {
   productId    String
   product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Restrict)
   questionText String
   isApproved   Boolean  @default(false)
   createdAt    DateTime @default(now())
@@ -1104,7 +1126,7 @@ model ProductAnswer {
   questionId String
   question   ProductQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
   userId     String
-  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User            @relation(fields: [userId], references: [id], onDelete: Restrict)
   answerText String
   isApproved Boolean         @default(false)
   createdAt  DateTime        @default(now())
@@ -1177,7 +1199,7 @@ model Review {
   rating    Int // 1 to 5
   comment   String?
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Restrict)
   productId String
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
@@ -1204,7 +1226,7 @@ model ReviewImage {
 model RecentlyViewed {
   id        String   @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Restrict)
   productId String
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   viewedAt  DateTime @default(now())
@@ -1225,7 +1247,7 @@ enum NotificationType {
 model Notification {
   id        String           @id @default(cuid())
   userId    String
-  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User             @relation(fields: [userId], references: [id], onDelete: Restrict)
   title     String
   message   String
   type      NotificationType @default(SYSTEM)
@@ -1327,9 +1349,9 @@ model FinancialDLQ {
 model ReconciliationReport {
   id                String   @id @default(cuid())
   reportDate        DateTime // Date being reconciled
-  stripeTotal       Float // Total from Stripe
-  dbTotal           Float // Total from DB payments
-  delta             Float // Difference (should be 0)
+  stripeTotal       Decimal // Total from Stripe
+  dbTotal           Decimal // Total from DB payments
+  delta             Decimal // Difference (should be 0)
   missingInDB       String   @default("[]") // JSON array of Stripe PI IDs
   missingInStripe   String   @default("[]") // JSON array of DB payment IDs
   mismatchedAmounts String   @default("[]") // JSON array of {orderId, stripe, db}

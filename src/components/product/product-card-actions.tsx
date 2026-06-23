@@ -5,6 +5,7 @@ import { Heart } from "lucide-react"
 import { useCartStore } from "@/store/cart"
 import { useSession } from "next-auth/react"
 import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 interface ProductCardActionsProps {
   product: any;
@@ -14,6 +15,7 @@ interface ProductCardActionsProps {
 export const ProductCardActions = memo(function ProductCardActions({ product }: ProductCardActionsProps) {
   const { data: session } = useSession()
   const cartStore = useCartStore()
+  const router = useRouter()
   const [inWishlist, setInWishlist] = useState(false)
   const [isAdding, setIsAdding] = useState(false)
 
@@ -26,6 +28,15 @@ export const ProductCardActions = memo(function ProductCardActions({ product }: 
 
   const addToCart = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault()
+    
+    if (!session) {
+      toast.error("Please sign in to add items to your cart", { 
+        style: { background: "#0e0918", color: "#facc15", border: "1px solid #ef4444" } 
+      })
+      router.push("/login")
+      return
+    }
+
     const defaultVariant = product.variants?.[0]
     if (!defaultVariant) {
       toast.error("No variants available")

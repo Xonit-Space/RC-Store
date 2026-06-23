@@ -224,10 +224,10 @@ async function main() {
         orderNumber: `ORD-${Date.now()}-${i}`,
         userId: user.id,
         status: "DELIVERED",
-        subtotal: p1.price,
-        tax: p1.price * 0.1,
+        subtotal: Number(p1.price),
+        tax: Number(p1.price) * 0.1,
         shippingCost: 15,
-        total: p1.price * 1.1 + 15,
+        total: Number(p1.price) * 1.1 + 15,
         shippingAddressId: addr.id,
         billingAddressId: addr.id,
         items: { create: [{ variantId: v1.id, quantity: 1, price: p1.price, total: p1.price }] }
@@ -241,8 +241,8 @@ async function main() {
     // Loyalty Points (Upsert pattern to prevent duplicates)
     await prisma.loyaltyPoint.upsert({
       where: { userId: user.id },
-      update: { pointsBalance: { increment: Math.floor(order.total) } },
-      create: { userId: user.id, pointsBalance: Math.floor(order.total) }
+      update: { pointsBalance: { increment: Math.floor(Number(order.total)) } },
+      create: { userId: user.id, pointsBalance: Math.floor(Number(order.total)) }
     })
   }
 

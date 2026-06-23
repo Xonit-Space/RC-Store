@@ -6,6 +6,7 @@ import { useCartStore } from "@/store/cart"
 import { useSession } from "next-auth/react"
 import { toast } from "sonner"
 import { useTransition, useCallback, memo } from "react"
+import { useRouter } from "next/navigation"
 
 interface AddToCartClientButtonProps {
   productId: string
@@ -29,9 +30,18 @@ export const AddToCartClientButton = memo(function AddToCartClientButton({
 }: AddToCartClientButtonProps) {
   const { data: session } = useSession()
   const cartStore = useCartStore()
+  const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
   const handleAddToCart = useCallback(() => {
+    if (!session) {
+      toast.error("Please sign in to add items to your cart", { 
+        style: { background: "#0e0918", color: "#facc15", border: "1px solid #ef4444" } 
+      })
+      router.push("/login")
+      return
+    }
+
     startTransition(async () => {
       try {
         await cartStore.addItem(

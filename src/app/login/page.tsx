@@ -128,38 +128,25 @@ export default function LoginPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        setEmail("demo@neoshop.com")
-                        setPassword("neoshop_secure_password_2026")
+                        setEmail("racer@rc.com")
+                        setPassword("rcadmin123")
                       }}
                       className="p-3 border border-white/5 bg-smoke-dark hover:border-racing-yellow/50 hover:bg-white/5 transition-colors text-left group"
                     >
-                      <span className="block text-[10px] font-mono font-bold uppercase tracking-wider text-white mb-1 group-hover:text-racing-yellow transition-colors">Pilot</span>
-                      <span className="block text-[10px] font-mono text-gray-500 truncate">demo@neoshop.com</span>
+                      <span className="block text-[10px] font-mono font-bold uppercase tracking-wider text-white mb-1 group-hover:text-racing-yellow transition-colors">Pro Racer (Customer)</span>
+                      <span className="block text-[10px] font-mono text-gray-500 truncate">racer@rc.com</span>
                     </button>
                     
                     <button
                       type="button"
                       onClick={() => {
-                        setEmail("admin@neoshop.com")
-                        setPassword("neoshop_secure_password_2026")
+                        setEmail("admin@rc.com")
+                        setPassword("rcadmin123")
                       }}
                       className="p-3 border border-white/5 bg-smoke-dark hover:border-racing-yellow/50 hover:bg-white/5 transition-colors text-left group"
                     >
-                      <span className="block text-[10px] font-mono font-bold uppercase tracking-wider text-white mb-1 group-hover:text-racing-yellow transition-colors">Crew Chief</span>
-                      <span className="block text-[10px] font-mono text-gray-500 truncate">admin@neoshop.com</span>
-                    </button>
-                  </div>
-                  <div className="grid grid-cols-1 mt-0 pt-0">
-                    <button
-                        type="button"
-                        onClick={() => {
-                          setEmail("superadmin@neoshop.com")
-                          setPassword("neoshop_secure_password_2026")
-                        }}
-                        className="p-3 border border-white/5 bg-smoke-dark hover:border-racing-yellow/50 hover:bg-white/5 transition-colors text-center group"
-                      >
-                        <span className="block text-[10px] font-mono font-bold uppercase tracking-wider text-white mb-1 group-hover:text-racing-yellow transition-colors">Track Owner (Super Admin)</span>
-                        <span className="block text-[10px] font-mono text-gray-500 truncate">superadmin@neoshop.com</span>
+                      <span className="block text-[10px] font-mono font-bold uppercase tracking-wider text-white mb-1 group-hover:text-racing-yellow transition-colors">RC Admin (Super Admin)</span>
+                      <span className="block text-[10px] font-mono text-gray-500 truncate">admin@rc.com</span>
                     </button>
                   </div>
                 </div>

@@ -22,8 +22,17 @@ export default withAuth(
     const role = token?.role;
     const path = req.nextUrl.pathname;
 
-    if (path.startsWith("/api/admin") && (!token || (role !== "ADMIN" && role !== "SUPER_ADMIN"))) {
-      return new NextResponse("Unauthorized", { status: 401 });
+    const isAdminPath = path.startsWith("/admin") || path.startsWith("/api/admin");
+    const isAuthorizedAdmin = token && (role === "ADMIN" || role === "SUPER_ADMIN");
+
+    if (isAdminPath && !isAuthorizedAdmin) {
+      if (path.startsWith("/api/")) {
+        return new NextResponse("Unauthorized", { status: 401 });
+      } else {
+        // Redirect non-admins trying to access admin UI to the home page or login
+        const redirectUrl = new URL("/login", req.url);
+        return NextResponse.redirect(redirectUrl);
+      }
     }
 
     return response;

@@ -252,7 +252,7 @@ export async function updatePaymentStatus(orderId: string, transactionId: string
  * Cached for 60 seconds — admin stats don't need per-second freshness.
  */
 async function fetchOrderStats() {
-  const [totalRevenueResult, totalOrders, pendingOrders, completedOrders] = await Promise.all([
+  const [totalRevenueResult, totalOrders, pendingOrders, completedOrders, totalUsers, lowStockCount] = await Promise.all([
     db.payment.aggregate({
       where: { status: PaymentStatus.COMPLETED },
       _sum: { amount: true },
@@ -260,6 +260,8 @@ async function fetchOrderStats() {
     db.order.count(),
     db.order.count({ where: { status: OrderStatus.PENDING } }),
     db.order.count({ where: { status: OrderStatus.DELIVERED } }),
+    db.user.count(),
+    db.inventory.count({ where: { quantity: { lt: 5 } } }),
   ])
 
   return {
@@ -267,6 +269,8 @@ async function fetchOrderStats() {
     totalOrders,
     pendingOrders,
     completedOrders,
+    totalUsers,
+    lowStockCount,
   }
 }
 

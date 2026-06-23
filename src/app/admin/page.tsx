@@ -43,13 +43,15 @@ export default async function AdminOverviewPage() {
     },
     {
       title: "System Users",
-      value: stats.completedOrders.toString(),
-      change: "+9.1% CONNECTED",
+      value: stats.totalUsers.toString(),
+      change: "REGISTERED",
       icon: Users,
       color: "text-gray-400",
       bgColor: "bg-gray-800"
     },
   ]
+
+  const fulfillmentEfficiency = stats.totalOrders > 0 ? ((stats.completedOrders / stats.totalOrders) * 100).toFixed(1) : "0.0"
 
   return (
     <div className="space-y-12 fade-up-section visible">
@@ -128,11 +130,11 @@ export default async function AdminOverviewPage() {
             <div className="p-6 md:p-8 grid grid-cols-2 gap-4">
                <div>
                  <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-gray-400 mb-1">Fulfillment Efficiency</p>
-                 <p className="font-heading text-xl font-bold text-white tracking-widest">98.5%</p>
+                 <p className="font-heading text-xl font-bold text-white tracking-widest">{fulfillmentEfficiency}%</p>
                </div>
                <div>
-                 <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-gray-400 mb-1">Avg Process Delay</p>
-                 <p className="font-heading text-xl font-bold text-white tracking-widest">1.2 HRS</p>
+                 <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-gray-400 mb-1">Low Stock Alerts</p>
+                 <p className="font-heading text-xl font-bold text-racing-yellow tracking-widest">{stats.lowStockCount} VARIANTS</p>
                </div>
             </div>
           </div>

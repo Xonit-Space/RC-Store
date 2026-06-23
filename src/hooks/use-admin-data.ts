@@ -44,15 +44,34 @@ export function useAdminCreateCoupon() {
   })
 }
 
-export function useAdminProducts() {
+export function useAdminProducts(page = 1, limit = 10, search = "", categoryId = "") {
   return useQuery({
-    queryKey: ["admin", "products"],
+    queryKey: ["admin", "products", page, limit, search, categoryId],
     queryFn: async () => {
-      const res = await fetch("/api/products")
+      const params = new URLSearchParams({
+        page: String(page),
+        limit: String(limit),
+        ...(search ? { search } : {}),
+        ...(categoryId ? { categoryId } : {}),
+      })
+      const res = await fetch(`/api/admin/products?${params}`)
       if (!res.ok) throw new Error("Failed to load products")
       const json = await res.json()
-      return json.data || []
+      return json.data || { products: [], pagination: { total: 0, pages: 0, page: 1, limit: 10 } }
     }
+  })
+}
+
+export function useAdminProduct(productId: string) {
+  return useQuery({
+    queryKey: ["admin", "product", productId],
+    queryFn: async () => {
+      const res = await fetch(`/api/admin/products/${productId}`)
+      if (!res.ok) throw new Error("Failed to load product")
+      const json = await res.json()
+      return json.data || null
+    },
+    enabled: !!productId
   })
 }
 
@@ -76,7 +95,7 @@ export function useAdminCustomers(page = 1, limit = 24) {
         page: String(page),
         limit: String(limit),
       })
-      const res = await fetch(`/api/pos/customers?${params}`)
+      const res = await fetch(`/api/admin/customers?${params}`)
       if (!res.ok) throw new Error("Failed to load customers")
       return res.json()
     }

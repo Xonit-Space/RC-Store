@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { POSManagement } from "./pos-management"
 import { CourierManagement } from "./courier-management"
 
 export function AdminDashboard() {
@@ -45,7 +44,6 @@ export function AdminDashboard() {
 
   const modules = [
     { id: "overview", name: "Overview", icon: BarChart3 },
-    { id: "pos", name: "Point of Sale (POS)", icon: Calculator },
     { id: "couriers", name: "Courier Operations", icon: Truck },
     { id: "products", name: "Products", icon: Package },
     { id: "orders", name: "Orders", icon: ShoppingCart },
@@ -187,7 +185,6 @@ export function AdminDashboard() {
             </div>
           )}
 
-          {activeModule === "pos" && <POSManagement />}
 
           {activeModule === "couriers" && <CourierManagement />}
         </main>

@@ -45,7 +45,7 @@ async function main() {
   // 1. DELETE EVERYTHING
   console.log("🗑️  Clearing existing data...")
   const tables = [
-    "InventoryMovement", "InventoryReservation", "Inventory", "CartItem", "Cart", 
+    "StaffPick", "GalleryImage", "InventoryMovement", "InventoryReservation", "Inventory", "CartItem", "Cart", 
     "WishlistItem", "Wishlist", "OrderItem", "Payment", "Shipment", "ReturnRequest", 
     "Refund", "Order", "ReviewImage", "Review", "ProductQuestion", "ProductAnswer", 
     "RecentlyViewed", "ProductView", "RecommendationEvent", "SearchHistory", 
@@ -136,6 +136,7 @@ async function main() {
         originalPrice: i % 5 === 0 ? price + rand(20, 100) : null,
         isActive: true,
         isFeatured: i <= 8,
+        isNewRelease: i > 55,
         brandId: brand.id,
         categoryId: category.id,
         collectionId: collection?.id,
@@ -265,7 +266,28 @@ async function main() {
     ]
   })
 
-  // 9. HERO BANNERS
+  // 9. LANDING PAGE SECTIONS (Staff Picks & Gallery)
+  console.log("Generating landing page sections...")
+  await prisma.staffPick.createMany({
+    data: [
+      { productId: allProducts[0].id, userId: users[1].id, roleTitle: "Lead Technician", quote: "Absolute beast on the track.", sortOrder: 1 },
+      { productId: allProducts[2].id, userId: users[2].id, roleTitle: "Drift Specialist", quote: "Slides like butter.", sortOrder: 2 },
+      { productId: allProducts[4].id, userId: users[3].id, roleTitle: "Basher Pro", quote: "Toughest truck I've ever driven.", sortOrder: 3 },
+      { productId: allProducts[6].id, userId: users[4].id, roleTitle: "Crawler Expert", quote: "Unstoppable on the rocks.", sortOrder: 4 },
+    ]
+  })
+
+  await prisma.galleryImage.createMany({
+    data: [
+      { imageUrl: IMAGES.electric[0], caption: "Track day fun!", authorName: "@rc_racer_1", productId: allProducts[0].id, isApproved: true, sortOrder: 1 },
+      { imageUrl: IMAGES.nitro[0], caption: "Nitro smoke!", authorName: "@nitro_king", productId: allProducts[1].id, isApproved: true, sortOrder: 2 },
+      { imageUrl: IMAGES.offroad[0], caption: "Rock crawling.", authorName: "@trail_boss", productId: allProducts[2].id, isApproved: true, sortOrder: 3 },
+      { imageUrl: IMAGES.drift[0], caption: "Sideways action.", authorName: "@drift_legend", productId: allProducts[3].id, isApproved: true, sortOrder: 4 },
+      { imageUrl: IMAGES.electric[1], caption: "Jumping over cars.", authorName: "@bash_master", productId: allProducts[4].id, isApproved: true, sortOrder: 5 },
+    ]
+  })
+
+  // 10. HERO BANNERS
   await prisma.heroBanner.create({ data: { title: "Track Ready", subtitle: "Competition chassis", image: IMAGES.electric[0], link: "/products" } })
 
   console.log("\n🎉 ════════════════════════════════════════════════")

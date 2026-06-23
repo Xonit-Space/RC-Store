@@ -1,11 +1,11 @@
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearchPostgres"]
 }
 
@@ -25,34 +25,41 @@ model User {
   passwordHash  String
   name          String?
   avatar        String?
+  image         String? // Added for NextAuth compatibility
   role          UserRole  @default(CUSTOMER)
   emailVerified DateTime?
   isActive      Boolean   @default(true)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  addresses             Address[]
-  orders                Order[]
-  reviews               Review[]
-  wishlist              Wishlist?
-  cart                  Cart?
-  auditLogs             AuditLog[]
-  notifications         Notification[]
-  recentlyViewed        RecentlyViewed[]
-  searchHistory         SearchHistory[]
-  productViews          ProductView[]
-  recommendationEvents  RecommendationEvent[]
-  abandonedCarts        AbandonedCart[]
-  returnRequests        ReturnRequest[]
-  giftCards             GiftCard[]
-  loyaltyPoint          LoyaltyPoint?
-  storeCredits          StoreCredit[]
-  questions             ProductQuestion[]
-  answers               ProductAnswer[]
-  blogPosts             BlogPost[]
-  inventoryMovements    InventoryMovement[]
-  sessionLogs           SessionLog[]
-  deviceFingerprints    DeviceFingerprint[]
+  addresses            Address[]
+  orders               Order[]
+  reviews              Review[]
+  wishlist             Wishlist?
+  cart                 Cart?
+  auditLogs            AuditLog[]
+  notifications        Notification[]
+  recentlyViewed       RecentlyViewed[]
+  searchHistory        SearchHistory[]
+  productViews         ProductView[]
+  recommendationEvents RecommendationEvent[]
+  abandonedCarts       AbandonedCart[]
+  returnRequests       ReturnRequest[]
+  giftCards            GiftCard[]
+  loyaltyPoint         LoyaltyPoint?
+  storeCredits         StoreCredit[]
+  questions            ProductQuestion[]
+  answers              ProductAnswer[]
+  blogPosts            BlogPost[]
+  inventoryMovements   InventoryMovement[]
+  sessionLogs          SessionLog[]
+  deviceFingerprints   DeviceFingerprint[]
+
+  // NextAuth & Security Relations
+  accounts  Account[]
+  sessions  Session[]
+  security  UserSecurity?
+  StaffPick StaffPick[]
 
   @@index([email])
   @@map("users")
@@ -111,6 +118,83 @@ model DeviceFingerprint {
   @@map("device_fingerprints")
 }
 
+// NextAuth standard models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// Security Models
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@map("password_reset_tokens")
+}
+
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  email     String
+  ipAddress String?
+  success   Boolean
+  createdAt DateTime @default(now())
+
+  @@index([email, createdAt])
+  @@map("login_attempts")
+}
+
+model UserSecurity {
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  totpSecret        String?
+  totpEnabled       Boolean   @default(false)
+  recoveryCodes     String    @default("[]") // JSON array of hashed codes
+  failedAttempts    Int       @default(0)
+  lockedUntil       DateTime?
+  passwordChangedAt DateTime  @default(now())
+
+  @@map("user_security")
+}
+
 // ==========================================
 // 2. FASHION & PRODUCT CATALOG SCHEMAS
 // ==========================================
@@ -123,17 +207,17 @@ enum ProductGender {
 }
 
 model Category {
-  id          String    @id @default(cuid())
+  id          String     @id @default(cuid())
   name        String
-  slug        String    @unique
+  slug        String     @unique
   description String?
   image       String?
   parentId    String?
-  parent      Category? @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
   children    Category[] @relation("CategoryHierarchy")
   products    Product[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
   @@index([slug])
   @@index([parentId])
@@ -170,24 +254,26 @@ model Collection {
 }
 
 model Product {
-  id           String        @id @default(cuid())
-  name         String
-  slug         String        @unique
-  description  String?
-  price        Float
+  id            String        @id @default(cuid())
+  name          String
+  slug          String        @unique
+  description   String?
+  price         Float
   originalPrice Float?
-  gender       ProductGender @default(UNISEX)
-  isActive     Boolean       @default(true)
-  isFeatured   Boolean       @default(false)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  gender        ProductGender @default(UNISEX)
+  isActive      Boolean       @default(true)
+  isFeatured    Boolean       @default(false)
+  isNewRelease  Boolean       @default(false)
+  salesCount    Int           @default(0)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 
   categoryId   String
-  category     Category      @relation(fields: [categoryId], references: [id])
+  category     Category    @relation(fields: [categoryId], references: [id])
   brandId      String?
-  brand        Brand?        @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  brand        Brand?      @relation(fields: [brandId], references: [id], onDelete: SetNull)
   collectionId String?
-  collection   Collection?   @relation(fields: [collectionId], references: [id], onDelete: SetNull)
+  collection   Collection? @relation(fields: [collectionId], references: [id], onDelete: SetNull)
 
   variants             ProductVariant[]
   images               ProductImage[]
@@ -199,6 +285,9 @@ model Product {
   recommendationEvents RecommendationEvent[]
   questions            ProductQuestion[]
   flashSales           FlashSale[]
+  compatibleModels     PartCompatibility[]
+  staffPicks           StaffPick[]
+  galleryImages        GalleryImage[]
 
   @@index([slug])
   @@index([categoryId])
@@ -211,21 +300,21 @@ model Product {
 }
 
 model ProductVariant {
-  id            String   @id @default(cuid())
-  productId     String
-  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  sku           String   @unique
-  price         Float?   // Optional variant-level override
-  size          String   // XS, S, M, L, XL, XXL
-  color         String   // Hex code or visual name
-  colorName     String?
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sku       String   @unique
+  price     Float? // Optional variant-level override
+  size      String // XS, S, M, L, XL, XXL
+  color     String // Hex code or visual name
+  colorName String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  inventory     Inventory?
-  cartItems     CartItem[]
-  orderItems    OrderItem[]
+  inventory  Inventory?
+  cartItems  CartItem[]
+  orderItems OrderItem[]
 
   @@index([productId])
   @@index([sku])
@@ -233,37 +322,37 @@ model ProductVariant {
 }
 
 model ProductImage {
-  id        String   @id @default(cuid())
-  productId String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  url       String
-  alt       String?
+  id         String   @id @default(cuid())
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url        String
+  alt        String?
   isFeatured Boolean  @default(false)
   sortOrder  Int      @default(0)
-  createdAt DateTime @default(now())
+  createdAt  DateTime @default(now())
 
   @@index([productId])
   @@map("product_images")
 }
 
 model ProductAttribute {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   productId String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  name      String   // e.g., "Fit", "Fabric"
-  value     String   // e.g., "Slim Fit", "100% Cotton"
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name      String // e.g., "Fit", "Fabric"
+  value     String // e.g., "Slim Fit", "100% Cotton"
 
   @@index([productId])
   @@map("product_attributes")
 }
 
 model Warehouse {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  location    String
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  name      String   @unique
+  location  String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   inventories Inventory[]
 
@@ -278,10 +367,10 @@ model Inventory {
   reserved    Int            @default(0) // Inventory locks during active checkout sessions
   warehouseId String?
   warehouse   Warehouse?     @relation(fields: [warehouseId], references: [id], onDelete: SetNull)
-  location    String?        // Bin location
+  location    String? // Bin location
   updatedAt   DateTime       @updatedAt
 
-  movements   InventoryMovement[]
+  movements InventoryMovement[]
 
   @@index([warehouseId])
   @@map("inventory")
@@ -298,7 +387,7 @@ model InventoryMovement {
   id          String                @id @default(cuid())
   inventoryId String
   inventory   Inventory             @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
-  quantity    Int                   // e.g. +10, -5
+  quantity    Int // e.g. +10, -5
   type        InventoryMovementType
   userId      String?
   user        User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
@@ -316,12 +405,12 @@ model InventoryMovement {
 // ==========================================
 
 model Cart {
-  id             String     @id @default(cuid())
-  userId         String?    @unique
-  user           User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  guestSessionId String?    @unique
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+  id             String   @id @default(cuid())
+  userId         String?  @unique
+  user           User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guestSessionId String?  @unique
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   items          CartItem[]
   abandonedCarts AbandonedCart[]
@@ -348,13 +437,13 @@ model CartItem {
 }
 
 model Wishlist {
-  id        String         @id @default(cuid())
-  userId    String         @unique
-  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  items     WishlistItem[]
+  items WishlistItem[]
 
   @@index([userId])
   @@map("wishlists")
@@ -423,11 +512,11 @@ model Order {
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
 
-  items             OrderItem[]
-  payment           Payment?
-  shipment          Shipment?
-  returns           ReturnRequest[]
-  refunds           Refund[]
+  items    OrderItem[]
+  payment  Payment?
+  shipment Shipment?
+  returns  ReturnRequest[]
+  refunds  Refund[]
 
   @@index([userId])
   @@index([orderNumber])
@@ -505,17 +594,16 @@ model Courier {
   @@map("couriers")
 }
 
-
 model ReturnRequest {
-  id        String             @id @default(cuid())
+  id        String       @id @default(cuid())
   orderId   String
-  order     Order              @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order     Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
   userId    String
-  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   reason    String
-  status    ReturnStatus       @default(PENDING)
-  createdAt DateTime           @default(now())
-  updatedAt DateTime           @updatedAt
+  status    ReturnStatus @default(PENDING)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 
   @@index([orderId])
   @@index([userId])
@@ -554,21 +642,21 @@ enum RefundStatus {
 // ==========================================
 
 model Coupon {
-  id              String       @id @default(cuid())
-  code            String       @unique
-  discountType    String       // "PERCENTAGE", "FIXED_AMOUNT"
-  discountValue   Float
-  minOrderAmount  Float        @default(0)
+  id                String   @id @default(cuid())
+  code              String   @unique
+  discountType      String // "PERCENTAGE", "FIXED_AMOUNT"
+  discountValue     Float
+  minOrderAmount    Float    @default(0)
   maxDiscountAmount Float?
-  startDate       DateTime
-  endDate         DateTime
-  usageLimit      Int?
-  usedCount       Int          @default(0)
-  isActive        Boolean      @default(true)
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
+  startDate         DateTime
+  endDate           DateTime
+  usageLimit        Int?
+  usedCount         Int      @default(0)
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
-  orders          Order[]
+  orders Order[]
 
   @@index([code])
   @@map("coupons")
@@ -591,12 +679,13 @@ model MarketingCampaign {
 }
 
 model EmailSubscriber {
-  id          String           @id @default(cuid())
-  email       String           @unique
-  status      SubscriberStatus @default(ACTIVE)
-  token       String           @unique // Unsubscribe cryptographic token
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  id        String           @id @default(cuid())
+  firstName String?
+  email     String           @unique
+  status    SubscriberStatus @default(ACTIVE)
+  token     String           @unique // Unsubscribe cryptographic token
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
 
   @@index([email])
   @@map("email_subscribers")
@@ -608,14 +697,14 @@ enum SubscriberStatus {
 }
 
 model AbandonedCart {
-  id        String   @id @default(cuid())
-  cartId    String
-  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String   @id @default(cuid())
+  cartId     String
+  cart       Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   lastActive DateTime
-  emailSent Boolean  @default(false)
-  createdAt DateTime @default(now())
+  emailSent  Boolean  @default(false)
+  createdAt  DateTime @default(now())
 
   @@index([cartId])
   @@index([userId])
@@ -623,16 +712,16 @@ model AbandonedCart {
 }
 
 model GiftCard {
-  id            String   @id @default(cuid())
-  code          String   @unique
+  id            String    @id @default(cuid())
+  code          String    @unique
   balance       Float
   initialAmount Float
   expiresAt     DateTime?
-  isActive      Boolean  @default(true)
+  isActive      Boolean   @default(true)
   userId        String?
-  user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  user          User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@index([code])
   @@index([userId])
@@ -640,13 +729,13 @@ model GiftCard {
 }
 
 model LoyaltyPoint {
-  id            String               @id @default(cuid())
-  userId        String               @unique
-  user          User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-  pointsBalance Int                  @default(0)
-  updatedAt     DateTime             @updatedAt
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pointsBalance Int      @default(0)
+  updatedAt     DateTime @updatedAt
 
-  transactions  LoyaltyTransaction[]
+  transactions LoyaltyTransaction[]
 
   @@map("loyalty_points")
 }
@@ -655,8 +744,8 @@ model LoyaltyTransaction {
   id             String       @id @default(cuid())
   loyaltyPointId String
   loyaltyPoint   LoyaltyPoint @relation(fields: [loyaltyPointId], references: [id], onDelete: Cascade)
-  points         Int          // e.g. +50, -20
-  reason         String       // e.g. "PURCHASE_EARN", "REDEEMED"
+  points         Int // e.g. +50, -20
+  reason         String // e.g. "PURCHASE_EARN", "REDEEMED"
   createdAt      DateTime     @default(now())
 
   @@index([loyaltyPointId])
@@ -683,7 +772,7 @@ model CMSPage {
   id             String    @id @default(cuid())
   title          String
   slug           String    @unique
-  content        String    // JSON string for dynamic grids layout sections
+  content        String // JSON string for dynamic grids layout sections
   seoTitle       String?
   seoDescription String?
   published      Boolean   @default(false)
@@ -696,26 +785,25 @@ model CMSPage {
 }
 
 model BlogPost {
-  id             String       @id @default(cuid())
-  title          String
-  slug           String       @unique
-  content        String
-  excerpt        String?
-  coverImage     String?
-  published      Boolean      @default(false)
-  publishedAt    DateTime?
-  authorId       String?
-  author         User?        @relation(fields: [authorId], references: [id], onDelete: SetNull)
-  categoryId     String
-  category       BlogCategory @relation(fields: [categoryId], references: [id])
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  id          String       @id @default(cuid())
+  title       String
+  slug        String       @unique
+  content     String
+  excerpt     String?
+  coverImage  String?
+  published   Boolean      @default(false)
+  publishedAt DateTime?
+  authorId    String?
+  author      User?        @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  categoryId  String
+  category    BlogCategory @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 
-  tags           BlogTag[]
+  tags BlogTag[]
 
   @@index([slug])
   @@index([authorId])
-  @@index([categoryId])
   @@map("blog_posts")
 }
 
@@ -743,11 +831,92 @@ model BlogTag {
   @@map("blog_tags")
 }
 
+// ==========================================
+// 7. RC SPECIALTY & LANDING PAGE SCHEMAS
+// ==========================================
+
+model VehicleMake {
+  id        String         @id @default(cuid())
+  name      String         @unique
+  slug      String         @unique
+  logo      String?
+  models    VehicleModel[]
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@index([slug])
+  @@map("vehicle_makes")
+}
+
+model VehicleModel {
+  id              String              @id @default(cuid())
+  makeId          String
+  make            VehicleMake         @relation(fields: [makeId], references: [id], onDelete: Cascade)
+  name            String
+  slug            String              @unique
+  scale           String? // e.g., "1/10", "1/8"
+  type            String? // e.g., "Monster Truck", "Crawler"
+  image           String?
+  compatibilities PartCompatibility[]
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  @@index([slug])
+  @@index([makeId])
+  @@map("vehicle_models")
+}
+
+model PartCompatibility {
+  id             String       @id @default(cuid())
+  productId      String
+  product        Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  vehicleModelId String
+  vehicleModel   VehicleModel @relation(fields: [vehicleModelId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+
+  @@unique([productId, vehicleModelId])
+  @@index([productId])
+  @@index([vehicleModelId])
+  @@map("part_compatibilities")
+}
+
+model StaffPick {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roleTitle String // e.g., "Lead Technician"
+  quote     String   @db.Text
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+  @@index([userId])
+  @@map("staff_picks")
+}
+
+model GalleryImage {
+  id         String   @id @default(cuid())
+  imageUrl   String
+  caption    String?  @db.Text
+  authorName String? // e.g. "@neoshopultra"
+  productId  String?
+  product    Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  sortOrder  Int      @default(0)
+  isApproved Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  @@index([productId])
+  @@map("gallery_images")
+}
+
 model NavigationMenu {
   id        String   @id @default(cuid())
   name      String
   location  String   @unique // e.g. "HEADER", "FOOTER"
-  items     String   // JSON nested tree links structure
+  items     String // JSON nested tree links structure
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -767,32 +936,32 @@ model FAQ {
 }
 
 model HeroBanner {
-  id          String    @id @default(cuid())
-  title       String
-  subtitle    String?
-  image       String
-  link        String?
-  isActive    Boolean   @default(true)
-  startDate   DateTime?
-  endDate     DateTime?
-  sortOrder   Int       @default(0)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        String    @id @default(cuid())
+  title     String
+  subtitle  String?
+  image     String
+  link      String?
+  isActive  Boolean   @default(true)
+  startDate DateTime?
+  endDate   DateTime?
+  sortOrder Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@map("hero_banners")
 }
 
 model FlashSale {
-  id              String    @id @default(cuid())
+  id              String   @id @default(cuid())
   name            String
   discountPercent Float
   startDate       DateTime
   endDate         DateTime
-  isActive        Boolean   @default(true)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
-  products        Product[]
+  products Product[]
 
   @@map("flash_sales")
 }
@@ -810,7 +979,7 @@ model Currency {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  regions      Region[]
+  regions Region[]
 
   @@index([code])
   @@map("currencies")
@@ -825,22 +994,22 @@ model Region {
   taxRateId  String?  @unique
   taxRate    TaxRate? @relation(fields: [taxRateId], references: [id])
 
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([code])
   @@map("regions")
 }
 
 model TaxRate {
-  id         String   @id @default(cuid())
-  name       String
-  rate       Float    // e.g. 0.08 for 8%
-  isActive   Boolean  @default(true)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        String   @id @default(cuid())
+  name      String
+  rate      Float // e.g. 0.08 for 8%
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  region     Region?
+  region Region?
 
   @@map("tax_rates")
 }
@@ -848,7 +1017,7 @@ model TaxRate {
 model ShippingZone {
   id            String   @id @default(cuid())
   name          String
-  countries     String   // JSON array of strings
+  countries     String // JSON array of strings
   rate          Float
   estimatedDays String
   createdAt     DateTime @default(now())
@@ -904,8 +1073,8 @@ model RecommendationEvent {
   user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   productId String
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  algoType  String   // "COLLABORATIVE", "CATEGORY_AFFINITY", "TRENDING"
-  event     String   // "IMPRESSION", "CLICK", "PURCHASE"
+  algoType  String // "COLLABORATIVE", "CATEGORY_AFFINITY", "TRENDING"
+  event     String // "IMPRESSION", "CLICK", "PURCHASE"
   createdAt DateTime @default(now())
 
   @@index([userId])
@@ -914,16 +1083,16 @@ model RecommendationEvent {
 }
 
 model ProductQuestion {
-  id           String          @id @default(cuid())
+  id           String   @id @default(cuid())
   productId    String
-  product      Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   userId       String
-  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   questionText String
-  isApproved   Boolean         @default(false)
-  createdAt    DateTime        @default(now())
+  isApproved   Boolean  @default(false)
+  createdAt    DateTime @default(now())
 
-  answers      ProductAnswer[]
+  answers ProductAnswer[]
 
   @@index([productId])
   @@index([userId])
@@ -946,15 +1115,15 @@ model ProductAnswer {
 }
 
 model WebhookEvent {
-  id              String    @id @default(cuid())
-  stripeEventId   String    @unique // Stripe event.id — final ordering authority
-  stripeCreated   Int       // Stripe event.created (Unix epoch) — for ordering
-  eventType       String
-  payload         String    // JSON string
-  status          String    // "PENDING", "PROCESSED", "FAILED"
-  errorMessage    String?
-  createdAt       DateTime  @default(now())
-  processedAt     DateTime?
+  id            String    @id @default(cuid())
+  stripeEventId String    @unique // Stripe event.id — final ordering authority
+  stripeCreated Int // Stripe event.created (Unix epoch) — for ordering
+  eventType     String
+  payload       String // JSON string
+  status        String // "PENDING", "PROCESSED", "FAILED"
+  errorMessage  String?
+  createdAt     DateTime  @default(now())
+  processedAt   DateTime?
 
   @@index([stripeEventId])
   @@index([eventType])
@@ -967,7 +1136,7 @@ model FeatureFlag {
   key         String   @unique
   description String?
   isEnabled   Boolean  @default(false)
-  rules       String?  // JSON rules
+  rules       String? // JSON rules
   updatedAt   DateTime @updatedAt
 
   @@index([key])
@@ -983,7 +1152,7 @@ model AuditLog {
   entityId  String?
   ipAddress String?
   userAgent String?
-  changes   String?  // JSON
+  changes   String? // JSON
   createdAt DateTime @default(now())
 
   @@index([userId])
@@ -1004,17 +1173,17 @@ model SiteSetting {
 }
 
 model Review {
-  id        String        @id @default(cuid())
-  rating    Int           // 1 to 5
+  id        String   @id @default(cuid())
+  rating    Int // 1 to 5
   comment   String?
   userId    String
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   productId String
-  product   Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  images    ReviewImage[]
+  images ReviewImage[]
 
   @@index([userId])
   @@index([productId])
@@ -1061,7 +1230,7 @@ model Notification {
   message   String
   type      NotificationType @default(SYSTEM)
   read      Boolean          @default(false)
-  metadata  Json?            // Event payload context details
+  metadata  Json? // Event payload context details
   createdAt DateTime         @default(now())
 
   @@index([userId])
@@ -1072,8 +1241,8 @@ model DomainEventLog {
   id        String   @id @default(cuid())
   eventId   String   @unique
   eventType String
-  payload   String   // JSON string
-  signature String?  // HMAC signature for security audit
+  payload   String // JSON string
+  signature String? // HMAC signature for security audit
   status    String   @default("PUBLISHED") // PUBLISHED, REPLAYED, FAILED
   createdAt DateTime @default(now())
 
@@ -1088,13 +1257,13 @@ model DomainEventLog {
 
 // Hybrid idempotency: Redis fast-path + DB final authority
 model IdempotencyRecord {
-  id          String   @id @default(cuid())
-  key         String   @unique   // SHA-256 of (namespace:requestId)
-  namespace   String             // "stripe_webhook", "checkout", "pos_sale"
-  resultJson  String?            // Cached response payload (JSON)
-  status      String   @default("PROCESSING") // PROCESSING | COMPLETED | FAILED
-  expiresAt   DateTime           // TTL — after which record can be pruned
-  createdAt   DateTime @default(now())
+  id         String   @id @default(cuid())
+  key        String   @unique // SHA-256 of (namespace:requestId)
+  namespace  String // "stripe_webhook", "checkout", "pos_sale"
+  resultJson String? // Cached response payload (JSON)
+  status     String   @default("PROCESSING") // PROCESSING | COMPLETED | FAILED
+  expiresAt  DateTime // TTL — after which record can be pruned
+  createdAt  DateTime @default(now())
 
   @@index([key])
   @@index([expiresAt])
@@ -1112,9 +1281,9 @@ model InventoryReservation {
   id          String            @id @default(cuid())
   variantId   String
   quantity    Int
-  checkoutId  String            // Stripe session ID or POS transaction ID
+  checkoutId  String // Stripe session ID or POS transaction ID
   status      ReservationStatus @default(RESERVED)
-  expiresAt   DateTime          // RESERVED auto-releases after this
+  expiresAt   DateTime // RESERVED auto-releases after this
   committedAt DateTime?
   releasedAt  DateTime?
   createdAt   DateTime          @default(now())
@@ -1137,8 +1306,8 @@ enum DLQStatus {
 model FinancialDLQ {
   id           String    @id @default(cuid())
   eventId      String    @unique // Original event/idempotency key
-  namespace    String    // "stripe_webhook", "order_creation", "inventory_commit"
-  payloadJson  String    // Original event payload
+  namespace    String // "stripe_webhook", "order_creation", "inventory_commit"
+  payloadJson  String // Original event payload
   errorMessage String
   retryCount   Int       @default(0)
   maxRetries   Int       @default(5)
@@ -1156,17 +1325,17 @@ model FinancialDLQ {
 
 // Daily payment reconciliation reports
 model ReconciliationReport {
-  id                 String   @id @default(cuid())
-  reportDate         DateTime // Date being reconciled
-  stripeTotal        Float    // Total from Stripe
-  dbTotal            Float    // Total from DB payments
-  delta              Float    // Difference (should be 0)
-  missingInDB        String   @default("[]") // JSON array of Stripe PI IDs
-  missingInStripe    String   @default("[]") // JSON array of DB payment IDs
-  mismatchedAmounts  String   @default("[]") // JSON array of {orderId, stripe, db}
-  duplicateOrders    String   @default("[]") // JSON array of orderNumbers
-  status             String   @default("PENDING") // PENDING | CLEAN | DISCREPANCY
-  createdAt          DateTime @default(now())
+  id                String   @id @default(cuid())
+  reportDate        DateTime // Date being reconciled
+  stripeTotal       Float // Total from Stripe
+  dbTotal           Float // Total from DB payments
+  delta             Float // Difference (should be 0)
+  missingInDB       String   @default("[]") // JSON array of Stripe PI IDs
+  missingInStripe   String   @default("[]") // JSON array of DB payment IDs
+  mismatchedAmounts String   @default("[]") // JSON array of {orderId, stripe, db}
+  duplicateOrders   String   @default("[]") // JSON array of orderNumbers
+  status            String   @default("PENDING") // PENDING | CLEAN | DISCREPANCY
+  createdAt         DateTime @default(now())
 
   @@index([reportDate])
   @@index([status])

@@ -6,7 +6,7 @@ import { createCheckoutSession, CheckoutItem } from "@/services/stripe"
 import { ActionResponse } from "./auth"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
-
+import { sendOrderStatusUpdateSms } from "@/services/twilio"
 export async function checkCoupon(code: string, subtotal: number): Promise<ActionResponse> {
   try {
     const coupon = await db.coupon.findUnique({
@@ -74,7 +74,7 @@ export async function processStripeCheckout(
     }
 
     // 2. Map Items for Stripe Processing
-    const checkoutItems: CheckoutItem[] = cart.items.map((item) => {
+    const checkoutItems: CheckoutItem[] = cart.items.map((item: any) => {
       const price = item.variant.price || item.variant.product.price
       return {
         name: `${item.variant.product.name} (${item.variant.size} - ${item.variant.colorName || item.variant.color})`,
@@ -138,6 +138,17 @@ export async function adminUpdateOrderStatus(
         changes: JSON.stringify({ status })
       }
     }).catch(() => {})
+
+    // Send SMS notification if status is updated to SHIPPED or DELIVERED
+    if (status === "SHIPPED" || status === "DELIVERED") {
+      const orderDetails = await db.order.findUnique({
+        where: { id: orderId },
+        include: { shippingAddress: true }
+      })
+      if (orderDetails?.shippingAddress?.phone && orderDetails.shippingAddress.phone !== "0000000000") {
+        sendOrderStatusUpdateSms(orderDetails.shippingAddress.phone, orderDetails.orderNumber, status).catch(console.error)
+      }
+    }
 
     return { success: true, data: updated }
   } catch (err: any) {

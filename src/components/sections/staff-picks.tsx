@@ -87,7 +87,7 @@ export function StaffPicks() {
               </div>
               <h3 className="font-heading font-black text-xl text-white uppercase mb-2">{product.name}</h3>
               <p className="text-xs text-muted-foreground mb-4 line-clamp-2">{product.description}</p>
-              <div className="text-2xl font-mono font-bold text-racing-yellow mb-6">${product.price.toFixed(2)}</div>
+              <div className="text-2xl font-mono font-bold text-racing-yellow mb-6">${Number(product.price).toFixed(2)}</div>
               <CartIconButton 
                 product={product} 
                 className="bg-white/10 hover:bg-racing-yellow text-white hover:text-carbon-dark border border-white/20 hover:border-racing-yellow font-heading font-bold uppercase tracking-widest py-3 px-4 flex items-center justify-center gap-2 transition-colors text-sm w-fit"

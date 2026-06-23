@@ -107,7 +107,7 @@ export default function CustomerOrdersPage() {
                       {order.status}
                     </Badge>
                     <span className="text-sm font-extrabold text-foreground">
-                      Total: Rs. {order.total.toFixed(2)}
+                      Total: Rs. {Number(order.total).toFixed(2)}
                     </span>
                   </div>
                 </div>
@@ -131,7 +131,7 @@ export default function CustomerOrdersPage() {
                         </div>
                       </div>
                       <span className="text-xs font-extrabold text-foreground/70">
-                        Rs. {(item.quantity * item.price).toFixed(2)}
+                        Rs. {(item.quantity * Number(item.price)).toFixed(2)}
                       </span>
                     </div>
                   ))}

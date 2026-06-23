@@ -95,7 +95,7 @@ export function BestSellersTabs() {
                       {product.name}
                     </Link>
                     <div className="mt-auto flex items-center justify-between">
-                      <span className="font-mono font-bold text-lg text-white">${product.price.toFixed(2)}</span>
+                      <span className="font-mono font-bold text-lg text-white">${Number(product.price).toFixed(2)}</span>
                       <CartIconButton 
                         product={product} 
                         className="relative z-20 w-10 h-10 bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-racing-yellow hover:text-carbon-dark hover:border-racing-yellow transition-all"

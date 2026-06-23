@@ -75,7 +75,7 @@ export function NewReleases() {
                   </p>
                   
                   <div className="mt-auto flex items-center justify-between">
-                    <span className="font-mono font-bold text-xl text-white">${product.price.toFixed(2)}</span>
+                    <span className="font-mono font-bold text-xl text-white">${Number(product.price).toFixed(2)}</span>
                     <CartIconButton 
                       product={product} 
                       className="bg-white/5 hover:bg-neon-blue text-white hover:text-carbon-dark border border-white/10 hover:border-neon-blue p-3 transition-colors"

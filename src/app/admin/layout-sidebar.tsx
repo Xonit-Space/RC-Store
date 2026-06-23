@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation"
 import { signOut } from "next-auth/react"
 import { 
   BarChart3, Package, Users, ShoppingCart, Settings, 
-  Truck, Calculator, Coins, Database, LineChart, LogOut
+  Calculator, Coins, Database, LineChart, LogOut
 } from "lucide-react"
 
 interface SidebarProps {
@@ -17,7 +17,6 @@ export function Sidebar({ role }: SidebarProps) {
 
   const modules = [
     { id: "overview", name: "Overview", icon: BarChart3, path: "/admin" },
-    { id: "couriers", name: "Courier Operations", icon: Truck, path: "/admin/couriers" },
     { id: "products", name: "Products Catalog", icon: Package, path: "/admin/products" },
     { id: "orders", name: "Orders Manager", icon: ShoppingCart, path: "/admin/orders" },
     { id: "customers", name: "Customers Registry", icon: Users, path: "/admin/customers" },

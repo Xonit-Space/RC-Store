@@ -7,7 +7,7 @@ import { Prisma } from "@prisma/client"
 export async function GET(req: Request) {
   const session = await getServerSession(authOptions)
   
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
   }
 
@@ -45,6 +45,11 @@ export async function GET(req: Request) {
         include: {
           category: { select: { id: true, name: true } },
           brand: { select: { id: true, name: true } },
+          images: {
+            orderBy: { sortOrder: "asc" as const },
+            take: 1,
+            select: { id: true, url: true, alt: true, isFeatured: true }
+          },
           variants: {
             include: {
               inventory: true

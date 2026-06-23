@@ -1,9 +1,13 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, Suspense } from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { useSession } from "next-auth/react"
-import { RefreshCw, Search, ShoppingBag, ChevronLeft, ChevronRight } from "lucide-react"
+import {
+  RefreshCw, Search, ShoppingBag, ChevronLeft, ChevronRight,
+  MapPin, Package, Clock, CheckCircle2, Truck, XCircle, RotateCcw,
+  CreditCard, Filter,
+} from "lucide-react"
 import { toast } from "sonner"
 import { adminUpdateOrderStatus } from "@/actions/order"
 import { OrderStatus } from "@prisma/client"
@@ -11,48 +15,90 @@ import { useDebounce } from "@/hooks/use-debounce"
 import { useAdminOrders } from "@/hooks/use-admin-data"
 import { useQueryClient } from "@tanstack/react-query"
 
+// ─── Status config ────────────────────────────────────────────────────────────
+
+const STATUS_CONFIG: Record<
+  OrderStatus,
+  { label: string; color: string; bg: string; icon: React.ElementType }
+> = {
+  PENDING:    { label: "Pending",    color: "text-amber-500",    bg: "bg-amber-500/10",    icon: Clock },
+  PAID:       { label: "Paid",       color: "text-blue-500",     bg: "bg-blue-500/10",     icon: CreditCard },
+  PROCESSING: { label: "Processing", color: "text-purple-500",   bg: "bg-purple-500/10",   icon: RefreshCw },
+  SHIPPED:    { label: "Shipped",    color: "text-indigo-500",   bg: "bg-indigo-500/10",   icon: Truck },
+  DELIVERED:  { label: "Delivered",  color: "text-emerald-500",  bg: "bg-emerald-500/10",  icon: CheckCircle2 },
+  CANCELLED:  { label: "Cancelled",  color: "text-red-500",      bg: "bg-red-500/10",      icon: XCircle },
+  REFUNDED:   { label: "Refunded",   color: "text-zinc-400",     bg: "bg-zinc-500/10",     icon: RotateCcw },
+}
+
+function StatusBadge({ status }: { status: OrderStatus }) {
+  const cfg = STATUS_CONFIG[status]
+  if (!cfg) return <span className="text-xs text-muted-foreground">{status}</span>
+  const Icon = cfg.icon
+  return (
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest rounded-sm ${cfg.color} ${cfg.bg}`}>
+      <Icon className="w-3 h-3" />
+      {cfg.label}
+    </span>
+  )
+}
+
+const ALL_STATUSES = ["ALL", ...Object.keys(STATUS_CONFIG)] as const
+type FilterStatus = typeof ALL_STATUSES[number]
+
 const PAGE_SIZE = 20
 
-export default function AdminOrdersPage() {
+// ─── Inner page (needs useSearchParams inside Suspense) ───────────────────────
+
+function OrdersPageInner() {
   const { data: session } = useSession()
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const queryClient = useQueryClient()
 
   const currentPage = parseInt(searchParams.get("page") || "1", 10)
   const currentSearch = searchParams.get("search") || ""
-  const [search, setSearch] = useState(currentSearch)
-  const queryClient = useQueryClient()
+  const currentStatus = (searchParams.get("status") || "ALL") as FilterStatus
 
-  // Phase 9: Debounce the search input before URL navigation
+  const [search, setSearch] = useState(currentSearch)
+  const [activeStatus, setActiveStatus] = useState<FilterStatus>(currentStatus)
+
   const debouncedSearch = useDebounce(search, 400)
 
-  // Phase 9: Sync debounced search → URL
+  // Sync search + status filter → URL
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString())
-    if (debouncedSearch) {
-      params.set("search", debouncedSearch)
-    } else {
-      params.delete("search")
-    }
+    if (debouncedSearch) params.set("search", debouncedSearch)
+    else params.delete("search")
     params.set("page", "1")
     router.replace(`${pathname}?${params.toString()}`)
-  }, [debouncedSearch]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [debouncedSearch]) // eslint-disable-line
 
-  const { data: ordersData, isLoading: loading, refetch } = useAdminOrders(currentPage, PAGE_SIZE, debouncedSearch)
+  const { data: ordersData, isLoading: loading } = useAdminOrders(currentPage, PAGE_SIZE, debouncedSearch)
 
-  const orders = ordersData?.data || []
+  const allOrders: any[] = ordersData?.data || []
   const totalPages = ordersData?.pagination?.totalPages || 1
   const total = ordersData?.pagination?.total || 0
+
+  // Client-side status filter (on top of search)
+  const orders = activeStatus === "ALL"
+    ? allOrders
+    : allOrders.filter((o) => o.status === activeStatus)
+
+  // Count per status from current page
+  const statusCounts = allOrders.reduce<Record<string, number>>((acc, o) => {
+    acc[o.status] = (acc[o.status] || 0) + 1
+    return acc
+  }, {})
 
   const handleStatusChange = useCallback(async (orderId: string, newStatus: OrderStatus) => {
     try {
       const res = await adminUpdateOrderStatus(session?.user?.id || "", orderId, newStatus)
       if (res.success) {
-        toast.success("Order status updated successfully!")
+        toast.success("Order status updated!")
         queryClient.invalidateQueries({ queryKey: ["admin", "orders"] })
       } else {
-        toast.error(res.error || "Transition update rejected")
+        toast.error(res.error || "Failed to update status")
       }
     } catch (err: any) {
       toast.error(err.message || "Failed to update status")
@@ -69,13 +115,16 @@ export default function AdminOrdersPage() {
     return (
       <div className="flex flex-col items-center justify-center p-12 h-64">
         <RefreshCw className="h-8 w-8 text-foreground animate-spin" />
-        <span className="text-[10px] uppercase tracking-widest text-muted-foreground mt-4 font-bold">Loading Transactions...</span>
+        <span className="text-[10px] uppercase tracking-widest text-muted-foreground mt-4 font-bold">
+          Loading Orders...
+        </span>
       </div>
     )
   }
 
   return (
     <div className="space-y-8 font-sans">
+      {/* ── Header ── */}
       <div className="pb-6 border-b border-border/40">
         <p className="text-[10px] tracking-[0.25em] uppercase text-muted-foreground mb-1">
           Fulfillment
@@ -88,98 +137,194 @@ export default function AdminOrdersPage() {
         </p>
       </div>
 
-      <div className="relative max-w-sm">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <input
-          placeholder="Search by Order # or Customer..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-12 h-12 w-full bg-transparent border border-border/40 rounded-none focus:border-foreground focus:outline-none transition-colors placeholder:uppercase placeholder:tracking-wider placeholder:text-[10px]"
-        />
+      {/* ── Status counts bar ── */}
+      <div className="grid grid-cols-4 md:grid-cols-7 gap-2">
+        {Object.entries(STATUS_CONFIG).map(([status, cfg]) => {
+          const count = statusCounts[status] || 0
+          const Icon = cfg.icon
+          return (
+            <div key={status} className="border border-border/30 p-3 bg-muted/5 text-center">
+              <Icon className={`w-4 h-4 mx-auto mb-1 ${cfg.color}`} />
+              <p className={`text-sm font-bold ${cfg.color}`}>{count}</p>
+              <p className="text-[8px] uppercase tracking-widest text-muted-foreground mt-0.5">{cfg.label}</p>
+            </div>
+          )
+        })}
       </div>
 
+      {/* ── Search + filter tabs ── */}
+      <div className="flex flex-col md:flex-row gap-4">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <input
+            placeholder="Search by order # or customer..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-12 h-12 w-full bg-transparent border border-border/40 rounded-none focus:border-foreground focus:outline-none transition-colors placeholder:uppercase placeholder:tracking-wider placeholder:text-[10px] text-sm"
+          />
+        </div>
+
+        {/* Status filter tabs */}
+        <div className="flex items-center gap-1 flex-wrap">
+          <Filter className="w-3.5 h-3.5 text-muted-foreground shrink-0 mr-1" />
+          {ALL_STATUSES.map((s) => (
+            <button
+              key={s}
+              onClick={() => setActiveStatus(s)}
+              className={`h-8 px-3 text-[9px] font-bold uppercase tracking-widest border transition-colors ${
+                activeStatus === s
+                  ? "border-foreground bg-foreground text-background"
+                  : "border-border/40 text-muted-foreground hover:border-foreground/40 hover:text-foreground"
+              }`}
+            >
+              {s === "ALL" ? "All" : STATUS_CONFIG[s as OrderStatus]?.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Orders list ── */}
       {orders.length === 0 ? (
         <div className="border border-border/40 p-12 text-center bg-background">
           <ShoppingBag className="h-10 w-10 text-muted-foreground/30 mx-auto mb-4" />
-          <p className="text-xs uppercase tracking-widest font-bold text-muted-foreground">No transactions recorded</p>
+          <p className="text-xs uppercase tracking-widest font-bold text-muted-foreground">
+            No orders {activeStatus !== "ALL" ? `with status ${STATUS_CONFIG[activeStatus as OrderStatus]?.label}` : "found"}
+          </p>
         </div>
       ) : (
-        <>
-          <div className="space-y-4">
-            {orders.map((o: any) => (
-              <div key={o.id} className="border border-border/40 bg-background transition-colors hover:border-foreground/30">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-muted/5 border-b border-border/40 p-6 gap-6">
+        <div className="space-y-4">
+          {orders.map((o: any) => (
+            <div
+              key={o.id}
+              className="border border-border/40 bg-background transition-colors hover:border-foreground/20"
+            >
+              {/* Order header */}
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-muted/5 border-b border-border/40 px-6 py-4 gap-4">
+                <div className="flex items-start gap-4">
                   <div>
-                    <p className="font-sans text-lg text-foreground mb-1">
+                    <p className="font-sans text-base font-medium text-foreground">
                       Order #{o.orderNumber}
                     </p>
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
-                      {o.user.name || o.user.email} <span className="mx-2 text-border">|</span> {new Date(o.createdAt).toLocaleDateString()}
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest mt-0.5">
+                      {o.user?.name || o.user?.email}
+                      <span className="mx-2 text-border">·</span>
+                      {new Date(o.createdAt).toLocaleDateString("en-US", {
+                        day: "numeric", month: "short", year: "numeric"
+                      })}
                     </p>
                   </div>
-
-                  <div className="flex items-center gap-6 w-full md:w-auto">
-                    <span className="text-sm font-bold text-foreground">Rs. {o.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                    
-                    <select
-                      value={o.status}
-                      onChange={(e) => handleStatusChange(o.id, e.target.value as OrderStatus)}
-                      className="h-10 border border-border/40 bg-transparent text-[10px] font-bold text-foreground px-3 outline-none uppercase tracking-widest cursor-pointer focus:border-foreground ml-auto md:ml-0"
-                    >
-                      <option value={OrderStatus.PENDING}>Pending</option>
-                      <option value={OrderStatus.PAID}>Paid</option>
-                      <option value={OrderStatus.PROCESSING}>Processing</option>
-                      <option value={OrderStatus.SHIPPED}>Shipped</option>
-                      <option value={OrderStatus.DELIVERED}>Delivered</option>
-                      <option value={OrderStatus.CANCELLED}>Cancelled</option>
-                      <option value={OrderStatus.REFUNDED}>Refunded</option>
-                    </select>
-                  </div>
                 </div>
 
-                <div className="p-6">
-                  <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-[0.2em] mb-4">Order Manifest</div>
-                  <div className="space-y-3">
-                    {o.items?.map((item: any) => (
-                      <div key={item.id} className="flex justify-between items-center text-sm text-foreground">
-                        <p className="line-clamp-1">{item.variant?.product?.name || "Product SKU variant"}</p>
-                        <p className="text-muted-foreground shrink-0 ml-4 font-bold">
-                          {item.quantity} <span className="font-normal text-xs mx-1">×</span> Rs. {item.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                <div className="flex items-center gap-4 w-full md:w-auto">
+                  <span className="text-base font-bold text-foreground">
+                    Rs. {Number(o.total).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                  </span>
+
+                  <StatusBadge status={o.status} />
+
+                  {/* Status change dropdown */}
+                  <select
+                    value={o.status}
+                    onChange={(e) => handleStatusChange(o.id, e.target.value as OrderStatus)}
+                    className="h-9 border border-border/40 bg-background text-[10px] font-bold text-foreground px-2 outline-none uppercase tracking-widest cursor-pointer focus:border-foreground ml-auto md:ml-0 min-w-[120px]"
+                  >
+                    {Object.entries(STATUS_CONFIG).map(([s, cfg]) => (
+                      <option key={s} value={s}>{cfg.label}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Order manifest + shipping address */}
+              <div className="px-6 py-4 grid md:grid-cols-3 gap-6">
+                {/* Items */}
+                <div className="md:col-span-2 space-y-2">
+                  <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-[0.2em] mb-3 flex items-center gap-1.5">
+                    <Package className="w-3 h-3" /> Order Items
+                  </div>
+                  {o.items?.map((item: any) => (
+                    <div key={item.id} className="flex justify-between items-center gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 border border-border/30 bg-muted/10 shrink-0" />
+                        <p className="text-sm text-foreground line-clamp-1">
+                          {item.variant?.product?.name || "RC Product"}
                         </p>
                       </div>
-                    ))}
-                  </div>
+                      <p className="text-sm text-muted-foreground whitespace-nowrap shrink-0">
+                        <span className="font-bold text-foreground">{item.quantity}</span>
+                        {" "}× Rs. {Number(item.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                      </p>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            ))}
-          </div>
 
-          {/* Phase 9: Pagination controls */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between pt-4 border-t border-border/40">
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
-                Page {currentPage} of {totalPages}
-              </p>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => navigatePage(currentPage - 1)}
-                  disabled={currentPage <= 1}
-                  className="flex items-center gap-2 px-4 py-2 border border-border/40 text-[10px] uppercase tracking-widest font-bold text-foreground disabled:opacity-30 hover:border-foreground transition-colors"
-                >
-                  <ChevronLeft className="h-3 w-3" /> Prev
-                </button>
-                <button
-                  onClick={() => navigatePage(currentPage + 1)}
-                  disabled={currentPage >= totalPages}
-                  className="flex items-center gap-2 px-4 py-2 border border-border/40 text-[10px] uppercase tracking-widest font-bold text-foreground disabled:opacity-30 hover:border-foreground transition-colors"
-                >
-                  Next <ChevronRight className="h-3 w-3" />
-                </button>
+                {/* Shipping address */}
+                {o.shippingAddress && (
+                  <div className="space-y-2">
+                    <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-[0.2em] mb-3 flex items-center gap-1.5">
+                      <MapPin className="w-3 h-3" /> Ship To
+                    </div>
+                    <div className="text-xs text-muted-foreground leading-relaxed">
+                      <p className="text-foreground font-medium">{o.shippingAddress.title}</p>
+                      <p>{o.shippingAddress.line1}</p>
+                      {o.shippingAddress.line2 && <p>{o.shippingAddress.line2}</p>}
+                      <p>{o.shippingAddress.city}, {o.shippingAddress.state} {o.shippingAddress.postalCode}</p>
+                      <p>{o.shippingAddress.country}</p>
+                      {o.shippingAddress.phone && (
+                        <p className="mt-1 font-medium text-foreground">{o.shippingAddress.phone}</p>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-          )}
-        </>
+          ))}
+        </div>
+      )}
+
+      {/* ── Pagination ── */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between pt-4 border-t border-border/40">
+          <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
+            Page {currentPage} of {totalPages}
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => navigatePage(currentPage - 1)}
+              disabled={currentPage <= 1}
+              className="flex items-center gap-2 px-4 py-2 border border-border/40 text-[10px] uppercase tracking-widest font-bold text-foreground disabled:opacity-30 hover:border-foreground transition-colors"
+            >
+              <ChevronLeft className="h-3 w-3" /> Prev
+            </button>
+            <button
+              onClick={() => navigatePage(currentPage + 1)}
+              disabled={currentPage >= totalPages}
+              className="flex items-center gap-2 px-4 py-2 border border-border/40 text-[10px] uppercase tracking-widest font-bold text-foreground disabled:opacity-30 hover:border-foreground transition-colors"
+            >
+              Next <ChevronRight className="h-3 w-3" />
+            </button>
+          </div>
+        </div>
       )}
     </div>
+  )
+}
+
+// ─── Exported page (wraps in Suspense for useSearchParams) ────────────────────
+
+export default function AdminOrdersPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex flex-col items-center justify-center p-12 h-64">
+          <RefreshCw className="h-8 w-8 text-foreground animate-spin" />
+          <span className="text-[10px] uppercase tracking-widest text-muted-foreground mt-4 font-bold">
+            Loading Orders...
+          </span>
+        </div>
+      }
+    >
+      <OrdersPageInner />
+    </Suspense>
   )
 }

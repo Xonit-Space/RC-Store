@@ -20,6 +20,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
       // That old pattern loaded ALL product columns (description, metadata, etc.)
       select: {
         id: true,
+        variantId: true,
         quantity: true,
         reserved: true,
         variant: {

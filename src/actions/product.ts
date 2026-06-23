@@ -1,6 +1,6 @@
 "use server"
 
-import { db } from "@/lib/db"
+import { ProductService } from "@/services/product.service"
 import { ReviewSchema, CmsProductSchema, CmsProductVariantSchema } from "@/validators/product"
 import { createProductReview } from "@/repositories/product"
 import { ActionResponse } from "./auth"
@@ -48,49 +48,35 @@ export async function adminCreateProduct(adminId: string, formData: any): Promis
   }
 
   const data = result.data
-  const slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "")
-
   try {
-    const product = await db.$transaction(async (tx) => {
-      const p = await tx.product.create({
-        data: {
-          name: data.name,
-          slug,
-          description: data.description,
-          price: data.price,
-          originalPrice: data.originalPrice,
-          gender: data.gender,
-          categoryId: data.categoryId,
-          brandId: data.brandId,
-          collectionId: data.collectionId,
-          isActive: data.isActive,
-          isFeatured: data.isFeatured,
-          attributes: {
-            create: data.attributes.map((attr) => ({
-              name: attr.name,
-              value: attr.value,
-            })),
-          },
-        },
-      })
-
-      await tx.auditLog.create({
-        data: {
-          userId: adminId,
-          action: "PRODUCT_CREATE",
-          entity: "Product",
-          entityId: p.id,
-          changes: JSON.stringify(data),
-        },
-      })
-
-      return p
-    })
-
+    const product = await ProductService.createProduct(adminId, data)
     return { success: true, data: product }
   } catch (error) {
     console.error("CMS Product Create Action Error:", error)
     return { success: false, error: "Failed to create catalog product" }
+  }
+}
+
+export async function adminUpdateProduct(adminId: string, productId: string, formData: any): Promise<ActionResponse> {
+  const session = await getServerSession(authOptions)
+  if (!session?.user || session.user.role !== "ADMIN") {
+    return { success: false, error: "Unauthorized access" }
+  }
+
+  const result = CmsProductSchema.safeParse(formData)
+
+  if (!result.success) {
+    const errorMsg = result.error.errors.map((e) => e.message).join(", ")
+    return { success: false, error: errorMsg }
+  }
+
+  const data = result.data
+  try {
+    const product = await ProductService.updateProduct(adminId, productId, data)
+    return { success: true, data: product }
+  } catch (error) {
+    console.error("CMS Product Update Action Error:", error)
+    return { success: false, error: "Failed to update catalog product" }
   }
 }
 
@@ -114,37 +100,7 @@ export async function adminAddVariant(
   const data = result.data
 
   try {
-    const variant = await db.$transaction(async (tx) => {
-      const v = await tx.productVariant.create({
-        data: {
-          productId,
-          sku: data.sku,
-          size: data.size,
-          color: data.color,
-          colorName: data.colorName,
-          price: data.price,
-          inventory: {
-            create: {
-              quantity: data.stock,
-              location: data.location,
-            },
-          },
-        },
-      })
-
-      await tx.auditLog.create({
-        data: {
-          userId: adminId,
-          action: "VARIANT_ADD",
-          entity: "ProductVariant",
-          entityId: v.id,
-          changes: JSON.stringify(data),
-        },
-      })
-
-      return v
-    })
-
+    const variant = await ProductService.addVariant(adminId, productId, data)
     return { success: true, data: variant }
   } catch (error) {
     console.error("CMS Variant Create Action Error:", error)
@@ -159,21 +115,7 @@ export async function adminDeleteProduct(adminId: string, productId: string): Pr
   }
 
   try {
-    await db.$transaction(async (tx) => {
-      await tx.product.delete({
-        where: { id: productId },
-      })
-
-      await tx.auditLog.create({
-        data: {
-          userId: adminId,
-          action: "PRODUCT_DELETE",
-          entity: "Product",
-          entityId: productId,
-        },
-      })
-    })
-
+    await ProductService.softDeleteProduct(adminId, productId)
     return { success: true }
   } catch (error) {
     console.error("CMS Product Delete Action Error:", error)

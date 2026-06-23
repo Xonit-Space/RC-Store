@@ -17,7 +17,6 @@ export function Sidebar({ role }: SidebarProps) {
 
   const modules = [
     { id: "overview", name: "Overview", icon: BarChart3, path: "/admin" },
-    { id: "pos", name: "Point of Sale (POS)", icon: Calculator, path: "/admin/pos" },
     { id: "couriers", name: "Courier Operations", icon: Truck, path: "/admin/couriers" },
     { id: "products", name: "Products Catalog", icon: Package, path: "/admin/products" },
     { id: "orders", name: "Orders Manager", icon: ShoppingCart, path: "/admin/orders" },

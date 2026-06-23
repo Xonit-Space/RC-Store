@@ -1,76 +1,98 @@
-// ISR: rebuild homepage every 5 minutes — removes per-request cold starts
+// ISR: rebuild homepage every 5 minutes
 export const revalidate = 300
 
 import { Suspense } from "react"
 import nextDynamic from "next/dynamic"
+
+// Eager components for LCP
 import { Header } from "@/components/layout/header"
-// HeroSection is the LCP element — must be SSR'd, not lazy-loaded
 import { HeroSection } from "@/components/sections/hero-section"
-import { ProductGridSkeleton } from "@/components/ui/loading-skeleton"
 
-// Phase 3: Lazy load below-the-fold components
-const SeasonalCollectionSection = nextDynamic(() => import("@/components/sections/seasonal-collection-section").then(mod => mod.SeasonalCollectionSection))
-const FeaturedProducts = nextDynamic(() => import("@/components/sections/featured-products").then(mod => mod.FeaturedProducts))
-const MaterialsSection = nextDynamic(() => import("@/components/sections/materials-section").then(mod => mod.MaterialsSection))
-const BrandStorySection = nextDynamic(() => import("@/components/sections/brand-story-section").then(mod => mod.BrandStorySection))
-const MembershipSection = nextDynamic(() => import("@/components/sections/membership-section").then(mod => mod.MembershipSection))
-const NewsletterSection = nextDynamic(() => import("@/components/sections/newsletter-section").then(mod => mod.NewsletterSection))
-const AIRecommendations = nextDynamic(() => import("@/components/sections/ai-recommendations").then(mod => mod.AIRecommendations))
-const Footer = nextDynamic(() => import("@/components/layout/footer").then(mod => mod.Footer))
+// Lazy loaded below-the-fold components
+const FeaturedProductCard = nextDynamic(() => import("@/components/sections/featured-product-card").then(m => m.FeaturedProductCard))
+const TrustHighlights = nextDynamic(() => import("@/components/sections/trust-highlights").then(m => m.TrustHighlights))
+const ShopCategories = nextDynamic(() => import("@/components/sections/shop-categories").then(m => m.ShopCategories))
+const BestSellersTabs = nextDynamic(() => import("@/components/sections/best-sellers-tabs").then(m => m.BestSellersTabs))
+const BrandShowcase = nextDynamic(() => import("@/components/sections/brand-showcase").then(m => m.BrandShowcase))
+const PartFinderBanner = nextDynamic(() => import("@/components/sections/part-finder-banner").then(m => m.PartFinderBanner))
+const StaffPicks = nextDynamic(() => import("@/components/sections/staff-picks").then(m => m.StaffPicks))
+const NewReleases = nextDynamic(() => import("@/components/sections/new-releases").then(m => m.NewReleases))
+const CustomerGallery = nextDynamic(() => import("@/components/sections/customer-gallery").then(m => m.CustomerGallery))
+const NewsletterSection = nextDynamic(() => import("@/components/sections/newsletter-section").then(m => m.NewsletterSection))
+const SeoAboutContent = nextDynamic(() => import("@/components/sections/seo-about-content").then(m => m.SeoAboutContent))
+const Footer = nextDynamic(() => import("@/components/layout/footer").then(m => m.Footer))
 
-// Simple skeleton for sections
 function SectionSkeleton({ heightClass = "h-96" }) {
-  return <div className={`w-full ${heightClass} bg-muted/20 animate-pulse`} />
+  return <div className={`w-full ${heightClass} bg-smoke-dark animate-pulse`} />
 }
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Transparent fixed nav — sits above the full-bleed hero */}
+      {/* 1 & 2. Announcement Bar & Header */}
       <Header />
 
       <main>
-        {/* 1. Cinematic full-viewport video hero */}
-        <Suspense fallback={<SectionSkeleton heightClass="h-screen" />}>
-          <HeroSection />
-        </Suspense>
+        {/* 3. Hero Banner (LCP) */}
+        <HeroSection />
 
-        {/* 2. Seasonal Collections — asymmetric editorial grid */}
+        {/* 4. Featured Product */}
         <Suspense fallback={<SectionSkeleton heightClass="h-[600px]" />}>
-          <SeasonalCollectionSection />
+          <FeaturedProductCard />
         </Suspense>
 
-        {/* 3. New Arrivals — 4-column image-first editorial grid */}
-        <Suspense fallback={<div className="container mx-auto px-4 py-24"><ProductGridSkeleton count={4} /></div>}>
-          <FeaturedProducts />
+        {/* 5. Trust / Service Highlights */}
+        <Suspense fallback={<SectionSkeleton heightClass="h-[200px]" />}>
+          <TrustHighlights />
         </Suspense>
 
-        {/* AI Recommendations */}
-        <Suspense fallback={<div className="container mx-auto px-4 py-24"><ProductGridSkeleton count={4} /></div>}>
-          <AIRecommendations />
+        {/* 6. Shop Categories */}
+        <Suspense fallback={<SectionSkeleton heightClass="h-[800px]" />}>
+          <ShopCategories />
         </Suspense>
 
-        {/* 4. Signature Materials — provenance storytelling */}
+        {/* 7. Best Sellers */}
+        <Suspense fallback={<SectionSkeleton heightClass="h-[600px]" />}>
+          <BestSellersTabs />
+        </Suspense>
+
+        {/* 8. Brand Showcase */}
+        <Suspense fallback={<SectionSkeleton heightClass="h-[200px]" />}>
+          <BrandShowcase />
+        </Suspense>
+
+        {/* 9. Part Finder Banner */}
         <Suspense fallback={<SectionSkeleton heightClass="h-[500px]" />}>
-          <MaterialsSection />
+          <PartFinderBanner />
         </Suspense>
 
-        {/* 5. Brand Story — split editorial layout */}
-        <Suspense fallback={<SectionSkeleton heightClass="h-[500px]" />}>
-          <BrandStorySection />
+        {/* 10. Staff Picks */}
+        <Suspense fallback={<SectionSkeleton heightClass="h-[600px]" />}>
+          <StaffPicks />
         </Suspense>
 
-        {/* 6. Private Membership — deep forest green */}
+        {/* 11. New Releases */}
+        <Suspense fallback={<SectionSkeleton heightClass="h-[600px]" />}>
+          <NewReleases />
+        </Suspense>
+
+        {/* 12. Customer Gallery */}
         <Suspense fallback={<SectionSkeleton heightClass="h-[400px]" />}>
-          <MembershipSection />
+          <CustomerGallery />
         </Suspense>
 
-        {/* 7. Newsletter — minimal underline input */}
-        <Suspense fallback={<SectionSkeleton heightClass="h-[300px]" />}>
+        {/* 13. Newsletter */}
+        <Suspense fallback={<SectionSkeleton heightClass="h-[400px]" />}>
           <NewsletterSection />
+        </Suspense>
+
+        {/* 14. SEO Content */}
+        <Suspense fallback={<SectionSkeleton heightClass="h-[300px]" />}>
+          <SeoAboutContent />
         </Suspense>
       </main>
 
+      {/* 15. Footer */}
       <Footer />
     </div>
   )

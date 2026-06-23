@@ -1,83 +1,97 @@
 "use client"
 
+import { Send, CheckCircle2 } from "lucide-react"
 import { useState } from "react"
-import { ArrowRight, Radio } from "lucide-react"
+import { subscribeNewsletter } from "@/actions/landing-page"
 
 export function NewsletterSection() {
-  const [email, setEmail] = useState("")
-  const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [error, setError] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    if (!email) return
-    setSubmitted(true)
+    setLoading(true)
+    setError("")
+    
+    const formData = new FormData(e.currentTarget)
+    
+    try {
+      const res = await subscribeNewsletter(formData)
+      if (res.success) {
+        setSuccess(true)
+      } else {
+        setError(res.error || "Failed to subscribe")
+      }
+    } catch (err) {
+      setError("An unexpected error occurred.")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
-    <section className="py-24 md:py-32 bg-slate-100 dark:bg-smoke-dark border-t border-border relative overflow-hidden">
-      {/* Background Video */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none"
-      >
-        <source src="/snaptik_7558048161005194526_v3.mp4" type="video/mp4" />
-      </video>
-      <div className="absolute inset-0 bg-gradient-to-t from-slate-100 dark:from-smoke-dark to-transparent pointer-events-none" />
+    <section className="bg-racing-yellow py-24 relative overflow-hidden">
+      {/* Background Graphic */}
+      <div className="absolute -right-20 -top-20 opacity-10 pointer-events-none">
+        <svg width="400" height="400" viewBox="0 0 100 100" className="animate-spin-slow">
+          <path d="M50 0 L100 50 L50 100 L0 50 Z" fill="currentColor" />
+        </svg>
+      </div>
 
       <div className="container mx-auto px-6 md:px-12 relative z-10">
-        <div className="max-w-2xl mx-auto text-center space-y-10 fade-up-section visible">
-
-          <div className="space-y-4">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Radio className="w-5 h-5 text-racing-yellow animate-pulse" />
-              <p className="text-[12px] font-heading font-bold tracking-[0.35em] uppercase text-racing-yellow">
-                Comms Link
-              </p>
-            </div>
-            <h2 className="font-heading text-4xl md:text-6xl font-black leading-tight text-foreground dark:text-white uppercase drop-shadow-[0_0_15px_rgba(255, 204, 0,0.3)]">
-              System Telemetry<br />
-              <span className="text-racing-yellow">Updates</span>
+        <div className="max-w-3xl mx-auto flex flex-col md:flex-row items-center gap-12">
+          
+          <div className="flex-1 text-center md:text-left">
+            <h2 className="font-heading font-black text-4xl md:text-5xl text-carbon-dark uppercase tracking-wider mb-4">
+              Join the Pits
             </h2>
+            <p className="text-carbon-dark/80 font-medium">
+              Get exclusive access to new releases, setup tips, and VIP discounts before anyone else.
+            </p>
           </div>
 
-          <p className="text-sm text-muted-foreground leading-relaxed max-w-md mx-auto font-sans glass-dark p-4 border border-border">
-            Receive exclusive part drops, firmware patch notes, and pro racing league announcements. 
-            No spam — only high-octane data.
-          </p>
-
-          {submitted ? (
-            <div className="py-8 border border-racing-yellow/50 bg-racing-yellow/10 animate-in fade-in zoom-in duration-500">
-              <p className="font-heading font-bold text-2xl text-foreground dark:text-white uppercase tracking-widest text-shadow-glow">Connection Established.</p>
-              <p className="text-sm text-muted-foreground mt-2 font-mono">Standby for initial telemetry burst...</p>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="relative max-w-md mx-auto mt-8">
-              <div className="flex items-center border border-border bg-background focus-within:border-racing-yellow focus-within:shadow-[0_0_15px_rgba(255, 204, 0,0.4)] transition-all duration-300 p-1">
-                <input
-                  id="newsletter-email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="ENTER COMMS FREQUENCY (EMAIL)"
-                  required
-                  className="flex-1 bg-transparent text-sm font-mono text-foreground dark:text-white focus:outline-none placeholder:text-gray-600 px-4 py-3 uppercase"
-                />
-                <button
-                  type="submit"
-                  aria-label="Subscribe to updates"
-                  className="bg-racing-yellow text-foreground dark:text-white p-3 hover:bg-neon-yellow hover:shadow-[0_0_10px_rgba(255, 204, 0,0.8)] transition-all"
-                >
-                  <ArrowRight strokeWidth={2.5} className="w-5 h-5" />
-                </button>
+          <div className="flex-1 w-full">
+            {success ? (
+              <div className="bg-carbon-dark p-6 flex flex-col items-center justify-center text-center gap-4 animate-in fade-in zoom-in">
+                <CheckCircle2 className="w-12 h-12 text-racing-yellow" />
+                <h3 className="font-heading font-bold text-white text-xl uppercase tracking-widest">You're on the list</h3>
+                <p className="text-muted-foreground text-sm">Welcome to the crew. Watch your inbox for updates.</p>
               </div>
-              <p className="text-[10px] font-mono text-gray-600 mt-4 tracking-widest uppercase">
-                Secure connection. Terminate link at any time.
-              </p>
-            </form>
-          )}
+            ) : (
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                <input 
+                  type="text" 
+                  name="firstName"
+                  placeholder="FIRST NAME"
+                  required
+                  className="w-full bg-carbon-dark text-white px-6 py-4 font-mono text-sm border border-transparent focus:border-white outline-none transition-colors"
+                />
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input 
+                    type="email" 
+                    name="email"
+                    placeholder="EMAIL ADDRESS"
+                    required
+                    className="flex-1 bg-carbon-dark text-white px-6 py-4 font-mono text-sm border border-transparent focus:border-white outline-none transition-colors"
+                  />
+                  <button 
+                    type="submit"
+                    disabled={loading}
+                    className="bg-white text-carbon-dark px-8 py-4 font-heading font-black uppercase tracking-widest hover:bg-smoke-dark hover:text-white transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    {loading ? "Joining..." : "Subscribe"}
+                    {!loading && <Send className="w-4 h-4" />}
+                  </button>
+                </div>
+                {error && <p className="text-red-600 font-bold text-sm text-center md:text-left">{error}</p>}
+                <p className="text-carbon-dark/60 text-xs text-center md:text-left mt-2">
+                  By subscribing, you agree to our Privacy Policy and Terms of Service.
+                </p>
+              </form>
+            )}
+          </div>
+
         </div>
       </div>
     </section>

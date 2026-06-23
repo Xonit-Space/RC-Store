@@ -25,21 +25,21 @@ export async function applyCampaignCoupon(code: string, subtotal: number): Promi
       return { success: false, error: "The usage limit for this coupon has been reached" }
     }
 
-    if (subtotal < coupon.minOrderAmount) {
+    if (subtotal < Number(coupon.minOrderAmount)) {
       return {
         success: false,
-        error: `Minimum subtotal of $${coupon.minOrderAmount.toFixed(2)} is required to apply this coupon`,
+        error: `Minimum subtotal of $${Number(coupon.minOrderAmount).toFixed(2)} is required to apply this coupon`,
       }
     }
 
     let discount = 0
     if (coupon.discountType === "PERCENTAGE") {
-      discount = (subtotal * coupon.discountValue) / 100
+      discount = (subtotal * Number(coupon.discountValue)) / 100
       if (coupon.maxDiscountAmount) {
-        discount = Math.min(discount, coupon.maxDiscountAmount)
+        discount = Math.min(discount, Number(coupon.maxDiscountAmount))
       }
     } else {
-      discount = coupon.discountValue
+      discount = Number(coupon.discountValue)
     }
 
     return {

@@ -1,9 +1,11 @@
 "use server"
 
 import { db } from "@/lib/db"
+import { unstable_cache } from "next/cache"
 import { ActionResponse } from "./auth"
 
-export async function getFeaturedProduct() {
+export const getFeaturedProduct = unstable_cache(
+  async () => {
   try {
     const product = await db.product.findFirst({
       where: {
@@ -28,9 +30,10 @@ export async function getFeaturedProduct() {
     console.error("Failed to fetch featured product:", error)
     return null
   }
-}
+}, ["landing-featured"], { revalidate: 3600, tags: ["products"] })
 
-export async function getShopCategories() {
+export const getShopCategories = unstable_cache(
+  async () => {
   try {
     const categories = await db.category.findMany({
       where: {
@@ -46,9 +49,10 @@ export async function getShopCategories() {
     console.error("Failed to fetch shop categories:", error)
     return []
   }
-}
+}, ["landing-categories"], { revalidate: 86400, tags: ["categories"] })
 
-export async function getBestSellers() {
+export const getBestSellers = unstable_cache(
+  async () => {
   try {
     // For now, return top selling active products grouped by a mocked logic or category.
     const products = await db.product.findMany({
@@ -78,9 +82,10 @@ export async function getBestSellers() {
     console.error("Failed to fetch best sellers:", error)
     return { "Off-Road": [], "Crawlers": [], "On-Road": [] }
   }
-}
+}, ["landing-best-sellers"], { revalidate: 3600, tags: ["products", "orders"] })
 
-export async function getBrands() {
+export const getBrands = unstable_cache(
+  async () => {
   try {
     const brands = await db.brand.findMany({
       take: 10,
@@ -91,9 +96,10 @@ export async function getBrands() {
     console.error("Failed to fetch brands:", error)
     return []
   }
-}
+}, ["landing-brands"], { revalidate: 86400, tags: ["brands"] })
 
-export async function getVehicleMakesAndModels() {
+export const getVehicleMakesAndModels = unstable_cache(
+  async () => {
   try {
     const makes = await db.vehicleMake.findMany({
       include: {
@@ -108,9 +114,10 @@ export async function getVehicleMakesAndModels() {
     console.error("Failed to fetch vehicle makes:", error)
     return []
   }
-}
+}, ["landing-vehicles"], { revalidate: 86400, tags: ["vehicles"] })
 
-export async function getStaffPicks() {
+export const getStaffPicks = unstable_cache(
+  async () => {
   try {
     const picks = await db.staffPick.findMany({
       take: 4,
@@ -130,9 +137,10 @@ export async function getStaffPicks() {
     console.error("Failed to fetch staff picks:", error)
     return []
   }
-}
+}, ["landing-staff-picks"], { revalidate: 3600, tags: ["staff-picks"] })
 
-export async function getNewReleases() {
+export const getNewReleases = unstable_cache(
+  async () => {
   try {
     const products = await db.product.findMany({
       where: {
@@ -153,9 +161,10 @@ export async function getNewReleases() {
     console.error("Failed to fetch new releases:", error)
     return []
   }
-}
+}, ["landing-new-releases"], { revalidate: 3600, tags: ["products"] })
 
-export async function getGalleryImages() {
+export const getGalleryImages = unstable_cache(
+  async () => {
   try {
     const images = await db.galleryImage.findMany({
       where: {
@@ -171,7 +180,7 @@ export async function getGalleryImages() {
     console.error("Failed to fetch gallery images:", error)
     return []
   }
-}
+}, ["landing-gallery"], { revalidate: 3600, tags: ["gallery"] })
 
 export async function subscribeNewsletter(formData: FormData): Promise<ActionResponse> {
   const email = formData.get("email") as string

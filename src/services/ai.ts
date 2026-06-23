@@ -103,7 +103,7 @@ export class AiService {
 
       // Boost 2: Pricing Affinity Boost (SaaS premium filter)
       // If user has browsed higher-value items, boost other high-value matches
-      if (product.price > 200) {
+      if (Number(product.price) > 200) {
         score += 0.1
         reasons.push("Premium Collection highlight")
       }

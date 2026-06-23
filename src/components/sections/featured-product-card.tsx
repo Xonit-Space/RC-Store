@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Star, ShieldCheck, Zap, BatteryCharging, ShoppingCart } from "lucide-react"
+import { CartIconButton } from "../product/cart-icon-button"
 
 export function FeaturedProductCard() {
   return (
@@ -7,7 +8,8 @@ export function FeaturedProductCard() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-racing-yellow/50 to-transparent" />
       
       <div className="container mx-auto px-6 md:px-12 relative z-10">
-        <div className="glass-dark border border-white/10 p-8 md:p-12 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+        <div className="glass-dark border border-white/10 p-8 md:p-12 shadow-[0_0_50px_rgba(0,0,0,0.5)] relative">
+          <Link href="/products/traxxas-x-maxx" className="absolute inset-0 z-10" aria-label="View Traxxas X-Maxx" />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             
             {/* Image Side */}
@@ -61,11 +63,11 @@ export function FeaturedProductCard() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <button className="flex-1 bg-racing-yellow text-carbon-dark font-heading font-black uppercase tracking-widest py-4 px-6 flex items-center justify-center gap-2 hover:bg-neon-yellow transition-colors shadow-[0_0_15px_rgba(255, 204, 0,0.3)] hover:shadow-[0_0_25px_rgba(255, 204, 0,0.6)]">
+                <CartIconButton className="relative z-20 flex-1 bg-racing-yellow text-carbon-dark font-heading font-black uppercase tracking-widest py-4 px-6 flex items-center justify-center gap-2 hover:bg-neon-yellow transition-colors shadow-[0_0_15px_rgba(255, 204, 0,0.3)] hover:shadow-[0_0_25px_rgba(255, 204, 0,0.6)]">
                   <ShoppingCart className="w-5 h-5" />
                   Add to Cart
-                </button>
-                <Link href="/products/traxxas-x-maxx" className="flex-1 border border-white/20 text-white font-heading font-bold uppercase tracking-widest py-4 px-6 flex items-center justify-center hover:bg-white/5 hover:border-racing-yellow/50 transition-colors">
+                </CartIconButton>
+                <Link href="/products/traxxas-x-maxx" className="relative z-20 flex-1 border border-white/20 text-white font-heading font-bold uppercase tracking-widest py-4 px-6 flex items-center justify-center hover:bg-white/5 hover:border-racing-yellow/50 transition-colors">
                   View Specs
                 </Link>
               </div>

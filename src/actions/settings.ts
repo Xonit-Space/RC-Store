@@ -37,7 +37,6 @@ export async function getSiteSettings(): Promise<ActionResponse<Record<string, s
     if (!formatted["tax_rate"]) formatted["tax_rate"] = "12.0"
     if (!formatted["currency"]) formatted["currency"] = "LKR"
     if (!formatted["stripe_enabled"]) formatted["stripe_enabled"] = "true"
-    if (!formatted["pos_sync_enabled"]) formatted["pos_sync_enabled"] = "true"
     if (!formatted["courier_auto_assign"]) formatted["courier_auto_assign"] = "false"
 
     return { success: true, data: formatted }

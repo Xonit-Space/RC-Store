@@ -26,7 +26,7 @@ export async function checkCoupon(code: string, subtotal: number): Promise<Actio
       return { success: false, error: "This coupon code usage limit has been reached" }
     }
 
-    if (subtotal < coupon.minOrderAmount) {
+    if (subtotal < Number(coupon.minOrderAmount)) {
       return {
         success: false,
         error: `Minimum order amount of $${coupon.minOrderAmount} is required for this coupon`,
@@ -35,12 +35,12 @@ export async function checkCoupon(code: string, subtotal: number): Promise<Actio
 
     let discount = 0
     if (coupon.discountType === "PERCENTAGE") {
-      discount = (subtotal * coupon.discountValue) / 100
+      discount = (subtotal * Number(coupon.discountValue)) / 100
       if (coupon.maxDiscountAmount) {
-        discount = Math.min(discount, coupon.maxDiscountAmount)
+        discount = Math.min(discount, Number(coupon.maxDiscountAmount))
       }
     } else {
-      discount = coupon.discountValue
+      discount = Number(coupon.discountValue)
     }
 
     return {

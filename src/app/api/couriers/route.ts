@@ -1,7 +1,7 @@
 import { db } from "@/lib/db"
 import { NextRequest, NextResponse } from "next/server"
 import { withApiHandler } from "@/lib/api-middleware"
-import { CourierCreateSchema } from "@/validators/pos"
+import { CourierCreateSchema } from "@/validators/courier"
 
 export const dynamic = "force-dynamic"
 

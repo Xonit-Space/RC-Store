@@ -9,6 +9,7 @@ import { useSession } from "next-auth/react"
 import { toast } from "sonner"
 import { useLoading } from "@/components/providers/loading-provider"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 interface ProductDetailClientProps {
   product: any
@@ -18,6 +19,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const { data: session } = useSession()
   const cartStore = useCartStore()
   const { withLoading } = useLoading()
+  const router = useRouter()
 
   // Options
   const [selectedSize, setSelectedSize] = useState("")
@@ -47,6 +49,14 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   }, [selectedSize, selectedColor, product])
 
   const handleAddToCart = async () => {
+    if (!session) {
+      toast.error("CONNECTION DENIED: You must be authenticated to request supplies.", {
+        style: { background: "#0e0918", color: "#facc15", border: "1px solid #ef4444" }
+      })
+      router.push("/login")
+      return
+    }
+
     if (!product) return
     if (!selectedVariant) {
       toast.error("Please select a size and color")

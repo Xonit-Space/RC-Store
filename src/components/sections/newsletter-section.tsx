@@ -55,7 +55,7 @@ export function NewsletterSection() {
             {success ? (
               <div className="bg-carbon-dark p-6 flex flex-col items-center justify-center text-center gap-4 animate-in fade-in zoom-in">
                 <CheckCircle2 className="w-12 h-12 text-racing-yellow" />
-                <h3 className="font-heading font-bold text-white text-xl uppercase tracking-widest">You're on the list</h3>
+                <h3 className="font-heading font-bold text-white text-xl uppercase tracking-widest">You&apos;re on the list</h3>
                 <p className="text-muted-foreground text-sm">Welcome to the crew. Watch your inbox for updates.</p>
               </div>
             ) : (

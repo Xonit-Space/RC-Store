@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { ShoppingCart } from "lucide-react"
 import { getNewReleases } from "@/actions/landing-page"
+import { CartIconButton } from "../product/cart-icon-button"
 
 export function NewReleases() {
   const [products, setProducts] = useState<any[]>([])
@@ -76,9 +76,10 @@ export function NewReleases() {
                   
                   <div className="mt-auto flex items-center justify-between">
                     <span className="font-mono font-bold text-xl text-white">${product.price.toFixed(2)}</span>
-                    <button className="bg-white/5 hover:bg-neon-blue text-white hover:text-carbon-dark border border-white/10 hover:border-neon-blue p-3 transition-colors">
-                      <ShoppingCart className="w-5 h-5" />
-                    </button>
+                    <CartIconButton 
+                      product={product} 
+                      className="bg-white/5 hover:bg-neon-blue text-white hover:text-carbon-dark border border-white/10 hover:border-neon-blue p-3 transition-colors"
+                    />
                   </div>
                 </div>
               </div>

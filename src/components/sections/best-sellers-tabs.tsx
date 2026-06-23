@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Star, Heart, Repeat, ShoppingCart } from "lucide-react"
+import { Star, Heart, Repeat } from "lucide-react"
 import { getBestSellers } from "@/actions/landing-page"
+import { CartIconButton } from "../product/cart-icon-button"
 
 export function BestSellersTabs() {
   const [productsData, setProductsData] = useState<Record<string, any[]>>({
@@ -64,14 +65,16 @@ export function BestSellersTabs() {
               const reviewsCount = product.reviews?.length || 0
 
               return (
-                <div key={product.id} className="bg-smoke-dark border border-white/5 hover:border-racing-yellow/30 group flex flex-col">
+                <div key={product.id} className="relative bg-smoke-dark border border-white/5 hover:border-racing-yellow/30 group flex flex-col">
+                  <Link href={`/products/${product.slug}`} className="absolute inset-0 z-10" aria-label={`View ${product.name}`} />
+                  
                   {/* Image Box */}
                   <div className="relative aspect-square overflow-hidden bg-black/50 p-4">
                     <div className="absolute top-3 left-3 z-20 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="w-8 h-8 bg-carbon-dark/80 backdrop-blur border border-white/10 flex items-center justify-center text-white hover:text-racing-yellow hover:border-racing-yellow transition-colors">
+                      <button className="relative z-20 w-8 h-8 bg-carbon-dark/80 backdrop-blur border border-white/10 flex items-center justify-center text-white hover:text-racing-yellow hover:border-racing-yellow transition-colors">
                         <Heart className="w-4 h-4" />
                       </button>
-                      <button className="w-8 h-8 bg-carbon-dark/80 backdrop-blur border border-white/10 flex items-center justify-center text-white hover:text-racing-yellow hover:border-racing-yellow transition-colors">
+                      <button className="relative z-20 w-8 h-8 bg-carbon-dark/80 backdrop-blur border border-white/10 flex items-center justify-center text-white hover:text-racing-yellow hover:border-racing-yellow transition-colors">
                         <Repeat className="w-4 h-4" />
                       </button>
                     </div>
@@ -88,14 +91,15 @@ export function BestSellersTabs() {
                       <Star className="w-3 h-3 fill-racing-yellow text-racing-yellow" />
                       <span className="text-[10px] font-mono text-muted-foreground">{rating} ({reviewsCount})</span>
                     </div>
-                    <Link href={`/products/${product.slug}`} className="font-heading font-bold text-lg text-white uppercase tracking-wide mb-4 hover:text-racing-yellow transition-colors line-clamp-2">
+                    <Link href={`/products/${product.slug}`} className="relative z-20 font-heading font-bold text-lg text-white uppercase tracking-wide mb-4 hover:text-racing-yellow transition-colors line-clamp-2">
                       {product.name}
                     </Link>
                     <div className="mt-auto flex items-center justify-between">
                       <span className="font-mono font-bold text-lg text-white">${product.price.toFixed(2)}</span>
-                      <button className="w-10 h-10 bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-racing-yellow hover:text-carbon-dark hover:border-racing-yellow transition-all">
-                        <ShoppingCart className="w-4 h-4" />
-                      </button>
+                      <CartIconButton 
+                        product={product} 
+                        className="relative z-20 w-10 h-10 bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-racing-yellow hover:text-carbon-dark hover:border-racing-yellow transition-all"
+                      />
                     </div>
                   </div>
                 </div>

@@ -103,13 +103,13 @@ export async function runReconciliation(input: ReconciliationInput = {}): Promis
     if (!dbPayment) {
       missingInDB.push(intentId)
     } else {
-      const delta = Math.abs(stripeAmount - dbPayment.amount)
+      const delta = Math.abs(stripeAmount - Number(dbPayment.amount))
       if (delta > 0.01) { // >1 cent tolerance
         mismatchedAmounts.push({
           orderId: dbPayment.orderId,
           orderNumber: dbPayment.order.orderNumber,
           stripeAmount,
-          dbAmount: dbPayment.amount,
+          dbAmount: Number(dbPayment.amount),
           delta,
         })
       }
@@ -120,7 +120,7 @@ export async function runReconciliation(input: ReconciliationInput = {}): Promis
   let dbTotal = 0
 
   for (const [transactionId, payment] of dbByTransactionId) {
-    dbTotal += payment.amount
+    dbTotal += Number(payment.amount)
     if (!stripeByIntentId.has(transactionId)) {
       missingInStripe.push(transactionId)
     }

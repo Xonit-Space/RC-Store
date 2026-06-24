@@ -36,14 +36,14 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     }, { status: 400 })
   }
 
-  const { name, phone, email, status } = validated.data
+  const { name, phone, email, isActive } = validated.data
 
   const createdCourier = await db.courier.create({
     data: {
       name,
       phone: phone || null,
       email: email || null,
-      isActive: status === "ACTIVE"
+      isActive: isActive
     }
   })
 

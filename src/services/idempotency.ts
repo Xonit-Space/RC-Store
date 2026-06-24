@@ -16,7 +16,7 @@
  */
 
 import { createHash } from "crypto"
-import { redisGet, redisSet, redisDel } from "@/services/redis"
+import { redisGet, redisSet, redisDel, redisClient } from "@/services/redis"
 import { db } from "@/lib/db"
 
 const DEFAULT_TTL_SECONDS = 86400 // 24 hours
@@ -91,12 +91,11 @@ export async function claimIdempotencyKey(
   const redisKey = `idempotency:${key}`
 
   // Attempt atomic SET NX (only set if not exists)
-  const rawClient = (globalThis as Record<string, unknown>).__redisRawClient as { set: (...args: unknown[]) => Promise<string> } | undefined
   let claimed = false
 
-  if (rawClient) {
+  if (redisClient) {
     // True Redis: use SET NX EX atomic command
-    const result = await rawClient.set(
+    const result = await redisClient.set(
       redisKey,
       JSON.stringify({ status: "PROCESSING" }),
       "EX",

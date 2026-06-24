@@ -1348,7 +1348,7 @@ model FinancialDLQ {
 // Daily payment reconciliation reports
 model ReconciliationReport {
   id                String   @id @default(cuid())
-  reportDate        DateTime // Date being reconciled
+  reportDate        DateTime @unique // Date being reconciled
   stripeTotal       Decimal // Total from Stripe
   dbTotal           Decimal // Total from DB payments
   delta             Decimal // Difference (should be 0)

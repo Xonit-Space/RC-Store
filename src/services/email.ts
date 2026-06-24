@@ -44,6 +44,7 @@ export async function sendEmail(options: EmailOptions) {
 // ==========================================
 
 export async function sendWelcomeEmail(to: string, name: string) {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || "http://localhost:3000"
   const html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
       <h2 style="color: #1C1C1A; text-align: center;">Welcome to Neoshop Ultra</h2>
@@ -51,7 +52,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
       <p>Thank you for creating an account with Neoshop Ultra—the next generation of fashion streetwear.</p>
       <p>We are thrilled to accompany you on your fashion journey. Discover limited-edition drops and explore collections curated specifically for you.</p>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="http://localhost:3000/shop" style="background-color: #1C1C1A; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Explore Collections</a>
+        <a href="${baseUrl}/shop" style="background-color: #1C1C1A; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Explore Collections</a>
       </div>
       <p>Best regards,<br>The Neoshop Team</p>
     </div>

@@ -86,11 +86,13 @@ export async function runAbandonedCartJob(): Promise<ActionResponse> {
           },
         })
 
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || "http://localhost:3000"
+        
         // Fire Resend campaign
         await sendAbandonedCartRecovery(
           userEmail,
           userName,
-          "http://localhost:3000/cart"
+          `${baseUrl}/cart`
         )
       })
 

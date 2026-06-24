@@ -3,13 +3,29 @@ import { NextResponse } from "next/server";
 
 export default withAuth(
   function middleware(req) {
-    const response = NextResponse.next();
+    const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
+    const cspHeader = `
+      default-src 'self';
+      script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https: http: ${
+        process.env.NODE_ENV === 'production' ? '' : "'unsafe-eval'"
+      };
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      img-src 'self' data: https: http:;
+      font-src 'self' https://fonts.gstatic.com;
+      frame-src 'self' https://js.stripe.com;
+    `.replace(/\s{2,}/g, ' ').trim();
 
-    // Implement strict security headers
-    response.headers.set(
-      "Content-Security-Policy",
-      "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: http:; font-src 'self' https://fonts.gstatic.com; frame-src 'self' https://js.stripe.com;"
-    );
+    const requestHeaders = new Headers(req.headers);
+    requestHeaders.set('x-nonce', nonce);
+    requestHeaders.set('Content-Security-Policy', cspHeader);
+
+    const response = NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
+
+    response.headers.set("Content-Security-Policy", cspHeader);
     response.headers.set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload");
     response.headers.set("X-Content-Type-Options", "nosniff");
     response.headers.set("X-Frame-Options", "DENY");

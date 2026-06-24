@@ -5,7 +5,7 @@ import { db } from '@/lib/db';
 import argon2 from 'argon2';
 import crypto from 'crypto';
 import { rateLimit } from '@/lib/security/rate-limit';
-import { sendPasswordResetEmail } from '@/services/email';
+import { sendPasswordResetEmail, sendVerificationEmail } from '@/services/email';
 import { PasswordSchema, RegisterSchema, ResetPasswordSchema } from '@/validators/auth';
 
 export type ActionResponse<T = any> = {
@@ -62,8 +62,9 @@ export async function registerUser(data: z.infer<typeof RegisterSchema>) {
     }
   });
 
-  // TODO: Send email with token
-  // await sendVerificationEmail(email, token);
+  await sendVerificationEmail(email, token).catch((e) => {
+    console.error("Failed to send verification email:", e);
+  });
 
   return { success: true };
 }

@@ -59,6 +59,24 @@ export async function sendWelcomeEmail(to: string, name: string) {
   return sendEmail({ to, subject: "Welcome to Neoshop Ultra", html })
 }
 
+export async function sendVerificationEmail(to: string, token: string) {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || "http://localhost:3000"
+  const verificationUrl = `${baseUrl}/api/auth/verify?token=${token}`
+
+  const html = `
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+      <h2 style="color: #1C1C1A; text-align: center;">Verify Your Account</h2>
+      <p>Please confirm your email address to complete your registration at Neoshop Ultra.</p>
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${verificationUrl}" style="background-color: #1C1C1A; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Verify Email</a>
+      </div>
+      <p>This link will expire in 24 hours.</p>
+      <p>Best regards,<br>The Neoshop Team</p>
+    </div>
+  `
+  return sendEmail({ to, subject: "Verify your email address", html })
+}
+
 export async function sendOrderConfirmation(to: string, orderNumber: string, total: number) {
   const html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">

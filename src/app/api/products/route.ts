@@ -25,6 +25,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
 
   const where: Prisma.ProductWhereInput = {
     isActive: true,
+    deletedAt: null,
     price: { gte: minPrice, lte: maxPrice },
   }
   if (category) where.category = { slug: category }

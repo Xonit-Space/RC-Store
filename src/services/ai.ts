@@ -81,7 +81,7 @@ export class AiService {
    */
   static async getPersonalizedFeed(userId?: string, limit = 8): Promise<RecommendationScore[]> {
     const products = await db.product.findMany({
-      where: { isActive: true },
+      where: { isActive: true, deletedAt: null },
       select: { id: true, categoryId: true, price: true }
     })
 

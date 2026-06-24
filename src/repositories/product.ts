@@ -39,6 +39,7 @@ export async function getProducts(filters: GetProductsFilters) {
   // Construct dynamic Prisma where clause
   const where: any = {
     isActive,
+    deletedAt: null,
     price: {
       gte: minPrice,
       ...(maxPrice && { lte: maxPrice }),

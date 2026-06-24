@@ -6,16 +6,51 @@ export let redisClient: Redis | null = null
 let redisPub: Redis | null = null
 let redisSub: Redis | null = null
 
+// Shared options: disable offline queue so commands fail immediately instead of
+// piling up and spamming retries when Redis is unreachable.
+const BASE_OPTIONS = {
+  maxRetriesPerRequest: 3,
+  enableOfflineQueue: false,
+  lazyConnect: true,
+  connectTimeout: 5000,
+}
+
+function attachErrorHandler(client: Redis, label: string) {
+  client.on("error", (err: Error) => {
+    // Only log once per type of error to avoid console flooding.
+    // ECONNREFUSED / MaxRetriesPerRequestError are expected when Redis is down.
+    if (
+      err.message.includes("ECONNREFUSED") ||
+      err.message.includes("ECONNRESET") ||
+      err.message.includes("MaxRetriesPerRequest")
+    ) {
+      // Downgrade to a single-line warning — already shown on startup.
+      return
+    }
+    console.error(`[Redis:${label}] Unexpected error:`, err.message)
+  })
+}
+
 // Initialize ioredis clients if host target URL is defined in env parameters
 if (redisUrl) {
   try {
-    redisClient = new Redis(redisUrl, { maxRetriesPerRequest: 3 })
-    redisPub = new Redis(redisUrl, { maxRetriesPerRequest: 3 })
-    redisSub = new Redis(redisUrl, { maxRetriesPerRequest: 3 })
-    
-    redisClient.on("error", (err) => console.error("Redis client connection error:", err))
+    redisClient = new Redis(redisUrl, BASE_OPTIONS)
+    redisPub = new Redis(redisUrl, BASE_OPTIONS)
+    redisSub = new Redis(redisUrl, BASE_OPTIONS)
+
+    attachErrorHandler(redisClient, "client")
+    attachErrorHandler(redisPub, "pub")
+    attachErrorHandler(redisSub, "sub")
+
+    // Attempt connection and warn once on failure
+    redisClient.connect().catch(() => {
+      console.warn("[Redis] Could not connect to Redis — falling back to in-memory cache.")
+      redisClient = null
+      redisPub = null
+      redisSub = null
+    })
   } catch (err) {
-    console.warn("Failed to initialize live Redis clients. Falling back to local memory broker.")
+    console.warn("[Redis] Failed to initialize Redis clients — falling back to in-memory cache.")
   }
 }
 

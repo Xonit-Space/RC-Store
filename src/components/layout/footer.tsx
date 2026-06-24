@@ -10,7 +10,7 @@ export function Footer() {
           {/* Brand Info */}
           <div className="space-y-6">
             <Link href="/" className="inline-block font-heading font-black text-3xl tracking-widest text-foreground uppercase drop-shadow-[0_0_10px_rgba(255, 204, 0,0.5)]">
-              <img src="/Transparent/logo yellow0.png" alt="Aussie Rigs Arena" className="h-32 w-auto object-contain" />
+              <img src="/Transparent/logo yellow0.png" alt="Aussie Rigs Arena" className="h-8 w-auto object-contain scale-[4] md:scale-[5] origin-left pointer-events-none" />
             </Link>
             <p className="text-sm leading-relaxed max-w-sm">
               The ultimate destination for high-performance remote control vehicles. We stock the best RC cars, drones, boats, and parts from industry-leading manufacturers. Built for speed, engineered for durability.

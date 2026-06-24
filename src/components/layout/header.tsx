@@ -109,7 +109,7 @@ export function Header() {
             </button>
             
             <Link href="/" className="font-heading font-black text-2xl md:text-3xl tracking-widest text-foreground uppercase drop-shadow-[0_0_10px_rgba(255, 204, 0,0.5)]">
-              <img src="/Transparent/logo yellow0.png" alt="Aussie Rigs Arena" className="h-32 w-auto object-contain" />
+              <img src="/Transparent/logo yellow0.png" alt="Aussie Rigs Arena" className="h-8 w-auto object-contain scale-[4] md:scale-[5] origin-left pointer-events-none" />
             </Link>
 
             {/* Mobile Actions */}

@@ -125,44 +125,60 @@ export async function createOrder(input: CreateOrderInput) {
   })
 }
 
-export async function getOrdersByUserId(userId: string, take = 20) {
-  return db.order.findMany({
-    where: { userId },
-    take,
-    orderBy: { createdAt: "desc" },
-    select: {
-      id: true,
-      orderNumber: true,
-      status: true,
-      total: true,
-      createdAt: true,
-      items: {
-        take: 10,
-        select: {
-          id: true,
-          quantity: true,
-          price: true,
-          variant: {
-            select: {
-              size: true,
-              color: true,
-              product: {
-                select: {
-                  name: true,
-                  // Only the first image needed for the order item thumbnail
-                  images: {
-                    take: 1,
-                    orderBy: { sortOrder: "asc" },
-                    select: { url: true }
+export async function getOrdersByUserId(
+  userId: string,
+  page = 1,
+  limit = 20
+) {
+  const skip = (page - 1) * limit
+  const [orders, total] = await Promise.all([
+    db.order.findMany({
+      where: { userId },
+      take: limit,
+      skip,
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        orderNumber: true,
+        status: true,
+        total: true,
+        createdAt: true,
+        items: {
+          take: 10,
+          select: {
+            id: true,
+            quantity: true,
+            price: true,
+            variant: {
+              select: {
+                size: true,
+                color: true,
+                product: {
+                  select: {
+                    name: true,
+                    // Only the first image needed for the order item thumbnail
+                    images: {
+                      take: 1,
+                      orderBy: { sortOrder: "asc" },
+                      select: { url: true }
+                    }
                   }
                 }
               }
             }
           }
         }
-      }
-    },
-  })
+      },
+    }),
+    db.order.count({ where: { userId } }),
+  ])
+
+  return {
+    orders,
+    total,
+    totalPages: Math.ceil(total / limit),
+    currentPage: page,
+  }
 }
 
 export async function getOrderById(id: string) {

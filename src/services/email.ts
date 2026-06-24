@@ -91,3 +91,23 @@ export async function sendAbandonedCartRecovery(to: string, name: string, checko
   `
   return sendEmail({ to, subject: "Don't forget your favorites!", html })
 }
+
+export async function sendPasswordResetEmail(to: string, token: string) {
+  // Use NEXT_PUBLIC_BASE_URL if available, else fallback to NEXTAUTH_URL or localhost
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || "http://localhost:3000"
+  const resetUrl = `${baseUrl}/reset-password?token=${token}`
+
+  const html = `
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+      <h2 style="color: #1C1C1A; text-align: center;">Reset Your Password</h2>
+      <p>We received a request to reset your password for your Neoshop Ultra account.</p>
+      <p>If you didn't make this request, you can safely ignore this email.</p>
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${resetUrl}" style="background-color: #1C1C1A; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Reset Password</a>
+      </div>
+      <p>This link will expire in 15 minutes.</p>
+      <p>Best regards,<br>The Neoshop Team</p>
+    </div>
+  `
+  return sendEmail({ to, subject: "Reset your password", html })
+}

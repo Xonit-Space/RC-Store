@@ -5,6 +5,7 @@ import { db } from '@/lib/db';
 import argon2 from 'argon2';
 import crypto from 'crypto';
 import { rateLimit } from '@/lib/security/rate-limit';
+import { sendPasswordResetEmail } from '@/services/email';
 const passwordSchema = z.string()
   .min(12, 'Password must be at least 12 characters')
   .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
@@ -107,8 +108,10 @@ export async function forgotPassword(email: string) {
     }
   });
 
-  // TODO: Send email with raw `token`
-  // await sendPasswordResetEmail(email, token);
+  // Send email with raw `token` (hashed token is stored in DB)
+  await sendPasswordResetEmail(email, token).catch(e => {
+    console.error("Failed to send password reset email:", e);
+  });
 
   return { success: true };
 }

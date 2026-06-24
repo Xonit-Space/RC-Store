@@ -1,4 +1,5 @@
 import { LRUCache } from 'lru-cache';
+import { redisClient } from '@/services/redis';
 
 // Basic memory rate limiter fallback
 const rateLimitCache = new LRUCache<string, { count: number; lastReset: number }>({
@@ -12,6 +13,34 @@ export async function rateLimit(
   windowMs: number = 60 * 1000
 ): Promise<{ success: boolean; limit: number; remaining: number; reset: number }> {
   const now = Date.now();
+  const defaultReset = now + windowMs;
+
+  if (redisClient) {
+    const redisKey = `rate_limit:${identifier}`;
+    
+    // Atomic increment
+    const current = await redisClient.incr(redisKey);
+    
+    // If it's the first request in the window, set the expiry
+    if (current === 1) {
+      await redisClient.pexpire(redisKey, windowMs);
+    }
+    
+    const remaining = Math.max(0, limit - current);
+    
+    // Optional: Fetch exact TTL for the reset time
+    const ttl = await redisClient.pttl(redisKey);
+    const actualReset = ttl > 0 ? now + ttl : defaultReset;
+
+    return {
+      success: current <= limit,
+      limit,
+      remaining,
+      reset: actualReset,
+    };
+  }
+
+  // Fallback to LRU memory cache
   let record = rateLimitCache.get(identifier);
 
   if (!record) {
@@ -28,12 +57,11 @@ export async function rateLimit(
   rateLimitCache.set(identifier, record);
 
   const remaining = Math.max(0, limit - record.count);
-  const reset = record.lastReset + windowMs;
 
   return {
     success: record.count <= limit,
     limit,
     remaining,
-    reset,
+    reset: record.lastReset + windowMs,
   };
 }

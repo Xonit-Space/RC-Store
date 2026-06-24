@@ -52,8 +52,24 @@ export async function updateSiteSettingsBulk(
   try {
     const user = await requireAdmin()
 
+    const ALLOWED_SETTINGS = [
+      "store_name",
+      "store_email",
+      "store_phone",
+      "store_status_open",
+      "free_shipping_threshold",
+      "tax_rate",
+      "currency",
+      "stripe_enabled",
+      "courier_auto_assign"
+    ] as const
+
+    const filteredSettings = Object.fromEntries(
+      Object.entries(settings).filter(([key]) => ALLOWED_SETTINGS.includes(key as any))
+    )
+
     // Upsert each site setting key/value pair
-    const ops = Object.entries(settings).map(([key, value]) =>
+    const ops = Object.entries(filteredSettings).map(([key, value]) =>
       db.siteSetting.upsert({
         where: { key },
         update: { value, updatedAt: new Date() },

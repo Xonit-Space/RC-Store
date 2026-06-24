@@ -12,6 +12,11 @@ export async function submitReview(
   userId: string,
   formData: any
 ): Promise<ActionResponse> {
+  const session = await getServerSession(authOptions)
+  if (!session?.user) {
+    return { success: false, error: "Unauthorized" }
+  }
+  const resolvedUserId = session.user.id
   const result = ReviewSchema.safeParse(formData)
 
   if (!result.success) {
@@ -22,7 +27,7 @@ export async function submitReview(
   try {
     const review = await createProductReview(
       productId,
-      userId,
+      resolvedUserId,
       result.data.rating,
       result.data.comment || undefined
     )
@@ -36,7 +41,7 @@ export async function submitReview(
 
 export async function adminCreateProduct(adminId: string, formData: any): Promise<ActionResponse> {
   const session = await getServerSession(authOptions)
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!session?.user || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {
     return { success: false, error: "Unauthorized access" }
   }
 
@@ -59,7 +64,7 @@ export async function adminCreateProduct(adminId: string, formData: any): Promis
 
 export async function adminUpdateProduct(adminId: string, productId: string, formData: any): Promise<ActionResponse> {
   const session = await getServerSession(authOptions)
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!session?.user || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {
     return { success: false, error: "Unauthorized access" }
   }
 
@@ -86,7 +91,7 @@ export async function adminAddVariant(
   variantData: any
 ): Promise<ActionResponse> {
   const session = await getServerSession(authOptions)
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!session?.user || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {
     return { success: false, error: "Unauthorized access" }
   }
 
@@ -110,7 +115,7 @@ export async function adminAddVariant(
 
 export async function adminDeleteProduct(adminId: string, productId: string): Promise<ActionResponse> {
   const session = await getServerSession(authOptions)
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!session?.user || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {
     return { success: false, error: "Unauthorized access" }
   }
 

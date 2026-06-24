@@ -6,8 +6,8 @@ import { db } from "@/lib/db"
 export async function GET(req: Request, { params }: { params: { productId: string } }) {
   const session = await getServerSession(authOptions)
   
-  if (!session?.user || session.user.role !== "ADMIN") {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
+  if (!session?.user || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   try {

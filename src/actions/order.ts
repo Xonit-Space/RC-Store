@@ -121,7 +121,7 @@ export async function adminUpdateOrderStatus(
   status: OrderStatus
 ): Promise<ActionResponse> {
   const session = await getServerSession(authOptions)
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!session?.user || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {
     return { success: false, error: "Unauthorized access" }
   }
 

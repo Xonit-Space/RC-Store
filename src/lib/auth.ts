@@ -2,7 +2,7 @@ import NextAuth, { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { db } from "@/lib/db"
-import bcrypt from "bcryptjs"
+import argon2 from "argon2"
 import { UserRole } from "@prisma/client"
 
 export const authOptions: NextAuthOptions = {
@@ -35,7 +35,7 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Your account has been deactivated")
         }
 
-        const isValid = await bcrypt.compare(credentials.password, user.passwordHash)
+        const isValid = await argon2.verify(user.passwordHash, credentials.password)
 
         if (!isValid) {
           throw new Error("Incorrect password")

@@ -6,6 +6,7 @@ import { createProductReview } from "@/repositories/product"
 import { ActionResponse } from "./auth"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
+import { db } from "@/lib/db"
 
 export async function submitReview(
   productId: string,
@@ -25,6 +26,14 @@ export async function submitReview(
   }
 
   try {
+    const existing = await db.review.findFirst({
+      where: { userId: resolvedUserId, productId }
+    })
+
+    if (existing) {
+      return { success: false, error: "You have already reviewed this product" }
+    }
+
     const review = await createProductReview(
       productId,
       resolvedUserId,

@@ -104,8 +104,8 @@ export async function getProducts(filters: GetProductsFilters) {
         variants: {
           where: { isActive: true },
         },
-        reviews: {
-          select: { rating: true },
+        _count: {
+          select: { reviews: true }
         },
       },
       orderBy,
@@ -115,18 +115,24 @@ export async function getProducts(filters: GetProductsFilters) {
     db.product.count({ where }),
   ])
 
-  // Calculate review averages on the fly
-  const items = products.map((product) => {
-    const totalReviews = product.reviews.length
-    const averageRating =
-      totalReviews > 0
-        ? product.reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews
-        : 0
+  // Get aggregated reviews for the products on this page
+  const productIds = products.map(p => p.id)
+  const reviewStats = await db.review.groupBy({
+    by: ['productId'],
+    where: { productId: { in: productIds } },
+    _avg: { rating: true },
+  })
 
+  const ratingMap = new Map(reviewStats.map(stat => [stat.productId, stat._avg.rating ?? 0]))
+
+  // Map to the final result
+  const items = products.map((product) => {
+    // Explicitly destructure out _count if needed to avoid sending it to the client, but it's fine as is
+    const { _count, ...rest } = product
     return {
-      ...product,
-      averageRating,
-      reviewCount: totalReviews,
+      ...rest,
+      averageRating: ratingMap.get(product.id) ?? 0,
+      reviewCount: product._count.reviews,
     }
   })
 

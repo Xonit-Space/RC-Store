@@ -2,7 +2,7 @@ import Redis from "ioredis"
 
 const redisUrl = process.env.REDIS_URL
 
-let redisClient: Redis | null = null
+export let redisClient: Redis | null = null
 let redisPub: Redis | null = null
 let redisSub: Redis | null = null
 

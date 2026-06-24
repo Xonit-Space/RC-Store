@@ -15,7 +15,7 @@ import { DomainEventEnvelope } from "@/events/contracts/events"
 const TEST_PORT = 3003 // Use 3003 to avoid collision with websocket.test.ts which owns 3002
 const TEST_WS_URL = `ws://localhost:${TEST_PORT}`
 
-describe("Neoshop Realtime Notifications Integration Tests", () => {
+describe("Aussie Rigs Arena Realtime Notifications Integration Tests", () => {
   
   beforeAll(async () => {
     // 1. Initialize WebSocket server gateway on port 3002

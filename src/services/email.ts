@@ -27,7 +27,7 @@ export async function sendEmail(options: EmailOptions) {
 
   try {
     const data = await resend.emails.send({
-      from: "Neoshop Ultra <noreply@neoshop.com>",
+      from: "Aussie Rigs Arena <noreply@aussierigsarena.com>",
       to: options.to,
       subject: options.subject,
       html: options.html,
@@ -47,17 +47,17 @@ export async function sendWelcomeEmail(to: string, name: string) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || "http://localhost:3000"
   const html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
-      <h2 style="color: #1C1C1A; text-align: center;">Welcome to Neoshop Ultra</h2>
+      <h2 style="color: #1C1C1A; text-align: center;">Welcome to Aussie Rigs Arena</h2>
       <p>Hello ${name},</p>
-      <p>Thank you for creating an account with Neoshop Ultra—the next generation of fashion streetwear.</p>
+      <p>Thank you for creating an account with Aussie Rigs Arena—the next generation of fashion streetwear.</p>
       <p>We are thrilled to accompany you on your fashion journey. Discover limited-edition drops and explore collections curated specifically for you.</p>
       <div style="text-align: center; margin: 30px 0;">
         <a href="${baseUrl}/shop" style="background-color: #1C1C1A; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Explore Collections</a>
       </div>
-      <p>Best regards,<br>The Neoshop Team</p>
+      <p>Best regards,<br>The Aussie Rigs Arena Team</p>
     </div>
   `
-  return sendEmail({ to, subject: "Welcome to Neoshop Ultra", html })
+  return sendEmail({ to, subject: "Welcome to Aussie Rigs Arena", html })
 }
 
 export async function sendVerificationEmail(to: string, token: string) {
@@ -67,12 +67,12 @@ export async function sendVerificationEmail(to: string, token: string) {
   const html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
       <h2 style="color: #1C1C1A; text-align: center;">Verify Your Account</h2>
-      <p>Please confirm your email address to complete your registration at Neoshop Ultra.</p>
+      <p>Please confirm your email address to complete your registration at Aussie Rigs Arena.</p>
       <div style="text-align: center; margin: 30px 0;">
         <a href="${verificationUrl}" style="background-color: #1C1C1A; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Verify Email</a>
       </div>
       <p>This link will expire in 24 hours.</p>
-      <p>Best regards,<br>The Neoshop Team</p>
+      <p>Best regards,<br>The Aussie Rigs Arena Team</p>
     </div>
   `
   return sendEmail({ to, subject: "Verify your email address", html })
@@ -89,7 +89,7 @@ export async function sendOrderConfirmation(to: string, orderNumber: string, tot
         <h3 style="margin: 5px 0 0 0; color: #1C1C1A;">$${total.toFixed(2)}</h3>
       </div>
       <p>We will email you a tracking code as soon as your premium streetwear is in transit.</p>
-      <p>Best regards,<br>The Neoshop Team</p>
+      <p>Best regards,<br>The Aussie Rigs Arena Team</p>
     </div>
   `
   return sendEmail({ to, subject: `Order Confirmation #${orderNumber}`, html })
@@ -105,7 +105,7 @@ export async function sendAbandonedCartRecovery(to: string, name: string, checko
         <a href="${checkoutUrl}" style="background-color: #1C1C1A; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Complete Checkout</a>
       </div>
       <p>Need assistance? Replying directly to this email hooks you up with our elite customer support agents.</p>
-      <p>Best regards,<br>The Neoshop Team</p>
+      <p>Best regards,<br>The Aussie Rigs Arena Team</p>
     </div>
   `
   return sendEmail({ to, subject: "Don't forget your favorites!", html })
@@ -119,13 +119,13 @@ export async function sendPasswordResetEmail(to: string, token: string) {
   const html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
       <h2 style="color: #1C1C1A; text-align: center;">Reset Your Password</h2>
-      <p>We received a request to reset your password for your Neoshop Ultra account.</p>
+      <p>We received a request to reset your password for your Aussie Rigs Arena account.</p>
       <p>If you didn't make this request, you can safely ignore this email.</p>
       <div style="text-align: center; margin: 30px 0;">
         <a href="${resetUrl}" style="background-color: #1C1C1A; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Reset Password</a>
       </div>
       <p>This link will expire in 15 minutes.</p>
-      <p>Best regards,<br>The Neoshop Team</p>
+      <p>Best regards,<br>The Aussie Rigs Arena Team</p>
     </div>
   `
   return sendEmail({ to, subject: "Reset your password", html })

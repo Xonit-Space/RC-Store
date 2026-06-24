@@ -16,7 +16,7 @@ export default function TermsPage() {
         <div className="space-y-12 text-sm text-muted-foreground leading-relaxed">
           <section className="space-y-4">
             <p>
-              Welcome to NeoShop Ultra. These Terms of Service (&quot;Terms&quot;) govern your use of the NeoShop Ultra website and the purchase of our products. By accessing our website or placing an order, you agree to be bound by these Terms.
+              Welcome to Aussie Rigs Arena. These Terms of Service (&quot;Terms&quot;) govern your use of the Aussie Rigs Arena website and the purchase of our products. By accessing our website or placing an order, you agree to be bound by these Terms.
             </p>
           </section>
 
@@ -50,7 +50,7 @@ export default function TermsPage() {
           <section className="space-y-4">
             <h2 className="text-xl font-serif text-foreground font-light mb-4">4. Intellectual Property</h2>
             <p>
-              All content included on this site, such as text, graphics, logos, button icons, images, audio clips, digital downloads, data compilations, and software, is the property of NeoShop Ultra or its content suppliers and protected by international copyright laws.
+              All content included on this site, such as text, graphics, logos, button icons, images, audio clips, digital downloads, data compilations, and software, is the property of Aussie Rigs Arena or its content suppliers and protected by international copyright laws.
             </p>
           </section>
 

@@ -42,13 +42,13 @@ export default function ContactPage() {
             <div className="space-y-8">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-foreground mb-2">Client Services</h3>
-                <p className="text-sm text-muted-foreground">support@neoshop.com</p>
+                <p className="text-sm text-muted-foreground">support@aussierigsarena.com</p>
                 <p className="text-sm text-muted-foreground">+94 77 123 4567</p>
               </div>
               
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-foreground mb-2">Atelier & Press</h3>
-                <p className="text-sm text-muted-foreground">press@neoshop.com</p>
+                <p className="text-sm text-muted-foreground">press@aussierigsarena.com</p>
               </div>
 
               <div>

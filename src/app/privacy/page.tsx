@@ -16,7 +16,7 @@ export default function PrivacyPage() {
         <div className="space-y-12 text-sm text-muted-foreground leading-relaxed">
           <section className="space-y-4">
             <p>
-              NeoShop Ultra (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;) respects your privacy and is committed to protecting your personal data. This privacy policy informs you about how we look after your personal data when you visit our website (regardless of where you visit it from) and tells you about your privacy rights and how the law protects you.
+              Aussie Rigs Arena (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;) respects your privacy and is committed to protecting your personal data. This privacy policy informs you about how we look after your personal data when you visit our website (regardless of where you visit it from) and tells you about your privacy rights and how the law protects you.
             </p>
           </section>
 
@@ -59,7 +59,7 @@ export default function PrivacyPage() {
               <li>Object to processing of your personal data.</li>
             </ul>
             <p className="pt-4">
-              To exercise any of these rights, please contact our Data Protection Officer at privacy@neoshop.com.
+              To exercise any of these rights, please contact our Data Protection Officer at privacy@aussierigsarena.com.
             </p>
           </section>
         </div>

@@ -22,7 +22,7 @@ export default function AboutPage() {
           <div className="absolute inset-0 bg-muted/20" />
           <Image 
             src="/placeholder.svg" 
-            alt="NeoShop Ultra Atelier" 
+            alt="Aussie Rigs Arena Atelier" 
             fill 
             className="object-cover object-center grayscale opacity-80"
           />
@@ -35,7 +35,7 @@ export default function AboutPage() {
               The Foundation
             </h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Founded in 2026, NeoShop Ultra emerged from a desire to strip away the excess of modern fashion and focus entirely on silhouette, material, and construction.
+              Founded in 2026, Aussie Rigs Arena emerged from a desire to strip away the excess of modern fashion and focus entirely on silhouette, material, and construction.
             </p>
           </div>
           <div className="md:col-span-7 space-y-6 md:mt-32">

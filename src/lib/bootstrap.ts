@@ -21,7 +21,7 @@ export function bootstrapBackendSystems(): void {
     return
   }
 
-  console.log("[Bootstrap] 🚀 Initializing Neoshop Ultra backend systems...")
+  console.log("[Bootstrap] 🚀 Initializing Aussie Rigs Arena backend systems...")
 
   try {
     // 1. Wire Event Bus → BullMQ Queue Workers

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest"
 import { redisSet, redisGet, redisDel, redisPublish, redisSubscribe } from "@/services/redis"
 
-describe("Neoshop Enterprise Redis Abstraction Layer Tests", () => {
+describe("Aussie Rigs Arena Enterprise Redis Abstraction Layer Tests", () => {
   
   // 1. Validate basic set, get, and delete operations
   describe("Redis Basic Cache Operations", () => {

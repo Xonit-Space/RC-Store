@@ -20,7 +20,7 @@ const outfit = Outfit({
 })
 
 export const metadata: Metadata = {
-  title: "NEOSHOP ULTRA | Racing Control",
+  title: "AUSSIE RIGS ARENA | Racing Control",
   description: "Ultra-Premium RC Cars & Remote Racing Experience Platform"
 }
 

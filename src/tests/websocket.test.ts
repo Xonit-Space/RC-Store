@@ -10,7 +10,7 @@ import { clearAllHandlers } from "@/events/handlers/handler-registry"
 const TEST_PORT = 3002 // Use dedicated port 3002 to prevent local dev port conflicts
 const TEST_WS_URL = `ws://localhost:${TEST_PORT}`
 
-describe("Neoshop WebSocket Gateway Infrastructure Tests", () => {
+describe("Aussie Rigs Arena WebSocket Gateway Infrastructure Tests", () => {
   
   beforeAll(async () => {
     // Start WebSocket Gateway Server on test port 3002

@@ -54,7 +54,7 @@ export default function ShippingPage() {
               We partner with DHL Express for all international shipments to ensure secure and timely delivery. Shipping rates and estimated delivery times are calculated dynamically at checkout based on your delivery zone.
             </p>
             <p>
-              <strong>Important Note on Duties & Taxes:</strong> International orders may be subject to customs duties and import taxes upon arrival in the destination country. These charges are determined by the local customs authority and are the sole responsibility of the recipient. NeoShop Ultra cannot predict or control these charges.
+              <strong>Important Note on Duties & Taxes:</strong> International orders may be subject to customs duties and import taxes upon arrival in the destination country. These charges are determined by the local customs authority and are the sole responsibility of the recipient. Aussie Rigs Arena cannot predict or control these charges.
             </p>
           </section>
 

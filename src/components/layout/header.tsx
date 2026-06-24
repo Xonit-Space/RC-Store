@@ -109,7 +109,7 @@ export function Header() {
             </button>
             
             <Link href="/" className="font-heading font-black text-2xl md:text-3xl tracking-widest text-foreground uppercase drop-shadow-[0_0_10px_rgba(255, 204, 0,0.5)]">
-              NEOSHOP <span className="text-racing-yellow">ULTRA</span>
+              <img src="/Transparent/logo white.png" alt="Aussie Rigs Arena" className="h-8" />
             </Link>
 
             {/* Mobile Actions */}

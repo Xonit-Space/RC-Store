@@ -16,7 +16,7 @@ export function initializeQueueBridge(): void {
   registerHandler("USER_REGISTERED", async (envelope) => {
     await emailQueue.add("welcome_email", {
       to: envelope.payload.email,
-      subject: "Welcome to Neoshop Ultra",
+      subject: "Welcome to Aussie Rigs Arena",
       html: "<p>Welcome to the premium fashion experience.</p>"
     })
     
@@ -60,7 +60,7 @@ export function initializeQueueBridge(): void {
   registerHandler("PAYMENT_COMPLETED", async (envelope) => {
     await emailQueue.add("receipt_email", {
       to: "customer@example.com", // In a real app, fetch order/user email
-      subject: "Payment Receipt - Neoshop Ultra",
+      subject: "Payment Receipt - Aussie Rigs Arena",
       html: `<p>We have received your payment of $${envelope.payload.amount} for order ${envelope.payload.orderId}.</p>`
     })
   })
@@ -68,7 +68,7 @@ export function initializeQueueBridge(): void {
   registerHandler("REFUND_ISSUED", async (envelope) => {
     await emailQueue.add("refund_email", {
       to: "customer@example.com",
-      subject: "Refund Issued - Neoshop Ultra",
+      subject: "Refund Issued - Aussie Rigs Arena",
       html: `<p>A refund of $${envelope.payload.amount} has been issued for order ${envelope.payload.orderId}.</p>`
     })
   })

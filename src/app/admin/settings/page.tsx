@@ -71,7 +71,7 @@ export default function AdminSettingsPage() {
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">Store Name</label>
                     <Input
-                      defaultValue="NeoShop Ultra"
+                      defaultValue="Aussie Rigs Arena"
                       className="h-12 bg-transparent border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-foreground"
                     />
                   </div>
@@ -79,7 +79,7 @@ export default function AdminSettingsPage() {
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">Contact Email</label>
                     <Input
-                      defaultValue="support@neoshop.com"
+                      defaultValue="support@aussierigsarena.com"
                       type="email"
                       className="h-12 bg-transparent border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-foreground"
                     />

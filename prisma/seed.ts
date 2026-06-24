@@ -1,5 +1,5 @@
 /**
- * NeoShop Ultra — MASSIVE Comprehensive RC Cars & Racing Experience Seed Script
+ * Aussie Rigs Arena — MASSIVE Comprehensive RC Cars & Racing Experience Seed Script
  * Generates an exhaustive relational dataset across all tables for RC Cars.
  */
 
@@ -40,7 +40,7 @@ function slugify(s: string) { return s.toLowerCase().replace(/[^a-z0-9]+/g, "-")
 function rand(min: number, max: number) { return Math.floor(Math.random() * (max - min + 1)) + min }
 
 async function main() {
-  console.log("🏎️  NeoShop Ultra — COMPREHENSIVE RC Cars Database Seed Starting...")
+  console.log("🏎️  Aussie Rigs Arena — COMPREHENSIVE RC Cars Database Seed Starting...")
 
   // 1. DELETE EVERYTHING
   console.log("🗑️  Clearing existing data...")
@@ -291,7 +291,7 @@ async function main() {
   await prisma.heroBanner.create({ data: { title: "Track Ready", subtitle: "Competition chassis", image: IMAGES.electric[0], link: "/products" } })
 
   console.log("\n🎉 ════════════════════════════════════════════════")
-  console.log("   NeoShop Ultra COMPREHENSIVE RC Cars seed complete!")
+  console.log("   Aussie Rigs Arena COMPREHENSIVE RC Cars seed complete!")
   console.log("   ════════════════════════════════════════════════\n")
 }
 

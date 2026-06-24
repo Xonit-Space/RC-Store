@@ -428,7 +428,7 @@ export function CourierManagement() {
             <div className="p-6 bg-muted/5 overflow-y-auto max-h-[380px]">
               <div className="bg-background border-2 border-border/40 p-4 rounded-none shadow-inner font-mono text-[11px] text-foreground space-y-4">
                 <div className="text-center space-y-1">
-                  <h3 className="font-extrabold text-sm uppercase tracking-widest text-foreground">NEOSHOP LOGISTICS</h3>
+                  <h3 className="font-extrabold text-sm uppercase tracking-widest text-foreground">AUSSIE RIGS ARENA LOGISTICS</h3>
                   <p className="text-[9px] text-muted-foreground font-bold">1 Waybill Ave, Colombo, LK</p>
                   <p className="text-[10px] font-extrabold pt-2">TRACKING SLIP PREVIEW</p>
                 </div>

@@ -10,7 +10,7 @@ export default function AccessDeniedPage() {
         
         <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-10">
           <Link href="/" className="inline-block">
-            <h1 className="text-3xl font-serif tracking-tight text-foreground font-light">NEOSHOP ULTRA</h1>
+            <h1 className="text-3xl font-serif tracking-tight text-foreground font-light">AUSSIE RIGS ARENA</h1>
           </Link>
         </div>
 

@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest"
 import { formatPrice } from "@/config/i18n"
 import { LoginSchema } from "@/validators/auth"
 
-describe("Neoshop Enterprise Global Tests", () => {
+describe("Aussie Rigs Arena Enterprise Global Tests", () => {
   
   // 1. Validate locale-specific pricing transformations
   describe("i18n Multi-Currency Pricing Formatter", () => {
@@ -30,7 +30,7 @@ describe("Neoshop Enterprise Global Tests", () => {
   describe("Zod Authentication Validation Schemas", () => {
     it("should successfully parse valid login credentials", () => {
       const payload = {
-        email: "demo@neoshop.com",
+        email: "demo@aussierigsarena.com",
         password: "secure_password_2026",
       }
       const result = LoginSchema.safeParse(payload)
@@ -48,7 +48,7 @@ describe("Neoshop Enterprise Global Tests", () => {
 
     it("should fail validation on passwords shorter than 6 characters", () => {
       const payload = {
-        email: "demo@neoshop.com",
+        email: "demo@aussierigsarena.com",
         password: "123",
       }
       const result = LoginSchema.safeParse(payload)

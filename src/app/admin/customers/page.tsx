@@ -54,7 +54,7 @@ export default function AdminCustomersPage() {
           <div key={u.id} className="border border-border/40 bg-background transition-colors hover:border-foreground/30">
             <div className="p-6 flex items-start gap-5">
               <div className="h-12 w-12 bg-muted/10 border border-border/40 flex items-center justify-center text-muted-foreground shrink-0">
-                {u.email === "admin@neoshop.com" ? (
+                {u.email === "admin@aussierigsarena.com" ? (
                   <Shield strokeWidth={1.5} className="w-5 h-5 text-foreground" />
                 ) : (
                   <User strokeWidth={1.5} className="w-5 h-5 text-muted-foreground" />

@@ -15,7 +15,7 @@ export function Header({ user }: HeaderProps) {
         <Link href="/" className="flex items-center gap-2 group">
           <Home strokeWidth={1} className="w-4 h-4 text-muted-foreground group-hover:text-accent transition-colors" />
           <h1 className="text-[11px] font-medium tracking-[0.2em] uppercase text-foreground">
-            Neoshop <span className="opacity-50">Atelier</span>
+            Aussie Rigs Arena <span className="opacity-50">Atelier</span>
           </h1>
         </Link>
         <span className="text-[9px] tracking-[0.25em] uppercase text-terracotta border border-terracotta/30 px-2 py-0.5">

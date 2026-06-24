@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: ProductDetailPageProps) {
   const product = await getProductBySlug(slug)
   if (!product) return { title: "Product Not Found" }
   return {
-    title: `${product.name} | NeoShop Ultra`,
+    title: `${product.name} | Aussie Rigs Arena`,
     description: product.description,
   }
 }

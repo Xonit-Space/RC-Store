@@ -5,7 +5,7 @@ import { registerHandler, clearAllHandlers, executeHandlers } from "../events/ha
 import { replayEvents } from "../events/replay/replay-manager"
 import { DomainEventEnvelope } from "../events/contracts/events"
 
-describe("Neoshop Event Bus Infrastructure Tests", () => {
+describe("Aussie Rigs Arena Event Bus Infrastructure Tests", () => {
   
   // Clean registry and database logs before and after each run
   beforeEach(async () => {

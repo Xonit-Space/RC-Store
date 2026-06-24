@@ -56,7 +56,7 @@ export default function LoginPage() {
         
         <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-10">
           <Link href="/" className="inline-block">
-            <h1 className="text-4xl font-heading font-black tracking-widest text-white uppercase drop-shadow-[0_0_10px_rgba(255, 204, 0,0.5)]">NEOSHOP <span className="text-racing-yellow">ULTRA</span></h1>
+            <h1 className="text-4xl font-heading font-black tracking-widest text-white uppercase drop-shadow-[0_0_10px_rgba(255, 204, 0,0.5)]"><img src="/Transparent/logo white.png" alt="Aussie Rigs Arena" className="h-8" /></h1>
           </Link>
           <p className="mt-4 text-[10px] tracking-[0.4em] uppercase text-racing-yellow font-mono font-bold animate-pulse">
             Driver Authentication

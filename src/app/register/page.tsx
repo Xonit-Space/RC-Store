@@ -55,7 +55,7 @@ export default function RegisterPage() {
         
         <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-10">
           <Link href="/" className="inline-block">
-            <h1 className="text-3xl font-serif tracking-tight text-foreground font-light">NEOSHOP ULTRA</h1>
+            <h1 className="text-3xl font-serif tracking-tight text-foreground font-light">AUSSIE RIGS ARENA</h1>
           </Link>
           <p className="mt-4 text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-bold">
             Client Registration
@@ -70,7 +70,7 @@ export default function RegisterPage() {
                   <CheckCircle2 className="h-8 w-8 text-foreground" />
                 </div>
                 <div className="space-y-2">
-                  <h3 className="font-serif text-xl font-light text-foreground">Welcome to NeoShop Ultra</h3>
+                  <h3 className="font-serif text-xl font-light text-foreground">Welcome to Aussie Rigs Arena</h3>
                   <p className="text-xs text-muted-foreground uppercase tracking-widest leading-relaxed">
                     Account provisioned.<br/>Redirecting to authentication...
                   </p>

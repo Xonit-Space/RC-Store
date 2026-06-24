@@ -4,7 +4,7 @@ import { queueConnection, emailQueue, analyticsQueue } from "@/lib/queue"
 import { emailWorker } from "@/lib/queue/workers/email.worker"
 import { analyticsWorker } from "@/lib/queue/workers/analytics.worker"
 
-describe("Neoshop Enterprise Background Queue Infrastructure", () => {
+describe("Aussie Rigs Arena Enterprise Background Queue Infrastructure", () => {
   beforeAll(async () => {
     // Clear out testing queues if they exist to start fresh
     await emailQueue.obliterate({ force: true }).catch(() => {})

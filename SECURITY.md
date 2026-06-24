@@ -1,6 +1,6 @@
 # Application Security Architecture & Mitigations
 
-This document details the security architecture implemented in NeoShop Ultra, aligned with OWASP Top 10 and ASVS guidelines.
+This document details the security architecture implemented in Aussie Rigs Arena, aligned with OWASP Top 10 and ASVS guidelines.
 
 ## 1. Authentication Flow
 - **NextAuth v5 (Auth.js)** is configured with the `PrismaAdapter` running fully server-side.

@@ -58,7 +58,7 @@ export function AdminDashboard() {
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="flex h-16 items-center px-6">
           <div className="flex items-center space-x-4">
-            <h1 className="text-xl font-bold">NEOSHOP ULTRA Admin</h1>
+            <h1 className="text-xl font-bold">AUSSIE RIGS ARENA Admin</h1>
             <Badge variant="secondary">v2.0</Badge>
           </div>
 

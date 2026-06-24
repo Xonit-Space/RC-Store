@@ -84,7 +84,7 @@ export function initializeWSServer(port: number = WS_PORT): WebSocketServer {
       JSON.stringify({
         type: "message",
         payload: {
-          message: "Welcome to Neoshop Realtime Commerce Service",
+          message: "Welcome to Aussie Rigs Arena Realtime Commerce Service",
           sessionId,
           userId,
           isAnonymous,

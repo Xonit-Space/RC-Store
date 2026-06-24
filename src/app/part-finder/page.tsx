@@ -4,7 +4,7 @@ import { PartFinderBanner } from "@/components/sections/part-finder-banner"
 import { ShieldCheck, Zap, Activity } from "lucide-react"
 
 export const metadata = {
-  title: "Part Finder | NeoShop Ultra",
+  title: "Part Finder | Aussie Rigs Arena",
   description: "Find the exact compatible OEM and aftermarket parts for your RC vehicle.",
 }
 

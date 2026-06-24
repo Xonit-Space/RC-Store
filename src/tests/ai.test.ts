@@ -18,7 +18,7 @@ vi.mock("@/lib/db", () => {
   }
 })
 
-describe("Neoshop Enterprise AI Commerce Engine Tests", () => {
+describe("Aussie Rigs Arena Enterprise AI Commerce Engine Tests", () => {
 
   // 1. Verify that coordinate styling advice is parsed or fallback is returned
   describe("OpenAI Prompt Orchestration - Styling Coordinates", () => {

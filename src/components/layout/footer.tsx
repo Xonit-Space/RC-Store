@@ -10,7 +10,7 @@ export function Footer() {
           {/* Brand Info */}
           <div className="space-y-6">
             <Link href="/" className="inline-block font-heading font-black text-3xl tracking-widest text-foreground uppercase drop-shadow-[0_0_10px_rgba(255, 204, 0,0.5)]">
-              NEOSHOP <span className="text-racing-yellow">ULTRA</span>
+              <img src="/Transparent/logo white.png" alt="Aussie Rigs Arena" className="h-8" />
             </Link>
             <p className="text-sm leading-relaxed max-w-sm">
               The ultimate destination for high-performance remote control vehicles. We stock the best RC cars, drones, boats, and parts from industry-leading manufacturers. Built for speed, engineered for durability.
@@ -64,13 +64,13 @@ export function Footer() {
               <li className="flex items-start gap-3">
                 <Phone className="h-5 w-5 text-racing-yellow shrink-0" />
                 <div>
-                  <p className="text-white">1-800-NEO-SHOP</p>
+                  <p className="text-white">1-800-AUS-RIGS</p>
                   <p className="text-xs mt-1">Mon-Fri: 9am - 6pm EST</p>
                 </div>
               </li>
               <li className="flex items-start gap-3">
                 <Mail className="h-5 w-5 text-racing-yellow shrink-0" />
-                <a href="mailto:support@neoshopultra.com" className="hover:text-white transition-colors">support@neoshopultra.com</a>
+                <a href="mailto:support@aussierigsarena.com" className="hover:text-white transition-colors">support@aussierigsarena.com</a>
               </li>
               <li className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 text-racing-yellow shrink-0" />
@@ -83,7 +83,7 @@ export function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-mono">
-          <p>© {new Date().getFullYear()} NeoShop Ultra. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Aussie Rigs Arena. All rights reserved.</p>
           <div className="flex space-x-6">
             <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>

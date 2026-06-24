@@ -5,7 +5,7 @@ test.describe("Storefront Checkout Funnel E2E Spec", () => {
   test("should successfully navigate the full purchase funnel", async ({ page }) => {
     // 1. Land on Storefront Homepage
     await page.goto("/")
-    await expect(page).toHaveTitle(/NEOSHOP ULTRA/)
+    await expect(page).toHaveTitle(/AUSSIE RIGS ARENA/)
 
     // 2. Locate omnibox and search for designer cargo jacket
     const searchInput = page.locator("input[placeholder*='Search products']")

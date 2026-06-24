@@ -148,7 +148,7 @@ export class AiService {
           messages: [
             {
               role: "system",
-              content: "You are a professional editorial fashion designer for an elite luxury streetwear brand called Neoshop Ultra. Give brief, premium coordinate styling advice."
+              content: "You are a professional editorial fashion designer for an elite luxury streetwear brand called Aussie Rigs Arena. Give brief, premium coordinate styling advice."
             },
             {
               role: "user",

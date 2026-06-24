@@ -7,52 +7,12 @@ import { ActionResponse } from "./auth"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { sendOrderStatusUpdateSms } from "@/services/twilio"
+import { validateAndCalculateCoupon } from "@/lib/coupon"
+
 export async function checkCoupon(code: string, subtotal: number): Promise<ActionResponse> {
   try {
-    const coupon = await db.coupon.findUnique({
-      where: { code: code.toUpperCase() },
-    })
-
-    if (!coupon || !coupon.isActive) {
-      return { success: false, error: "Invalid coupon code" }
-    }
-
-    const now = new Date()
-    if (now < coupon.startDate || now > coupon.endDate) {
-      return { success: false, error: "This coupon code has expired" }
-    }
-
-    if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) {
-      return { success: false, error: "This coupon code usage limit has been reached" }
-    }
-
-    if (subtotal < Number(coupon.minOrderAmount)) {
-      return {
-        success: false,
-        error: `Minimum order amount of $${coupon.minOrderAmount} is required for this coupon`,
-      }
-    }
-
-    let discount = 0
-    if (coupon.discountType === "PERCENTAGE") {
-      discount = (subtotal * Number(coupon.discountValue)) / 100
-      if (coupon.maxDiscountAmount) {
-        discount = Math.min(discount, Number(coupon.maxDiscountAmount))
-      }
-    } else {
-      discount = Number(coupon.discountValue)
-    }
-
-    return {
-      success: true,
-      data: {
-        id: coupon.id,
-        code: coupon.code,
-        discount,
-        discountType: coupon.discountType,
-        discountValue: coupon.discountValue,
-      },
-    }
+    const result = await validateAndCalculateCoupon(code, subtotal)
+    return result
   } catch (error) {
     return { success: false, error: "Failed to validate coupon" }
   }

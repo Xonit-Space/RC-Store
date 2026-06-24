@@ -48,24 +48,73 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col font-sans bg-carbon-dark relative overflow-hidden">
-      {/* Background Decor */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+    <div className="min-h-screen flex font-sans bg-carbon-dark">
+      {/* Column 1: Visual / Video Background (Hidden on Mobile, 2/3 width on Desktop) */}
+      <div className="hidden lg:flex lg:w-2/3 relative flex-col justify-between p-10 overflow-hidden">
+        {/* Video Background */}
+        <video 
+          autoPlay 
+          loop 
+          muted 
+          playsInline 
+          className="absolute inset-0 w-full h-full object-cover z-0"
+        >
+          <source src="/snaptik_7531203151316258062_v3.mp4" type="video/mp4" />
+        </video>
 
-      <div className="flex-1 flex flex-col justify-center items-center px-6 py-12 lg:px-8 relative z-10">
-        
-        <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-10">
-          <Link href="/" className="inline-block">
-            <h1 className="text-4xl font-heading font-black tracking-widest text-white uppercase drop-shadow-[0_0_10px_rgba(255, 204, 0,0.5)]"><img src="/Transparent/logo white.png" alt="Aussie Rigs Arena" className="h-8" /></h1>
+        {/* Overlay to ensure text/logo readability */}
+        <div className="absolute inset-0 bg-black/60 z-10" />
+
+        {/* Minimal Navbar / Top area */}
+        <div className="relative z-20 flex items-center justify-between w-full">
+          <Link href="/">
+            <img src="/Transparent/logo yellow1.png" alt="Aussie Rigs Arena" className="h-20 w-auto object-contain" />
           </Link>
-          <p className="mt-4 text-[10px] tracking-[0.4em] uppercase text-racing-yellow font-mono font-bold animate-pulse">
-            Driver Authentication
-          </p>
+          <Link href="/" className="text-white text-[10px] font-mono font-bold tracking-widest uppercase border border-white/20 px-4 py-2 hover:bg-white/10 hover:border-racing-yellow transition-all">
+            Back to Arena
+          </Link>
         </div>
 
-        <div className="sm:mx-auto sm:w-full sm:max-w-[400px]">
-          <div className="glass-dark py-10 px-8 md:px-10 border border-racing-yellow/40 shadow-[0_0_30px_rgba(255, 204, 0,0.15)] relative">
+        {/* Center large branding if desired, or leave empty to showcase video */}
+        <div className="relative z-20 text-center">
+          {/* <img src="/Transparent/logo yellow1.png" alt="Aussie Rigs Arena" className="h-48 w-auto object-contain mx-auto opacity-90 drop-shadow-2xl" /> */}
+        </div>
+
+        {/* Minimal Footer */}
+        <div className="relative z-20 flex justify-between items-center text-white/50 text-[10px] font-mono uppercase tracking-widest">
+          <p>© {new Date().getFullYear()} AUSSIE RIGS ARENA.</p>
+          <div className="flex gap-4">
+            <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Column 2: Form Container (Full width on mobile, 1/3 on desktop) */}
+      <div className="w-full lg:w-1/3 flex flex-col justify-center items-center px-6 py-12 relative z-10 border-l border-white/10 bg-carbon-dark shadow-[-20px_0_50px_rgba(0,0,0,0.5)]">
+        
+        {/* Grid Background Decor */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+
+        <div className="sm:mx-auto sm:w-full sm:max-w-[400px] relative z-20">
+          <div className="text-center mb-10 lg:hidden">
+            <Link href="/" className="inline-block">
+              <img src="/Transparent/logo yellow1.png" alt="Aussie Rigs Arena" className="h-12 w-auto object-contain mx-auto" />
+            </Link>
+          </div>
+
+          <div className="text-left mb-8">
+            <h1 className="text-3xl font-heading font-black tracking-widest text-white uppercase drop-shadow-[0_0_10px_rgba(255, 204, 0,0.5)]">
+              Login
+            </h1>
+            <p className="mt-2 text-[10px] tracking-[0.4em] uppercase text-racing-yellow font-mono font-bold animate-pulse">
+              Driver Authentication
+            </p>
+          </div>
+
+          <div className="glass-dark py-10 px-8 border border-racing-yellow/40 shadow-[0_0_30px_rgba(255, 204, 0,0.15)] relative">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-racing-yellow to-transparent opacity-50" />
+            
             <form className="space-y-6" onSubmit={handleSubmit}>
               {error && (
                 <div className="flex items-center gap-3 p-4 bg-red-950/50 border border-red-500/50 text-yellow-400 text-xs font-mono font-bold uppercase tracking-wider">
@@ -109,7 +158,7 @@ export default function LoginPage() {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full h-12 bg-racing-yellow text-white hover:bg-neon-yellow hover:shadow-[0_0_20px_rgba(255, 204, 0,0.6)] rounded-none font-heading font-black text-sm tracking-[0.2em] uppercase transition-all"
+                  className="w-full h-12 bg-racing-yellow text-carbon-dark hover:bg-neon-yellow hover:shadow-[0_0_20px_rgba(255, 204, 0,0.6)] rounded-none font-heading font-black text-sm tracking-[0.2em] uppercase transition-all"
                 >
                   {loading ? "Establishing Link..." : "Initialize Link"}
                 </Button>

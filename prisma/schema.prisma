@@ -655,6 +655,11 @@ enum RefundStatus {
   FAILED
 }
 
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
 // ==========================================
 // 5. MARKETING & DISCOUNTS SCHEMAS
 // ==========================================
@@ -662,7 +667,7 @@ enum RefundStatus {
 model Coupon {
   id                String   @id @default(cuid())
   code              String   @unique
-  discountType      String // "PERCENTAGE", "FIXED_AMOUNT"
+  discountType      DiscountType
   discountValue     Decimal
   minOrderAmount    Decimal  @default(0)
   maxDiscountAmount Decimal?

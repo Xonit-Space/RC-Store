@@ -9,6 +9,7 @@ const nextConfig = {
   output: "standalone",
   experimental: {
     serverComponentsExternalPackages: ["bullmq"],
+    instrumentationHook: true,
   },
   images: {
     formats: ['image/avif', 'image/webp'],

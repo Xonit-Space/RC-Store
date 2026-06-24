@@ -6,12 +6,7 @@ import argon2 from 'argon2';
 import crypto from 'crypto';
 import { rateLimit } from '@/lib/security/rate-limit';
 import { sendPasswordResetEmail } from '@/services/email';
-const passwordSchema = z.string()
-  .min(12, 'Password must be at least 12 characters')
-  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-  .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-  .regex(/[0-9]/, 'Password must contain at least one number')
-  .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character');
+import { PasswordSchema, RegisterSchema, ResetPasswordSchema } from '@/validators/auth';
 
 export type ActionResponse<T = any> = {
   success: boolean;
@@ -22,26 +17,18 @@ export type ActionResponse<T = any> = {
 export async function addCustomerAddress(...args: any[]): Promise<ActionResponse> { return { success: true } }
 export async function updateCustomerProfile(...args: any[]): Promise<ActionResponse> { return { success: true } }
 
-export const registerSchema = z.object({
-  email: z.string().email(),
-  password: passwordSchema,
-  name: z.string().min(1).optional(),
-});
 
-export const resetPasswordSchema = z.object({
-  password: passwordSchema,
-});
 
-export async function registerUser(data: z.infer<typeof registerSchema>) {
+export async function registerUser(data: z.infer<typeof RegisterSchema>) {
   // Rate limiting check
   const rl = await rateLimit(`register:${data.email}`);
   if (!rl.success) {
     return { error: 'Too many requests. Please try again later.' };
   }
 
-  const parsed = registerSchema.safeParse(data);
+  const parsed = RegisterSchema.safeParse(data);
   if (!parsed.success) {
-    return { error: 'Invalid input data' };
+    return { error: 'Invalid input data', data: parsed.error.errors };
   }
 
   const { email, password, name } = parsed.data;
@@ -116,10 +103,10 @@ export async function forgotPassword(email: string) {
   return { success: true };
 }
 
-export async function resetPassword(token: string, data: z.infer<typeof resetPasswordSchema>) {
-  const parsed = resetPasswordSchema.safeParse(data);
+export async function resetPassword(token: string, data: Omit<z.infer<typeof ResetPasswordSchema>, "token">) {
+  const parsed = ResetPasswordSchema.safeParse({ token, ...data });
   if (!parsed.success) {
-    return { error: 'Invalid input data' };
+    return { error: 'Invalid input data', data: parsed.error.errors };
   }
 
   const hashedToken = crypto.createHash('sha256').update(token).digest('hex');

@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input"
 import { Lock, CheckCircle2, AlertCircle } from "lucide-react"
 import { toast } from "sonner"
 import { useParams, useRouter } from "next/navigation"
+import { resetPassword } from "@/actions/auth"
+import { ResetPasswordSchema } from "@/validators/auth"
 
 export default function ResetPasswordPage() {
   const params = useParams()
@@ -24,8 +26,9 @@ export default function ResetPasswordPage() {
     e.preventDefault()
     setError(null)
 
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters long")
+    const validation = ResetPasswordSchema.safeParse({ token, password })
+    if (!validation.success) {
+      setError(validation.error.errors[0].message)
       return
     }
 
@@ -36,8 +39,12 @@ export default function ResetPasswordPage() {
 
     setLoading(true)
     try {
-      // For demo purposes, we simulate the reset since no token schema exists
-      await new Promise((resolve) => setTimeout(resolve, 800))
+      const response = await resetPassword(token, { password })
+      
+      if (!response.success) {
+        setError(response.error || "Failed to restore credentials. Token may be invalid or expired.")
+        return
+      }
       
       toast.success("Password updated successfully!")
       setCompleted(true)

@@ -4,6 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { registerUser } from "@/actions/auth"
+import { RegisterSchema } from "@/validators/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { AlertCircle, CheckCircle2 } from "lucide-react"
@@ -23,13 +24,9 @@ export default function RegisterPage() {
     setError(null)
     setLoading(true)
 
-    if (password.length < 12) {
-      setError("Password must be at least 12 characters long")
-      setLoading(false)
-      return
-    }
-    if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
-      setError("Password must contain uppercase, lowercase, number, and special character")
+    const validation = RegisterSchema.safeParse({ name, email, password })
+    if (!validation.success) {
+      setError(validation.error.errors[0].message)
       setLoading(false)
       return
     }

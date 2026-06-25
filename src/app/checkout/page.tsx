@@ -296,7 +296,7 @@ export default function CheckoutPage() {
                     </p>
                   </div>
                   <span className="text-xs font-bold text-foreground">
-                    Rs. {(item.product.price * item.quantity).toLocaleString()}
+                    $ {(item.product.price * item.quantity).toLocaleString()}
                   </span>
                 </div>
               ))}
@@ -305,20 +305,20 @@ export default function CheckoutPage() {
             <div className="space-y-2 pt-2 text-xs font-semibold text-muted/50">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span className="font-bold text-foreground">Rs. {subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                <span className="font-bold text-foreground">$ {subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between">
                 <span>GST Tax (8%)</span>
-                <span className="font-bold text-foreground">Rs. {tax.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                <span className="font-bold text-foreground">$ {tax.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between">
                 <span>Stripe Ground Shipping</span>
-                <span className="font-bold text-foreground">Rs. {shipping.toFixed(2)}</span>
+                <span className="font-bold text-foreground">$ {shipping.toFixed(2)}</span>
               </div>
               <div className="my-3 border-t border-dashed" />
               <div className="flex justify-between font-extrabold text-foreground text-sm pt-1">
                 <span>Order Total Due</span>
-                <span className="text-foreground">Rs. {grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                <span className="text-foreground">$ {grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
               </div>
             </div>
           </div>

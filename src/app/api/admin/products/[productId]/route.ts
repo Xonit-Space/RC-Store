@@ -38,3 +38,62 @@ export async function GET(req: Request, { params }: { params: { productId: strin
     )
   }
 }
+
+export async function PATCH(req: Request, { params }: { params: { productId: string } }) {
+  const session = await getServerSession(authOptions)
+  
+  if (!session?.user || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
+  try {
+    const body = await req.json()
+    const { name, slug, description, price, categoryId, brandId, gender, isActive } = body
+
+    const product = await db.product.update({
+      where: { id: params.productId },
+      data: {
+        ...(name && { name }),
+        ...(slug && { slug }),
+        ...(description !== undefined && { description }),
+        ...(price && { price }),
+        ...(categoryId && { categoryId }),
+        ...(brandId !== undefined && { brandId }),
+        ...(gender && { gender }),
+        ...(isActive !== undefined && { isActive }),
+      }
+    })
+
+    return NextResponse.json({ success: true, data: product })
+  } catch (error: any) {
+    console.error("Admin product update error:", error)
+    return NextResponse.json(
+      { success: false, error: "Failed to update product" },
+      { status: 500 }
+    )
+  }
+}
+
+export async function DELETE(req: Request, { params }: { params: { productId: string } }) {
+  const session = await getServerSession(authOptions)
+  
+  if (!session?.user || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
+  try {
+    // Soft delete
+    const product = await db.product.update({
+      where: { id: params.productId },
+      data: { deletedAt: new Date(), isActive: false }
+    })
+
+    return NextResponse.json({ success: true, data: product })
+  } catch (error: any) {
+    console.error("Admin product delete error:", error)
+    return NextResponse.json(
+      { success: false, error: "Failed to delete product" },
+      { status: 500 }
+    )
+  }
+}

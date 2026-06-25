@@ -182,12 +182,15 @@ export async function runReconciliation(input: ReconciliationInput = {}): Promis
   }
 
   if (status === "DISCREPANCY") {
-    logger.error(`[Reconciliation] DISCREPANCY detected for ${summary.reportDate}:`, {
-      missingInDB: missingInDB.length,
-      missingInStripe: missingInStripe.length,
-      mismatchedAmounts: mismatchedAmounts.length,
-      duplicateOrders: duplicateOrders.length,
-      delta,
+    logger.error({
+      message: `[Reconciliation] DISCREPANCY detected for ${summary.reportDate}:`,
+      context: {
+        missingInDB: missingInDB.length,
+        missingInStripe: missingInStripe.length,
+        mismatchedAmounts: mismatchedAmounts.length,
+        duplicateOrders: duplicateOrders.length,
+        delta,
+      }
     })
   } else {
     logger.info(`[Reconciliation] CLEAN for ${summary.reportDate}. Stripe: $${stripeTotal}, DB: $${dbTotal}`)

@@ -1,4 +1,8 @@
 import twilio from "twilio"
+import { logger } from "@/lib/logger"
+
+// Standard E.164 phone number regex (starts with +, up to 15 digits)
+const E164_REGEX = /^\+[1-9]\d{1,14}$/
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID
 const authToken = process.env.TWILIO_AUTH_TOKEN
@@ -9,7 +13,13 @@ export const twilioClient = accountSid && authToken ? twilio(accountSid, authTok
 
 export async function sendOrderConfirmationSms(to: string, orderNumber: string, totalAmount: number): Promise<boolean> {
   if (!twilioClient || !twilioPhoneNumber) {
-    console.warn("[Twilio] SMS service is not configured. Skipping SMS.")
+    logger.warn("[Twilio] SMS service is not configured. Skipping SMS.")
+    return false
+  }
+
+  // E.164 format validation
+  if (!E164_REGEX.test(to)) {
+    logger.error(`[Twilio] Invalid phone number format for order ${orderNumber}. Must be E.164 (e.g. +1234567890). Got: ${to}`)
     return false
   }
 
@@ -19,17 +29,23 @@ export async function sendOrderConfirmationSms(to: string, orderNumber: string, 
       from: twilioPhoneNumber,
       to,
     })
-    console.info(`[Twilio] Order confirmation SMS sent to ${to} for order ${orderNumber}`)
+    logger.info(`[Twilio] Order confirmation SMS sent to ${to} for order ${orderNumber}`)
     return true
   } catch (error) {
-    console.error(`[Twilio] Failed to send order confirmation SMS:`, error)
+    logger.error(`[Twilio] Failed to send order confirmation SMS:`, error)
     return false
   }
 }
 
 export async function sendOrderStatusUpdateSms(to: string, orderNumber: string, status: string): Promise<boolean> {
   if (!twilioClient || !twilioPhoneNumber) {
-    console.warn("[Twilio] SMS service is not configured. Skipping SMS.")
+    logger.warn("[Twilio] SMS service is not configured. Skipping SMS.")
+    return false
+  }
+
+  // E.164 format validation
+  if (!E164_REGEX.test(to)) {
+    logger.error(`[Twilio] Invalid phone number format for order ${orderNumber} status update. Must be E.164. Got: ${to}`)
     return false
   }
 
@@ -46,10 +62,10 @@ export async function sendOrderStatusUpdateSms(to: string, orderNumber: string, 
       from: twilioPhoneNumber,
       to,
     })
-    console.info(`[Twilio] Order status update SMS sent to ${to} for order ${orderNumber}`)
+    logger.info(`[Twilio] Order status update SMS sent to ${to} for order ${orderNumber}`)
     return true
   } catch (error) {
-    console.error(`[Twilio] Failed to send order status update SMS:`, error)
+    logger.error(`[Twilio] Failed to send order status update SMS:`, error)
     return false
   }
 }

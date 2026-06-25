@@ -14,8 +14,8 @@ export default function AdminSettingsPage() {
   const [isLoading, setIsLoading] = useState(true)
   
   const [settings, setSettings] = useState<Record<string, string>>({
-    storeName: "Aussie Rigs Arena",
-    contactEmail: "support@aussierigsarena.com",
+    storeName: "RC Store",
+    contactEmail: "support@rcstore.com",
     orderPrefix: "ORD-",
     require2fa: "true",
     sessionTimeout: "30",

@@ -176,7 +176,9 @@ export class AiService {
   static async generateQueryEmbedding(query: string): Promise<number[]> {
     const apiKey = process.env.OPENAI_API_KEY
     if (!apiKey) {
-      // Mock dense float vector array (1536 dimensions filled with standard parameters)
+      // WARNING: Mock dense float vector array (1536 dimensions filled with standard parameters)
+      // This is a placeholder for development only. Do NOT use this in production vector search
+      // as it is deterministic and will cause all search results to return identical rankings.
       return Array.from({ length: 1536 }, (_, i) => Math.sin(i) * 0.01)
     }
 

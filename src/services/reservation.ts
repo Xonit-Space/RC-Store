@@ -13,6 +13,7 @@
 
 import { db } from "@/lib/db"
 import { ReservationStatus } from "@prisma/client"
+import { logger } from "@/lib/logger"
 
 export interface ReservationInput {
   variantId: string
@@ -155,7 +156,7 @@ export async function releaseReservation(reservationId: string) {
 
     // Only RESERVED can be released (not already committed/released)
     if (reservation.status !== "RESERVED") {
-      console.log(`[Reservation] ${reservationId} already in state ${reservation.status} — skipping release`)
+      logger.info(`[Reservation] ${reservationId} already in state ${reservation.status} — skipping release`)
       return null
     }
 
@@ -208,9 +209,9 @@ export async function releaseExpiredReservations(): Promise<number> {
     try {
       await releaseReservation(id)
       released++
-      console.log(`[ReservationEngine] Released expired reservation: ${id}`)
+      logger.info(`[ReservationEngine] Released expired reservation: ${id}`)
     } catch (err: unknown) {
-      console.error(`[ReservationEngine] Release failed for ${id}:`, (err as Error).message)
+      logger.error(`[ReservationEngine] Release failed for ${id}: ${(err as Error).message}`)
     }
   }
 
@@ -236,7 +237,7 @@ export async function releaseCheckoutReservations(checkoutId: string): Promise<n
       await releaseReservation(id)
       released++
     } catch (err: unknown) {
-      console.error(`[ReservationEngine] Release failed for ${id}:`, (err as Error).message)
+      logger.error(`[ReservationEngine] Release failed for ${id}: ${(err as Error).message}`)
     }
   }
 

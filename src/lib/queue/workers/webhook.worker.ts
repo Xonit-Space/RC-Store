@@ -1,9 +1,10 @@
 import { Job } from "bullmq"
 import { createWorker } from "../worker"
+import { logger } from "@/lib/logger"
 
 export const webhookWorker = createWorker("webhook", async (job: Job) => {
   const { url, payload } = job.data
-  console.log(`[WebhookWorker] Firing webhook to ${url}`)
+  logger.info(`[WebhookWorker] Firing webhook to ${url}`)
   
   // Simulate outbound HTTP request
   await new Promise(resolve => setTimeout(resolve, 600))

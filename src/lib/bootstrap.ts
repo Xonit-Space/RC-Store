@@ -12,30 +12,31 @@
 
 import { initializeQueueBridge } from "@/events/handlers/queue-bridge"
 import { initializeNotificationPipeline } from "@/notifications/event-subscriber"
+import { logger } from "@/lib/logger"
 
 let bootstrapped = false
 
 export function bootstrapBackendSystems(): void {
   if (bootstrapped) {
-    console.log("[Bootstrap] Systems already initialized. Skipping duplicate call.")
+    logger.info("[Bootstrap] Systems already initialized. Skipping duplicate call.")
     return
   }
 
-  console.log("[Bootstrap] 🚀 Initializing Aussie Rigs Arena backend systems...")
+  logger.info("[Bootstrap] 🚀 Initializing RC Store backend systems...")
 
   try {
     // 1. Wire Event Bus → BullMQ Queue Workers
     initializeQueueBridge()
-    console.log("[Bootstrap] ✅ Queue Bridge: Event Bus → BullMQ workers wired.")
+    logger.info("[Bootstrap] ✅ Queue Bridge: Event Bus → BullMQ workers wired.")
 
     // 2. Wire Event Bus → Notification Engine (DB + Push)
     initializeNotificationPipeline()
-    console.log("[Bootstrap] ✅ Notification Pipeline: Event Bus → Notification Engine wired.")
+    logger.info("[Bootstrap] ✅ Notification Pipeline: Event Bus → Notification Engine wired.")
 
     bootstrapped = true
-    console.log("[Bootstrap] 🟢 All systems nominal. Commerce OS is live.")
+    logger.info("[Bootstrap] 🟢 All systems nominal. Commerce OS is live.")
   } catch (err) {
-    console.error("[Bootstrap] ❌ CRITICAL: System initialization failed:", err)
+    logger.error("[Bootstrap] ❌ CRITICAL: System initialization failed:", err)
     // Do not set bootstrapped = true — allow retry on next invocation
     throw err
   }

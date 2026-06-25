@@ -11,16 +11,17 @@ import { Job } from "bullmq"
 import { createWorker } from "../worker"
 import { getPendingDLQEntries, resolveDLQ, escalateDLQ } from "@/services/dlq"
 import { db } from "@/lib/db"
+import { logger } from "@/lib/logger"
 
 export const dlqWorker = createWorker("dlq", async (job: Job) => {
   const { action } = job.data
 
   if (action === "PROCESS_DLQ_BATCH") {
-    console.log("[DLQWorker] Processing DLQ batch...")
+    logger.info("[DLQWorker] Processing DLQ batch...")
     const entries = await getPendingDLQEntries(20)
 
     if (entries.length === 0) {
-      console.log("[DLQWorker] DLQ is empty.")
+      logger.info("[DLQWorker] DLQ is empty.")
       return { processed: 0 }
     }
 
@@ -50,7 +51,7 @@ export const dlqWorker = createWorker("dlq", async (job: Job) => {
             })
             if (existingOrder) {
               // Order exists — the original failure was non-critical (e.g., audit log)
-              console.log(`[DLQWorker] Order ${orderNumber} found — resolving DLQ entry ${entry.id}`)
+              logger.info(`[DLQWorker] Order ${orderNumber} found — resolving DLQ entry ${entry.id}`)
               await resolveDLQ(entry.id)
               resolved++
               continue
@@ -58,7 +59,7 @@ export const dlqWorker = createWorker("dlq", async (job: Job) => {
           }
 
           // Order doesn't exist — log for manual review (cannot safely re-replay webhook body)
-          console.warn(
+          logger.warn(
             `[DLQWorker] Stripe webhook ${entry.eventId} requires manual replay. ` +
             `Order ${orderNumber} not found after ${entry.retryCount} retries.`
           )
@@ -73,12 +74,12 @@ export const dlqWorker = createWorker("dlq", async (job: Job) => {
           escalated++
         }
       } catch (err: any) {
-        console.error(`[DLQWorker] Error processing DLQ entry ${entry.id}:`, err.message)
+        logger.error(`[DLQWorker] Error processing DLQ entry ${entry.id}:`, err.message)
         // Don't throw — process remaining entries
       }
     }
 
-    console.log(`[DLQWorker] Batch complete. Resolved: ${resolved}, Escalated: ${escalated}`)
+    logger.info(`[DLQWorker] Batch complete. Resolved: ${resolved}, Escalated: ${escalated}`)
     return { processed: entries.length, resolved, escalated }
   }
 

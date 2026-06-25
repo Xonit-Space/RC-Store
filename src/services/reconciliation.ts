@@ -15,6 +15,7 @@ import Stripe from "stripe"
 import { db } from "@/lib/db"
 import { stripe } from "@/services/stripe"
 import { PaymentStatus } from "@prisma/client"
+import { logger } from "@/lib/logger"
 
 export interface ReconciliationInput {
   date?: Date // Reconcile this day. Defaults to yesterday.
@@ -82,7 +83,7 @@ export async function runReconciliation(input: ReconciliationInput = {}): Promis
     })
     stripePaymentIntents = stripeList.data.filter((pi: Stripe.PaymentIntent) => pi.status === "succeeded")
   } catch (err: unknown) {
-    console.warn("[Reconciliation] Stripe API unavailable — using DB-only data:", (err as any).message)
+    logger.warn("[Reconciliation] Stripe API unavailable — using DB-only data:", (err as any).message)
     // Graceful degradation: still produce partial report
   }
 
@@ -181,7 +182,7 @@ export async function runReconciliation(input: ReconciliationInput = {}): Promis
   }
 
   if (status === "DISCREPANCY") {
-    console.error(`[Reconciliation] DISCREPANCY detected for ${summary.reportDate}:`, {
+    logger.error(`[Reconciliation] DISCREPANCY detected for ${summary.reportDate}:`, {
       missingInDB: missingInDB.length,
       missingInStripe: missingInStripe.length,
       mismatchedAmounts: mismatchedAmounts.length,
@@ -189,7 +190,7 @@ export async function runReconciliation(input: ReconciliationInput = {}): Promis
       delta,
     })
   } else {
-    console.log(`[Reconciliation] CLEAN for ${summary.reportDate}. Stripe: $${stripeTotal}, DB: $${dbTotal}`)
+    logger.info(`[Reconciliation] CLEAN for ${summary.reportDate}. Stripe: $${stripeTotal}, DB: $${dbTotal}`)
   }
 
   return summary

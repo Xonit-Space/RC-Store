@@ -1,5 +1,6 @@
 import { db } from "@/lib/db"
 import { unstable_cache } from "next/cache"
+import { serializeForClient } from "@/lib/serialize"
 
 export interface GetProductsOptions {
   featured?: boolean
@@ -74,12 +75,14 @@ async function getProductsFromDb(options: GetProductsOptions = {}) {
   })
 
   // Format to standard product object signature
-  return products.map((product) => ({
-    ...product,
-    images: product.images?.map((img) => img.url) || ["/placeholder.svg"],
-    tags: product.createdAt && (new Date(product.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) ? ["new"] : [],
-    reviewCount: product._count.reviews,
-  }))
+  return serializeForClient(
+    products.map((product) => ({
+      ...product,
+      images: product.images?.map((img) => img.url) || ["/placeholder.svg"],
+      tags: product.createdAt && (new Date(product.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) ? ["new"] : [],
+      reviewCount: product._count.reviews,
+    }))
+  )
 }
 
 /**

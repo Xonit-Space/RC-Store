@@ -3,6 +3,7 @@
 import { db } from "@/lib/db"
 import { unstable_cache } from "next/cache"
 import { ActionResponse } from "./auth"
+import { serializeForClient } from "@/lib/serialize"
 
 export const getFeaturedProduct = unstable_cache(
   async () => {
@@ -25,7 +26,7 @@ export const getFeaturedProduct = unstable_cache(
         updatedAt: "desc",
       },
     })
-    return product
+    return product ? serializeForClient(product) : null
   } catch (error) {
     console.error("Failed to fetch featured product:", error)
     return null
@@ -77,7 +78,7 @@ export const getBestSellers = unstable_cache(
       "On-Road": products.slice(8, 12),
     }
     
-    return grouped
+    return serializeForClient(grouped)
   } catch (error) {
     console.error("Failed to fetch best sellers:", error)
     return { "Off-Road": [], "Crawlers": [], "On-Road": [] }
@@ -132,7 +133,7 @@ export const getStaffPicks = unstable_cache(
         },
       },
     })
-    return picks
+    return serializeForClient(picks)
   } catch (error) {
     console.error("Failed to fetch staff picks:", error)
     return []
@@ -156,7 +157,7 @@ export const getNewReleases = unstable_cache(
         reviews: { select: { rating: true } },
       },
     })
-    return products
+    return serializeForClient(products)
   } catch (error) {
     console.error("Failed to fetch new releases:", error)
     return []

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { withApiHandler } from "@/lib/api-middleware"
 import { db } from "@/lib/db"
 import { Prisma } from "@prisma/client"
+import { serializeForClient } from "@/lib/serialize"
 
 // API responses cached 60 seconds on Vercel CDN — products don't change per-second
 // Using force-dynamic because withApiHandler reads headers for rate limiting
@@ -73,13 +74,13 @@ export const GET = withApiHandler(async (req: NextRequest) => {
   ])
 
   // Format to standard product object signature
-  const formattedProducts = products.map((p) => {
-    return {
+  const formattedProducts = serializeForClient(
+    products.map((p) => ({
       ...p,
       images: p.images || [],
-      reviewCount: p._count.reviews
-    }
-  })
+      reviewCount: p._count.reviews,
+    }))
+  )
 
   return NextResponse.json({
     success: true,

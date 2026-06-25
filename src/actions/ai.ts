@@ -3,6 +3,7 @@
 import { db } from "@/lib/db"
 import { AiService } from "@/services/ai"
 import { ActionResponse } from "./auth"
+import { serializeForClient } from "@/lib/serialize"
 
 export async function getPersonalizedFeed(userId?: string, limit = 4): Promise<ActionResponse> {
   try {
@@ -20,7 +21,7 @@ export async function getPersonalizedFeed(userId?: string, limit = 4): Promise<A
         },
         take: limit,
       })
-      return { success: true, data: fallbackProducts }
+      return { success: true, data: serializeForClient(fallbackProducts) }
     }
 
     // 2. Query fully resolved products matching the recommendations list
@@ -52,7 +53,7 @@ export async function getPersonalizedFeed(userId?: string, limit = 4): Promise<A
     // Sort by AI score descending
     resolvedProducts.sort((a, b) => b.aiScore - a.aiScore)
 
-    return { success: true, data: resolvedProducts }
+    return { success: true, data: serializeForClient(resolvedProducts) }
   } catch (error: any) {
     console.error("AI Personalized Feed Server Action Error:", error)
     return { success: false, error: "Failed to load AI recommendations" }

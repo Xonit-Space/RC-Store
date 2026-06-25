@@ -1,5 +1,6 @@
 import { db } from "@/lib/db"
 import { ProductGender } from "@prisma/client"
+import { serializeForClient } from "@/lib/serialize"
 
 export interface GetProductsFilters {
   category?: string
@@ -136,12 +137,12 @@ export async function getProducts(filters: GetProductsFilters) {
     }
   })
 
-  return {
+  return serializeForClient({
     items,
     totalCount,
     totalPages: Math.ceil(totalCount / limit),
     currentPage: page,
-  }
+  })
 }
 
 export async function getProductBySlug(slug: string) {
@@ -184,11 +185,11 @@ export async function getProductBySlug(slug: string) {
 
   if (!product) return null
 
-  return {
+  return serializeForClient({
     ...product,
     averageRating: reviewStats._avg.rating ?? 0,
     reviewCount: reviewStats._count.id,
-  }
+  })
 }
 
 export async function createProductReview(productId: string, userId: string, rating: number, comment?: string) {

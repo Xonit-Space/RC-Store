@@ -1,4 +1,5 @@
 import { db } from "./db"
+import { serializeForClient } from "@/lib/serialize"
 
 export async function getProducts(options?: {
   featured?: boolean
@@ -39,16 +40,18 @@ export async function getProducts(options?: {
     },
   })
 
-  return products.map((product) => ({
-    ...product,
-    images: product.images.map((img) => img.url),
-    tags: product.createdAt > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) ? ["new"] : [],
-    averageRating:
-      product.reviews.length > 0
-        ? product.reviews.reduce((sum, review) => sum + review.rating, 0) / product.reviews.length
-        : 0,
-    reviewCount: product.reviews.length,
-  }))
+  return serializeForClient(
+    products.map((product) => ({
+      ...product,
+      images: product.images.map((img) => img.url),
+      tags: product.createdAt > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) ? ["new"] : [],
+      averageRating:
+        product.reviews.length > 0
+          ? product.reviews.reduce((sum, review) => sum + review.rating, 0) / product.reviews.length
+          : 0,
+      reviewCount: product.reviews.length,
+    }))
+  )
 }
 
 export async function getCategories() {
@@ -92,7 +95,7 @@ export async function getProductBySlug(slug: string) {
 
   if (!product) return null
 
-  return {
+  return serializeForClient({
     ...product,
     images: product.images.map((img) => img.url),
     tags: product.createdAt > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) ? ["new"] : [],
@@ -101,7 +104,7 @@ export async function getProductBySlug(slug: string) {
         ? product.reviews.reduce((sum, review) => sum + review.rating, 0) / product.reviews.length
         : 0,
     reviewCount: product.reviews.length,
-  }
+  })
 }
 
 // Simulate AI recommendations

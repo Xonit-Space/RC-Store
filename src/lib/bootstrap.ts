@@ -48,7 +48,9 @@ export async function bootstrapBackendSystems(): Promise<void> {
     initializeNotificationPipeline()
     logger.info("[Bootstrap] ✅ Notification Pipeline: Event Bus → Notification Engine wired.")
 
-    if (isLongRunningNode && process.env.ENABLE_QUEUE_WORKERS !== "false") {
+    const { shouldStartQueueWorkers } = await import("@/lib/runtime")
+
+    if (shouldStartQueueWorkers()) {
       const { isQueueEnabled } = await import("@/lib/queue/connection")
       if (isQueueEnabled) {
         await import("@/lib/queue/workers")
@@ -58,6 +60,8 @@ export async function bootstrapBackendSystems(): Promise<void> {
       } else {
         logger.info("[Bootstrap] BullMQ workers skipped — REDIS_URL not configured.")
       }
+    } else if (process.env.NODE_ENV === "development") {
+      logger.info("[Bootstrap] BullMQ workers skipped in development (set ENABLE_QUEUE_WORKERS=true with npm start to test).")
     }
 
     bootstrapped = true

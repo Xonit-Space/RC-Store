@@ -4,7 +4,7 @@
  */
 
 import { PrismaClient, ProductGender, OrderStatus, PaymentStatus, ReturnStatus, RefundStatus, SubscriberStatus } from "@prisma/client"
-import bcrypt from "bcryptjs"
+import argon2 from "argon2"
 
 const prisma = new PrismaClient()
 
@@ -67,7 +67,7 @@ async function main() {
   const warehouse = await prisma.warehouse.create({ data: { name: "Global RC Pits", location: "UK" } })
   const courier = await prisma.courier.create({ data: { name: "Nitro Express" } })
 
-  const pass = await bcrypt.hash("rcadmin123", 10)
+  const pass = await argon2.hash("rcadmin123")
   const users = await Promise.all([
     prisma.user.create({ data: { email: "admin@rc.com", passwordHash: pass, role: "SUPER_ADMIN", name: "RC Admin" } }),
     prisma.user.create({ data: { email: "racer@rc.com", passwordHash: pass, role: "CUSTOMER", name: "Pro Racer" } }),
@@ -171,13 +171,16 @@ async function main() {
       })
     }
     
-    // REVIEWS (2 per product)
+    // REVIEWS (2 per product, always from different users to avoid unique constraint)
     if (i % 2 === 0) {
-      for (let r = 0; r < 2; r++) {
+      const reviewers = [users[1], users[2], users[3], users[4]]
+      const r1 = reviewers[i % reviewers.length]
+      const r2 = reviewers[(i + 1) % reviewers.length]
+      for (const reviewer of [r1, r2]) {
         await prisma.review.create({
           data: {
             productId: p.id,
-            userId: users[rand(1, users.length - 1)].id,
+            userId: reviewer.id,
             rating: rand(4, 5),
             comment: pick(["Insane speed!", "Broke an arm on first jump, but otherwise great.", "Best drift chassis ever.", "Battery lasts forever."])
           }

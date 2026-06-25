@@ -35,6 +35,7 @@ export default function CheckoutPage() {
   const [postalCode, setPostalCode] = useState("")
   const [country, setCountry] = useState("US")
   const [phone, setPhone] = useState("")
+  const [couponCode, setCouponCode] = useState("")
 
   const [error, setError] = useState<string | null>(null)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
@@ -83,7 +84,7 @@ export default function CheckoutPage() {
         session.user.email || "",
         `${baseUrl}/customer`, // Success URL redirects to orders tab
         `${baseUrl}/checkout`, // Cancel URL
-        undefined, // Coupon code
+        couponCode || undefined, // Coupon code
         15 // Shipping cost snapshot
       )
 
@@ -319,6 +320,26 @@ export default function CheckoutPage() {
               <div className="flex justify-between font-extrabold text-foreground text-sm pt-1">
                 <span>Order Total Due</span>
                 <span className="text-foreground">$ {grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-border/40 space-y-2">
+              <label className="text-xs font-bold text-muted/50 block">Discount / Promo Code</label>
+              <div className="flex gap-2">
+                <Input
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                  placeholder="e.g. SUMMER25"
+                  className="h-9 text-xs bg-background uppercase placeholder:normal-case"
+                />
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="h-9 text-xs font-bold"
+                  onClick={() => toast.success("Coupon will be applied at Stripe checkout if valid.")}
+                >
+                  Apply
+                </Button>
               </div>
             </div>
           </div>

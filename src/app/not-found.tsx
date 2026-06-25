@@ -1,9 +1,9 @@
 "use client"
 
 import Link from "next/link"
-import { ShieldAlert } from "lucide-react"
+import { AlertTriangle } from "lucide-react"
 
-export default function AccessDeniedPage() {
+export default function NotFoundPage() {
   return (
     <div className="min-h-screen flex flex-col font-sans bg-background">
       <div className="flex-1 flex flex-col justify-center items-center px-6 py-12 lg:px-8">
@@ -16,10 +16,10 @@ export default function AccessDeniedPage() {
 
         <div className="sm:mx-auto sm:w-full sm:max-w-[400px]">
           <div className="bg-background py-10 px-8 md:px-10 border border-border/40 shadow-sm flex flex-col items-center text-center">
-            <ShieldAlert className="h-16 w-16 text-red-500 mb-6" />
-            <h2 className="text-xl font-bold font-serif mb-2 text-foreground">Access Denied</h2>
+            <AlertTriangle className="h-16 w-16 text-muted-foreground mb-6" />
+            <h2 className="text-xl font-bold font-serif mb-2 text-foreground">Page Not Found</h2>
             <p className="text-xs text-muted-foreground uppercase tracking-widest leading-relaxed mb-8">
-              You do not have the required permissions to access this area.
+              The page you are looking for does not exist or has been moved.
             </p>
             <Link 
               href="/"

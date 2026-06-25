@@ -5,6 +5,7 @@ export const dynamic = "force-dynamic"
 import { useState, useEffect } from "react"
 import { useCartStore } from "@/store/cart"
 import { processStripeCheckout } from "@/actions/order"
+import { getTaxRateByRegionCode } from "@/actions/tax"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { Button } from "@/components/ui/button"
@@ -36,6 +37,7 @@ export default function CheckoutPage() {
   const [country, setCountry] = useState("US")
   const [phone, setPhone] = useState("")
   const [couponCode, setCouponCode] = useState("")
+  const [taxRate, setTaxRate] = useState(0.08)
 
   const [error, setError] = useState<string | null>(null)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
@@ -45,6 +47,10 @@ export default function CheckoutPage() {
     useCartStore.persist.rehydrate()
     setIsHydrated(true)
   }, [])
+
+  useEffect(() => {
+    getTaxRateByRegionCode(country).then(rate => setTaxRate(rate))
+  }, [country])
 
   const handleCheckoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -137,7 +143,7 @@ export default function CheckoutPage() {
 
   const items = cartStore.items
   const subtotal = cartStore.getSubtotal()
-  const tax = subtotal * 0.08
+  const tax = subtotal * taxRate
   const shipping = 15
   const grandTotal = subtotal + tax + shipping
 
@@ -309,7 +315,7 @@ export default function CheckoutPage() {
                 <span className="font-bold text-foreground">$ {subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between">
-                <span>GST Tax (8%)</span>
+                <span>Tax ({(taxRate * 100).toFixed(0)}%)</span>
                 <span className="font-bold text-foreground">$ {tax.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between">

@@ -1,5 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
+import { headers } from "next/headers"
 import { Plus_Jakarta_Sans, Outfit } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -24,11 +25,16 @@ export const metadata: Metadata = {
   description: "Ultra-Premium RC Cars & Remote Racing Experience Platform"
 }
 
+// Nonces are per-request; pages using CSP must be dynamically rendered.
+export const dynamic = "force-dynamic"
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const nonce = headers().get("x-nonce") ?? undefined
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${jakarta.variable} ${outfit.variable} font-sans antialiased bg-background text-foreground selection:bg-racing-yellow selection:text-white`}>
@@ -36,7 +42,13 @@ export default function RootLayout({
         <SessionProvider>
           <QueryProvider>
             {/* Allow system theme default for racing UI */}
-            <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+              nonce={nonce}
+            >
               <LoadingProvider>
                 <Suspense fallback={<HeaderSkeleton />}>{children}</Suspense>
                 <Toaster />

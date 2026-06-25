@@ -1,39 +1,107 @@
-version: '3.8'
+# RC Store — Docker Compose (Local Dev / Self-Hosted)
+# Secrets are loaded from .env (never hardcode credentials here)
+# Usage:
+#   docker compose up -d          → start all services
+#   docker compose up --build app → rebuild Next.js app
+#   docker compose down -v        → teardown + remove volumes
 
 services:
+  # ─── PostgreSQL ──────────────────────────────────────────────────
   db:
     image: postgres:15-alpine
-    container_name: neoshop_postgres
-    restart: always
+    container_name: rcstore_postgres
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: neoshop_admin
-      POSTGRES_PASSWORD: neoshop_secure_password_2026
-      POSTGRES_DB: neoshop_ultra_db
+      POSTGRES_USER: ${POSTGRES_USER:-rcstore_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-rcstore_db}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - neoshop_network
+      - rcstore_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-rcstore_admin} -d ${POSTGRES_DB:-rcstore_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
+  # ─── Redis ───────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: rcstore_redis
+    restart: unless-stopped
+    command: redis-server --save 60 1 --loglevel warning
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - rcstore_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ─── pgAdmin (optional dev UI for Postgres) ──────────────────────
   pgadmin:
     image: dpage/pgadmin4
-    container_name: neoshop_pgadmin
-    restart: always
+    container_name: rcstore_pgadmin
+    restart: unless-stopped
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@neoshop.com
-      PGADMIN_DEFAULT_PASSWORD: admin_secure_password_2026
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@rcstore.local}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:?PGADMIN_PASSWORD must be set in .env}
     ports:
       - "5050:80"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
-      - neoshop_network
+      - rcstore_network
+    profiles:
+      - tools   # Only starts with: docker compose --profile tools up
 
+  # ─── Next.js App ─────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    container_name: rcstore_app
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-rcstore_admin}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-rcstore_db}
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - rcstore_network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+# ─── Volumes ─────────────────────────────────────────────────────
 volumes:
   postgres_data:
     driver: local
+  redis_data:
+    driver: local
 
+# ─── Networks ────────────────────────────────────────────────────
 networks:
-  neoshop_network:
+  rcstore_network:
     driver: bridge

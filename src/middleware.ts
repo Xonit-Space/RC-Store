@@ -1,23 +1,15 @@
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
+import { buildContentSecurityPolicy, generateCspNonce } from "@/lib/security/csp";
 
 export default withAuth(
   function middleware(req) {
-    const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
-    const cspHeader = `
-      default-src 'self';
-      script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https: http: ${
-        process.env.NODE_ENV === 'production' ? '' : "'unsafe-eval'"
-      };
-      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-      img-src 'self' data: https: http:;
-      font-src 'self' https://fonts.gstatic.com;
-      frame-src 'self' https://js.stripe.com;
-    `.replace(/\s{2,}/g, ' ').trim();
+    const nonce = generateCspNonce();
+    const cspHeader = buildContentSecurityPolicy(nonce);
 
     const requestHeaders = new Headers(req.headers);
-    requestHeaders.set('x-nonce', nonce);
-    requestHeaders.set('Content-Security-Policy', cspHeader);
+    requestHeaders.set("x-nonce", nonce);
+    requestHeaders.set("Content-Security-Policy", cspHeader);
 
     const response = NextResponse.next({
       request: {

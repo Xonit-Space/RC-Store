@@ -1,6 +1,4 @@
-// ISR: rebuild homepage every 5 minutes
-export const revalidate = 300
-
+// ISR disabled — root layout uses per-request CSP nonces via middleware.
 import { Suspense } from "react"
 import nextDynamic from "next/dynamic"
 

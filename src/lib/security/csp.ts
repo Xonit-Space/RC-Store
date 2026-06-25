@@ -7,9 +7,9 @@ export function buildContentSecurityPolicy(nonce: string): string {
 
   const directives = [
     "default-src 'self'",
-    // strict-dynamic: only nonced scripts (and their descendants) may run.
-    // Do not add https:/http: here — they are ignored when strict-dynamic is present.
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
+    // nonce + 'self': Next.js applies the nonce to framework scripts during SSR.
+    // Avoid strict-dynamic so same-origin /_next/static scripts still load on fallback error pages.
+    `script-src 'self' 'nonce-${nonce}'${isDev ? " 'unsafe-eval'" : ""}`,
     // Tailwind, Radix, and next/font rely on inline styles; unsafe-inline is standard for style-src.
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "img-src 'self' data: blob: https: http:",
@@ -28,5 +28,10 @@ export function buildContentSecurityPolicy(nonce: string): string {
 }
 
 export function generateCspNonce(): string {
-  return Buffer.from(crypto.randomUUID()).toString("base64")
+  const uuid = crypto.randomUUID()
+  // Edge middleware has no Node Buffer — use btoa on the UTF-8 bytes.
+  if (typeof btoa === "function") {
+    return btoa(uuid)
+  }
+  return Buffer.from(uuid).toString("base64")
 }

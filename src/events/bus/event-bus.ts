@@ -1,5 +1,4 @@
-import { redisPublish, redisSubscribe } from "@/services/redis"
-import { queueConnection } from "@/lib/queue/connection"
+import { redisPublish, redisSubscribe, redisSetNx } from "@/services/redis"
 import { DomainEventEnvelope, EventType } from "../contracts/events"
 
 const CHANNEL_PREFIX = "neoshop:events:"
@@ -32,7 +31,7 @@ export async function subscribeToBusEvent<T>(
       if (envelope.eventId) {
         const lockKey = `${IDEMPOTENCY_KEY_PREFIX}${envelope.eventId}`
         // Set the lock with a 7-day expiration. NX ensures it only sets if it doesn't exist
-        const acquired = await queueConnection.set(lockKey, "1", "EX", 7 * 24 * 60 * 60, "NX")
+        const acquired = await redisSetNx(lockKey, "1", 7 * 24 * 60 * 60)
         
         if (!acquired) {
           console.log(`[EventBus] Dropping duplicate event (Replay Protection): ${envelope.eventId}`)

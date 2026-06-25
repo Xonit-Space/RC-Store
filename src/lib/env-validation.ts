@@ -39,7 +39,13 @@ const ENV_SPEC: EnvSpec[] = [
   { key: "OPENAI_API_KEY",                   required: false, description: "OpenAI API key for AI styling advisor", redact: true },
 ]
 
-export function validateEnvironment(): void {
+export interface ValidateEnvironmentOptions {
+  /** When false, log critical issues but do not throw (web server startup). */
+  strict?: boolean
+}
+
+export function validateEnvironment(options: ValidateEnvironmentOptions = {}): void {
+  const strict = options.strict ?? true
   const errors: string[] = []
   const warnings: string[] = []
 
@@ -80,6 +86,11 @@ export function validateEnvironment(): void {
       "  → See .env.example for documentation on each variable.\n",
     ].join("\n")
 
-    throw new Error(message)
+    if (strict) {
+      throw new Error(message)
+    }
+
+    console.error(message)
+    console.error("[ENV] Continuing in degraded mode — configure missing vars before accepting payments.\n")
   }
 }

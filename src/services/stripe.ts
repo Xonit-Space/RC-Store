@@ -1,14 +1,33 @@
 import Stripe from "stripe"
 import { reserveStock } from "@/services/inventory"
 import { inventoryQueue } from "@/lib/queue/queues"
+import { isQueueEnabled } from "@/lib/queue/connection"
 
-if (!process.env.STRIPE_API_KEY) {
-  throw new Error("STRIPE_API_KEY is missing. Payment gateway cannot be initialized.")
+let stripeClient: Stripe | null = null
+
+function getStripeClient(): Stripe {
+  const apiKey = process.env.STRIPE_API_KEY
+  if (!apiKey) {
+    throw new Error("STRIPE_API_KEY is missing. Payment gateway cannot be initialized.")
+  }
+
+  if (!stripeClient) {
+    stripeClient = new Stripe(apiKey, {
+      apiVersion: "2024-04-10" as any,
+      typescript: true,
+    })
+  }
+
+  return stripeClient
 }
 
-export const stripe = new Stripe(process.env.STRIPE_API_KEY, {
-  apiVersion: "2024-04-10" as any, // Target stable Stripe API version
-  typescript: true,
+/** Lazy Stripe client — avoids crashing app startup when keys are not yet configured. */
+export const stripe: Stripe = new Proxy({} as Stripe, {
+  get(_target, prop) {
+    const client = getStripeClient()
+    const value = Reflect.get(client, prop, client)
+    return typeof value === "function" ? value.bind(client) : value
+  },
 })
 
 export interface CheckoutItem {
@@ -56,20 +75,22 @@ export async function createCheckoutSession(options: CheckoutSessionOptions) {
   const orderNumber = `NS-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`
 
   // 2. Schedule delayed BullMQ job to automatically release reserved stock if cart is abandoned (15 mins TTL)
-  try {
-    await inventoryQueue.add(
-      "release_reservation",
-      {
-        action: "RELEASE_RESERVATION",
-        orderNumber,
-        items: items.map(item => ({ variantId: item.variantId, quantity: item.quantity }))
-      },
-      {
-        delay: 15 * 60 * 1000 // 15 minutes delay
-      }
-    )
-  } catch (err) {
-    console.error("Failed to enqueue delayed stock release job:", err)
+  if (isQueueEnabled) {
+    try {
+      await inventoryQueue.add(
+        "release_reservation",
+        {
+          action: "RELEASE_RESERVATION",
+          orderNumber,
+          items: items.map(item => ({ variantId: item.variantId, quantity: item.quantity }))
+        },
+        {
+          delay: 15 * 60 * 1000 // 15 minutes delay
+        }
+      )
+    } catch (err) {
+      console.error("Failed to enqueue delayed stock release job:", err)
+    }
   }
 
   // Map session payload parameters
@@ -109,7 +130,7 @@ export async function createCheckoutSession(options: CheckoutSessionOptions) {
     ]
   }
 
-  const session = await stripe.checkout.sessions.create(sessionCreateParams)
+  const session = await getStripeClient().checkout.sessions.create(sessionCreateParams)
   return {
     id: session.id,
     url: session.url,
@@ -126,10 +147,10 @@ export async function refundPayment(transactionId: string, amount?: number) {
     refundParams.amount = Math.round(amount * 100) // cents
   }
 
-  const refund = await stripe.refunds.create(refundParams)
+  const refund = await getStripeClient().refunds.create(refundParams)
   return refund
 }
 
 export async function validateWebhookEvent(body: string, signature: string, webhookSecret: string) {
-  return stripe.webhooks.constructEvent(body, signature, webhookSecret)
+  return getStripeClient().webhooks.constructEvent(body, signature, webhookSecret)
 }

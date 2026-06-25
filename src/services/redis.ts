@@ -192,6 +192,21 @@ export async function redisDel(key: string): Promise<void> {
   }
 }
 
+/** Atomic SET if not exists — used for idempotency locks. Returns true when the key was set. */
+export async function redisSetNx(key: string, value: string, ttlSeconds: number): Promise<boolean> {
+  const ready = await ensureRedisReady()
+
+  if (ready && redisClient) {
+    const result = await redisClient.set(key, value, "EX", ttlSeconds, "NX")
+    return result === "OK"
+  }
+
+  const existing = await localMemoryMock.get(key)
+  if (existing) return false
+  await localMemoryMock.set(key, value, "EX", ttlSeconds)
+  return true
+}
+
 export async function redisPublish(channel: string, message: unknown): Promise<number> {
   const payload = typeof message === "string" ? message : JSON.stringify(message)
   const ready = await ensureRedisReady()

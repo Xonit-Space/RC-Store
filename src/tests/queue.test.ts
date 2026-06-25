@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest"
 import { Job } from "bullmq"
-import { queueConnection, emailQueue, analyticsQueue } from "@/lib/queue"
+import { getQueueConnection, emailQueue, analyticsQueue } from "@/lib/queue"
 import { emailWorker } from "@/lib/queue/workers/email.worker"
 import { analyticsWorker } from "@/lib/queue/workers/analytics.worker"
 
@@ -14,7 +14,7 @@ describe("Aussie Rigs Arena Enterprise Background Queue Infrastructure", () => {
   afterAll(async () => {
     await emailWorker.close()
     await analyticsWorker.close()
-    await queueConnection.quit()
+    await getQueueConnection().quit()
   })
 
   it("should successfully enqueue an email job and process it asynchronously via BullMQ workers", async () => {

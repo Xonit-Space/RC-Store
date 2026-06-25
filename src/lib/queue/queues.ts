@@ -1,19 +1,47 @@
 import { Queue, DefaultJobOptions } from "bullmq"
-import { queueConnection } from "./connection"
+import { getQueueConnection, isQueueEnabled } from "./connection"
 
-// Default policies for robust queue retries and worker execution
 const defaultJobOptions: DefaultJobOptions = {
   attempts: 3,
   backoff: {
     type: "exponential",
-    delay: 1000, // Wait 1s, then 2s, then 4s, etc...
+    delay: 1000,
   },
-  removeOnComplete: true, // Keep Redis clean
-  removeOnFail: 100, // Keep last 100 failed jobs for inspection
+  removeOnComplete: true,
+  removeOnFail: 100,
 }
 
-export const emailQueue = new Queue("email", { connection: queueConnection as any, defaultJobOptions })
-export const analyticsQueue = new Queue("analytics", { connection: queueConnection as any, defaultJobOptions })
-export const inventoryQueue = new Queue("inventory", { connection: queueConnection as any, defaultJobOptions })
-export const webhookQueue = new Queue("webhook", { connection: queueConnection as any, defaultJobOptions })
-export const dlqQueue = new Queue("dlq", { connection: queueConnection as any, defaultJobOptions })
+const queueCache = new Map<string, Queue>()
+
+function getOrCreateQueue(name: string): Queue {
+  if (!isQueueEnabled) {
+    throw new Error(`[Queue] "${name}" unavailable — REDIS_URL not configured for this runtime`)
+  }
+
+  let queue = queueCache.get(name)
+  if (!queue) {
+    queue = new Queue(name, {
+      connection: getQueueConnection() as any,
+      defaultJobOptions,
+    })
+    queueCache.set(name, queue)
+  }
+  return queue
+}
+
+/** Lazy queue proxy — defers Redis connection until first use (safe on Vercel without Redis). */
+function lazyQueue(name: string): Queue {
+  return new Proxy({} as Queue, {
+    get(_target, prop) {
+      const queue = getOrCreateQueue(name)
+      const value = Reflect.get(queue, prop, queue)
+      return typeof value === "function" ? value.bind(queue) : value
+    },
+  })
+}
+
+export const emailQueue = lazyQueue("email")
+export const analyticsQueue = lazyQueue("analytics")
+export const inventoryQueue = lazyQueue("inventory")
+export const webhookQueue = lazyQueue("webhook")
+export const dlqQueue = lazyQueue("dlq")

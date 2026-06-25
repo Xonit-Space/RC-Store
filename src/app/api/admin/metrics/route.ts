@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from "next/server"
 import { withApiHandler } from "@/lib/api-middleware"
-import { queueConnection } from "@/lib/queue/connection"
+import { getQueueConnection, isQueueEnabled } from "@/lib/queue/connection"
 import { db } from "@/lib/db"
 
 export const dynamic = "force-dynamic"
+
+async function queueDepth(listKey: string): Promise<number> {
+  if (!isQueueEnabled) return 0
+  try {
+    return await getQueueConnection().llen(listKey)
+  } catch {
+    return 0
+  }
+}
 
 /**
  * GET /api/admin/metrics
@@ -18,9 +27,9 @@ export const GET = withApiHandler(async (req: NextRequest) => {
     orderCount,
     userCount,
   ] = await Promise.all([
-    queueConnection.llen("bull:email_queue:wait").catch(() => 0),
-    queueConnection.llen("bull:analytics_queue:wait").catch(() => 0),
-    queueConnection.llen("bull:inventory_queue:wait").catch(() => 0),
+    queueDepth("bull:email:wait"),
+    queueDepth("bull:analytics:wait"),
+    queueDepth("bull:inventory:wait"),
     db.domainEventLog.findMany({
       orderBy: { createdAt: "desc" },
       take: 20,

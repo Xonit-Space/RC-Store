@@ -24,18 +24,20 @@ export async function bootstrapBackendSystems(): Promise<void> {
 
   try {
     const { ensureRedisReady } = await import("@/services/redis")
-    const { isServerless } = await import("@/lib/runtime")
+    const { isLongRunningNode } = await import("@/lib/runtime")
     const { setBusSubscriptionsEnabled } = await import("@/events/handlers/handler-registry")
 
     const redisReady = await ensureRedisReady()
 
-    const enableBusSubscriptions = !isServerless && redisReady
+    const enableBusSubscriptions = isLongRunningNode && redisReady
     setBusSubscriptionsEnabled(enableBusSubscriptions)
 
-    if (isServerless) {
+    if (isLongRunningNode) {
+      if (!redisReady) {
+        logger.info("[Bootstrap] Redis unavailable: using in-memory pub/sub fallback.")
+      }
+    } else {
       logger.info("[Bootstrap] Serverless runtime: event handlers will dispatch inline.")
-    } else if (!redisReady) {
-      logger.info("[Bootstrap] Redis unavailable: using in-memory pub/sub fallback.")
     }
 
     const { initializeQueueBridge } = await import("@/events/handlers/queue-bridge")
@@ -46,11 +48,22 @@ export async function bootstrapBackendSystems(): Promise<void> {
     initializeNotificationPipeline()
     logger.info("[Bootstrap] ✅ Notification Pipeline: Event Bus → Notification Engine wired.")
 
+    if (isLongRunningNode && process.env.ENABLE_QUEUE_WORKERS !== "false") {
+      const { isQueueEnabled } = await import("@/lib/queue/connection")
+      if (isQueueEnabled) {
+        await import("@/lib/queue/workers")
+        const { initializeScheduledJobs } = await import("@/lib/queue/cron")
+        await initializeScheduledJobs()
+        logger.info("[Bootstrap] ✅ BullMQ workers and scheduled jobs started.")
+      } else {
+        logger.info("[Bootstrap] BullMQ workers skipped — REDIS_URL not configured.")
+      }
+    }
+
     bootstrapped = true
     logger.info("[Bootstrap] 🟢 All systems nominal. Commerce OS is live.")
   } catch (err) {
-    logger.error({ message: "[Bootstrap] ❌ CRITICAL: System initialization failed:", error: err })
-    throw err
+    logger.error({ message: "[Bootstrap] ❌ System initialization failed — continuing without queue/event wiring:", error: err })
   }
 }
 

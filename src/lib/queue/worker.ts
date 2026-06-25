@@ -1,5 +1,5 @@
 import { Worker, Processor, WorkerOptions } from "bullmq"
-import { queueConnection } from "./connection"
+import { getQueueConnection } from "./connection"
 
 /**
  * Creates a BullMQ Worker attached to the standard Redis connection
@@ -11,7 +11,7 @@ export function createWorker<T, R>(
   options?: Omit<WorkerOptions, "connection">
 ): Worker<T, R> {
   const worker = new Worker<T, R>(queueName, processor, {
-    connection: queueConnection as any,
+    connection: getQueueConnection() as any,
     ...options,
   })
 

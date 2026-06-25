@@ -1,4 +1,4 @@
-export { queueConnection } from "./connection"
+export { getQueueConnection, isQueueEnabled } from "./connection"
 export {
   emailQueue,
   analyticsQueue,

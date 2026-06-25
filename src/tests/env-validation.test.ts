@@ -107,4 +107,12 @@ describe("validateEnvironment (api-008)", () => {
     const { validateEnvironment } = await import("@/lib/env-validation")
     expect(() => validateEnvironment()).toThrow(/DATABASE_URL/)
   })
+
+  it("should NOT throw when strict is false and required vars are missing", async () => {
+    vi.resetModules()
+    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {})
+    const { validateEnvironment } = await import("@/lib/env-validation")
+    expect(() => validateEnvironment({ strict: false })).not.toThrow()
+    consoleErrorSpy.mockRestore()
+  })
 })

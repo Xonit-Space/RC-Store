@@ -36,7 +36,7 @@ export default function PartFinderPage() {
 
         {/* Feature Highlights */}
         <div className="container mx-auto px-6 md:px-12 pb-24">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto">
             <div className="flex flex-col gap-4">
               <ShieldCheck className="w-8 h-8 text-racing-yellow" />
               <h3 className="text-xl font-heading font-bold text-foreground">Guaranteed Fitment</h3>
@@ -46,11 +46,6 @@ export default function PartFinderPage() {
               <Zap className="w-8 h-8 text-racing-yellow" />
               <h3 className="text-xl font-heading font-bold text-foreground">Performance Upgrades</h3>
               <p className="text-sm text-muted-foreground">Discover aluminum and carbon fiber hop-ups designed to push your machine past its stock limits.</p>
-            </div>
-            <div className="flex flex-col gap-4">
-              <Activity className="w-8 h-8 text-racing-yellow" />
-              <h3 className="text-xl font-heading font-bold text-foreground">Exploded Views</h3>
-              <p className="text-sm text-muted-foreground">Access interactive diagrams for your specific chassis to pinpoint the exact screw, bearing, or gear you need.</p>
             </div>
           </div>
         </div>

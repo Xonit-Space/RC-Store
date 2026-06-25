@@ -1,13 +1,7 @@
 import { Job } from "bullmq"
 import { createWorker } from "../worker"
-import { logger } from "@/lib/logger"
+import { sendEmailJob } from "@/services/email-job"
 
 export const emailWorker = createWorker("email", async (job: Job) => {
-  const { to, subject, html } = job.data
-  logger.info(`[EmailWorker] Sending email to ${to} (Subject: ${subject})`)
-  
-  // Simulate email sending delay
-  await new Promise(resolve => setTimeout(resolve, 500))
-  
-  return { delivered: true, timestamp: Date.now() }
+  return sendEmailJob(job.data)
 })

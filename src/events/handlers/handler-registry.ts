@@ -7,6 +7,16 @@ export type EventHandler<T = any> = (envelope: DomainEventEnvelope<T>) => void |
 const handlerMap = new Map<string, Array<EventHandler>>()
 const subscribedEvents = new Set<string>()
 
+let busSubscriptionsEnabled = true
+
+/**
+ * When false, handlers are registered but Redis pub/sub wiring is skipped
+ * (used on serverless where events are dispatched inline).
+ */
+export function setBusSubscriptionsEnabled(enabled: boolean): void {
+  busSubscriptionsEnabled = enabled
+}
+
 /**
  * Register a listener to execute operations when a target domain event triggers
  */
@@ -17,20 +27,21 @@ export function registerHandler<T = any>(
   const handlers = handlerMap.get(eventType) || []
   handlerMap.set(eventType, [...handlers, handler])
 
-  // Automatically establish connection to Event Bus upon first listener registration
-  if (!subscribedEvents.has(eventType)) {
-    subscribedEvents.add(eventType)
-    
-    subscribeToBusEvent(eventType, async (envelope) => {
-      try {
-        await executeHandlers(eventType, envelope)
-      } catch (err) {
-        console.error(`Security guard or executor blocked message ${envelope.eventId} propagation:`, err)
-      }
-    }).catch((err) => {
-      console.error(`Failed to wire Event Bus subscriptions for ${eventType}:`, err)
-    })
+  if (!busSubscriptionsEnabled || subscribedEvents.has(eventType)) {
+    return
   }
+
+  subscribedEvents.add(eventType)
+
+  subscribeToBusEvent(eventType, async (envelope) => {
+    try {
+      await executeHandlers(eventType, envelope)
+    } catch (err) {
+      console.error(`Security guard or executor blocked message ${envelope.eventId} propagation:`, err)
+    }
+  }).catch((err) => {
+    console.error(`Failed to wire Event Bus subscriptions for ${eventType}:`, err)
+  })
 }
 
 /**
@@ -40,7 +51,6 @@ export async function executeHandlers(
   eventType: EventType,
   envelope: DomainEventEnvelope
 ): Promise<void> {
-  // Reject untrusted payloads immediately to prevent replay attack vector
   if (!verifyEventSignature(envelope)) {
     const alertMsg = `SECURITY ALERT: Event packet signature validation failed for event ${envelope.eventId} of type ${eventType}`
     console.error(alertMsg)
@@ -49,7 +59,6 @@ export async function executeHandlers(
 
   const handlers = handlerMap.get(eventType) || []
 
-  // Execute all registered callback operations in parallel
   await Promise.all(
     handlers.map(async (handler) => {
       try {
@@ -73,4 +82,5 @@ export async function executeHandlers(
 export function clearAllHandlers(): void {
   handlerMap.clear()
   subscribedEvents.clear()
+  busSubscriptionsEnabled = true
 }

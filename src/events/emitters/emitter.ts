@@ -1,9 +1,11 @@
 import crypto from "crypto"
+import { z } from "zod"
 import { db } from "@/lib/db"
 import { EventSchemaRegistry, EventType, DomainEventEnvelope } from "../contracts/events"
 import { publishEventToBus } from "../bus/event-bus"
+import { executeHandlers } from "../handlers/handler-registry"
+import { isServerless } from "@/lib/runtime"
 
-// Retrieve secure event secret
 const SECRET_KEY = process.env.EVENT_BUS_SECRET || "neoshop_ultra_default_cryptographic_signing_secret_2026"
 
 /**
@@ -49,7 +51,6 @@ export async function emitDomainEvent<T extends EventType>(
   eventType: T,
   payload: z.infer<typeof EventSchemaRegistry[T]>
 ): Promise<DomainEventEnvelope<z.infer<typeof EventSchemaRegistry[T]>>> {
-  // 1. Validate payload using target Zod Schema
   const schema = EventSchemaRegistry[eventType]
   if (!schema) {
     throw new Error(`Unsupported event type requested: ${eventType}`)
@@ -64,7 +65,6 @@ export async function emitDomainEvent<T extends EventType>(
 
   const validatedPayload = parseResult.data
 
-  // 2. Generate envelope parameters
   const eventId = `ev_${crypto.randomUUID().replace(/-/g, "")}`
   const timestamp = new Date()
   const signature = generateEventSignature(eventId, eventType, validatedPayload)
@@ -77,7 +77,6 @@ export async function emitDomainEvent<T extends EventType>(
     signature,
   }
 
-  // 3. Persist to PostgreSQL DomainEventLog ledger for audits & replayability
   try {
     await db.domainEventLog.create({
       data: {
@@ -91,24 +90,32 @@ export async function emitDomainEvent<T extends EventType>(
     })
   } catch (dbError) {
     console.error(`Event Bus failed to persist event ${eventId} in database:`, dbError)
-    // Throw database failure to guarantee consistency in transactional sagas
     throw new Error(`Database persistence failure for event ${eventType}: ${String(dbError)}`)
   }
 
-  // 4. Publish onto the distributed Event Bus channels
   try {
     await publishEventToBus(eventType, envelope)
   } catch (busError) {
     console.error(`Event Bus failed to publish event ${eventId} onto bus:`, busError)
-    // Update log status to denote bus error
-    await db.domainEventLog.update({
-      where: { eventId },
-      data: { status: "FAILED" },
-    }).catch(() => {})
-    
-    throw new Error(`Event Bus publication failure for event ${eventType}: ${String(busError)}`)
+
+    if (!isServerless) {
+      await db.domainEventLog.update({
+        where: { eventId },
+        data: { status: "FAILED" },
+      }).catch(() => {})
+
+      throw new Error(`Event Bus publication failure for event ${eventType}: ${String(busError)}`)
+    }
   }
 
-  return envelope;
+  // On serverless, pub/sub subscribers are not wired — dispatch handlers inline.
+  if (isServerless) {
+    try {
+      await executeHandlers(eventType, envelope)
+    } catch (handlerError) {
+      console.error(`Inline handler dispatch failed for event ${eventId} (${eventType}):`, handlerError)
+    }
+  }
+
+  return envelope
 }
-import { z } from "zod"

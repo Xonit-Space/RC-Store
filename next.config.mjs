@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 import bundleAnalyzer from "@next/bundle-analyzer"
+import path from "path"
+import { fileURLToPath } from "url"
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
@@ -8,7 +12,7 @@ const withBundleAnalyzer = bundleAnalyzer({
 const nextConfig = {
   output: "standalone",
   experimental: {
-    serverComponentsExternalPackages: ["bullmq"],
+    serverComponentsExternalPackages: ["bullmq", "ioredis"],
     instrumentationHook: true,
   },
   images: {
@@ -27,6 +31,19 @@ const nextConfig = {
         hostname: '**.supabase.co',
       },
     ],
+  },
+
+  webpack: (config, { isServer, nextRuntime }) => {
+    if (nextRuntime === "edge") {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        "./instrumentation-node": path.resolve(__dirname, "src/instrumentation-node.stub.ts"),
+      }
+    }
+    if (isServer) {
+      config.externals = [...(config.externals || []), "ioredis", "bullmq"]
+    }
+    return config
   },
 
   // Phase 10: Network Optimization — Granular Cache-Control headers

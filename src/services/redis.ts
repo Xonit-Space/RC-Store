@@ -6,8 +6,8 @@ export let redisClient: Redis | null = null
 let redisPub: Redis | null = null
 let redisSub: Redis | null = null
 
-// Shared options: disable offline queue so commands fail immediately instead of
-// piling up and spamming retries when Redis is unreachable.
+let redisReadyPromise: Promise<boolean> | null = null
+
 const BASE_OPTIONS = {
   maxRetriesPerRequest: 3,
   enableOfflineQueue: false,
@@ -17,22 +17,20 @@ const BASE_OPTIONS = {
 
 function attachErrorHandler(client: Redis, label: string) {
   client.on("error", (err: Error) => {
-    // Only log once per type of error to avoid console flooding.
-    // ECONNREFUSED / MaxRetriesPerRequestError are expected when Redis is down.
     if (
       err.message.includes("ECONNREFUSED") ||
       err.message.includes("ECONNRESET") ||
       err.message.includes("MaxRetriesPerRequest")
     ) {
-      // Downgrade to a single-line warning — already shown on startup.
       return
     }
     console.error(`[Redis:${label}] Unexpected error:`, err.message)
   })
 }
 
-// Initialize ioredis clients if host target URL is defined in env parameters
-if (redisUrl) {
+function createRedisClients(): void {
+  if (!redisUrl || redisClient) return
+
   try {
     redisClient = new Redis(redisUrl, BASE_OPTIONS)
     redisPub = new Redis(redisUrl, BASE_OPTIONS)
@@ -41,17 +39,47 @@ if (redisUrl) {
     attachErrorHandler(redisClient, "client")
     attachErrorHandler(redisPub, "pub")
     attachErrorHandler(redisSub, "sub")
-
-    // Attempt connection and warn once on failure
-    redisClient.connect().catch(() => {
-      console.warn("[Redis] Could not connect to Redis — falling back to in-memory cache.")
-      redisClient = null
-      redisPub = null
-      redisSub = null
-    })
-  } catch (err) {
+  } catch {
     console.warn("[Redis] Failed to initialize Redis clients — falling back to in-memory cache.")
+    redisClient = null
+    redisPub = null
+    redisSub = null
   }
+}
+
+function tearDownRedisClients(): void {
+  redisClient = null
+  redisPub = null
+  redisSub = null
+}
+
+/**
+ * Await a single Redis connection attempt. Returns true when pub/sub clients are usable.
+ */
+export async function ensureRedisReady(): Promise<boolean> {
+  if (!redisUrl) return false
+
+  if (!redisReadyPromise) {
+    redisReadyPromise = (async () => {
+      createRedisClients()
+      if (!redisClient || !redisPub || !redisSub) return false
+
+      try {
+        await Promise.all([
+          redisClient.connect(),
+          redisPub.connect(),
+          redisSub.connect(),
+        ])
+        return true
+      } catch {
+        console.warn("[Redis] Could not connect to Redis — falling back to in-memory cache.")
+        tearDownRedisClients()
+        return false
+      }
+    })()
+  }
+
+  return redisReadyPromise
 }
 
 // ==========================================
@@ -80,11 +108,11 @@ class MemoryRedisMock {
   }
 
   async set(key: string, value: string, mode?: string, duration?: number): Promise<string> {
-    let ttlMs = 30 * 24 * 60 * 60 * 1000 // 30 days default
+    let ttlMs = 30 * 24 * 60 * 60 * 1000
     if (mode === "EX" && duration) {
       ttlMs = duration * 1000
     }
-    
+
     this.cache.set(key, {
       value,
       expiresAt: Date.now() + ttlMs,
@@ -93,8 +121,7 @@ class MemoryRedisMock {
   }
 
   async del(key: string): Promise<number> {
-    const deleted = this.cache.delete(key) ? 1 : 0
-    return deleted
+    return this.cache.delete(key) ? 1 : 0
   }
 
   async publish(channel: string, message: string): Promise<number> {
@@ -123,8 +150,9 @@ const localMemoryMock = new MemoryRedisMock()
 
 export async function redisSet<T>(key: string, value: T, ttlSeconds?: number): Promise<void> {
   const stringValue = typeof value === "string" ? value : JSON.stringify(value)
-  
-  if (redisClient) {
+  const ready = await ensureRedisReady()
+
+  if (ready && redisClient) {
     if (ttlSeconds) {
       await redisClient.set(key, stringValue, "EX", ttlSeconds)
     } else {
@@ -136,9 +164,10 @@ export async function redisSet<T>(key: string, value: T, ttlSeconds?: number): P
 }
 
 export async function redisGet<T>(key: string): Promise<T | null> {
+  const ready = await ensureRedisReady()
   let valueStr: string | null = null
 
-  if (redisClient) {
+  if (ready && redisClient) {
     valueStr = await redisClient.get(key)
   } else {
     valueStr = await localMemoryMock.get(key)
@@ -154,7 +183,9 @@ export async function redisGet<T>(key: string): Promise<T | null> {
 }
 
 export async function redisDel(key: string): Promise<void> {
-  if (redisClient) {
+  const ready = await ensureRedisReady()
+
+  if (ready && redisClient) {
     await redisClient.del(key)
   } else {
     await localMemoryMock.del(key)
@@ -163,16 +194,22 @@ export async function redisDel(key: string): Promise<void> {
 
 export async function redisPublish(channel: string, message: unknown): Promise<number> {
   const payload = typeof message === "string" ? message : JSON.stringify(message)
-  
-  if (redisPub) {
+  const ready = await ensureRedisReady()
+
+  if (ready && redisPub) {
     return redisPub.publish(channel, payload)
-  } else {
-    return localMemoryMock.publish(channel, payload)
   }
+
+  return localMemoryMock.publish(channel, payload)
 }
 
-export async function redisSubscribe(channel: string, callback: (message: string) => void): Promise<void> {
-  if (redisSub) {
+export async function redisSubscribe(
+  channel: string,
+  callback: (message: string) => void
+): Promise<void> {
+  const ready = await ensureRedisReady()
+
+  if (ready && redisSub) {
     await redisSub.subscribe(channel)
     redisSub.on("message", (subChannel, message) => {
       if (subChannel === channel) {

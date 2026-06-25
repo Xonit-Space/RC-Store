@@ -18,6 +18,14 @@ export interface UseWebsocketResult {
   disconnect: () => void
 }
 
+function getWebSocketUrl(token?: string): string | null {
+  const baseUrl = process.env.NEXT_PUBLIC_WS_URL
+  if (!baseUrl) return null
+
+  const separator = baseUrl.includes("?") ? "&" : "?"
+  return `${baseUrl}${separator}token=${encodeURIComponent(token || "anonymous")}`
+}
+
 /**
  * Resilient Storefront WebSocket Hook:
  * Manages heartbeats, exponential backoff reconnects, SSR safety,
@@ -31,13 +39,9 @@ export function useWebsocket(options: UseWebsocketOptions = {}): UseWebsocketRes
   const socketRef = useRef<WebSocket | null>(null)
   const reconnectAttemptsRef = useRef(0)
   const messageQueueRef = useRef<any[]>([])
-  
-  // Track active browser-side callback registrations per channel
+
   const callbacksRef = useRef<Map<string, Set<(payload: any) => void>>>(new Map())
 
-  /**
-   * Terminate connection gracefully
-   */
   const disconnect = useCallback(() => {
     if (socketRef.current) {
       socketRef.current.close()
@@ -46,12 +50,14 @@ export function useWebsocket(options: UseWebsocketOptions = {}): UseWebsocketRes
     setIsConnected(false)
   }, [])
 
-  /**
-   * Initialize and hook the WebSocket client
-   */
   const connect = useCallback(() => {
-    if (typeof window === "undefined") return // Server-Side Rendering (SSR) safety check
-    
+    if (typeof window === "undefined") return
+
+    const url = getWebSocketUrl(token)
+    if (!url) {
+      return
+    }
+
     if (
       socketRef.current &&
       (socketRef.current.readyState === WebSocket.CONNECTING || socketRef.current.readyState === WebSocket.OPEN)
@@ -60,7 +66,6 @@ export function useWebsocket(options: UseWebsocketOptions = {}): UseWebsocketRes
     }
 
     try {
-      const url = `ws://localhost:3001?token=${token || "anonymous"}`
       const socket = new WebSocket(url)
       socketRef.current = socket
 
@@ -71,14 +76,12 @@ export function useWebsocket(options: UseWebsocketOptions = {}): UseWebsocketRes
 
         onConnect?.()
 
-        // 1. Process queued messages
         const queue = messageQueueRef.current
         messageQueueRef.current = []
         queue.forEach((msg) => {
           socket.send(JSON.stringify(msg))
         })
 
-        // 2. Auto-renew active channel subscriptions on reconnect
         Array.from(callbacksRef.current.keys()).forEach((channel) => {
           socket.send(JSON.stringify({ type: "subscribe", channel }))
         })
@@ -88,13 +91,11 @@ export function useWebsocket(options: UseWebsocketOptions = {}): UseWebsocketRes
         try {
           const data = JSON.parse(event.data)
 
-          // 1. Handle Ping-Pong heartbeat
           if (data.type === "ping") {
             socket.send(JSON.stringify({ type: "pong" }))
             return
           }
 
-          // 2. Dispatch events to local subscription callbacks
           if (data.type === "event" && data.channel) {
             const channelCallbacks = callbacksRef.current.get(data.channel)
             channelCallbacks?.forEach((callback) => {
@@ -128,11 +129,9 @@ export function useWebsocket(options: UseWebsocketOptions = {}): UseWebsocketRes
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, onConnect, onDisconnect, onMessage])
 
-  /**
-   * Exponential Backoff Reconnection Scheduler:
-   * Retries connections at 1s, 2s, 4s, 8s, up to a maximum cap of 16s.
-   */
   const scheduleReconnect = useCallback(() => {
+    if (!getWebSocketUrl(token)) return
+
     if (reconnectAttemptsRef.current >= 5) {
       setError("Maximum WebSocket reconnect attempts reached.")
       return
@@ -144,11 +143,8 @@ export function useWebsocket(options: UseWebsocketOptions = {}): UseWebsocketRes
     setTimeout(() => {
       connect()
     }, backoffMs)
-  }, [connect])
+  }, [connect, token])
 
-  /**
-   * Thread-safe client send wrapper (queues messages if client is offline)
-   */
   const send = useCallback((message: any) => {
     const socket = socketRef.current
     if (socket && socket.readyState === WebSocket.OPEN) {
@@ -158,9 +154,6 @@ export function useWebsocket(options: UseWebsocketOptions = {}): UseWebsocketRes
     }
   }, [])
 
-  /**
-   * Subscribe to a custom WebSocket channel
-   */
   const subscribeToChannel = useCallback(
     (channel: string, callback: (payload: any) => void) => {
       const channelCallbacks = callbacksRef.current.get(channel) || new Set()
@@ -172,9 +165,6 @@ export function useWebsocket(options: UseWebsocketOptions = {}): UseWebsocketRes
     [send]
   )
 
-  /**
-   * Unsubscribe from a custom WebSocket channel
-   */
   const unsubscribeFromChannel = useCallback(
     (channel: string) => {
       callbacksRef.current.delete(channel)
@@ -183,15 +173,14 @@ export function useWebsocket(options: UseWebsocketOptions = {}): UseWebsocketRes
     [send]
   )
 
-  // Establish lifecycle connections
   useEffect(() => {
-    if (autoConnect) {
+    if (autoConnect && getWebSocketUrl(token)) {
       connect()
     }
     return () => {
       disconnect()
     }
-  }, [autoConnect, connect, disconnect])
+  }, [autoConnect, connect, disconnect, token])
 
   return {
     isConnected,

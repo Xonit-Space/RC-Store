@@ -76,12 +76,13 @@ export default function CheckoutPage() {
     }
 
     try {
+      const baseUrl = typeof window !== "undefined" ? window.location.origin : (process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000");
       // 1. Initialize Stripe Secure Session checkout action
       const response = await processStripeCheckout(
         session.user.id,
         session.user.email || "",
-        "http://localhost:3000/customer", // Success URL redirects to orders tab
-        "http://localhost:3000/checkout", // Cancel URL
+        `${baseUrl}/customer`, // Success URL redirects to orders tab
+        `${baseUrl}/checkout`, // Cancel URL
         undefined, // Coupon code
         15 // Shipping cost snapshot
       )

@@ -58,7 +58,7 @@ export function mapEventToNotification(envelope: DomainEventEnvelope): Normalize
       return {
         userId: payload.userId,
         type: "SYSTEM",
-        title: "Welcome to Aussie Rigs Arena!",
+        title: "Welcome to RC Store!",
         message: `Hi ${payload.name || "Customer"}, your account registration was completed successfully.`,
         metadata: { userId: payload.userId, email: payload.email },
       }

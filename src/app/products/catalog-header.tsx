@@ -2,6 +2,8 @@
 
 import { useRouter, useSearchParams } from "next/navigation"
 import { SlidersHorizontal } from "lucide-react"
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import { SidebarFilters } from "./sidebar-filters"
 
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest" },
@@ -28,16 +30,20 @@ export function CatalogHeader({ totalCount }: CatalogHeaderProps) {
   return (
     <div className="flex items-center justify-between mb-10 md:mb-14">
       {/* Mobile filter toggle */}
-      <button
-        className="md:hidden flex items-center gap-2 text-[11px] tracking-[0.2em] uppercase text-muted-foreground hover:text-foreground transition-colors"
-        onClick={() => {
-          // Open mobile filters (would need a context or state lifted up, but for now just console log or skip)
-          console.log("Open mobile filters")
-        }}
-      >
-        <SlidersHorizontal strokeWidth={1} className="w-4 h-4" />
-        Filters
-      </button>
+      <Sheet>
+        <SheetTrigger asChild>
+          <button className="md:hidden flex items-center gap-2 text-[11px] tracking-[0.2em] uppercase text-muted-foreground hover:text-foreground transition-colors">
+            <SlidersHorizontal strokeWidth={1} className="w-4 h-4" />
+            Filters
+          </button>
+        </SheetTrigger>
+        <SheetContent side="left" className="w-[300px] sm:w-[400px] overflow-y-auto pt-12">
+          <SheetHeader className="mb-6">
+            <SheetTitle className="text-left font-serif font-light text-2xl">Filters</SheetTitle>
+          </SheetHeader>
+          <SidebarFilters />
+        </SheetContent>
+      </Sheet>
 
       <p className="hidden md:block text-xs text-muted-foreground">
         {totalCount} {totalCount === 1 ? "result" : "results"}

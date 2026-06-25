@@ -102,7 +102,7 @@ export function SidebarFilters() {
             Price
           </label>
           <span className="text-[10px] text-muted-foreground">
-            Rs.{priceRange[0]} – Rs.{priceRange[1]}
+            ${priceRange[0]} – ${priceRange[1]}
           </span>
         </div>
         <Slider

@@ -2,9 +2,11 @@ import Stripe from "stripe"
 import { reserveStock } from "@/services/inventory"
 import { inventoryQueue } from "@/lib/queue/queues"
 
-const stripeApiKey = process.env.STRIPE_API_KEY || "dummy_key_for_build"
+if (!process.env.STRIPE_API_KEY) {
+  throw new Error("STRIPE_API_KEY is missing. Payment gateway cannot be initialized.")
+}
 
-export const stripe = new Stripe(stripeApiKey, {
+export const stripe = new Stripe(process.env.STRIPE_API_KEY, {
   apiVersion: "2024-04-10" as any, // Target stable Stripe API version
   typescript: true,
 })

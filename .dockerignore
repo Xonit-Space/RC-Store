@@ -1,0 +1,47 @@
+# --- Version Control ---
+.git
+.gitignore
+
+# --- Node dependencies (reinstalled inside image) ---
+node_modules
+
+# --- Next.js build artifacts ---
+.next
+out
+
+# --- Environment files (never copy secrets into image) ---
+.env
+.env.*
+!.env.example
+
+# --- Test & Development tooling ---
+*.test.ts
+*.spec.ts
+playwright.config.ts
+vitest.config.ts
+__tests__
+coverage
+
+# --- Editor / OS files ---
+.DS_Store
+*.tsbuildinfo
+.idea
+.vscode
+
+# --- Docker files (don't recurse) ---
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# --- CI / GitHub ---
+.github
+
+# --- Project scratch files ---
+scratch
+PERFORMANCE.md
+SECURITY.md
+SYSTEM_MAP.md
+README.md
+env.txt
+test-api.js
+replace-colors.js

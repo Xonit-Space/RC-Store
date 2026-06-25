@@ -36,7 +36,7 @@ export function bootstrapBackendSystems(): void {
     bootstrapped = true
     logger.info("[Bootstrap] 🟢 All systems nominal. Commerce OS is live.")
   } catch (err) {
-    logger.error("[Bootstrap] ❌ CRITICAL: System initialization failed:", err)
+    logger.error({ message: "[Bootstrap] ❌ CRITICAL: System initialization failed:", error: err })
     // Do not set bootstrapped = true — allow retry on next invocation
     throw err
   }

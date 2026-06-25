@@ -83,7 +83,7 @@ export async function runReconciliation(input: ReconciliationInput = {}): Promis
     })
     stripePaymentIntents = stripeList.data.filter((pi: Stripe.PaymentIntent) => pi.status === "succeeded")
   } catch (err: unknown) {
-    logger.warn("[Reconciliation] Stripe API unavailable — using DB-only data:", (err as any).message)
+    logger.warn({ message: "[Reconciliation] Stripe API unavailable — using DB-only data:", error: (err as any).message })
     // Graceful degradation: still produce partial report
   }
 

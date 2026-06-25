@@ -32,7 +32,7 @@ export async function sendOrderConfirmationSms(to: string, orderNumber: string, 
     logger.info(`[Twilio] Order confirmation SMS sent to ${to} for order ${orderNumber}`)
     return true
   } catch (error) {
-    logger.error(`[Twilio] Failed to send order confirmation SMS:`, error)
+    logger.error({ message: "[Twilio] Failed to send order confirmation SMS:", error })
     return false
   }
 }
@@ -65,7 +65,7 @@ export async function sendOrderStatusUpdateSms(to: string, orderNumber: string, 
     logger.info(`[Twilio] Order status update SMS sent to ${to} for order ${orderNumber}`)
     return true
   } catch (error) {
-    logger.error(`[Twilio] Failed to send order status update SMS:`, error)
+    logger.error({ message: "[Twilio] Failed to send order status update SMS:", error })
     return false
   }
 }

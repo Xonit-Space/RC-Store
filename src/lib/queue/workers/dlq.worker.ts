@@ -74,7 +74,7 @@ export const dlqWorker = createWorker("dlq", async (job: Job) => {
           escalated++
         }
       } catch (err: any) {
-        logger.error(`[DLQWorker] Error processing DLQ entry ${entry.id}:`, err.message)
+        logger.error({ message: `[DLQWorker] Error processing DLQ entry ${entry.id}:`, error: err.message })
         // Don't throw — process remaining entries
       }
     }

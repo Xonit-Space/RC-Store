@@ -35,7 +35,7 @@ export const inventoryWorker = createWorker("inventory", async (job: Job) => {
       return { success: true, released: true }
 
     } catch (err: any) {
-      logger.error(`[InventoryWorker] Release failed for order ${orderNumber}:`, err)
+      logger.error({ message: `[InventoryWorker] Release failed for order ${orderNumber}:`, error: err })
       throw err
     }
   }
@@ -48,7 +48,7 @@ export const inventoryWorker = createWorker("inventory", async (job: Job) => {
       logger.info(`[InventoryWorker] Released ${count} expired reservations.`)
       return { success: true, releasedCount: count }
     } catch (err: any) {
-      logger.error("[InventoryWorker] Reservation sweep failed:", err.message)
+      logger.error({ message: "[InventoryWorker] Reservation sweep failed:", error: err.message })
       throw err
     }
   }

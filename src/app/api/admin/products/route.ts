@@ -66,3 +66,34 @@ export const GET = withApiHandler(async (req: NextRequest) => {
     }
   })
 }, { requireAdmin: true, rateLimitNamespace: "admin_products_get" })
+
+export const POST = withApiHandler(async (req: NextRequest) => {
+  const body = await req.json()
+  const { name, slug, description, price, categoryId, brandId, gender } = body
+
+  if (!name || !slug || !price || !categoryId) {
+    return NextResponse.json({ error: "Missing required fields: name, slug, price, categoryId" }, { status: 400 })
+  }
+
+  try {
+    const product = await db.product.create({
+      data: {
+        name,
+        slug,
+        description,
+        price: new Prisma.Decimal(price),
+        categoryId,
+        brandId,
+        gender: gender || "UNISEX"
+      }
+    })
+
+    return NextResponse.json({ success: true, data: product })
+  } catch (error: any) {
+    if (error.code === 'P2002') {
+      return NextResponse.json({ error: "A product with this slug already exists" }, { status: 409 })
+    }
+    throw error
+  }
+}, { requireAdmin: true, rateLimitNamespace: "admin_products_post" })
+

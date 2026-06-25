@@ -2,7 +2,7 @@ import { trace, type Span } from "@opentelemetry/api"
 import { PostHog } from "posthog-node"
 import { db } from "@/lib/db"
 
-const posthogProjectKey = process.env.POSTGRES_API_KEY || process.env.POSTHOG_API_KEY
+const posthogProjectKey = process.env.POSTHOG_API_KEY
 const posthogHost = process.env.POSTHOG_HOST || "https://app.posthog.com"
 
 let posthogClient: PostHog | null = null

@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Settings, Save, Bell, Shield } from "lucide-react"
+import { Settings, Save, Bell, Shield, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
 type TabType = "general" | "security" | "notifications"
@@ -11,14 +11,61 @@ type TabType = "general" | "security" | "notifications"
 export default function AdminSettingsPage() {
   const [activeTab, setActiveTab] = useState<TabType>("general")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  
+  const [settings, setSettings] = useState<Record<string, string>>({
+    storeName: "Aussie Rigs Arena",
+    contactEmail: "support@aussierigsarena.com",
+    orderPrefix: "ORD-",
+    require2fa: "true",
+    sessionTimeout: "30",
+    passwordPolicy: "standard",
+    notifyNewOrder: "true",
+    notifyLowInventory: "true",
+    notifyDailySummary: "false"
+  })
 
-  const handleSave = (e: React.FormEvent) => {
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const res = await fetch("/api/admin/settings")
+        if (res.ok) {
+          const { data } = await res.json()
+          setSettings(prev => ({ ...prev, ...data }))
+        }
+      } catch (err) {
+        console.error("Failed to load settings:", err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    loadSettings()
+  }, [])
+
+  const handleChange = (key: string, value: string | boolean) => {
+    setSettings(prev => ({ ...prev, [key]: String(value) }))
+  }
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(settings)
+      })
+      if (!res.ok) throw new Error("Failed to save")
       toast.success("Platform settings updated successfully")
+    } catch (err) {
+      toast.error("Failed to update settings")
+    } finally {
       setIsSubmitting(false)
-    }, 1000)
+    }
+  }
+
+  if (isLoading) {
+    return <div className="flex h-[50vh] items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
   }
 
   return (
@@ -71,7 +118,8 @@ export default function AdminSettingsPage() {
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">Store Name</label>
                     <Input
-                      defaultValue="Aussie Rigs Arena"
+                      value={settings.storeName}
+                      onChange={e => handleChange("storeName", e.target.value)}
                       className="h-12 bg-transparent border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-foreground"
                     />
                   </div>
@@ -79,7 +127,8 @@ export default function AdminSettingsPage() {
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">Contact Email</label>
                     <Input
-                      defaultValue="support@aussierigsarena.com"
+                      value={settings.contactEmail}
+                      onChange={e => handleChange("contactEmail", e.target.value)}
                       type="email"
                       className="h-12 bg-transparent border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-foreground"
                     />
@@ -88,7 +137,8 @@ export default function AdminSettingsPage() {
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">Order Prefix</label>
                     <Input
-                      defaultValue="ORD-"
+                      value={settings.orderPrefix}
+                      onChange={e => handleChange("orderPrefix", e.target.value)}
                       className="h-12 bg-transparent border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-foreground font-mono"
                     />
                     <p className="text-[10px] text-muted-foreground uppercase tracking-widest mt-2">Example: ORD-10256</p>
@@ -109,7 +159,7 @@ export default function AdminSettingsPage() {
                       <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-1">Require 2FA for all admin accounts</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" defaultChecked />
+                      <input type="checkbox" className="sr-only peer" checked={settings.require2fa === "true"} onChange={e => handleChange("require2fa", e.target.checked)} />
                       <div className="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-racing-yellow"></div>
                     </label>
                   </div>
@@ -117,7 +167,8 @@ export default function AdminSettingsPage() {
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">Session Timeout (Minutes)</label>
                     <Input
-                      defaultValue="30"
+                      value={settings.sessionTimeout}
+                      onChange={e => handleChange("sessionTimeout", e.target.value)}
                       type="number"
                       className="h-12 bg-transparent border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-foreground"
                     />
@@ -125,7 +176,11 @@ export default function AdminSettingsPage() {
                   
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">Password Policy</label>
-                    <select className="w-full h-12 bg-transparent border border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-foreground px-3 text-sm outline-none">
+                    <select 
+                      value={settings.passwordPolicy}
+                      onChange={e => handleChange("passwordPolicy", e.target.value)}
+                      className="w-full h-12 bg-transparent border border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-foreground px-3 text-sm outline-none"
+                    >
                       <option value="standard">Standard (8+ chars, 1 number)</option>
                       <option value="strict">Strict (12+ chars, special char, uppercase)</option>
                     </select>
@@ -146,7 +201,7 @@ export default function AdminSettingsPage() {
                       <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-1">Email on successful checkout</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" defaultChecked />
+                      <input type="checkbox" className="sr-only peer" checked={settings.notifyNewOrder === "true"} onChange={e => handleChange("notifyNewOrder", e.target.checked)} />
                       <div className="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-racing-yellow"></div>
                     </label>
                   </div>
@@ -157,7 +212,7 @@ export default function AdminSettingsPage() {
                       <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-1">Email when stock hits threshold</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" defaultChecked />
+                      <input type="checkbox" className="sr-only peer" checked={settings.notifyLowInventory === "true"} onChange={e => handleChange("notifyLowInventory", e.target.checked)} />
                       <div className="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-racing-yellow"></div>
                     </label>
                   </div>
@@ -168,7 +223,7 @@ export default function AdminSettingsPage() {
                       <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-1">Daily sales and traffic digest</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" />
+                      <input type="checkbox" className="sr-only peer" checked={settings.notifyDailySummary === "true"} onChange={e => handleChange("notifyDailySummary", e.target.checked)} />
                       <div className="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-racing-yellow"></div>
                     </label>
                   </div>

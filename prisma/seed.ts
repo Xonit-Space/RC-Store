@@ -4,7 +4,7 @@
  */
 
 import { PrismaClient, ProductGender, OrderStatus, PaymentStatus, ReturnStatus, RefundStatus, SubscriberStatus } from "@prisma/client"
-import argon2 from "argon2"
+import bcrypt from "bcryptjs"
 
 const prisma = new PrismaClient()
 
@@ -67,7 +67,7 @@ async function main() {
   const warehouse = await prisma.warehouse.create({ data: { name: "Global RC Pits", location: "UK" } })
   const courier = await prisma.courier.create({ data: { name: "Nitro Express" } })
 
-  const pass = await argon2.hash("rcadmin123")
+  const pass = await bcrypt.hash("rcadmin123", 12)
   const users = await Promise.all([
     prisma.user.create({ data: { email: "admin@rc.com", passwordHash: pass, role: "SUPER_ADMIN", name: "RC Admin" } }),
     prisma.user.create({ data: { email: "racer@rc.com", passwordHash: pass, role: "CUSTOMER", name: "Pro Racer" } }),

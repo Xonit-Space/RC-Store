@@ -39,8 +39,8 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        const argon2 = await import("argon2")
-        const isValid = await argon2.verify(user.passwordHash, credentials.password)
+        const bcrypt = await import("bcryptjs")
+        const isValid = await bcrypt.compare(credentials.password, user.passwordHash)
 
         if (!isValid) {
           return null

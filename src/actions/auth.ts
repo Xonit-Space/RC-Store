@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 import { db } from '@/lib/db';
-import argon2 from 'argon2';
+import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { rateLimit } from '@/lib/security/rate-limit';
 import { sendPasswordResetEmail, sendVerificationEmail } from '@/services/email';
@@ -38,7 +38,7 @@ export async function registerUser(data: z.infer<typeof RegisterSchema>) {
     return { error: 'Email already exists' };
   }
 
-  const passwordHash = await argon2.hash(password);
+  const passwordHash = await bcrypt.hash(password, 12);
 
   // Generate Verification Token
   const token = crypto.randomUUID();
@@ -125,7 +125,7 @@ export async function resetPassword(token: string, data: Omit<z.infer<typeof Res
     return { error: 'User not found' };
   }
 
-  const passwordHash = await argon2.hash(parsed.data.password);
+  const passwordHash = await bcrypt.hash(parsed.data.password, 12);
 
   await db.user.update({
     where: { id: user.id },

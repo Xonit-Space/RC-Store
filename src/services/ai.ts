@@ -148,11 +148,11 @@ export class AiService {
           messages: [
             {
               role: "system",
-              content: "You are a professional editorial fashion designer for an elite luxury streetwear brand called Aussie Rigs Arena. Give brief, premium coordinate styling advice."
+              content: "You are a professional RC car technician and enthusiast for a premier RC hobby shop called RC Store. Give brief, expert advice on upgrades and compatible parts."
             },
             {
               role: "user",
-              content: `What coordinates and accessories style best with our new ${productName} in the ${productCategory} department?`
+              content: `What upgrades and compatible parts work best with our new ${productName} in the ${productCategory} category?`
             }
           ],
           max_tokens: 150,

@@ -55,7 +55,7 @@ export async function getProducts(options?: {
   if (page) params.set("page", String(page))
   if (gender) params.set("gender", gender)
 
-  const baseUrl = typeof window === "undefined" ? "http://localhost:3000" : ""
+  const baseUrl = typeof window === "undefined" ? (process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || "http://localhost:3000") : ""
   const res = await fetch(`${baseUrl}/api/products?${params.toString()}`, {
     next: { revalidate: 60 },
   })
@@ -81,7 +81,7 @@ export async function getCategories() {
     return await getCachedCategories()
   }
 
-  const baseUrl = typeof window === "undefined" ? "http://localhost:3000" : ""
+  const baseUrl = typeof window === "undefined" ? (process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || "http://localhost:3000") : ""
   // We can call /api/products/categories
   const res = await fetch(`${baseUrl}/api/products/categories`, {
     next: { revalidate: 3600 },
@@ -92,7 +92,7 @@ export async function getCategories() {
 }
 
 export async function getProductBySlug(slug: string) {
-  const baseUrl = typeof window === "undefined" ? "http://localhost:3000" : ""
+  const baseUrl = typeof window === "undefined" ? (process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || "http://localhost:3000") : ""
   const res = await fetch(`${baseUrl}/api/products/slug/${slug}`, {
     next: { revalidate: 60 },
   })

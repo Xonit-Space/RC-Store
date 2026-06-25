@@ -4,5 +4,10 @@
   "regions": ["sin1"],
   "env": {
     "ENABLE_QUEUE_WORKERS": "false"
+  },
+  "build": {
+    "env": {
+      "ENABLE_QUEUE_WORKERS": "false"
+    }
   }
 }

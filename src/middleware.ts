@@ -54,6 +54,10 @@ export default withAuth(
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|sw.js).*)",
+    /*
+     * Skip Next.js internals, static assets, and NextAuth API routes.
+     * Running withAuth on /api/auth/* causes 500s on Vercel.
+     */
+    "/((?!_next/static|_next/image|favicon.ico|sw.js|api/auth).*)",
   ],
 };

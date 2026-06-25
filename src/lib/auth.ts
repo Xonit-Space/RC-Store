@@ -1,44 +1,47 @@
-import NextAuth, { NextAuthOptions } from "next-auth"
+import type { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
-import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { db } from "@/lib/db"
-import argon2 from "argon2"
 import { UserRole } from "@prisma/client"
 
+function getAuthSecret(): string | undefined {
+  return process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET
+}
+
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(db),
+  // JWT sessions with credentials — no database adapter required.
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 30 * 24 * 60 * 60,
   },
   providers: [
     CredentialsProvider({
       name: "credentials",
       credentials: {
         email: { label: "Email", type: "email", placeholder: "hello@example.com" },
-        password: { label: "Password", type: "password" }
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error("Invalid credentials")
+          return null
         }
 
         const user = await db.user.findUnique({
-          where: { email: credentials.email }
+          where: { email: credentials.email },
         })
 
         if (!user || !user.passwordHash) {
-          throw new Error("No user found with this email")
+          return null
         }
 
         if (!user.isActive) {
-          throw new Error("Your account has been deactivated")
+          return null
         }
 
+        const argon2 = await import("argon2")
         const isValid = await argon2.verify(user.passwordHash, credentials.password)
 
         if (!isValid) {
-          throw new Error("Incorrect password")
+          return null
         }
 
         return {
@@ -46,20 +49,19 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name,
           role: user.role,
-          image: user.avatar
+          image: user.avatar,
         }
-      }
-    })
+      },
+    }),
   ],
   callbacks: {
     async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id
-        token.role = (user as any).role as UserRole
+        token.role = (user as { role?: UserRole }).role as UserRole
         token.image = user.image
       }
 
-      // Handle session updates
       if (trigger === "update" && session) {
         return { ...token, ...session }
       }
@@ -73,13 +75,12 @@ export const authOptions: NextAuthOptions = {
         session.user.image = token.image as string | null
       }
       return session
-    }
+    },
   },
   pages: {
     signIn: "/login",
-    error: "/login"
+    error: "/login",
   },
-  secret: process.env.NEXTAUTH_SECRET
+  secret: getAuthSecret(),
+  debug: process.env.NODE_ENV === "development",
 }
-
-export default NextAuth(authOptions)

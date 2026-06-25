@@ -12,7 +12,7 @@ const withBundleAnalyzer = bundleAnalyzer({
 const nextConfig = {
   output: "standalone",
   experimental: {
-    serverComponentsExternalPackages: ["bullmq", "ioredis"],
+    serverComponentsExternalPackages: ["bullmq", "ioredis", "argon2", "@node-rs/argon2"],
     instrumentationHook: true,
   },
   images: {

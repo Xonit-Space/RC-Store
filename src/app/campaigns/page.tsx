@@ -1,6 +1,7 @@
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import Image from "next/image"
+import Link from "next/link"
 
 export default function CampaignsPage() {
   const campaigns = [
@@ -58,9 +59,9 @@ export default function CampaignsPage() {
                     {campaign.description}
                   </p>
                   <div className="pt-8">
-                    <button className="text-[12px] font-heading tracking-[0.2em] uppercase font-bold border-b border-border text-foreground dark:text-white hover:text-racing-yellow hover:border-racing-yellow transition-colors pb-1">
-                      Access Event Logs
-                    </button>
+                    <Link href="/products" className="inline-block text-[12px] font-heading tracking-[0.2em] uppercase font-bold border-b border-border text-foreground dark:text-white hover:text-racing-yellow hover:border-racing-yellow transition-colors pb-1">
+                      Shop Collection
+                    </Link>
                   </div>
                 </div>
               </div>

@@ -3,15 +3,21 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import { db } from "@/lib/db"
 import { UserRole } from "@prisma/client"
 
-function getAuthSecret(): string | undefined {
-  return process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET
-}
-
 export const authOptions: NextAuthOptions = {
-  // JWT sessions with credentials — no database adapter required.
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60,
+  },
+  cookies: {
+    sessionToken: {
+      name: process.env.NODE_ENV === "production" ? "__Secure-next-auth.session-token" : "next-auth.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
   },
   providers: [
     CredentialsProvider({
@@ -29,11 +35,7 @@ export const authOptions: NextAuthOptions = {
           where: { email: credentials.email },
         })
 
-        if (!user || !user.passwordHash) {
-          return null
-        }
-
-        if (!user.isActive) {
+        if (!user || !user.passwordHash || !user.isActive) {
           return null
         }
 
@@ -81,6 +83,6 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
     error: "/login",
   },
-  secret: getAuthSecret(),
+  secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === "development",
 }

@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { signIn } from "next-auth/react"
+import { signIn, getSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { AlertCircle, Zap, ShieldAlert } from "lucide-react"
@@ -37,7 +37,20 @@ export default function LoginPage() {
         toast.error("CONNECTION DENIED")
       } else {
         toast.success("CONNECTION SECURED")
-        router.push(callbackUrl)
+        
+        const session = await getSession()
+        const role = (session?.user as any)?.role
+        
+        let targetUrl = callbackUrl
+        if (targetUrl === "/") {
+          if (role === "ADMIN" || role === "SUPER_ADMIN") {
+            targetUrl = "/admin"
+          } else {
+            targetUrl = "/customer"
+          }
+        }
+
+        router.push(targetUrl)
         router.refresh()
       }
     } catch (err: any) {

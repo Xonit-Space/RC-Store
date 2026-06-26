@@ -54,16 +54,49 @@ export function Header() {
     setIsUserMenuOpen(false)
   }, [pathname])
 
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+
+  useEffect(() => {
+    const targetDate = new Date("2026-12-31T23:59:59").getTime()
+    
+    const timer = setInterval(() => {
+      const now = new Date().getTime()
+      const difference = targetDate - now
+      
+      if (difference > 0) {
+        setTimeLeft({
+          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((difference % (1000 * 60)) / 1000)
+        })
+      }
+    }, 1000)
+    
+    return () => clearInterval(timer)
+  }, [])
+
   return (
     <header 
       suppressHydrationWarning 
       className={`fixed top-0 z-50 w-full transition-all duration-300 ${
         scrolled 
-          ? "bg-background/80 backdrop-blur-md border-b border-border shadow-sm" 
-          : "bg-background border-b border-transparent"
+          ? "bg-background/80 backdrop-blur-md shadow-sm" 
+          : "bg-background"
       }`}
     >
-      <div className="container mx-auto px-4 lg:px-8 h-16 flex items-center justify-between">
+      {/* Promotion Bar */}
+      <div className="bg-primary text-primary-foreground py-2 px-4 text-center">
+        <p className="text-[10px] sm:text-xs font-bold tracking-widest uppercase">
+          🚨 End of Financial Year Sale - Up to 40% Off - Ends in: 
+          <span className="inline-block min-w-[80px] ml-2 tabular-nums">
+            {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s
+          </span>
+        </p>
+      </div>
+
+      <div className={`border-b transition-colors duration-300 ${scrolled ? "border-border" : "border-transparent"}`}>
+        <div className="container mx-auto px-4 lg:px-8 h-16 flex items-center justify-between">
         
         {/* Mobile Hamburger */}
         <button 
@@ -187,6 +220,7 @@ export function Header() {
             )}
           </Link>
         </div>
+      </div>
       </div>
 
       {/* Mobile Menu Dropdown */}

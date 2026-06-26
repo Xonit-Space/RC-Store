@@ -11,6 +11,10 @@ import { useLoading } from "@/components/providers/loading-provider"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { WishlistButton } from "@/components/product/wishlist-button"
+import { ProductSidebarRelated } from "@/components/product/product-sidebar-related"
+import { ProductGallery } from "@/components/product/product-gallery"
+import { ProductContentSections } from "@/components/product/product-content-sections"
+import { ShieldCheck, Truck, RotateCcw, CreditCard } from "lucide-react"
 
 interface ProductDetailClientProps {
   product: any
@@ -27,6 +31,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const [selectedColor, setSelectedColor] = useState("")
   const [selectedVariant, setSelectedVariant] = useState<any>(null)
   const [selectedAddons, setSelectedAddons] = useState<string[]>([])
+  const [quantity, setQuantity] = useState(1)
 
   // UI state
   const [activeTab, setActiveTab] = useState<"details" | "shipping" | "reviews">("details")
@@ -77,7 +82,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
       promises.push(
         cartStore.addItem({
           variantId: selectedVariant.id,
-          quantity: 1,
+          quantity: quantity,
           product: {
             id: product.id, name: product.name, price: selectedVariant.price || product.price,
             imageUrl: product.images?.[0] || "/placeholder.svg",
@@ -128,42 +133,18 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const isOutOfStock = (selectedVariant?.inventory?.quantity || 0) <= 0
 
   return (
-    <div className="grid md:grid-cols-12 gap-0 min-h-screen">
-      
-      {/* ── LEFT: SCROLLING GALLERY ── */}
-      <div className="md:col-span-7 bg-muted relative">
-        <div className="flex flex-col">
-          {product.images?.length > 0 ? (
-            product.images.map((img: string, idx: number) => (
-              <div key={idx} className="w-full min-h-screen md:min-h-[120vh] relative">
-                <Image
-                  src={img}
-                  alt={`${product.name} - View ${idx + 1}`}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 58vw"
-                  className="object-cover"
-                  priority={idx === 0}
-                />
-              </div>
-            ))
-          ) : (
-            <div className="w-full h-screen bg-muted flex items-center justify-center">
-              <p className="text-muted-foreground text-sm">No images available</p>
-            </div>
-          )}
-        </div>
+    <div className="flex flex-col min-h-screen pt-4 pb-24">
+      {/* ── TOP SECTION: GALLERY & PURCHASE ── */}
+      <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 w-full max-w-7xl mx-auto px-4 md:px-8 mb-16">
         
-        {/* Mobile back button overlay */}
-        <div className="md:hidden absolute top-6 left-6">
-          <Link href="/products" className="text-[10px] tracking-[0.2em] uppercase text-foreground bg-background/80 px-4 py-2 backdrop-blur-md">
-            Back
-          </Link>
+        {/* Left: Gallery */}
+        <div className="lg:col-span-7">
+          <ProductGallery images={product.images || []} productName={product.name} />
         </div>
-      </div>
 
-      {/* ── RIGHT: STICKY DETAILS ── */}
-      <div className="md:col-span-5 relative">
-        <div className="sticky top-0 h-screen overflow-y-auto px-8 md:px-16 py-12 md:py-32 flex flex-col no-scrollbar">
+      {/* Right: Info & Purchase */}
+      <div className="lg:col-span-5 relative">
+        <div className="flex flex-col space-y-12">
           
           <div className="flex-1 space-y-12 max-w-md">
             {/* Header */}
@@ -177,6 +158,25 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               <h1 className="font-serif text-3xl md:text-5xl font-light text-foreground leading-tight">
                 {product.name}
               </h1>
+              
+              <div className="flex items-center gap-4">
+                {product.averageRating > 0 && (
+                  <div className="flex items-center gap-1">
+                    <div className="flex text-primary">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <span key={i} className="text-sm">{i < Math.round(product.averageRating) ? "★" : "☆"}</span>
+                      ))}
+                    </div>
+                    <span className="text-xs text-muted-foreground ml-1">({product.reviewCount} Reviews)</span>
+                  </div>
+                )}
+                {product.variants?.[0]?.sku && (
+                  <div className="text-xs text-muted-foreground font-mono">
+                    SKU: {selectedVariant?.sku || product.variants[0].sku}
+                  </div>
+                )}
+              </div>
+
               <div className="flex items-center gap-4 text-sm pt-2">
                 <span className="text-foreground">Rs. {displayPrice.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 {product.originalPrice && (
@@ -288,121 +288,66 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               )}
             </div>
 
-            {/* Status & CTA */}
+            {/* Purchase Options */}
             <div className="space-y-4 pt-4">
-              {selectedVariant && isOutOfStock && (
-                <p className="text-[10px] tracking-[0.2em] uppercase text-terracotta mb-4">
-                  Currently Unavailable
-                </p>
-              )}
-              <button
-                onClick={handleAddToCart}
-                disabled={isOutOfStock || !selectedVariant}
-                className="w-full py-5 bg-foreground text-[11px] tracking-[0.25em] uppercase text-background hover:bg-charcoal transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isOutOfStock ? "Out of Stock" : "Add to Bag"}
-              </button>
-            </div>
-
-            {/* Details Accordion */}
-            <div className="pt-8 border-t border-border/40">
-              <div className="flex gap-8 mb-8 text-[10px] tracking-[0.2em] uppercase">
-                {(["details", "shipping", "reviews"] as const).map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`pb-2 border-b transition-colors ${
-                      activeTab === tab ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
-                    }`}
+              <div className="flex gap-4">
+                <div className="flex items-center border border-border/40 bg-transparent h-12 w-32">
+                  <button 
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="w-10 h-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
                   >
-                    {tab}
+                    -
                   </button>
-                ))}
+                  <div className="flex-1 text-center text-sm font-mono">{quantity}</div>
+                  <button 
+                    onClick={() => setQuantity(Math.min((selectedVariant?.inventory?.quantity || 10), quantity + 1))}
+                    className="w-10 h-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                  >
+                    +
+                  </button>
+                </div>
+                
+                <button
+                  onClick={handleAddToCart}
+                  disabled={isOutOfStock || !selectedVariant}
+                  className="flex-1 h-12 bg-foreground text-[11px] tracking-[0.25em] uppercase text-background hover:bg-charcoal transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isOutOfStock ? "Out of Stock" : "Add to Bag"}
+                </button>
               </div>
 
-              <div className="min-h-[150px] text-sm text-muted-foreground leading-relaxed">
-                {activeTab === "details" && (
-                  <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                    <p>Composition: 100% Signature Material</p>
-                    <p>Made in Atelier</p>
-                    <p>Dry clean only. Handle with care to preserve the natural fibers.</p>
-                    {product.attributes?.map((attr: any) => (
-                      <p key={attr.id}>{attr.name}: {attr.value}</p>
-                    ))}
+              {/* Payment & Trust Badges */}
+              <div className="pt-6 space-y-4 border-t border-border/40 mt-6">
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                  <CreditCard className="w-4 h-4 text-foreground" />
+                  <span>Pay in 4 interest-free payments of <strong>Rs. {(displayPrice / 4).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></span>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Truck className="w-4 h-4 text-foreground" />
+                    <span>Free Shipping</span>
                   </div>
-                )}
-                {activeTab === "shipping" && (
-                  <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                    <p>Complimentary express shipping on all orders.</p>
-                    <p>Delivery within 2-4 business days globally.</p>
-                    <p>Returns accepted within 14 days of delivery in original condition.</p>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <ShieldCheck className="w-4 h-4 text-foreground" />
+                    <span>1 Year Warranty</span>
                   </div>
-                )}
-                {activeTab === "reviews" && (
-                  <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                    {session?.user && (
-                      <form action={async (formData) => {
-                        const res = await submitReview(product.id, session.user.id, {
-                          rating: Number(formData.get("rating")),
-                          comment: formData.get("comment"),
-                        })
-                        if (res.success) {
-                          toast.success("Review submitted for approval")
-                          // In a real app we'd reload or optimistically append
-                        } else {
-                          toast.error(res.error || "Failed to submit review")
-                        }
-                      }} className="border-b border-border/40 pb-6 mb-6">
-                        <p className="text-[10px] tracking-wider uppercase text-foreground mb-3 font-bold">Write a Review</p>
-                        <div className="space-y-3">
-                          <select name="rating" required className="w-full bg-background border border-border/40 text-sm p-2 text-foreground">
-                            <option value="5">5 Stars - Excellent</option>
-                            <option value="4">4 Stars - Good</option>
-                            <option value="3">3 Stars - Average</option>
-                            <option value="2">2 Stars - Poor</option>
-                            <option value="1">1 Star - Terrible</option>
-                          </select>
-                          <textarea 
-                            name="comment" 
-                            required 
-                            placeholder="Share your thoughts about this product..."
-                            className="w-full bg-background border border-border/40 p-3 text-sm min-h-[80px] text-foreground"
-                          />
-                          <button type="submit" className="px-4 py-2 bg-foreground text-background text-[10px] tracking-wider uppercase hover:opacity-90 transition">
-                            Submit Review
-                          </button>
-                        </div>
-                      </form>
-                    )}
-                    
-                    {product.reviews?.filter((r: any) => r.isApproved).length > 0 ? (
-                      product.reviews.filter((r: any) => r.isApproved).map((rev: any) => (
-                        <div key={rev.id} className="border-b border-border/40 pb-4 last:border-0">
-                          <div className="flex items-center gap-2 mb-2">
-                            <p className="text-[10px] tracking-wider uppercase text-foreground">
-                              {rev.user?.name || "Client"}
-                            </p>
-                            <div className="flex text-primary">
-                              {Array.from({ length: 5 }).map((_, i) => (
-                                <span key={i} className="text-xs">{i < rev.rating ? "★" : "☆"}</span>
-                              ))}
-                            </div>
-                          </div>
-                          <p className="text-sm">{rev.comment}</p>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-sm">No approved reviews yet.</p>
-                    )}
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <RotateCcw className="w-4 h-4 text-foreground" />
+                    <span>30-Day Returns</span>
                   </div>
-                )}
+                </div>
               </div>
             </div>
-
+            
+            {/* Sidebar Related Products */}
+            <ProductSidebarRelated relatedProducts={product.relatedSource} />
           </div>
         </div>
-      </div>
+      </div>      </div>
 
+      {/* ── LOWER SECTION: CONTENT BLOCKS ── */}
+      <ProductContentSections product={product} />
     </div>
   )
 }

@@ -2,6 +2,7 @@ import { getProductBySlugServer as getProductBySlug } from "@/lib/server-api"
 import { ProductDetailClient } from "./product-detail-client"
 import { notFound } from "next/navigation"
 import Link from "next/link"
+import { ProductBreadcrumb } from "@/components/product/product-breadcrumb"
 
 // ISR: product detail pages revalidate every 5 minutes
 export const revalidate = 300
@@ -39,9 +40,10 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-            <main className="flex-1 mt-20 md:mt-0">
+      <main className="flex-1 mt-20 md:mt-24">
+        <ProductBreadcrumb product={product} />
         <ProductDetailClient product={product} />
       </main>
-          </div>
+    </div>
   )
 }

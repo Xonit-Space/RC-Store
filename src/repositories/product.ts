@@ -166,6 +166,26 @@ export async function getProductBySlug(slug: string) {
           include: { addon: true },
         },
         attributes: true,
+        videos: {
+          orderBy: { sortOrder: "asc" }
+        },
+        documents: true,
+        featureBlocks: {
+          orderBy: { sortOrder: "asc" }
+        },
+        relatedSource: {
+          include: { related: { include: { images: true } } }
+        },
+        questions: {
+          where: { isApproved: true },
+          include: {
+            user: { select: { name: true, avatar: true } },
+            answers: {
+              where: { isApproved: true },
+              include: { user: { select: { name: true, avatar: true } } }
+            }
+          }
+        },
         // Limit reviews to most recent 20 — avoids full table load on high-review products
         reviews: {
           take: 20,

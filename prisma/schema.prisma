@@ -280,6 +280,11 @@ model Product {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
+  features      String[]      @default([])
+  includedItems String[]      @default([])
+  requiredItems String[]      @default([])
+  notes         String?       @db.Text
+
   categoryId   String
   category     Category    @relation(fields: [categoryId], references: [id])
   brandId      String?
@@ -301,6 +306,12 @@ model Product {
   staffPicks           StaffPick[]
   galleryImages        GalleryImage[]
   addons               ProductAddon[]
+
+  videos               ProductVideo[]
+  documents            ProductDocument[]
+  featureBlocks        ProductFeatureBlock[]
+  relatedSource        RelatedProduct[] @relation("SourceProduct")
+  relatedTarget        RelatedProduct[] @relation("TargetProduct")
 
   deletedAt DateTime?
   createdBy String?
@@ -1414,4 +1425,64 @@ model ReconciliationReport {
   @@index([reportDate])
   @@index([status])
   @@map("reconciliation_reports")
+}
+
+// ==========================================
+// 10. PRODUCT DETAIL PAGE EXTENSIONS
+// ==========================================
+
+model ProductVideo {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  title     String
+  url       String
+  type      String   @default("DEMO") // DEMO, SETUP, REVIEW
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+  @@map("product_videos")
+}
+
+model ProductDocument {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name      String
+  url       String
+  type      String   @default("MANUAL") // MANUAL, DATASHEET
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+  @@map("product_documents")
+}
+
+model ProductFeatureBlock {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  title       String
+  description String   @db.Text
+  image       String?
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  @@index([productId])
+  @@map("product_feature_blocks")
+}
+
+model RelatedProduct {
+  id           String   @id @default(cuid())
+  productId    String
+  product      Product  @relation("SourceProduct", fields: [productId], references: [id], onDelete: Cascade)
+  relatedId    String
+  related      Product  @relation("TargetProduct", fields: [relatedId], references: [id], onDelete: Cascade)
+  relationType String   @default("COMPATIBLE") // COMPATIBLE, ACCESSORY, UPGRADE, FREQUENTLY_BOUGHT_TOGETHER
+  createdAt    DateTime @default(now())
+
+  @@unique([productId, relatedId])
+  @@index([productId])
+  @@index([relatedId])
+  @@map("related_products")
 }

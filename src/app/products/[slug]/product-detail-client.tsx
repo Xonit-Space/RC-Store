@@ -161,14 +161,21 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               
               <div className="flex items-center gap-4">
                 {product.averageRating > 0 && (
-                  <div className="flex items-center gap-1">
-                    <div className="flex text-primary">
+                  <a
+                    href="#reviews"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      document.getElementById("reviews")?.scrollIntoView({ behavior: "smooth", block: "start" })
+                    }}
+                    className="flex items-center gap-1 group cursor-pointer"
+                  >
+                    <div className="flex text-primary group-hover:text-primary/70 transition-colors">
                       {Array.from({ length: 5 }).map((_, i) => (
                         <span key={i} className="text-sm">{i < Math.round(product.averageRating) ? "★" : "☆"}</span>
                       ))}
                     </div>
-                    <span className="text-xs text-muted-foreground ml-1">({product.reviewCount} Reviews)</span>
-                  </div>
+                    <span className="text-xs text-muted-foreground ml-1 group-hover:underline">({product.reviewCount} Reviews)</span>
+                  </a>
                 )}
                 {product.variants?.[0]?.sku && (
                   <div className="text-xs text-muted-foreground font-mono">
@@ -316,14 +323,44 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 </button>
               </div>
 
+              {/* Inventory Urgency Indicator */}
+              {selectedVariant && (() => {
+                const stock = selectedVariant.inventory?.quantity || 0
+                if (stock <= 0) return null
+                if (stock <= 5) return (
+                  <p className="text-xs font-bold text-amber-500 flex items-center gap-1.5">
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    Only {stock} left in stock — order soon!
+                  </p>
+                )
+                if (stock <= 15) return (
+                  <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary" />
+                    {stock} units in stock
+                  </p>
+                )
+                return null
+              })()}
+
+              {/* Part Finder Cross-link */}
+              <div className="pt-3 border-t border-border/30">
+                <Link
+                  href="/part-finder"
+                  className="flex items-center gap-2 text-[10px] tracking-[0.2em] uppercase text-muted-foreground hover:text-primary transition-colors group"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:rotate-12 transition-transform"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                  Looking for compatible parts? Use our Part Finder
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-auto group-hover:translate-x-0.5 transition-transform"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                </Link>
+              </div>
+
               {/* Payment & Trust Badges */}
-              <div className="pt-6 space-y-4 border-t border-border/40 mt-6">
+              <div className="pt-6 space-y-4 border-t border-border/40">
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
                   <CreditCard className="w-4 h-4 text-foreground" />
                   <span>Pay in 4 interest-free payments of <strong>Rs. {(displayPrice / 4).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></span>
                 </div>
-                
-                <div className="grid grid-cols-2 gap-4 mt-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Truck className="w-4 h-4 text-foreground" />
                     <span>Free Shipping</span>
@@ -344,7 +381,6 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             <ProductSidebarRelated relatedProducts={product.relatedSource} />
           </div>
         </div>
-      </div>      </div>
 
       {/* ── LOWER SECTION: CONTENT BLOCKS ── */}
       <ProductContentSections product={product} />

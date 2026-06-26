@@ -186,11 +186,7 @@ export function Header() {
                       {accountUrl === "/admin" ? <Shield className="h-4 w-4" /> : <Settings className="h-4 w-4" />}
                       {accountUrl === "/admin" ? "Admin Dashboard" : "My Garage"}
                     </Link>
-                    {accountUrl === "/customer" && (
-                      <Link href="/customer/orders" className="flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted rounded-sm transition-colors">
-                        <Package className="h-4 w-4" /> My Orders
-                      </Link>
-                    )}
+
                   </div>
                   
                   <div className="border-t border-border p-1">

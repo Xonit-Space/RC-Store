@@ -216,7 +216,7 @@ export function ProductContentSections({ product }: ProductContentSectionsProps)
       )}
 
       {/* 17. Customer Reviews & 18. Questions & Answers */}
-      <section className="pt-16 border-t border-border/40">
+      <section id="reviews" className="pt-16 border-t border-border/40">
         <div className="grid md:grid-cols-2 gap-16">
           
           {/* Reviews */}

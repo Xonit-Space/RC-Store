@@ -343,3 +343,14 @@ Prisma Studio will load at [http://localhost:5555](http://localhost:5555) automa
 ## ⚡ Performance Optimization Roadmap
 
 We are actively optimizing RC Store Ultra to handle 100K+ monthly users efficiently. See our comprehensive [Performance Optimization Roadmap](PERFORMANCE.md) detailing the ongoing transition from Client Components to Server Components, PostgreSQL tuning, streaming, and caching strategies.
+
+
+Admin Account (Super Admin Access)
+
+Email: admin@rc.com
+Password: rcadmin123
+
+Customer Account (Standard Access)
+
+Email: racer@rc.com
+Password: rcadmin123

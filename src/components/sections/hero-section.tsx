@@ -40,9 +40,9 @@ export function HeroSection() {
           </div>
 
           {/* Editorial Headline */}
-          <h1 className="font-heading text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black leading-[0.85] tracking-tighter text-foreground dark:text-white mb-6 drop-shadow-xl dark:drop-shadow-2xl uppercase">
+          <h1 className="font-heading text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black leading-[0.85] tracking-tighter text-foreground mb-6 drop-shadow-xl dark:drop-shadow-2xl uppercase">
             EOFY<br />
-            <span className="text-foreground dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-racing-yellow dark:to-neon-yellow">SALE 2026</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-neutral-800 to-neutral-500 dark:from-racing-yellow dark:to-neon-yellow">SALE 2026</span>
           </h1>
 
           {/* Subline */}

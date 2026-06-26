@@ -79,9 +79,9 @@ export function Header() {
   return (
     <header 
       suppressHydrationWarning 
-      className={`fixed top-0 z-50 w-full transition-all duration-300 bg-background/70 backdrop-blur-md ${
+      className={`fixed top-0 z-50 w-full transition-all duration-500 bg-background/70 backdrop-blur-md ${
         scrolled 
-          ? "shadow-[0_4px_30px_rgba(0,0,0,0.1)] border-b border-border/50" 
+          ? "shadow-md border-b border-border/50" 
           : "border-b border-transparent"
       }`}
     >
@@ -124,9 +124,9 @@ export function Header() {
               <Link
                 key={link.name}
                 href={link.path}
-                className={`px-4 py-2 rounded-sm text-[11px] font-bold uppercase tracking-widest transition-all ${
+                className={`px-4 py-2 rounded-md text-[11px] font-bold uppercase tracking-widest transition-all ${
                   isActive 
-                    ? "text-primary" 
+                    ? "bg-primary/10 text-primary" 
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
               >
@@ -143,10 +143,10 @@ export function Header() {
           {mounted && (
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="p-2 text-muted-foreground hover:bg-muted hover:text-foreground rounded-full transition-colors flex items-center justify-center"
+              className="p-2 text-foreground hover:bg-muted rounded-full transition-colors flex items-center justify-center border border-transparent hover:border-border"
               aria-label="Toggle Theme"
             >
-              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
           )}
 

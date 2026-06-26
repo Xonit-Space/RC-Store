@@ -23,8 +23,8 @@ export function PartFinderBanner() {
   return (
     <section className="relative bg-background py-24 border-t border-border overflow-hidden">
       {/* Background Image & Theme-aware Gradient */}
-      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1588612143093-4e44208d1326?q=80&w=2070')] bg-cover bg-center opacity-10 mix-blend-luminosity dark:opacity-20" />
-      <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-transparent" />
+      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1588612143093-4e44208d1326?q=80&w=2070')] bg-cover bg-center opacity-15 mix-blend-luminosity dark:opacity-20" />
+      <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-transparent dark:from-background dark:via-background/90" />
       
       <div className="container mx-auto px-6 md:px-12 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -94,16 +94,29 @@ export function PartFinderBanner() {
           </div>
           
           {/* Right Column: Image Graphic */}
-          <div className="hidden lg:flex justify-end relative h-full min-h-[400px]">
+          <div className="hidden lg:flex justify-end relative h-full min-h-[400px] items-center">
              {/* Decorative Elements */}
              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-72 h-72 bg-primary/20 rounded-full blur-3xl" />
-             <div className="absolute right-20 top-20 w-40 h-40 bg-racing-yellow/10 rounded-full blur-2xl" />
+             <div className="absolute right-20 top-20 w-40 h-40 bg-racing-yellow/10 rounded-full blur-2xl dark:bg-racing-yellow/10 bg-primary/20" />
              
-             <img 
-               src="https://images.unsplash.com/photo-1594895085350-02a820c75cc9?q=80&w=1200&auto=format&fit=crop" 
-               alt="RC Car Components" 
-               className="relative z-10 object-cover w-[90%] max-w-[600px] h-full max-h-[500px] border border-border/50 shadow-2xl skew-x-[-5deg] hover:skew-x-0 transition-transform duration-700 ease-in-out"
-             />
+             <div className="relative z-10 w-[90%] max-w-[600px] aspect-video border border-border/50 shadow-2xl skew-x-[-5deg] hover:skew-x-0 transition-transform duration-700 ease-in-out overflow-hidden rounded-md bg-muted">
+               <img 
+                 src="https://images.unsplash.com/photo-1588612143093-4e44208d1326?q=80&w=1200&auto=format&fit=crop" 
+                 alt="RC Car Components" 
+                 className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity"
+               />
+               {/* Overlay graphic */}
+               <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+               <div className="absolute bottom-4 left-4 right-4 p-4 border border-border/40 bg-background/50 backdrop-blur-sm rounded-sm">
+                 <div className="flex items-center justify-between">
+                   <div className="space-y-1">
+                     <div className="h-1 w-12 bg-primary rounded-full"></div>
+                     <p className="text-[10px] font-mono text-foreground uppercase tracking-widest">System Scan Complete</p>
+                   </div>
+                   <span className="text-xs font-bold text-primary">100% Match</span>
+                 </div>
+               </div>
+             </div>
           </div>
         </div>
       </div>

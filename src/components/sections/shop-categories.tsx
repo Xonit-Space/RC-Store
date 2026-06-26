@@ -11,12 +11,12 @@ export async function ShopCategories() {
 
   // Provide fallback image if category has no image uploaded yet
   const fallbackImages = [
-    "https://images.unsplash.com/photo-1589793463357-550912af4a4c?q=80&w=1000",
-    "https://images.unsplash.com/photo-1508614589041-895b88991e3e?q=80&w=1000",
-    "https://images.unsplash.com/photo-1622345095360-14e38c92a688?q=80&w=1000",
-    "https://images.unsplash.com/photo-1517420704952-d9f39e95b43e?q=80&w=1000",
-    "https://images.unsplash.com/photo-1601524909162-ae8725290836?q=80&w=1000",
-    "https://images.unsplash.com/photo-1614083311899-7988591dff32?q=80&w=1000",
+    "https://images.unsplash.com/photo-1594819047050-99defca82545?q=80&w=1000",
+    "https://images.unsplash.com/photo-1563207153-f40879983378?q=80&w=1000",
+    "https://images.unsplash.com/photo-1588612143093-4e44208d1326?q=80&w=1000",
+    "https://images.unsplash.com/photo-1621539266155-d3c2aeb7fc75?q=80&w=1000",
+    "https://images.unsplash.com/photo-1513038630932-eb26365bf021?q=80&w=1000",
+    "https://images.unsplash.com/photo-1594895085350-02a820c75cc9?q=80&w=1000",
   ]
 
   const categories = dbCategories.map((c, i) => {
@@ -57,7 +57,7 @@ export async function ShopCategories() {
               key={idx}
               className={`relative group overflow-hidden ${cat.colSpan} bg-muted block min-h-[200px] border border-border hover:border-racing-yellow/50 transition-colors`}
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-10 opacity-90" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-10" />
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img 
                 src={cat.image} 

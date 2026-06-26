@@ -47,14 +47,14 @@ async function main() {
   const tables = [
     "StaffPick", "GalleryImage", "InventoryMovement", "InventoryReservation", "Inventory", "CartItem", "Cart", 
     "WishlistItem", "Wishlist", "OrderItem", "Payment", "Shipment", "ReturnRequest", 
-    "Refund", "Order", "ReviewImage", "Review", "ProductQuestion", "ProductAnswer", 
+    "Refund", "Order", "ReviewImage", "Review", "ProductAnswer", "ProductQuestion", 
+    "ProductVideo", "ProductDocument", "ProductFeatureBlock", "RelatedProduct",
     "RecentlyViewed", "ProductView", "RecommendationEvent", "SearchHistory", 
     "AbandonedCart", "ProductAttribute", "ProductImage", "ProductVariant", 
     "FlashSale", "Product", "Collection", "Brand", "Category", "Warehouse", 
     "LoyaltyTransaction", "LoyaltyPoint", "StoreCredit", "GiftCard", 
     "EmailSubscriber", "Coupon", "MarketingCampaign", "HeroBanner", "FAQ", 
     "NavigationMenu", "BlogPost", "BlogCategory", "BlogTag", "CMSPage", 
-    "Notification", "AuditLog", "SessionLog", "DeviceFingerprint", "Address", 
     "Notification", "AuditLog", "SessionLog", "DeviceFingerprint", "Address", 
     "Courier", "User", "SiteSetting"
   ]
@@ -138,6 +138,10 @@ async function main() {
         isActive: true,
         isFeatured: i <= 8,
         isNewRelease: i > 55,
+        features: ["Waterproof electronics", "Brushless power system", "Heavy-duty suspension"],
+        includedItems: ["Ready-to-Run model", "2.4GHz Transmitter", "Instruction Manual"],
+        requiredItems: ["4x AA batteries", "Compatible LiPo charger"],
+        notes: "Due to high speeds, adult supervision is required. Do not use near open water.",
         brandId: brand.id,
         categoryId: category.id,
         collectionId: collection?.id,
@@ -198,6 +202,62 @@ async function main() {
         data: { questionId: q.id, userId: users[0].id, answerText: "Yes, this is an RTR (Ready-to-Run) kit." }
       })
     }
+    
+    // NEW PDP EXTENSIONS
+    if (i % 3 === 0) {
+      // Feature Blocks
+      await prisma.productFeatureBlock.create({
+        data: {
+          productId: p.id,
+          title: "Extreme Durability",
+          description: "Built to withstand the toughest bashing sessions.",
+          image: IMAGES.electric[0]
+        }
+      })
+      await prisma.productFeatureBlock.create({
+        data: {
+          productId: p.id,
+          title: "Precision Control",
+          description: "Included 2.4GHz radio provides lag-free inputs.",
+        }
+      })
+      
+      // Videos
+      await prisma.productVideo.create({
+        data: {
+          productId: p.id,
+          title: "Official Promo",
+          url: "https://www.youtube.com/embed/dQw4w9WgXcQ", // Example placeholder
+          type: "DEMO"
+        }
+      })
+      
+      // Documents
+      await prisma.productDocument.create({
+        data: {
+          productId: p.id,
+          name: "Owner's Manual",
+          url: "/docs/sample-manual.pdf",
+          type: "MANUAL"
+        }
+      })
+    }
+  }
+
+  // Related Products
+  console.log("Generating related products...")
+  for (let i = 0; i < 20; i++) {
+    const p1 = allProducts[i]
+    const p2 = allProducts[(i + 1) % allProducts.length]
+    const p3 = allProducts[(i + 2) % allProducts.length]
+    
+    await prisma.relatedProduct.createMany({
+      data: [
+        { productId: p1.id, relatedId: p2.id, relationType: "FREQUENTLY_BOUGHT_TOGETHER" },
+        { productId: p1.id, relatedId: p3.id, relationType: "ACCESSORY" }
+      ],
+      skipDuplicates: true
+    })
   }
 
   // 5. FLASH SALES & COUPONS

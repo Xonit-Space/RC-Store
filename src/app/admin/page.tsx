@@ -1,187 +1,248 @@
 import { db } from "@/lib/db"
 import { getOrderStats as fetchStats } from "@/repositories/order"
-import { TrendingUp, ShoppingCart, Package, Users, Activity, Radar, Cpu } from "lucide-react"
+import { 
+  TrendingUp, ShoppingCart, Package, Users, Activity, 
+  Warehouse, Star, ArrowRight, AlertTriangle, CheckCircle
+} from "lucide-react"
+import Link from "next/link"
 
 export const dynamic = "force-dynamic"
+
+const ORDER_STATUS_COLORS: Record<string, string> = {
+  PENDING: "text-amber-500 bg-amber-500/10 border-amber-500/30",
+  PROCESSING: "text-blue-500 bg-blue-500/10 border-blue-500/30",
+  SHIPPED: "text-purple-500 bg-purple-500/10 border-purple-500/30",
+  DELIVERED: "text-emerald-500 bg-emerald-500/10 border-emerald-500/30",
+  COMPLETED: "text-emerald-500 bg-emerald-500/10 border-emerald-500/30",
+  CANCELLED: "text-red-500 bg-red-500/10 border-red-500/30",
+}
 
 export default async function AdminOverviewPage() {
   const [stats, recentOrders] = await Promise.all([
     fetchStats(),
     db.order.findMany({
       orderBy: { createdAt: "desc" },
-      take: 5,
+      take: 6,
       include: {
         user: { select: { name: true, email: true } }
       }
     })
   ])
 
-  const statsCards = [
+  const kpiCards = [
     {
-      title: "Revenue Output",
+      label: "Total Revenue",
       value: `Rs. ${Number(stats.totalRevenue).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-      change: "+12.5% THRUST",
+      sub: "Lifetime earnings",
       icon: TrendingUp,
       color: "text-primary",
-      bgColor: "bg-racing-yellow/10"
+      border: "border-primary/20",
+      bg: "bg-primary/5",
     },
     {
-      title: "Active Orders",
+      label: "Total Orders",
       value: stats.totalOrders.toString(),
-      change: "+8.2% ONLINE",
+      sub: `${stats.completedOrders} completed`,
       icon: ShoppingCart,
-      color: "text-foreground",
-      bgColor: "bg-muted/50"
+      color: "text-blue-500",
+      border: "border-blue-500/20",
+      bg: "bg-blue-500/5",
     },
     {
-      title: "Pending Fulfillment",
+      label: "Pending Orders",
       value: stats.pendingOrders.toString(),
-      change: "WARNING: ACTION REQ",
+      sub: stats.pendingOrders > 0 ? "Requires action" : "All clear",
       icon: Package,
-      color: "text-primary animate-pulse",
-      bgColor: "bg-racing-yellow/20 border border-primary"
+      color: stats.pendingOrders > 0 ? "text-amber-500" : "text-emerald-500",
+      border: stats.pendingOrders > 0 ? "border-amber-500/30" : "border-emerald-500/20",
+      bg: stats.pendingOrders > 0 ? "bg-amber-500/5" : "bg-emerald-500/5",
     },
     {
-      title: "System Users",
+      label: "Registered Users",
       value: stats.totalUsers.toString(),
-      change: "REGISTERED",
+      sub: "Total customers",
       icon: Users,
-      color: "text-muted-foreground",
-      bgColor: "bg-gray-800"
+      color: "text-purple-500",
+      border: "border-purple-500/20",
+      bg: "bg-purple-500/5",
     },
   ]
 
-  const fulfillmentEfficiency = stats.totalOrders > 0 ? ((stats.completedOrders / stats.totalOrders) * 100).toFixed(1) : "0.0"
+  const quickActions = [
+    { label: "Add Product", description: "Create a new RC product listing", href: "/admin/products", icon: Package, color: "text-blue-500" },
+    { label: "Manage Orders", description: "View and process customer orders", href: "/admin/orders", icon: ShoppingCart, color: "text-amber-500", badge: stats.pendingOrders > 0 ? stats.pendingOrders : null },
+    { label: "Stock Levels", description: `${stats.lowStockCount} variants need restocking`, href: "/admin/inventory", icon: Warehouse, color: "text-red-500", badge: stats.lowStockCount > 0 ? stats.lowStockCount : null },
+    { label: "Review Queue", description: "Moderate customer reviews", href: "/admin/reviews", icon: Star, color: "text-primary" },
+    { label: "Customers", description: "Browse customer registry", href: "/admin/customers", icon: Users, color: "text-purple-500" },
+    { label: "Analytics", description: "View store performance charts", href: "/admin/analytics", icon: Activity, color: "text-emerald-500" },
+  ]
+
+  const fulfillmentRate = stats.totalOrders > 0 
+    ? ((stats.completedOrders / stats.totalOrders) * 100).toFixed(1) 
+    : "0.0"
 
   return (
-    <div className="space-y-12 fade-up-section visible">
-      {/* Header */}
-      <div className="border-b border-border pb-6 mb-8 flex items-end justify-between">
+    <div className="space-y-8">
+      {/* Page Header */}
+      <div className="flex items-end justify-between border-b border-border/40 pb-6">
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <Activity className="w-4 h-4 text-primary animate-pulse" />
-            <p className="text-[10px] tracking-[0.4em] uppercase text-primary font-mono font-bold">
-              SYSTEM ONLINE // TERMINAL: ALPHA
+          <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-1 font-medium">
+            Overview
+          </p>
+          <h2 className="text-2xl font-semibold text-foreground">
+            Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"} 👋
+          </h2>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Here&apos;s what&apos;s happening in your store today.
+          </p>
+        </div>
+        <div className="text-right hidden md:block">
+          <div className="flex items-center gap-1.5 justify-end">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-500">
+              System Online
             </p>
           </div>
-          <h2 className="font-heading text-4xl md:text-5xl font-black text-foreground leading-none uppercase tracking-tighter drop-shadow-[0_0_15px_rgba(255, 204, 0,0.3)]">
-            Control Center
-          </h2>
-        </div>
-        <div className="hidden md:block">
-          <p className="font-mono text-xs text-muted-foreground uppercase tracking-widest text-right">
-            Status: <span className="text-green-500 font-bold">NOMINAL</span>
-          </p>
-          <p className="font-mono text-xs text-muted-foreground uppercase tracking-widest text-right">
-            Uptime: <span className="text-foreground">99.9%</span>
+          <p className="text-[10px] text-muted-foreground tracking-wide mt-0.5">
+            Fulfillment rate: {fulfillmentRate}%
           </p>
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        {statsCards.map((stat) => (
-          <div key={stat.title} className="p-6 md:p-8 border border-border bg-background transition-all hover:border-primary hover:shadow-[0_0_20px_rgba(255, 204, 0,0.15)] group relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-racing-yellow/10 to-transparent pointer-events-none" />
-            <div className="flex justify-between items-start mb-12 relative z-10">
-              <div className={`h-10 w-10 ${stat.bgColor} flex items-center justify-center`}>
-                <stat.icon strokeWidth={2} className={`h-5 w-5 ${stat.color}`} />
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {kpiCards.map((card) => (
+          <div
+            key={card.label}
+            className={`p-5 border ${card.border} ${card.bg} rounded-lg relative overflow-hidden group hover:shadow-sm transition-shadow`}
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className={`h-9 w-9 ${card.bg} border ${card.border} flex items-center justify-center rounded-md`}>
+                <card.icon strokeWidth={1.5} className={`h-4 w-4 ${card.color}`} />
               </div>
-              <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-foreground group-hover:text-racing-yellow transition-colors">
-                {stat.change}
-              </p>
             </div>
-            <div className="relative z-10">
-              <p className="text-[10px] font-mono tracking-[0.3em] uppercase text-muted-foreground mb-2">
-                {stat.title}
-              </p>
-              <p className="font-heading text-3xl md:text-4xl font-black text-foreground tracking-tighter">
-                {stat.value}
-              </p>
-            </div>
+            <p className="text-2xl font-bold text-foreground leading-none mb-1">
+              {card.value}
+            </p>
+            <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+              {card.label}
+            </p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">
+              {card.sub}
+            </p>
           </div>
         ))}
       </div>
 
-      {/* Two Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
-        
-        {/* System Analytics */}
-        <div className="lg:col-span-7 space-y-6">
-          <h3 className="font-heading text-2xl font-black text-foreground border-b border-border pb-4 uppercase tracking-widest flex items-center gap-2">
-            <Radar className="w-5 h-5 text-primary" />
-            Telemetry Data
-          </h3>
-          <div className="border border-border bg-background overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.5)]">
-            <div className="p-6 md:p-8 bg-muted border-b border-border relative">
-               <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
-               <div className="flex justify-between items-center relative z-10">
-                 <div>
-                   <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-foreground mb-1">
-                     Gross Output Volume
-                   </p>
-                   <p className="font-heading text-2xl font-black text-foreground uppercase">
-                     {stats.totalOrders} UNITS DISPATCHED
-                   </p>
-                 </div>
-                 <Cpu strokeWidth={1} className="h-10 w-10 text-primary opacity-50" />
-               </div>
-            </div>
-            <div className="p-6 md:p-8 grid grid-cols-2 gap-4">
-               <div>
-                 <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-foreground mb-1">Fulfillment Efficiency</p>
-                 <p className="font-heading text-xl font-bold text-foreground tracking-widest">{fulfillmentEfficiency}%</p>
-               </div>
-               <div>
-                 <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-foreground mb-1">Low Stock Alerts</p>
-                 <p className="font-heading text-xl font-bold text-primary tracking-widest">{stats.lowStockCount} VARIANTS</p>
-               </div>
-            </div>
+      {/* Main content: Quick Actions + Recent Orders */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        {/* Quick Actions */}
+        <div className="lg:col-span-5 space-y-3">
+          <h3 className="text-sm font-semibold text-foreground">Quick Actions</h3>
+          <div className="grid grid-cols-1 gap-2">
+            {quickActions.map((action) => (
+              <Link
+                key={action.href}
+                href={action.href}
+                className="flex items-center gap-4 p-4 border border-border/40 bg-background hover:bg-muted/30 hover:border-border/70 rounded-lg transition-all group"
+              >
+                <div className={`h-9 w-9 rounded-md bg-muted/60 flex items-center justify-center shrink-0 group-hover:bg-muted transition-colors`}>
+                  <action.icon strokeWidth={1.5} className={`h-4 w-4 ${action.color}`} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground">{action.label}</p>
+                  <p className="text-[10px] text-muted-foreground truncate">{action.description}</p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  {action.badge && (
+                    <span className="text-[9px] font-bold bg-red-500 text-white px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                      {action.badge}
+                    </span>
+                  )}
+                  <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/40 group-hover:text-muted-foreground group-hover:translate-x-0.5 transition-all" />
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
 
         {/* Recent Orders */}
-        <div className="lg:col-span-5 space-y-6">
-          <h3 className="font-heading text-2xl font-black text-foreground border-b border-border pb-4 uppercase tracking-widest flex items-center gap-2">
-            <Activity className="w-5 h-5 text-primary" />
-            Recent Logs
-          </h3>
-          <div className="border border-border bg-background divide-y divide-white/5 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+        <div className="lg:col-span-7 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-foreground">Recent Orders</h3>
+            <Link
+              href="/admin/orders"
+              className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
+            >
+              View all <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+
+          <div className="border border-border/40 rounded-lg bg-background overflow-hidden">
             {recentOrders.length === 0 ? (
               <div className="p-12 text-center">
-                <p className="text-[11px] font-mono tracking-[0.2em] uppercase text-muted-foreground">
-                  NO RECENT ACTIVITY DETECTED
+                <ShoppingCart className="h-8 w-8 text-muted-foreground/20 mx-auto mb-3" />
+                <p className="text-xs text-muted-foreground uppercase tracking-widest">
+                  No orders yet
                 </p>
               </div>
             ) : (
-              recentOrders.map((order) => (
-                <div key={order.id} className="p-5 flex justify-between items-center hover:bg-smoke-dark transition-colors group">
-                  <div>
-                    <p className="text-[11px] font-mono font-bold tracking-widest uppercase text-foreground mb-1 group-hover:text-racing-yellow transition-colors">
-                      TRX_{order.orderNumber}
-                    </p>
-                    <p className="text-sm font-sans text-muted-foreground">
-                      {order.user.name || order.user.email}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-mono font-bold text-foreground mb-1">
-                      Rs. {Number(order.total).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </p>
-                    <span className={`text-[9px] font-mono font-bold tracking-[0.2em] uppercase px-2 py-0.5 border ${
-                      order.status === "PENDING" ? "text-primary border-racing-yellow/50 bg-racing-yellow/10" : "text-green-500 border-green-500/50 bg-green-500/10"
-                    }`}>
-                      {order.status}
-                    </span>
-                  </div>
-                </div>
-              ))
+              <div className="divide-y divide-border/40">
+                {recentOrders.map((order) => {
+                  const statusColor = ORDER_STATUS_COLORS[order.status] || "text-muted-foreground bg-muted/30 border-border/30"
+                  return (
+                    <Link
+                      key={order.id}
+                      href={`/admin/orders`}
+                      className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors group"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+                          #{order.orderNumber}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground truncate">
+                          {order.user.name || order.user.email}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <span className={`text-[9px] font-bold tracking-widest uppercase px-2 py-0.5 border rounded-sm ${statusColor}`}>
+                          {order.status}
+                        </span>
+                        <p className="text-sm font-bold text-foreground hidden sm:block">
+                          Rs. {Number(order.total).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </p>
+                      </div>
+                    </Link>
+                  )
+                })}
+              </div>
             )}
           </div>
-        </div>
 
+          {/* Inventory Alert Bar */}
+          {stats.lowStockCount > 0 && (
+            <Link
+              href="/admin/inventory"
+              className="flex items-center gap-3 p-4 border border-amber-500/30 bg-amber-500/5 rounded-lg hover:bg-amber-500/10 transition-colors group"
+            >
+              <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0" />
+              <p className="text-xs text-amber-600 dark:text-amber-400 flex-1">
+                <span className="font-bold">{stats.lowStockCount} variants</span> are running low on stock and need restocking.
+              </p>
+              <ArrowRight className="h-3.5 w-3.5 text-amber-500 group-hover:translate-x-0.5 transition-transform shrink-0" />
+            </Link>
+          )}
+          {stats.lowStockCount === 0 && (
+            <div className="flex items-center gap-3 p-4 border border-emerald-500/20 bg-emerald-500/5 rounded-lg">
+              <CheckCircle className="h-4 w-4 text-emerald-500 shrink-0" />
+              <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                All inventory levels are healthy.
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
 }
-

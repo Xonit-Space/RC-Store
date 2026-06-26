@@ -31,7 +31,7 @@ export async function getSiteSettings(): Promise<ActionResponse<Record<string, s
     // Set some defaults if not present
     if (!formatted["store_name"]) formatted["store_name"] = "RC Store"
     if (!formatted["store_email"]) formatted["store_email"] = "support@rcstore.com"
-    if (!formatted["store_phone"]) formatted["store_phone"] = "+94 77 123 4567"
+    if (!formatted["store_phone"]) formatted["store_phone"] = "(03) 8000 8036"
     if (!formatted["store_status_open"]) formatted["store_status_open"] = "true"
     if (!formatted["free_shipping_threshold"]) formatted["free_shipping_threshold"] = "150.0"
     if (!formatted["tax_rate"]) formatted["tax_rate"] = "12.0"

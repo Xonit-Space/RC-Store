@@ -64,17 +64,17 @@ export function Footer() {
               <li className="flex items-start gap-3">
                 <Phone className="h-5 w-5 text-primary shrink-0" />
                 <div>
-                  <p className="text-foreground">1-800-AUS-RIGS</p>
+                  <p className="text-foreground">(03) 8000 8036</p>
                   <p className="text-xs mt-1">Mon-Fri: 9am - 6pm EST</p>
                 </div>
               </li>
               <li className="flex items-start gap-3">
                 <Mail className="h-5 w-5 text-primary shrink-0" />
-                <a href="mailto:support@aussierigsarena.com" className="hover:text-white transition-colors">support@aussierigsarena.com</a>
+                <a href="mailto:info@aussierigsarena.com.au" className="hover:text-white transition-colors">info@aussierigsarena.com.au</a>
               </li>
               <li className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 text-primary shrink-0" />
-                <p>123 Horizon Drive<br/>Speedway City, SC 90210</p>
+                <p>68, 56-68 Eucumbene Drive<br/>Ravenhall VIC 3023</p>
               </li>
             </ul>
           </div>

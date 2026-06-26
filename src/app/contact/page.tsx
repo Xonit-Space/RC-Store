@@ -39,13 +39,13 @@ export default function ContactPage() {
             <div className="space-y-8">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-foreground mb-2">Client Services</h3>
-                <p className="text-sm text-muted-foreground">support@aussierigsarena.com</p>
-                <p className="text-sm text-muted-foreground">+94 77 123 4567</p>
+                <p className="text-sm text-muted-foreground">info@aussierigsarena.com.au</p>
+                <p className="text-sm text-muted-foreground">(03) 8000 8036</p>
               </div>
               
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-foreground mb-2">Atelier & Press</h3>
-                <p className="text-sm text-muted-foreground">press@aussierigsarena.com</p>
+                <p className="text-sm text-muted-foreground">info@aussierigsarena.com.au</p>
               </div>
 
               <div>

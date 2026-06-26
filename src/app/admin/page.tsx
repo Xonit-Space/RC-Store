@@ -19,7 +19,7 @@ export default async function AdminOverviewPage() {
   const statsCards = [
     {
       title: "Revenue Output",
-      value: `Rs. ${stats.totalRevenue.toLocaleString()}`,
+      value: `Rs. ${Number(stats.totalRevenue).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       change: "+12.5% THRUST",
       icon: TrendingUp,
       color: "text-racing-yellow",
@@ -166,7 +166,7 @@ export default async function AdminOverviewPage() {
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-mono font-bold text-white mb-1">
-                      Rs. {order.total.toLocaleString()}
+                      Rs. {Number(order.total).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
                     <span className={`text-[9px] font-mono font-bold tracking-[0.2em] uppercase px-2 py-0.5 border ${
                       order.status === "PENDING" ? "text-racing-yellow border-racing-yellow/50 bg-racing-yellow/10" : "text-green-500 border-green-500/50 bg-green-500/10"

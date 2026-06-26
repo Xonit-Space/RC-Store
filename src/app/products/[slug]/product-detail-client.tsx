@@ -10,6 +10,7 @@ import { toast } from "sonner"
 import { useLoading } from "@/components/providers/loading-provider"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { WishlistButton } from "@/components/product/wishlist-button"
 
 interface ProductDetailClientProps {
   product: any
@@ -25,6 +26,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const [selectedSize, setSelectedSize] = useState("")
   const [selectedColor, setSelectedColor] = useState("")
   const [selectedVariant, setSelectedVariant] = useState<any>(null)
+  const [selectedAddons, setSelectedAddons] = useState<string[]>([])
 
   // UI state
   const [activeTab, setActiveTab] = useState<"details" | "shipping" | "reviews">("details")
@@ -69,7 +71,10 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     }
 
     try {
-      await withLoading(
+      const promises = []
+      
+      // Add main product
+      promises.push(
         cartStore.addItem({
           variantId: selectedVariant.id,
           quantity: 1,
@@ -80,6 +85,29 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
           },
         }, session?.user?.id)
       )
+
+      // Add selected addons
+      for (const addonId of selectedAddons) {
+        const addonObj = product.productAddons?.find((pa: any) => pa.addon.id === addonId)?.addon
+        if (addonObj) {
+          promises.push(
+            cartStore.addItem({
+              addonId: addonObj.id,
+              parentProductId: product.id,
+              quantity: 1,
+              product: {
+                id: addonObj.id, 
+                name: `${product.name} - ${addonObj.name}`, 
+                price: addonObj.price,
+                imageUrl: addonObj.image || product.images?.[0] || "/placeholder.svg",
+                size: "", color: "",
+              },
+            }, session?.user?.id)
+          )
+        }
+      }
+
+      await withLoading(Promise.all(promises))
       toast.success("Added to bag")
     } catch (err) {
       toast.error("Failed to add to bag")
@@ -92,6 +120,11 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     : []) as [string, string][]
 
   const currentPrice = selectedVariant?.price || product.price
+  const addonsTotal = selectedAddons.reduce((sum, addonId) => {
+    const addonPrice = product.productAddons?.find((pa: any) => pa.addon.id === addonId)?.addon?.price || 0
+    return sum + Number(addonPrice)
+  }, 0)
+  const displayPrice = Number(currentPrice) + addonsTotal
   const isOutOfStock = (selectedVariant?.inventory?.quantity || 0) <= 0
 
   return (
@@ -139,15 +172,13 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 <p className="text-[10px] tracking-[0.25em] uppercase text-muted-foreground">
                   {product.category?.name}
                 </p>
-                <button className="text-muted-foreground hover:text-terracotta transition-colors">
-                  <Heart strokeWidth={1} className="w-5 h-5" />
-                </button>
+                <WishlistButton productId={product.id} variant="minimal" />
               </div>
               <h1 className="font-serif text-3xl md:text-5xl font-light text-foreground leading-tight">
                 {product.name}
               </h1>
               <div className="flex items-center gap-4 text-sm pt-2">
-                <span className="text-foreground">Rs. {currentPrice.toLocaleString()}</span>
+                <span className="text-foreground">Rs. {displayPrice.toLocaleString()}</span>
                 {product.originalPrice && (
                   <span className="text-muted-foreground line-through">Rs. {product.originalPrice.toLocaleString()}</span>
                 )}
@@ -207,6 +238,51 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                         {size}
                       </button>
                     ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Addons */}
+              {product.productAddons?.length > 0 && (
+                <div className="space-y-4 pt-4 border-t border-border/40">
+                  <div className="text-[10px] tracking-[0.2em] uppercase text-foreground">
+                    Optional Extras
+                  </div>
+                  <div className="space-y-3">
+                    {product.productAddons.map(({ addon }: any) => {
+                      const isSelected = selectedAddons.includes(addon.id)
+                      return (
+                        <label 
+                          key={addon.id} 
+                          className={`flex items-start gap-4 p-4 border transition-all cursor-pointer ${
+                            isSelected 
+                              ? "border-foreground bg-muted/20" 
+                              : "border-border/40 hover:border-foreground/40"
+                          }`}
+                        >
+                          <div className="mt-0.5">
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={(e) => {
+                                if (e.target.checked) setSelectedAddons([...selectedAddons, addon.id])
+                                else setSelectedAddons(selectedAddons.filter(id => id !== addon.id))
+                              }}
+                              className="w-4 h-4 rounded-sm border-border bg-transparent text-foreground focus:ring-0 focus:ring-offset-0"
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex justify-between">
+                              <span className="text-sm font-medium text-foreground">{addon.name}</span>
+                              <span className="text-sm text-foreground">+ Rs. {Number(addon.price).toLocaleString()}</span>
+                            </div>
+                            {addon.description && (
+                              <p className="text-xs text-muted-foreground mt-1">{addon.description}</p>
+                            )}
+                          </div>
+                        </label>
+                      )
+                    })}
                   </div>
                 </div>
               )}

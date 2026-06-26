@@ -2,6 +2,7 @@ import Link from "next/link"
 import { memo } from "react"
 import { Star, Heart, Repeat } from "lucide-react"
 import { CartIconButton } from "./cart-icon-button"
+import { WishlistButton } from "./wishlist-button"
 
 interface ProductCardProps {
   product: any;
@@ -27,9 +28,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
       {/* Image Box */}
       <div className="relative aspect-square overflow-hidden bg-black/50 p-4">
         <div className="absolute top-3 left-3 z-20 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button className="relative z-20 w-8 h-8 bg-carbon-dark/80 backdrop-blur border border-white/10 flex items-center justify-center text-white hover:text-racing-yellow hover:border-racing-yellow transition-colors">
-            <Heart className="w-4 h-4" />
-          </button>
+          <WishlistButton productId={product.id} />
           <button className="relative z-20 w-8 h-8 bg-carbon-dark/80 backdrop-blur border border-white/10 flex items-center justify-center text-white hover:text-racing-yellow hover:border-racing-yellow transition-colors">
             <Repeat className="w-4 h-4" />
           </button>

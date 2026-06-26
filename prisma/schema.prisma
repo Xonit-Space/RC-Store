@@ -214,6 +214,8 @@ model Category {
   slug        String     @unique
   description String?
   image       String?
+  isActive    Boolean    @default(true)
+  sortOrder   Int        @default(0)
   parentId    String?
   parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
   children    Category[] @relation("CategoryHierarchy")
@@ -298,6 +300,7 @@ model Product {
   compatibleModels     PartCompatibility[]
   staffPicks           StaffPick[]
   galleryImages        GalleryImage[]
+  addons               ProductAddon[]
 
   deletedAt DateTime?
   createdBy String?
@@ -311,6 +314,39 @@ model Product {
   @@index([categoryId, isActive])
   @@index([categoryId, price])
   @@map("products")
+}
+
+model Addon {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  description String?
+  image       String?
+  price       Decimal
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  products    ProductAddon[]
+  cartItems   CartItem[]
+  orderItems  OrderItem[]
+
+  @@index([slug])
+  @@map("addons")
+}
+
+model ProductAddon {
+  productId String
+  addonId   String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  addon     Addon   @relation(fields: [addonId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@id([productId, addonId])
+  @@index([productId])
+  @@index([addonId])
+  @@map("product_addons")
 }
 
 model ProductVariant {
@@ -435,18 +471,22 @@ model Cart {
 }
 
 model CartItem {
-  id        String         @id @default(cuid())
-  cartId    String
-  cart      Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  variantId String
-  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
-  quantity  Int            @default(1)
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
+  id              String          @id @default(cuid())
+  cartId          String
+  cart            Cart            @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  variantId       String?
+  variant         ProductVariant? @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  addonId         String?
+  addon           Addon?          @relation(fields: [addonId], references: [id], onDelete: Cascade)
+  parentProductId String?         // Reference to parent product if it's an addon
+  quantity        Int             @default(1)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
 
-  @@unique([cartId, variantId])
+  @@unique([cartId, variantId, addonId, parentProductId])
   @@index([cartId])
   @@index([variantId])
+  @@index([addonId])
   @@map("cart_items")
 }
 
@@ -469,6 +509,7 @@ model WishlistItem {
   wishlist   Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
   productId  String
   product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  notifyOnRestock Boolean @default(false)
   createdAt  DateTime @default(now())
 
   @@unique([wishlistId, productId])
@@ -547,17 +588,21 @@ model Order {
 }
 
 model OrderItem {
-  id        String         @id @default(cuid())
-  orderId   String
-  order     Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  variantId String
-  variant   ProductVariant @relation(fields: [variantId], references: [id])
-  quantity  Int
-  price     Decimal
-  total     Decimal
+  id              String          @id @default(cuid())
+  orderId         String
+  order           Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variantId       String?
+  variant         ProductVariant? @relation(fields: [variantId], references: [id])
+  addonId         String?
+  addon           Addon?          @relation(fields: [addonId], references: [id])
+  parentProductId String?         // Reference to parent product if it's an addon
+  quantity        Int
+  price           Decimal
+  total           Decimal
 
   @@index([orderId])
   @@index([variantId])
+  @@index([addonId])
   @@map("order_items")
 }
 

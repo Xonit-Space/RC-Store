@@ -55,7 +55,8 @@ async function main() {
     "EmailSubscriber", "Coupon", "MarketingCampaign", "HeroBanner", "FAQ", 
     "NavigationMenu", "BlogPost", "BlogCategory", "BlogTag", "CMSPage", 
     "Notification", "AuditLog", "SessionLog", "DeviceFingerprint", "Address", 
-    "Courier", "User"
+    "Notification", "AuditLog", "SessionLog", "DeviceFingerprint", "Address", 
+    "Courier", "User", "SiteSetting"
   ]
   for (const table of tables) {
     if ((prisma as any)[table.charAt(0).toLowerCase() + table.slice(1)]) {
@@ -266,6 +267,26 @@ async function main() {
     data: [
       { category: "Shipping", question: "Do you ship LiPo batteries internationally?", answer: "Due to aviation regulations, we can only ship LiPo batteries via ground transport to domestic addresses." },
       { category: "Technical", question: "What is the difference between brushed and brushless?", answer: "Brushless motors are vastly more efficient, run cooler, and provide significantly higher top speeds and torque." }
+    ]
+  })
+
+  // 8b. SITE SETTINGS (EOFY PROMO)
+  await prisma.siteSetting.createMany({
+    data: [
+      { key: "promo_active", value: "true" },
+      { key: "promo_title", value: "Massive EOFY Garage Sale" },
+      { key: "promo_end_date", value: new Date(Date.now() + 86400000 * 5).toISOString() }
+    ]
+  })
+
+  // 8c. WISHLISTS
+  const wishlist = await prisma.wishlist.create({
+    data: { userId: users[1].id }
+  })
+  await prisma.wishlistItem.createMany({
+    data: [
+      { wishlistId: wishlist.id, productId: allProducts[0].id, notifyOnRestock: true },
+      { wishlistId: wishlist.id, productId: allProducts[2].id, notifyOnRestock: false }
     ]
   })
 

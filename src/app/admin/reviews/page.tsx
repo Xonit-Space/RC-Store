@@ -58,18 +58,31 @@ export default function AdminReviewsPage() {
     )
   }
 
+  const pending = reviews.filter((r: any) => !r.isApproved).length
+  const approved = reviews.filter((r: any) => r.isApproved).length
+
   return (
     <div className="space-y-8 font-sans">
-      <div className="pb-6 border-b border-border/40">
-        <p className="text-[10px] tracking-[0.25em] uppercase text-muted-foreground mb-1">
-          Moderation
-        </p>
-        <h2 className="font-sans text-3xl font-light text-foreground leading-none">
-          Product Reviews
-        </h2>
-        <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-2">
-          {total.toLocaleString("en-US")} total reviews
-        </p>
+      <div className="pb-6 border-b border-border/40 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h2 className="font-sans text-2xl font-semibold text-foreground leading-none">
+            Product Reviews
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            {total.toLocaleString()} total reviews
+          </p>
+        </div>
+        {/* Summary pills */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-amber-500/10 border border-amber-500/20">
+            <span className="w-2 h-2 rounded-full bg-amber-500" />
+            <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400">{pending} Pending</span>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-emerald-500/10 border border-emerald-500/20">
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">{approved} Approved</span>
+          </div>
+        </div>
       </div>
 
       <div className="space-y-4">

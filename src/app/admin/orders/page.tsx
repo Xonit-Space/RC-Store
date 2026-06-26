@@ -125,29 +125,45 @@ function OrdersPageInner() {
   return (
     <div className="space-y-8 font-sans">
       {/* ── Header ── */}
-      <div className="pb-6 border-b border-border/40">
-        <p className="text-[10px] tracking-[0.25em] uppercase text-muted-foreground mb-1">
-          Fulfillment
-        </p>
-        <h2 className="font-sans text-3xl font-light text-foreground leading-none">
-          Order Management
-        </h2>
-        <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-2">
-          {total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} total orders
-        </p>
+      <div className="pb-6 border-b border-border/40 flex items-end justify-between gap-4">
+        <div>
+          <h2 className="font-sans text-2xl font-semibold text-foreground leading-none">
+            Order Management
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            {total.toLocaleString()} total orders
+          </p>
+        </div>
+        {activeStatus !== "ALL" && (
+          <button
+            onClick={() => setActiveStatus("ALL")}
+            className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground border border-border/40 px-3 py-1.5 rounded-md transition-colors flex items-center gap-1.5"
+          >
+            <X className="h-3 w-3" /> Clear filter
+          </button>
+        )}
       </div>
 
-      {/* ── Status counts bar ── */}
+      {/* ── Status counts bar (clickable) ── */}
       <div className="grid grid-cols-4 md:grid-cols-7 gap-2">
         {Object.entries(STATUS_CONFIG).map(([status, cfg]) => {
           const count = statusCounts[status] || 0
           const Icon = cfg.icon
+          const isActive = activeStatus === status
           return (
-            <div key={status} className="border border-border/30 p-3 bg-muted/5 text-center">
+            <button
+              key={status}
+              onClick={() => setActiveStatus(isActive ? "ALL" : status as FilterStatus)}
+              className={`border p-3 text-center transition-all rounded-md ${
+                isActive
+                  ? `border-current ${cfg.color} bg-muted/30`
+                  : "border-border/30 bg-muted/5 hover:border-border/60"
+              }`}
+            >
               <Icon className={`w-4 h-4 mx-auto mb-1 ${cfg.color}`} />
               <p className={`text-sm font-bold ${cfg.color}`}>{count}</p>
               <p className="text-[8px] uppercase tracking-widest text-muted-foreground mt-0.5">{cfg.label}</p>
-            </div>
+            </button>
           )
         })}
       </div>

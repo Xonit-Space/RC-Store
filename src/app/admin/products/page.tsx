@@ -430,21 +430,18 @@ export default function AdminProductsPage() {
       {/* ── Page header ── */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-border/40">
         <div>
-          <p className="text-[10px] tracking-[0.25em] uppercase text-muted-foreground mb-1">
-            Inventory Management
-          </p>
-          <h2 className="font-sans text-3xl font-light text-foreground leading-none">
+          <h2 className="font-sans text-2xl font-semibold text-foreground leading-none">
             Product Catalog
           </h2>
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             {pagination.total} RC products
           </p>
         </div>
         <Button
           onClick={openCreateModal}
-          className="h-12 px-6 rounded-none bg-foreground text-background font-bold text-xs tracking-widest uppercase hover:bg-foreground/90 transition-colors"
+          className="h-10 px-5 rounded-md bg-foreground text-background font-semibold text-xs tracking-wide hover:bg-foreground/90 transition-colors flex items-center gap-2"
         >
-          <Plus className="h-4 w-4 mr-2" /> Add Product
+          <Plus className="h-3.5 w-3.5" /> Add Product
         </Button>
       </div>
 

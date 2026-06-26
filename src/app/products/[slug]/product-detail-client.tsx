@@ -340,17 +340,59 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 )}
                 {activeTab === "reviews" && (
                   <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                    {product.reviews?.length > 0 ? (
-                      product.reviews.map((rev: any) => (
+                    {session?.user && (
+                      <form action={async (formData) => {
+                        const res = await submitReview(product.id, session.user.id, {
+                          rating: Number(formData.get("rating")),
+                          comment: formData.get("comment"),
+                        })
+                        if (res.success) {
+                          toast.success("Review submitted for approval")
+                          // In a real app we'd reload or optimistically append
+                        } else {
+                          toast.error(res.error || "Failed to submit review")
+                        }
+                      }} className="border-b border-border/40 pb-6 mb-6">
+                        <p className="text-[10px] tracking-wider uppercase text-foreground mb-3 font-bold">Write a Review</p>
+                        <div className="space-y-3">
+                          <select name="rating" required className="w-full bg-background border border-border/40 text-sm p-2 text-foreground">
+                            <option value="5">5 Stars - Excellent</option>
+                            <option value="4">4 Stars - Good</option>
+                            <option value="3">3 Stars - Average</option>
+                            <option value="2">2 Stars - Poor</option>
+                            <option value="1">1 Star - Terrible</option>
+                          </select>
+                          <textarea 
+                            name="comment" 
+                            required 
+                            placeholder="Share your thoughts about this product..."
+                            className="w-full bg-background border border-border/40 p-3 text-sm min-h-[80px] text-foreground"
+                          />
+                          <button type="submit" className="px-4 py-2 bg-foreground text-background text-[10px] tracking-wider uppercase hover:opacity-90 transition">
+                            Submit Review
+                          </button>
+                        </div>
+                      </form>
+                    )}
+                    
+                    {product.reviews?.filter((r: any) => r.isApproved).length > 0 ? (
+                      product.reviews.filter((r: any) => r.isApproved).map((rev: any) => (
                         <div key={rev.id} className="border-b border-border/40 pb-4 last:border-0">
-                          <p className="text-[10px] tracking-wider uppercase text-foreground mb-2">
-                            {rev.user?.name || "Client"}
-                          </p>
-                          <p>{rev.comment}</p>
+                          <div className="flex items-center gap-2 mb-2">
+                            <p className="text-[10px] tracking-wider uppercase text-foreground">
+                              {rev.user?.name || "Client"}
+                            </p>
+                            <div className="flex text-primary">
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <span key={i} className="text-xs">{i < rev.rating ? "★" : "☆"}</span>
+                              ))}
+                            </div>
+                          </div>
+                          <p className="text-sm">{rev.comment}</p>
                         </div>
                       ))
                     ) : (
-                      <p>No reviews yet.</p>
+                      <p className="text-sm">No approved reviews yet.</p>
                     )}
                   </div>
                 )}

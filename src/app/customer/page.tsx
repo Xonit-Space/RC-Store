@@ -128,12 +128,20 @@ export default function CustomerDashboardPage() {
             >
               Log Out
             </button>
-            <a
-              href="/customer/gallery"
-              className="mt-4 px-4 py-2 bg-primary/10 border border-primary text-primary text-[10px] font-bold font-mono tracking-widest uppercase hover:bg-primary hover:text-primary-foreground transition-colors"
-            >
-              Upload to Gallery
-            </a>
+            <div className="flex gap-2">
+              <a
+                href="/customer/reviews"
+                className="mt-4 px-4 py-2 border border-muted-foreground text-muted-foreground text-[10px] font-bold font-mono tracking-widest uppercase hover:bg-muted-foreground hover:text-background transition-colors"
+              >
+                Manage Reviews
+              </a>
+              <a
+                href="/customer/gallery"
+                className="mt-4 px-4 py-2 bg-primary/10 border border-primary text-primary text-[10px] font-bold font-mono tracking-widest uppercase hover:bg-primary hover:text-primary-foreground transition-colors"
+              >
+                Upload to Gallery
+              </a>
+            </div>
           </div>
         </div>
 

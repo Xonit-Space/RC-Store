@@ -117,3 +117,53 @@ export function useAdminOrders(page = 1, limit = 20, search = "") {
     }
   })
 }
+
+export function useAdminReviews(page = 1, limit = 20, search = "") {
+  return useQuery({
+    queryKey: ["admin", "reviews", page, limit, search],
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        page: String(page),
+        limit: String(limit),
+        ...(search ? { search } : {}),
+      })
+      const res = await fetch(`/api/admin/reviews?${params}`)
+      if (!res.ok) throw new Error("Failed to load reviews")
+      return res.json()
+    }
+  })
+}
+
+export function useAdminUpdateReview() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, isApproved }: { id: string; isApproved: boolean }) => {
+      const res = await fetch(`/api/admin/reviews/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isApproved }),
+      })
+      if (!res.ok) throw new Error("Failed to update review")
+      return res.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "reviews"] })
+    }
+  })
+}
+
+export function useAdminDeleteReview() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/admin/reviews/${id}`, {
+        method: "DELETE",
+      })
+      if (!res.ok) throw new Error("Failed to delete review")
+      return res.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "reviews"] })
+    }
+  })
+}

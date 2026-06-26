@@ -18,6 +18,8 @@ export function Sidebar({ role }: SidebarProps) {
   const modules = [
     { id: "overview", name: "Overview", icon: BarChart3, path: "/admin" },
     { id: "products", name: "Products Catalog", icon: Package, path: "/admin/products" },
+    { id: "categories", name: "Categories", icon: Database, path: "/admin/categories" },
+    { id: "addons", name: "Product Addons", icon: Coins, path: "/admin/addons" },
     { id: "orders", name: "Orders Manager", icon: ShoppingCart, path: "/admin/orders" },
     { id: "customers", name: "Customers Registry", icon: Users, path: "/admin/customers" },
     { id: "inventory", name: "Inventory Stock", icon: Database, path: "/admin/inventory" },

@@ -11,8 +11,10 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 import { adminCreateProduct, adminUpdateProduct, adminDeleteProduct } from "@/actions/product"
-import { useAdminProducts, useAdminCategories } from "@/hooks/use-admin-data"
-import { useQueryClient } from "@tanstack/react-query"
+import { getAddons, getProductAddons, assignAddonsToProduct } from "@/actions/addons"
+import { getCategories } from "@/actions/categories"
+import { useAdminProducts } from "@/hooks/use-admin-data"
+import { useQueryClient, useQuery } from "@tanstack/react-query"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -204,7 +206,14 @@ export default function AdminProductsPage() {
   }, [search])
 
   const { data, isLoading: isLoadingProducts } = useAdminProducts(page, limit, debouncedSearch)
-  const { data: dbCategories = [], isLoading: isLoadingCategories } = useAdminCategories()
+  const { data: dbCategories = [], isLoading: isLoadingCategories } = useQuery({
+    queryKey: ["admin", "categories-data"],
+    queryFn: () => getCategories()
+  })
+  const { data: availableAddons = [], isLoading: isLoadingAddons } = useQuery({
+    queryKey: ["admin", "addons-data"],
+    queryFn: () => getAddons()
+  })
 
   const products = data?.products || []
   const pagination = data?.pagination || { total: 0, pages: 0, page: 1, limit }
@@ -226,6 +235,7 @@ export default function AdminProductsPage() {
   const [isFeatured, setIsFeatured] = useState(false)
   const [isActive, setIsActive] = useState(true)
   const [imageSlots, setImageSlots] = useState<ImageSlot[]>([])
+  const [selectedAddonIds, setSelectedAddonIds] = useState<string[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // ─── Upload images to Cloudinary & save to DB ──────────────────────────────
@@ -302,6 +312,7 @@ export default function AdminProductsPage() {
     setIsFeatured(false)
     setIsActive(true)
     setImageSlots([])
+    setSelectedAddonIds([])
     setIsOpen(true)
   }
 
@@ -319,8 +330,15 @@ export default function AdminProductsPage() {
     setIsFeatured(product.isFeatured || false)
     setIsActive(product.isActive !== false)
     setImageSlots([])
+    setSelectedAddonIds([])
     setIsOpen(true)
     await loadProductImages(product.id)
+    try {
+      const pAddons = await getProductAddons(product.id)
+      setSelectedAddonIds(pAddons.map(a => a.id))
+    } catch {
+      // Ignore
+    }
   }
 
   // ─── Submit handler ────────────────────────────────────────────────────────
@@ -363,6 +381,7 @@ export default function AdminProductsPage() {
         const productId = isEditMode ? editingId : (res.data as any)?.id
         if (productId) {
           await uploadPendingImages(productId)
+          await assignAddonsToProduct(productId, selectedAddonIds)
         }
         toast.success(`Product ${isEditMode ? "updated" : "created"} successfully!`)
         setIsOpen(false)
@@ -749,6 +768,35 @@ export default function AdminProductsPage() {
                       Featured Product
                     </span>
                   </label>
+                </div>
+
+                {/* Addons Selection */}
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">
+                    Product Addons
+                  </label>
+                  <div className="border border-border/60 p-4 max-h-48 overflow-y-auto space-y-2 bg-muted/5">
+                    {availableAddons.length === 0 ? (
+                      <p className="text-[10px] text-muted-foreground">No addons available.</p>
+                    ) : (
+                      availableAddons.map((addon: any) => (
+                        <label key={addon.id} className="flex items-center gap-3 cursor-pointer group">
+                          <input
+                            type="checkbox"
+                            checked={selectedAddonIds.includes(addon.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) setSelectedAddonIds([...selectedAddonIds, addon.id])
+                              else setSelectedAddonIds(selectedAddonIds.filter(id => id !== addon.id))
+                            }}
+                            className="w-4 h-4 rounded-sm border-border bg-transparent text-foreground focus:ring-0 focus:ring-offset-0"
+                          />
+                          <span className="text-xs text-foreground font-medium">
+                            {addon.name} <span className="text-muted-foreground">(Rs. {Number(addon.price).toFixed(2)})</span>
+                          </span>
+                        </label>
+                      ))
+                    )}
+                  </div>
                 </div>
 
                 {/* 5-image uploader */}

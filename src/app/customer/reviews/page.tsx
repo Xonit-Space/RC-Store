@@ -90,7 +90,7 @@ export default function CustomerReviewsPage() {
             <CardContent className="pt-6">
               <MessageSquare className="h-14 w-14 mx-auto text-muted-foreground/30 mb-3" />
               <p className="text-sm font-bold text-foreground">No reviews yet</p>
-              <p className="text-xs text-muted-foreground pt-1 mb-6">You haven't reviewed any products yet.</p>
+              <p className="text-xs text-muted-foreground pt-1 mb-6">You haven&apos;t reviewed any products yet.</p>
               <Link href="/products" className="inline-flex h-11 items-center justify-center px-6 rounded-none bg-primary hover:bg-primary/95 text-foreground text-xs font-bold transition">
                 Browse Products
               </Link>
@@ -113,7 +113,7 @@ export default function CustomerReviewsPage() {
                   </div>
                   
                   <p className="text-sm text-foreground mb-4 flex-1">
-                    "{review.comment}"
+                    &quot;{review.comment}&quot;
                   </p>
                   
                   <div className="flex items-center justify-between pt-4 border-t border-muted/20">

@@ -1,5 +1,3 @@
-import { Header } from "@/components/layout/header"
-import { Footer } from "@/components/layout/footer"
 import { PartFinderBanner } from "@/components/sections/part-finder-banner"
 import { ShieldCheck, Zap, Activity } from "lucide-react"
 
@@ -11,8 +9,7 @@ export const metadata = {
 export default function PartFinderPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Header />
-
+      
       <main className="flex-1 pt-24">
         {/* Page Header */}
         <div className="px-6 md:px-12 py-10 md:py-16">
@@ -51,7 +48,6 @@ export default function PartFinderPage() {
         </div>
       </main>
 
-      <Footer />
-    </div>
+          </div>
   )
 }

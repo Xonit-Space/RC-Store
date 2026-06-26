@@ -1,5 +1,3 @@
-import { Header } from "@/components/layout/header"
-import { Footer } from "@/components/layout/footer"
 import Link from "next/link"
 import { Wrench } from "lucide-react"
 
@@ -11,8 +9,7 @@ export const metadata = {
 export default function GaragePage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Header />
-      <main className="flex-grow flex flex-col items-center justify-center text-center px-6 py-24">
+            <main className="flex-grow flex flex-col items-center justify-center text-center px-6 py-24">
         <div className="w-20 h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-8">
           <Wrench className="w-10 h-10 text-racing-yellow" />
         </div>
@@ -37,7 +34,6 @@ export default function GaragePage() {
           </Link>
         </div>
       </main>
-      <Footer />
-    </div>
+          </div>
   )
 }

@@ -11,6 +11,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { Suspense } from "react"
 import { HeaderSkeleton } from "@/components/ui/loading-skeleton"
 import { WebVitals } from "@/components/performance/web-vitals"
+import { ClientLayoutWrapper } from "@/components/layout/client-layout-wrapper"
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-inter", display: "swap" })
 const outfit = Outfit({ 
@@ -50,7 +51,9 @@ export default function RootLayout({
               nonce={nonce}
             >
               <LoadingProvider>
-                <Suspense fallback={<HeaderSkeleton />}>{children}</Suspense>
+                <Suspense fallback={<HeaderSkeleton />}>
+                  <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
+                </Suspense>
                 <Toaster />
               </LoadingProvider>
             </ThemeProvider>

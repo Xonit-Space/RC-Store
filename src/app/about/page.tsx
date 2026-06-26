@@ -1,12 +1,9 @@
-import { Header } from "@/components/layout/header"
-import { Footer } from "@/components/layout/footer"
 import Image from "next/image"
 
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col font-sans">
-      <Header />
-      <main className="flex-1 pt-24 pb-24">
+            <main className="flex-1 pt-24 pb-24">
         {/* Hero Section */}
         <section className="px-6 md:px-12 lg:px-24 mb-24 max-w-[1400px] mx-auto">
           <div className="max-w-3xl space-y-8">
@@ -51,7 +48,6 @@ export default function AboutPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </div>
+          </div>
   )
 }

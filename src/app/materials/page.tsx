@@ -1,5 +1,3 @@
-import { Header } from "@/components/layout/header"
-import { Footer } from "@/components/layout/footer"
 import Image from "next/image"
 
 export default function MaterialsPage() {
@@ -26,8 +24,7 @@ export default function MaterialsPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col font-sans">
-      <Header />
-      <main className="flex-1 pt-32 pb-24">
+            <main className="flex-1 pt-32 pb-24">
         
         <div className="px-6 md:px-12 lg:px-24 max-w-[1400px] mx-auto w-full mb-24 text-center">
           <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-4">Sourcing</p>
@@ -69,7 +66,6 @@ export default function MaterialsPage() {
         </div>
 
       </main>
-      <Footer />
-    </div>
+          </div>
   )
 }

@@ -3,7 +3,6 @@ import { Suspense } from "react"
 import nextDynamic from "next/dynamic"
 
 // Eager components for LCP
-import { Header } from "@/components/layout/header"
 import { HeroSection } from "@/components/sections/hero-section"
 
 // Lazy loaded below-the-fold components
@@ -28,8 +27,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
       {/* 1 & 2. Announcement Bar & Header */}
-      <Header />
-
+      
       <main>
         {/* 3. Hero Banner (LCP) */}
         <HeroSection />
@@ -91,7 +89,6 @@ export default function HomePage() {
       </main>
 
       {/* 15. Footer */}
-      <Footer />
-    </div>
+          </div>
   )
 }

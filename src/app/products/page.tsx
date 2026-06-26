@@ -1,6 +1,4 @@
 import { getProductsServer as getProducts } from "@/lib/server-api"
-import { Header } from "@/components/layout/header"
-import { Footer } from "@/components/layout/footer"
 import { SidebarFilters } from "./sidebar-filters"
 import { CatalogHeader } from "./catalog-header"
 import { ProductCard } from "@/components/product/product-card"
@@ -53,8 +51,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Header />
-
+      
       {/* Page Title Bar */}
       <div className="pt-24 pb-10 md:pt-32 md:pb-12 px-6 md:px-12 border-b border-border/40">
         <div className="container mx-auto flex items-end justify-between">
@@ -130,7 +127,6 @@ export default async function ProductsPage({ searchParams }: PageProps) {
         </div>
       </main>
 
-      <Footer />
-    </div>
+          </div>
   )
 }

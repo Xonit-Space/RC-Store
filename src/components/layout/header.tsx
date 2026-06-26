@@ -2,128 +2,43 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Menu, X, Terminal, HelpCircle, Heart, Search, ChevronDown, Clock } from "lucide-react"
-import { ThemeToggle } from "@/components/theme-toggle"
+import { usePathname, useRouter } from "next/navigation"
+import { Menu, X, ShoppingCart, User, LogOut, Package, Shield, Settings, Terminal, Search, ChevronDown, Moon, Sun, Monitor } from "lucide-react"
+import { useSession, signOut } from "next-auth/react"
+import { useTheme } from "next-themes"
 import { useCartStore } from "@/store/cart"
-import { signOut, useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
-import { useDebounce } from "@/hooks/use-debounce"
-
-function AnnouncementBar() {
-  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, mins: 0, secs: 0 })
-  const [promoTitle, setPromoTitle] = useState("EOFY Sale")
-  const [targetDate, setTargetDate] = useState<Date | null>(null)
-  const [isActive, setIsActive] = useState(true) // assume true to prevent flash of hidden content
-
-  useEffect(() => {
-    async function loadPromo() {
-      try {
-        const res = await fetch("/api/promotion")
-        if (res.ok) {
-          const json = await res.json()
-          if (json.success && json.data) {
-            setPromoTitle(json.data.title)
-            setTargetDate(new Date(json.data.endDate))
-            setIsActive(true)
-          } else {
-            setIsActive(false)
-          }
-        }
-      } catch (err) {
-        console.error("Failed to load promo")
-      }
-    }
-    loadPromo()
-  }, [])
-
-  useEffect(() => {
-    if (!targetDate) return
-
-    const timer = setInterval(() => {
-      const now = new Date().getTime()
-      const distance = targetDate.getTime() - now
-
-      if (distance < 0) {
-        clearInterval(timer)
-        setTimeLeft({ days: 0, hours: 0, mins: 0, secs: 0 })
-        setIsActive(false)
-        return
-      }
-
-      setTimeLeft({
-        days: Math.floor(distance / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-        mins: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
-        secs: Math.floor((distance % (1000 * 60)) / 1000)
-      })
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [targetDate])
-
-  if (!isActive) return null;
-
-  return (
-    <div suppressHydrationWarning className="w-full bg-racing-yellow text-carbon-dark py-2 px-6 flex flex-col md:flex-row items-center justify-between text-[10px] font-mono font-bold uppercase tracking-widest relative z-[60]">
-      <div className="flex flex-wrap items-center justify-center gap-4 mb-2 md:mb-0">
-        <Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link>
-        <span className="opacity-50">|</span>
-        <Link href="/blog" className="hover:text-white transition-colors">Blog</Link>
-        <span className="opacity-50">|</span>
-        <Link href="/customer" className="hover:text-white transition-colors">My Garage</Link>
-        <span className="opacity-50">|</span>
-        <Link href="/wishlist" className="hover:text-white transition-colors flex items-center gap-1">
-          <Heart className="h-3 w-3" /> Wishlist
-        </Link>
-      </div>
-      <div className="flex items-center gap-2">
-        <Clock className="h-4 w-4 animate-pulse" />
-        <span>{promoTitle} Ends In:</span>
-        <span className="bg-carbon-dark text-racing-yellow px-2 py-0.5 rounded-sm">
-          {timeLeft.days}d {timeLeft.hours}h {timeLeft.mins}m {timeLeft.secs}s
-        </span>
-      </div>
-    </div>
-  )
-}
 
 export function Header() {
   const { data: session } = useSession()
   const router = useRouter()
+  const pathname = usePathname()
   const cartStore = useCartStore()
+  
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isSearchOpen, setIsSearchOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const { theme, setTheme } = useTheme()
   
-  const debouncedSearchQuery = useDebounce(searchQuery, 500)
   const cartCount = cartStore.getItemCount()
 
   useEffect(() => {
     useCartStore.persist.rehydrate()
     setMounted(true)
     const handleScroll = () => {
-      setScrolled(window.scrollY > 30)
+      setScrolled(window.scrollY > 10)
     }
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  useEffect(() => {
-    if (debouncedSearchQuery.trim()) {
-      router.push(`/products?query=${encodeURIComponent(debouncedSearchQuery)}`)
-    }
-  }, [debouncedSearchQuery, router])
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (searchQuery.trim()) {
-      router.push(`/products?query=${encodeURIComponent(searchQuery)}`)
-      setIsSearchOpen(false)
-      setSearchQuery("")
-    }
-  }
+  const navLinks = [
+    { name: "Home", path: "/" },
+    { name: "Shop All", path: "/products" },
+    { name: "Part Finder", path: "/part-finder" },
+    { name: "Blog", path: "/blog" },
+    { name: "Contact", path: "/contact" },
+  ]
 
   const accountUrl = session?.user
     ? (session.user.role as string) === "SUPER_ADMIN" || (session.user.role as string) === "ADMIN"
@@ -133,140 +48,232 @@ export function Header() {
         : "/customer"
     : "/login"
 
+  // Close menus when route changes
+  useEffect(() => {
+    setIsMenuOpen(false)
+    setIsUserMenuOpen(false)
+  }, [pathname])
+
   return (
-    <>
-      <header suppressHydrationWarning className={`fixed top-0 z-50 w-full transition-all duration-500 ${scrolled ? "glass-dark border-b border-racing-yellow/40 shadow-[0_0_20px_rgba(255, 204, 0,0.1)]" : "bg-gradient-to-b from-black to-carbon-dark/80"}`}>
-      <AnnouncementBar />
-      <div className={`transition-all duration-500 ${scrolled ? "py-2" : "py-4"}`}>
-        <div className="container mx-auto px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-4">
-          
-          <div className="flex items-center justify-between w-full md:w-auto">
-            <button className="md:hidden text-white hover:text-racing-yellow transition-colors" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-              <Menu strokeWidth={2} className="h-6 w-6" />
-            </button>
-            
-            <Link href="/" className="font-heading font-black text-2xl md:text-3xl tracking-widest text-foreground uppercase drop-shadow-[0_0_10px_rgba(255, 204, 0,0.5)]">
-              <img src="/Transparent/logo yellow0.png" alt="Aussie Rigs Arena" className="h-8 w-auto object-contain scale-[4] md:scale-[5] origin-left pointer-events-none" />
-            </Link>
+    <header 
+      suppressHydrationWarning 
+      className={`fixed top-0 z-50 w-full transition-all duration-300 ${
+        scrolled 
+          ? "bg-background/80 backdrop-blur-md border-b border-border shadow-sm" 
+          : "bg-background border-b border-transparent"
+      }`}
+    >
+      <div className="container mx-auto px-4 lg:px-8 h-16 flex items-center justify-between">
+        
+        {/* Mobile Hamburger */}
+        <button 
+          className="lg:hidden p-2 -ml-2 text-foreground hover:text-primary transition-colors focus:outline-none" 
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-label="Toggle Menu"
+        >
+          {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
 
-            {/* Mobile Actions */}
-            <div className="flex md:hidden items-center gap-4">
-              <button onClick={() => setIsSearchOpen(true)}>
-                <Search className="h-5 w-5 text-white/80 hover:text-white transition-colors" />
-              </button>
-              <Link href="/cart" className="relative">
-                <Terminal className="h-5 w-5 text-racing-yellow" />
-                {mounted && cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-racing-yellow text-carbon-dark text-[9px] font-bold px-1 rounded-full">{cartCount}</span>
-                )}
+        {/* Logo (Left) */}
+        <Link href="/" className="flex items-center gap-2 group mr-auto lg:mr-0 absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0">
+          <img 
+            src="/Transparent/logo yellow0.png" 
+            alt="Aussie Rigs Arena" 
+            className="h-8 w-auto object-contain scale-[3] origin-center lg:origin-left pointer-events-none group-hover:opacity-90 transition-opacity drop-shadow-sm" 
+          />
+        </Link>
+
+        {/* Main Menu (Center Desktop) */}
+        <nav className="hidden lg:flex items-center justify-center flex-1 mx-8 gap-1">
+          {navLinks.map((link) => {
+            const isActive = pathname === link.path || (link.path !== "/" && pathname.startsWith(link.path))
+            return (
+              <Link
+                key={link.name}
+                href={link.path}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                  isActive 
+                    ? "bg-primary/10 text-primary" 
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`}
+              >
+                {link.name}
               </Link>
-            </div>
-          </div>
+            )
+          })}
+        </nav>
 
-          {/* Desktop Search Bar */}
-          <div className="hidden md:flex flex-1 max-w-2xl px-8 relative">
-            <div className="relative w-full group">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                 <Search className="h-4 w-4 text-white/70 group-focus-within:text-racing-yellow transition-colors" />
-              </div>
-              <input 
-                type="text" 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="SEARCH RC CARS, DRONES, PARTS..." 
-                className="w-full h-10 bg-white/5 border border-white/10 hover:border-racing-yellow/50 focus:border-racing-yellow text-sm font-mono text-white pl-12 pr-28 outline-none placeholder:text-white/50 uppercase tracking-wider transition-all"
-              />
-              <button onClick={handleSearch} className="absolute right-0 top-0 h-full px-4 bg-racing-yellow text-carbon-dark text-[10px] font-mono font-bold tracking-[0.1em] uppercase hover:bg-neon-yellow transition-colors">
-                Search
-              </button>
-            </div>
-          </div>
+        {/* Right Actions */}
+        <div className="flex items-center gap-2 sm:gap-4">
+          
+          {/* Theme Toggle */}
+          {mounted && (
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="p-2 text-muted-foreground hover:bg-muted hover:text-foreground rounded-full transition-colors hidden sm:flex items-center justify-center"
+              aria-label="Toggle Theme"
+            >
+              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
+          )}
 
-          {/* Right Actions */}
-          <div className="hidden md:flex items-center space-x-6">
-            <Link href="/part-finder" className="flex items-center gap-1 text-[11px] font-mono font-bold tracking-[0.1em] uppercase text-racing-yellow hover:text-white transition-colors border border-racing-yellow/50 px-3 py-1.5 hover:bg-racing-yellow/10">
-              <Terminal className="h-3 w-3" /> Part Finder
-            </Link>
-
-            <Link href="/help" className="text-white/80 hover:text-racing-yellow transition-colors">
-              <HelpCircle className="h-5 w-5" />
-            </Link>
-
+          {/* User Menu */}
+          <div className="relative hidden sm:block">
             {session ? (
-              <div className="flex items-center gap-4">
-                <Link href={accountUrl} className="text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-white hover:text-racing-yellow transition-colors">
-                  Account
-                </Link>
-                <button onClick={() => signOut({ callbackUrl: '/' })} className="text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-red-500 hover:text-red-400 transition-colors">
-                  Log Out
-                </button>
-              </div>
+              <button 
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                className="flex items-center gap-2 p-2 hover:bg-muted rounded-full transition-colors focus:outline-none"
+              >
+                <div className="h-8 w-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-sm">
+                  {session.user.name?.charAt(0) || session.user.email?.charAt(0) || "U"}
+                </div>
+                <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${isUserMenuOpen ? "rotate-180" : ""}`} />
+              </button>
             ) : (
-              <Link href="/login" className="text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-white hover:text-racing-yellow transition-colors">
-                Login
+              <Link 
+                href="/login" 
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground bg-primary/10 hover:bg-primary/20 rounded-md transition-colors"
+              >
+                <User className="h-4 w-4" /> Login
               </Link>
             )}
 
-            <Link href="/cart" className="flex items-center gap-2 text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-white hover:text-racing-yellow transition-colors">
-              Cart {mounted && cartCount > 0 ? <span className="bg-racing-yellow text-carbon-dark px-1.5 py-0.5 rounded-sm">{cartCount}</span> : null}
-            </Link>
+            {/* User Dropdown */}
+            {isUserMenuOpen && session && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setIsUserMenuOpen(false)}></div>
+                <div className="absolute right-0 mt-2 w-56 bg-card border border-border rounded-md shadow-lg z-50 py-1 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="px-4 py-3 border-b border-border bg-muted/30">
+                    <p className="text-sm font-medium text-foreground truncate">{session.user.name || "User"}</p>
+                    <p className="text-xs text-muted-foreground truncate">{session.user.email}</p>
+                  </div>
+                  
+                  <div className="p-1">
+                    <Link href={accountUrl} className="flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted rounded-sm transition-colors">
+                      {accountUrl === "/admin" ? <Shield className="h-4 w-4" /> : <Settings className="h-4 w-4" />}
+                      {accountUrl === "/admin" ? "Admin Dashboard" : "My Garage"}
+                    </Link>
+                    {accountUrl === "/customer" && (
+                      <Link href="/customer/orders" className="flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted rounded-sm transition-colors">
+                        <Package className="h-4 w-4" /> My Orders
+                      </Link>
+                    )}
+                  </div>
+                  
+                  <div className="border-t border-border p-1">
+                    <button 
+                      onClick={() => signOut({ callbackUrl: '/' })}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-destructive hover:bg-destructive/10 rounded-sm transition-colors"
+                    >
+                      <LogOut className="h-4 w-4" /> Log Out
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
-        </div>
-        </div>
-      </header>
 
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="fixed inset-0 z-[100] glass-dark flex flex-col items-center justify-center space-y-8 animate-in fade-in duration-300">
-          <button className="absolute top-6 left-6 text-foreground hover:text-racing-yellow transition-colors" onClick={() => setIsMenuOpen(false)}>
-            <X strokeWidth={2} className="h-8 w-8" />
-          </button>
-          
-          <Link href="/part-finder" onClick={() => setIsMenuOpen(false)} className="font-heading font-black uppercase text-3xl tracking-widest text-racing-yellow hover:text-white transition-colors">
-            Part Finder
+          {/* Cart */}
+          <Link 
+            href="/cart" 
+            className="relative p-2 text-foreground hover:bg-muted rounded-full transition-colors flex items-center justify-center"
+            aria-label="Shopping Cart"
+          >
+            <ShoppingCart className="h-5 w-5" />
+            {mounted && cartCount > 0 && (
+              <span className="absolute top-0 right-0 h-4 min-w-4 px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center border-2 border-background">
+                {cartCount}
+              </span>
+            )}
           </Link>
-          <Link href="/products" onClick={() => setIsMenuOpen(false)} className="font-heading font-black uppercase text-3xl tracking-widest text-foreground hover:text-racing-yellow transition-colors">
-            Shop All
-          </Link>
-          <Link href="/customer" onClick={() => setIsMenuOpen(false)} className="font-heading font-black uppercase text-3xl tracking-widest text-foreground hover:text-racing-yellow transition-colors">
-            My Garage
-          </Link>
-          <Link href={accountUrl} onClick={() => setIsMenuOpen(false)} className="font-heading font-black uppercase text-3xl tracking-widest text-foreground hover:text-racing-yellow transition-colors">
-            Account
-          </Link>
+        </div>
+      </div>
+
+      {/* Mobile Menu Dropdown */}
+      <div 
+        className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out border-b border-border bg-background ${
+          isMenuOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0 border-transparent"
+        }`}
+      >
+        <nav className="flex flex-col p-4 space-y-1 overflow-y-auto max-h-[70vh]">
+          {navLinks.map((link) => {
+            const isActive = pathname === link.path || (link.path !== "/" && pathname.startsWith(link.path))
+            return (
+              <Link
+                key={link.name}
+                href={link.path}
+                className={`px-4 py-3 rounded-md text-base font-medium transition-colors ${
+                  isActive 
+                    ? "bg-primary/10 text-primary" 
+                    : "text-foreground hover:bg-muted"
+                }`}
+              >
+                {link.name}
+              </Link>
+            )
+          })}
+
+          <div className="my-4 border-t border-border"></div>
+
+          {/* Mobile Auth & Theme */}
+          <div className="flex items-center justify-between px-4 py-2">
+            <span className="text-sm font-medium text-muted-foreground">Theme Preference</span>
+            {mounted && (
+              <div className="flex bg-muted rounded-md p-1">
+                <button
+                  onClick={() => setTheme("light")}
+                  className={`p-1.5 rounded-sm transition-colors ${theme === "light" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}
+                >
+                  <Sun className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => setTheme("dark")}
+                  className={`p-1.5 rounded-sm transition-colors ${theme === "dark" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}
+                >
+                  <Moon className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => setTheme("system")}
+                  className={`p-1.5 rounded-sm transition-colors ${theme === "system" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"}`}
+                >
+                  <Monitor className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="my-2 border-t border-border"></div>
+
           {session ? (
-            <button onClick={() => { signOut({ callbackUrl: '/' }); setIsMenuOpen(false); }} className="font-heading font-black uppercase text-3xl tracking-widest text-red-500 hover:text-red-400 transition-colors mt-8">
-              Log Out
-            </button>
+            <div className="space-y-1">
+              <div className="px-4 py-2 mb-2">
+                <p className="text-sm font-medium text-foreground">{session.user.name || "User Account"}</p>
+                <p className="text-xs text-muted-foreground">{session.user.email}</p>
+              </div>
+              <Link
+                href={accountUrl}
+                className="flex items-center gap-3 px-4 py-3 rounded-md text-base font-medium text-foreground hover:bg-muted transition-colors"
+              >
+                {accountUrl === "/admin" ? <Shield className="h-5 w-5 text-muted-foreground" /> : <Settings className="h-5 w-5 text-muted-foreground" />}
+                {accountUrl === "/admin" ? "Admin Dashboard" : "My Garage"}
+              </Link>
+              <button
+                onClick={() => signOut({ callbackUrl: '/' })}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-md text-base font-medium text-destructive hover:bg-destructive/10 transition-colors"
+              >
+                <LogOut className="h-5 w-5" /> Log Out
+              </button>
+            </div>
           ) : (
-            <Link href="/login" onClick={() => setIsMenuOpen(false)} className="font-heading font-black uppercase text-3xl tracking-widest text-foreground hover:text-racing-yellow transition-colors mt-8">
-              Login
+            <Link
+              href="/login"
+              className="flex items-center justify-center gap-2 w-full mt-2 py-3 rounded-md text-base font-medium text-primary-foreground bg-primary hover:bg-primary/90 transition-colors"
+            >
+              <User className="h-5 w-5" /> Sign In / Register
             </Link>
           )}
-        </div>
-      )}
-
-      {/* Mobile Search Overlay */}
-      {isSearchOpen && (
-        <div className="fixed inset-0 z-[100] glass-dark flex flex-col items-center justify-start pt-32 px-6 animate-in fade-in duration-300 md:hidden">
-          <button className="absolute top-6 right-6 text-foreground hover:text-racing-yellow transition-colors" onClick={() => setIsSearchOpen(false)}>
-            <X strokeWidth={2} className="h-8 w-8" />
-          </button>
-          <form onSubmit={handleSearch} className="w-full relative">
-            <div className="absolute left-0 top-1/2 -translate-y-1/2">
-               <Search className="h-6 w-6 text-racing-yellow" />
-            </div>
-            <input 
-              type="text" 
-              autoFocus
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="SEARCH RC CARS..." 
-              className="w-full bg-transparent border-b-2 border-racing-yellow text-2xl font-heading font-black text-foreground pl-10 pb-4 outline-none placeholder:text-muted-foreground uppercase tracking-widest"
-            />
-          </form>
-        </div>
-      )}
-    </>
+        </nav>
+      </div>
+    </header>
   )
 }

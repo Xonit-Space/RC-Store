@@ -1,11 +1,8 @@
-import { Header } from "@/components/layout/header"
-import { Footer } from "@/components/layout/footer"
 
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col font-sans">
-      <Header />
-      <main className="flex-1 pt-32 pb-24 px-6 md:px-12 lg:px-24 max-w-[800px] mx-auto w-full">
+            <main className="flex-1 pt-32 pb-24 px-6 md:px-12 lg:px-24 max-w-[800px] mx-auto w-full">
         
         <div className="mb-16">
           <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-4">Legal</p>
@@ -63,7 +60,6 @@ export default function TermsPage() {
         </div>
 
       </main>
-      <Footer />
-    </div>
+          </div>
   )
 }

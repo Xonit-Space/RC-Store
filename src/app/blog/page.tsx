@@ -1,7 +1,6 @@
 import Link from "next/link"
 import { getPublishedBlogPosts } from "@/actions/blog"
 import { Calendar, User, ChevronRight } from "lucide-react"
-import { Header } from "@/components/layout/header"
 
 export const dynamic = "force-dynamic"
 
@@ -11,8 +10,7 @@ export default async function BlogIndexPage() {
 
   return (
     <main className="min-h-screen bg-black text-white selection:bg-racing-yellow selection:text-carbon-dark">
-      <Header />
-      <div className="pt-32 pb-24 container mx-auto px-6 md:px-12">
+            <div className="pt-32 pb-24 container mx-auto px-6 md:px-12">
         <div className="max-w-4xl mx-auto space-y-16">
           
           <div className="text-center space-y-6 fade-up-section visible">

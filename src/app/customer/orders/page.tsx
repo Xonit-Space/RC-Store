@@ -1,8 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Header } from "@/components/layout/header"
-import { Footer } from "@/components/layout/footer"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useSession } from "next-auth/react"
@@ -45,22 +43,19 @@ export default function CustomerOrdersPage() {
   if (status === "loading" || loading) {
     return (
       <div className="min-h-screen bg-background flex flex-col justify-between">
-        <Header />
-        <div className="flex-grow flex items-center justify-center p-12">
+                <div className="flex-grow flex items-center justify-center p-12">
           <div className="flex flex-col items-center gap-2">
             <RefreshCw className="h-10 w-10 text-primary animate-spin" />
             <span className="text-sm font-bold text-muted/50">Loading orders...</span>
           </div>
         </div>
-        <Footer />
-      </div>
+              </div>
     )
   }
 
   return (
     <div className="min-h-screen bg-background flex flex-col justify-between text-foreground font-sans">
-      <Header />
-
+      
       <main className="flex-grow container mx-auto px-4 py-8 space-y-6">
         {/* Navigation Breadcrumb */}
         <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
@@ -142,7 +137,6 @@ export default function CustomerOrdersPage() {
         )}
       </main>
 
-      <Footer />
-    </div>
+          </div>
   )
 }

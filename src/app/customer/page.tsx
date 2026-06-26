@@ -3,8 +3,6 @@
 export const dynamic = "force-dynamic"
 
 import { useState, useEffect } from "react"
-import { Header } from "@/components/layout/header"
-import { Footer } from "@/components/layout/footer"
 import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { addCustomerAddress } from "@/actions/auth"
@@ -98,8 +96,7 @@ export default function CustomerDashboardPage() {
   if (status === "loading" || loading) {
     return (
       <div className="min-h-screen bg-carbon-dark flex flex-col">
-        <Header />
-        <div className="flex-1 flex items-center justify-center">
+                <div className="flex-1 flex items-center justify-center">
           <p className="text-[10px] tracking-[0.3em] uppercase text-racing-yellow font-mono animate-pulse">
             Establishing Telemetry Link...
           </p>
@@ -110,8 +107,7 @@ export default function CustomerDashboardPage() {
 
   return (
     <div className="min-h-screen bg-carbon-dark flex flex-col font-sans">
-      <Header />
-
+      
       <main className="flex-1 container mx-auto px-6 md:px-12 py-24 md:py-32 relative z-10">
         
         {/* Header Section */}
@@ -398,7 +394,6 @@ export default function CustomerDashboardPage() {
         </div>
       )}
 
-      <Footer />
-    </div>
+          </div>
   )
 }

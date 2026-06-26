@@ -3,8 +3,6 @@
 export const dynamic = "force-dynamic"
 
 import { useCartStore } from "@/store/cart"
-import { Header } from "@/components/layout/header"
-import { Footer } from "@/components/layout/footer"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -51,12 +49,10 @@ export default function CartPage() {
   if (!isHydrated) {
     return (
       <div className="min-h-screen bg-background flex flex-col justify-between animate-pulse">
-        <Header />
-        <div className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
+                <div className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
           <Info className="h-10 w-10 text-muted-foreground/30 animate-spin" />
         </div>
-        <Footer />
-      </div>
+              </div>
     )
   }
 
@@ -68,8 +64,7 @@ export default function CartPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col justify-between">
-      <Header />
-
+      
       <main className="flex-grow container mx-auto px-4 md:px-12 max-w-6xl pt-32 pb-24">
         <h1 className="text-2xl font-extrabold text-foreground mb-6 flex items-center gap-2">
           <ShoppingCart className="h-6 w-6 text-primary" /> Your Shopping Bag
@@ -230,7 +225,6 @@ export default function CartPage() {
         )}
       </main>
 
-      <Footer />
-    </div>
+          </div>
   )
 }

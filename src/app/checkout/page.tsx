@@ -6,8 +6,6 @@ import { useState, useEffect } from "react"
 import { useCartStore } from "@/store/cart"
 import { processStripeCheckout } from "@/actions/order"
 import { getTaxRateByRegionCode } from "@/actions/tax"
-import { Header } from "@/components/layout/header"
-import { Footer } from "@/components/layout/footer"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
@@ -110,23 +108,20 @@ export default function CheckoutPage() {
   if (status === "loading" || !isHydrated) {
     return (
       <div className="min-h-screen bg-background flex flex-col justify-between">
-        <Header />
-        <div className="flex-1 flex items-center justify-center p-12">
+                <div className="flex-1 flex items-center justify-center p-12">
           <div className="flex flex-col items-center gap-2">
             <RefreshCw className="h-10 w-10 text-primary animate-spin" />
             <span className="text-sm font-bold text-muted/50">Checking auth session...</span>
           </div>
         </div>
-        <Footer />
-      </div>
+              </div>
     )
   }
 
   if (!session) {
     return (
       <div className="min-h-screen bg-background flex flex-col justify-between">
-        <Header />
-        <div className="flex-1 flex flex-col items-center justify-center p-12 max-w-md mx-auto text-center space-y-4">
+                <div className="flex-1 flex flex-col items-center justify-center p-12 max-w-md mx-auto text-center space-y-4">
           <ShieldCheck className="h-12 w-12 text-muted-foreground animate-pulse" />
           <h3 className="font-extrabold text-lg text-foreground">Secure Checkout Registry</h3>
           <p className="text-xs text-muted-foreground font-semibold">
@@ -136,8 +131,7 @@ export default function CheckoutPage() {
             Sign In to Checkout
           </Button>
         </div>
-        <Footer />
-      </div>
+              </div>
     )
   }
 
@@ -149,8 +143,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col justify-between">
-      <Header />
-
+      
       <main className="flex-1 container mx-auto px-4 md:px-12 max-w-6xl pt-32 pb-24">
         <h1 className="text-2xl font-extrabold text-foreground mb-6 flex items-center gap-2">
           <ShieldCheck className="h-6 w-6 text-emerald-600" /> Secure Checkout
@@ -353,7 +346,6 @@ export default function CheckoutPage() {
         </div>
       </main>
 
-      <Footer />
-    </div>
+          </div>
   )
 }

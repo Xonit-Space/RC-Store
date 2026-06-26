@@ -1,5 +1,3 @@
-import { Header } from "@/components/layout/header"
-import { Footer } from "@/components/layout/footer"
 import { db } from "@/lib/db"
 import Link from "next/link"
 import Image from "next/image"
@@ -32,8 +30,7 @@ export default async function CollectionsPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col font-sans">
-      <Header />
-      <main className="flex-1 pt-32 pb-24 px-6 md:px-12 lg:px-24 max-w-[1400px] mx-auto w-full relative">
+            <main className="flex-1 pt-32 pb-24 px-6 md:px-12 lg:px-24 max-w-[1400px] mx-auto w-full relative">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
         
         <div className="mb-16 relative z-10 fade-up-section visible">
@@ -79,7 +76,6 @@ export default async function CollectionsPage() {
         </div>
 
       </main>
-      <Footer />
-    </div>
+          </div>
   )
 }

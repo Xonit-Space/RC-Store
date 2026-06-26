@@ -2,7 +2,6 @@ import { getBlogPostBySlug } from "@/actions/blog"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { Calendar, User, ArrowLeft } from "lucide-react"
-import { Header } from "@/components/layout/header"
 
 export const dynamic = "force-dynamic"
 
@@ -16,8 +15,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
 
   return (
     <main className="min-h-screen bg-black text-white selection:bg-racing-yellow selection:text-carbon-dark">
-      <Header />
-      
+            
       <article className="pt-32 pb-24 container mx-auto px-6 md:px-12">
         <div className="max-w-3xl mx-auto space-y-12">
           

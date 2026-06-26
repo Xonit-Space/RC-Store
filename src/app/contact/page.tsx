@@ -1,8 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { Header } from "@/components/layout/header"
-import { Footer } from "@/components/layout/footer"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
@@ -25,8 +23,7 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col font-sans">
-      <Header />
-      <main className="flex-1 pt-32 pb-24 px-6 md:px-12 lg:px-24 max-w-[1400px] mx-auto w-full">
+            <main className="flex-1 pt-32 pb-24 px-6 md:px-12 lg:px-24 max-w-[1400px] mx-auto w-full">
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24">
           
@@ -111,7 +108,6 @@ export default function ContactPage() {
         </div>
 
       </main>
-      <Footer />
-    </div>
+          </div>
   )
 }

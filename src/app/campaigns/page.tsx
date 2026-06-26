@@ -1,5 +1,3 @@
-import { Header } from "@/components/layout/header"
-import { Footer } from "@/components/layout/footer"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -21,8 +19,7 @@ export default function CampaignsPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col font-sans">
-      <Header />
-      <main className="flex-1 pt-32 pb-24 relative">
+            <main className="flex-1 pt-32 pb-24 relative">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
         
         <div className="px-6 md:px-12 lg:px-24 max-w-[1400px] mx-auto w-full mb-16 relative z-10 fade-up-section visible">
@@ -69,7 +66,6 @@ export default function CampaignsPage() {
           ))}
         </div>
       </main>
-      <Footer />
-    </div>
+          </div>
   )
 }

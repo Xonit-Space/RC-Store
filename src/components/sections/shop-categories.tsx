@@ -6,7 +6,8 @@ export async function ShopCategories() {
   const dbCategories = await db.category.findMany({
     where: { isActive: true },
     orderBy: { sortOrder: 'asc' },
-    take: 6
+    // Fetch top 8 categories for a balanced layout
+    take: 8
   })
 
   // Provide fallback image if category has no image uploaded yet
@@ -20,15 +21,10 @@ export async function ShopCategories() {
   ]
 
   const categories = dbCategories.map((c, i) => {
-    let colSpan = "col-span-1"
-    if (i === 0) colSpan = "col-span-1 md:col-span-2 row-span-2"
-    else if (i === 3) colSpan = "col-span-1 md:col-span-2"
-
     return {
       name: c.name,
       slug: c.slug,
       image: c.image || fallbackImages[i % fallbackImages.length],
-      colSpan
     }
   })
 
@@ -50,12 +46,12 @@ export async function ShopCategories() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-auto gap-4 md:h-[600px]">
+        <div className="flex flex-wrap gap-4">
           {categories.map((cat, idx) => (
             <Link 
               href={`/products?category=${cat.slug}`} 
               key={idx}
-              className={`relative group overflow-hidden ${cat.colSpan} bg-muted block min-h-[200px] border border-border hover:border-racing-yellow/50 transition-colors`}
+              className="relative group overflow-hidden flex-auto min-w-[280px] lg:min-w-[300px] h-[250px] bg-muted border border-border hover:border-racing-yellow/50 transition-colors"
             >
               <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent z-10 opacity-90" />
               {/* eslint-disable-next-line @next/next/no-img-element */}

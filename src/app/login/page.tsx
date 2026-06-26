@@ -163,42 +163,7 @@ export default function LoginPage() {
                 </Button>
               </div>
 
-              <div className="mt-8 border-t border-border pt-6">
-                <div className="flex flex-col space-y-4">
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <Zap className="h-4 w-4 text-primary" />
-                    <span className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                      Test Protocols
-                    </span>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEmail("racer@rc.com")
-                        setPassword("rcadmin123")
-                      }}
-                      className="p-3 border border-border bg-muted hover:border-racing-yellow/50 hover:bg-white/5 transition-colors text-left group"
-                    >
-                      <span className="block text-[10px] font-mono font-bold uppercase tracking-wider text-foreground mb-1 group-hover:text-racing-yellow transition-colors">Pro Racer (Customer)</span>
-                      <span className="block text-[10px] font-mono text-muted-foreground truncate">racer@rc.com</span>
-                    </button>
-                    
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEmail("admin@rc.com")
-                        setPassword("rcadmin123")
-                      }}
-                      className="p-3 border border-border bg-muted hover:border-racing-yellow/50 hover:bg-white/5 transition-colors text-left group"
-                    >
-                      <span className="block text-[10px] font-mono font-bold uppercase tracking-wider text-foreground mb-1 group-hover:text-racing-yellow transition-colors">RC Admin (Super Admin)</span>
-                      <span className="block text-[10px] font-mono text-muted-foreground truncate">admin@rc.com</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
+
             </form>
           </div>
 

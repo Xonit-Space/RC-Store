@@ -53,6 +53,19 @@ export async function getBlogPostBySlug(slug: string) {
   }
 }
 
+export async function getBlogPostById(id: string) {
+  try {
+    const post = await db.blogPost.findUnique({
+      where: { id },
+    })
+    if (!post) return { success: false, error: "Post not found" }
+    return { success: true, data: post }
+  } catch (error: any) {
+    console.error("Failed to fetch blog post:", error)
+    return { success: false, error: "Failed to load blog post" }
+  }
+}
+
 export async function createBlogPost(data: {
   title: string
   slug: string
@@ -112,5 +125,35 @@ export async function createBlogCategory(name: string, slug: string) {
   } catch (error: any) {
     console.error("Failed to create blog category:", error)
     return { success: false, error: "Failed to create blog category" }
+  }
+}
+
+export async function updateBlogPost(id: string, data: {
+  title?: string
+  slug?: string
+  content?: string
+  excerpt?: string
+  coverImage?: string
+  published?: boolean
+  categoryId?: string
+}) {
+  try {
+    const updateData: any = { ...data }
+    if (data.published === true) {
+      updateData.publishedAt = new Date()
+    } else if (data.published === false) {
+      updateData.publishedAt = null
+    }
+
+    const post = await db.blogPost.update({
+      where: { id },
+      data: updateData
+    })
+    revalidatePath("/blog")
+    revalidatePath("/admin/blog")
+    return { success: true, data: post }
+  } catch (error: any) {
+    console.error("Failed to update blog post:", error)
+    return { success: false, error: "Failed to update blog post" }
   }
 }

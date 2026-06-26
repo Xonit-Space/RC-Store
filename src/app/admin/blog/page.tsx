@@ -100,6 +100,11 @@ export default function AdminBlogPage() {
                         </Button>
                       </Link>
                     )}
+                    <Link href={`/admin/blog/${post.id}/edit`}>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                    </Link>
                     <Button variant="ghost" size="icon" onClick={() => handleDelete(post.id)} className="h-8 w-8 text-muted-foreground hover:text-red-500">
                       <Trash2 className="w-4 h-4" />
                     </Button>

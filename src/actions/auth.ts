@@ -7,6 +7,7 @@ import crypto from 'crypto';
 import { rateLimit } from '@/lib/security/rate-limit';
 import { sendPasswordResetEmail, sendVerificationEmail } from '@/services/email';
 import { PasswordSchema, RegisterSchema, ResetPasswordSchema } from '@/validators/auth';
+import { sendSecurityOtpSms } from '@/services/twilio';
 
 export type ActionResponse<T = any> = {
   success: boolean;
@@ -88,10 +89,23 @@ export async function forgotPassword(email: string) {
   const token = crypto.randomUUID();
   const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
+  // Check if user has a phone number in their addresses
+  const latestAddress = await db.address.findFirst({
+    where: { userId: user.id },
+    orderBy: { createdAt: 'desc' }
+  });
+
+  let otp: string | null = null;
+  if (latestAddress?.phone) {
+    // Generate 6-digit OTP
+    otp = Math.floor(100000 + Math.random() * 900000).toString();
+  }
+
   await db.passwordResetToken.create({
     data: {
       email,
       token: hashedToken,
+      otp,
       expiresAt: new Date(Date.now() + 15 * 60 * 1000) // 15 mins
     }
   });
@@ -101,7 +115,12 @@ export async function forgotPassword(email: string) {
     console.error("Failed to send password reset email:", e);
   });
 
-  return { success: true };
+  if (otp && latestAddress?.phone) {
+    await sendSecurityOtpSms(latestAddress.phone, otp);
+  }
+
+  // Return success but also a flag indicating if OTP was sent, so UI can adapt.
+  return { success: true, data: { requiresOtp: !!otp } };
 }
 
 export async function resetPassword(token: string, data: Omit<z.infer<typeof ResetPasswordSchema>, "token">) {
@@ -118,6 +137,12 @@ export async function resetPassword(token: string, data: Omit<z.infer<typeof Res
 
   if (!resetToken || resetToken.expiresAt < new Date()) {
     return { error: 'Invalid or expired token' };
+  }
+
+  if (resetToken.otp) {
+    if (!parsed.data.otp || parsed.data.otp !== resetToken.otp) {
+      return { error: 'Invalid or missing Security OTP' };
+    }
   }
 
   const user = await db.user.findUnique({ where: { email: resetToken.email } });

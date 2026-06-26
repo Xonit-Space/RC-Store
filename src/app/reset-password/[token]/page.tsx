@@ -17,6 +17,8 @@ export default function ResetPasswordPage() {
 
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [otp, setOtp] = useState("")
+  const [requiresOtp, setRequiresOtp] = useState(false)
   const [loading, setLoading] = useState(false)
   const [completed, setCompleted] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -25,7 +27,7 @@ export default function ResetPasswordPage() {
     e.preventDefault()
     setError(null)
 
-    const validation = ResetPasswordSchema.safeParse({ token, password })
+    const validation = ResetPasswordSchema.safeParse({ token, password, otp: otp || undefined })
     if (!validation.success) {
       setError(validation.error.errors[0].message)
       return
@@ -38,9 +40,14 @@ export default function ResetPasswordPage() {
 
     setLoading(true)
     try {
-      const response = await resetPassword(token, { password })
+      const response = await resetPassword(token, { password, otp: otp || undefined })
       
       if (!response.success) {
+        if (response.error === 'Invalid or missing Security OTP') {
+          setRequiresOtp(true)
+          setError("A Security OTP was sent to your phone. Please enter it to continue.")
+          return
+        }
         setError(response.error || "Failed to restore credentials. Token may be invalid or expired.")
         return
       }
@@ -154,6 +161,26 @@ export default function ResetPasswordPage() {
                     className="h-12 bg-muted border-border rounded-none text-foreground focus-visible:ring-0 focus-visible:border-racing-yellow focus-visible:shadow-[0_0_10px_rgba(255, 204, 0,0.3)] transition-all font-mono"
                   />
                 </div>
+
+                {requiresOtp && (
+                  <div className="space-y-2 animate-in fade-in slide-in-from-top-4 duration-300">
+                    <label className="block text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-racing-yellow drop-shadow-[0_0_5px_rgba(255,204,0,0.5)]">
+                      SMS Verification Code
+                    </label>
+                    <Input
+                      type="text"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      required
+                      placeholder="6-digit code"
+                      className="h-12 bg-black/50 border-racing-yellow/50 rounded-none text-foreground text-center tracking-[0.5em] focus-visible:ring-0 focus-visible:border-racing-yellow focus-visible:shadow-[0_0_15px_rgba(255,204,0,0.5)] transition-all font-mono"
+                      maxLength={6}
+                    />
+                    <p className="text-[10px] text-muted-foreground font-mono">
+                      Check the phone number associated with your account.
+                    </p>
+                  </div>
+                )}
 
                 <div>
                   <Button

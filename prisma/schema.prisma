@@ -165,6 +165,7 @@ model PasswordResetToken {
   id        String   @id @default(cuid())
   email     String
   token     String   @unique
+  otp       String?
   expiresAt DateTime
   createdAt DateTime @default(now())
 

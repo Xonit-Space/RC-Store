@@ -69,3 +69,28 @@ export async function sendOrderStatusUpdateSms(to: string, orderNumber: string, 
     return false
   }
 }
+
+export async function sendSecurityOtpSms(to: string, otp: string): Promise<boolean> {
+  if (!twilioClient || !twilioPhoneNumber) {
+    logger.warn("[Twilio] SMS service is not configured. Skipping SMS.")
+    return false
+  }
+
+  if (!E164_REGEX.test(to)) {
+    logger.error(`[Twilio] Invalid phone number format for security OTP. Must be E.164. Got: ${to}`)
+    return false
+  }
+
+  try {
+    await twilioClient.messages.create({
+      body: `Your RC Store security reset code is: ${otp}. Do not share this code with anyone.`,
+      from: twilioPhoneNumber,
+      to,
+    })
+    logger.info(`[Twilio] Security OTP SMS sent to ${to}`)
+    return true
+  } catch (error) {
+    logger.error({ message: "[Twilio] Failed to send security OTP SMS:", error })
+    return false
+  }
+}

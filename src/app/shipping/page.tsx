@@ -29,8 +29,8 @@ export default function ShippingPage() {
                   <p className="text-xs mt-1">2-4 Business Days</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-foreground font-bold">LKR 450</p>
-                  <p className="text-[10px] uppercase tracking-wider mt-1">Free over LKR 15,000</p>
+                  <p className="text-foreground font-bold">$ 15.00</p>
+                  <p className="text-[10px] uppercase tracking-wider mt-1">Free over $ 150.00</p>
                 </div>
               </div>
               <div className="flex justify-between items-center pt-2">
@@ -39,7 +39,7 @@ export default function ShippingPage() {
                   <p className="text-xs mt-1">Next Business Day</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-foreground font-bold">LKR 800</p>
+                  <p className="text-foreground font-bold">$ 25.00</p>
                 </div>
               </div>
             </div>

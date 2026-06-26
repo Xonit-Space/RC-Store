@@ -35,7 +35,7 @@ export async function getSiteSettings(): Promise<ActionResponse<Record<string, s
     if (!formatted["store_status_open"]) formatted["store_status_open"] = "true"
     if (!formatted["free_shipping_threshold"]) formatted["free_shipping_threshold"] = "150.0"
     if (!formatted["tax_rate"]) formatted["tax_rate"] = "12.0"
-    if (!formatted["currency"]) formatted["currency"] = "LKR"
+    if (!formatted["currency"]) formatted["currency"] = "AUD"
     if (!formatted["stripe_enabled"]) formatted["stripe_enabled"] = "true"
     if (!formatted["courier_auto_assign"]) formatted["courier_auto_assign"] = "false"
 

@@ -159,7 +159,7 @@ export default function AdminAddonsPage() {
                   <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{addon.slug}</p>
                 </div>
                 <span className="text-sm font-bold text-foreground">
-                  Rs. {Number(addon.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  $ {Number(addon.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
               <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{addon.description || "No description"}</p>
@@ -230,7 +230,7 @@ export default function AdminAddonsPage() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">
-                    Price (Rs.) <span className="text-red-400">*</span>
+                    Price ($) <span className="text-red-400">*</span>
                   </label>
                   <Input
                     type="number"

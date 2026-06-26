@@ -61,7 +61,7 @@ export async function createCheckoutSession(options: CheckoutSessionOptions) {
 
   const lineItems = items.map((item) => ({
     price_data: {
-      currency: "usd",
+      currency: "aud",
       product_data: {
         name: item.name,
         images: item.images.length > 0 ? [item.images[0]] : [],
@@ -126,7 +126,7 @@ export async function createCheckoutSession(options: CheckoutSessionOptions) {
           type: "fixed_amount",
           fixed_amount: {
             amount: Math.round(shippingCost * 100),
-            currency: "usd",
+            currency: "aud",
           },
           display_name: "Premium Ground Delivery",
         },

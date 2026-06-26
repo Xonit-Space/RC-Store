@@ -32,7 +32,7 @@ export default async function AdminOverviewPage() {
   const kpiCards = [
     {
       label: "Total Revenue",
-      value: `Rs. ${Number(stats.totalRevenue).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      value: `$ ${Number(stats.totalRevenue).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       sub: "Lifetime earnings",
       icon: TrendingUp,
       color: "text-primary",
@@ -210,7 +210,7 @@ export default async function AdminOverviewPage() {
                           {order.status}
                         </span>
                         <p className="text-sm font-bold text-foreground hidden sm:block">
-                          Rs. {Number(order.total).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          $ {Number(order.total).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </p>
                       </div>
                     </Link>

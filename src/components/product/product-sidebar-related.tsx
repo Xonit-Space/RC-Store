@@ -42,7 +42,7 @@ export function ProductSidebarRelated({ relatedProducts }: ProductSidebarRelated
                   {product.name}
                 </p>
                 <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-1">
-                  Rs. {price.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                  $ {price.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 </p>
               </div>
               

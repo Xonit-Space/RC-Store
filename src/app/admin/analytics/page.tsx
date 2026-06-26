@@ -50,7 +50,7 @@ export default async function AdminAnalyticsPage() {
               Average Basket Value
             </p>
             <p className="font-sans text-3xl font-light text-foreground tracking-tight">
-              Rs. {avgBasket.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              $ {avgBasket.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
         </div>
@@ -66,7 +66,7 @@ export default async function AdminAnalyticsPage() {
               Annualized Run Rate
             </p>
             <p className="font-sans text-3xl font-light text-foreground tracking-tight">
-              Rs. {annualized.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              $ {annualized.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
         </div>
@@ -109,7 +109,7 @@ export default async function AdminAnalyticsPage() {
                   return (
                     <div key={order.id} className="flex-1 h-full flex flex-col justify-end items-center group relative">
                       <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 bg-foreground text-background text-[9px] px-2 py-1 rounded whitespace-nowrap z-10">
-                        Rs.{Number(order.total?.toString() || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        ${Number(order.total?.toString() || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </div>
                       <div 
                         className="w-full bg-forest/20 group-hover:bg-forest/50 transition-colors rounded-t-sm"

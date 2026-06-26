@@ -24,11 +24,11 @@ export const CURRENCIES: Record<string, CurrencyConfig> = {
     locale: "en-GB",
     exchangeRate: 0.79,
   },
-  LKR: {
-    code: "LKR",
-    symbol: "Rs.",
-    locale: "si-LK",
-    exchangeRate: 300.0,
+  AUD: {
+    code: "AUD",
+    symbol: "$",
+    locale: "en-AU",
+    exchangeRate: 1.5,
   },
 }
 

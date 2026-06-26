@@ -501,7 +501,7 @@ export default function AdminProductsPage() {
                         {p.name}
                       </h3>
                       <span className="text-sm font-bold text-foreground whitespace-nowrap shrink-0">
-                        Rs. {Number(p.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        $ {Number(p.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                     <p className="text-[9px] uppercase tracking-widest text-muted-foreground">
@@ -650,7 +650,7 @@ export default function AdminProductsPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">
-                      Price (Rs.) <span className="text-red-400">*</span>
+                      Price ($) <span className="text-red-400">*</span>
                     </label>
                     <Input
                       type="number"
@@ -664,7 +664,7 @@ export default function AdminProductsPage() {
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">
-                      Original Price (Rs.)
+                      Original Price ($)
                     </label>
                     <Input
                       type="number"
@@ -788,7 +788,7 @@ export default function AdminProductsPage() {
                             className="w-4 h-4 rounded-sm border-border bg-transparent text-foreground focus:ring-0 focus:ring-offset-0"
                           />
                           <span className="text-xs text-foreground font-medium">
-                            {addon.name} <span className="text-muted-foreground">(Rs. {Number(addon.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</span>
+                            {addon.name} <span className="text-muted-foreground">($ {Number(addon.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</span>
                           </span>
                         </label>
                       ))

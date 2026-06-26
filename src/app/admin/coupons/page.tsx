@@ -89,7 +89,7 @@ export default function AdminCouponsPage() {
                 <div>
                   <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Discount Value</span>
                   <span className="font-sans text-xl text-foreground">
-                    {c.discountType === "PERCENTAGE" ? `${c.discountValue}%` : `Rs. ${c.discountValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                    {c.discountType === "PERCENTAGE" ? `${c.discountValue}%` : `$ ${c.discountValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                   </span>
                 </div>
                 <div>
@@ -98,7 +98,7 @@ export default function AdminCouponsPage() {
                 </div>
               </div>
               <div className="pt-2">
-                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Min. Order Rs.</span>
+                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Min. Order $</span>
                 <span className="text-xs font-bold text-foreground">{c.minOrderAmount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
             </div>
@@ -157,7 +157,7 @@ export default function AdminCouponsPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">Min Order Amount (Rs.)</label>
+                <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">Min Order Amount ($)</label>
                 <Input
                   type="number"
                   placeholder="5000"

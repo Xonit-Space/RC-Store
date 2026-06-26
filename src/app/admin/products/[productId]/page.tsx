@@ -98,7 +98,7 @@ export default function AdminProductDetailsPage({ params }: { params: { productI
             {product.name}
           </h2>
           <p className="text-[10px] tracking-widest uppercase text-muted-foreground mt-2">
-            Base Price: Rs. {Number(product.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} | {product.category?.name}
+            Base Price: $ {Number(product.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} | {product.category?.name}
           </p>
         </div>
       </div>
@@ -135,7 +135,7 @@ export default function AdminProductDetailsPage({ params }: { params: { productI
                     <div className="flex items-center gap-6">
                       <div className="text-right">
                         <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Price</p>
-                        <p className="text-sm font-bold">Rs. {v.price ? Number(v.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : Number(product.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                        <p className="text-sm font-bold">$ {v.price ? Number(v.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : Number(product.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Stock</p>
@@ -235,7 +235,7 @@ export default function AdminProductDetailsPage({ params }: { params: { productI
 
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">Variant Price (Rs.)</label>
+                  <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">Variant Price ($)</label>
                   <Input
                     type="number"
                     value={variantPrice}

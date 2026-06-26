@@ -10,14 +10,14 @@ type CurrencyContextType = {
 };
 
 const CurrencyContext = createContext<CurrencyContextType>({
-  currency: "LKR",
+  currency: "AUD",
   setCurrency: () => {},
   useCents: false,
   setUseCents: () => {},
 });
 
 export function CurrencyProvider({ children }: { children: ReactNode }) {
-  const [currency, setCurrencyState] = useState("LKR");
+  const [currency, setCurrencyState] = useState("AUD");
   const [useCents, setUseCentsState] = useState(false);
 
   // Load from localStorage

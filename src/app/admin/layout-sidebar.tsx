@@ -25,6 +25,7 @@ export function Sidebar({ role }: SidebarProps) {
     { id: "customers", name: "Customers Registry", icon: Users, path: "/admin/customers" },
     { id: "inventory", name: "Inventory Stock", icon: Database, path: "/admin/inventory" },
     { id: "coupons", name: "Coupon Codes", icon: Coins, path: "/admin/coupons" },
+    { id: "part-finder", name: "Part Finder", icon: Package, path: "/admin/part-finder" },
     { id: "reviews", name: "Reviews", icon: MessageSquare, path: "/admin/reviews" },
     { id: "blog", name: "Blog Posts", icon: Newspaper, path: "/admin/blog" },
     { id: "gallery", name: "Community Gallery", icon: ImageIcon, path: "/admin/gallery" },

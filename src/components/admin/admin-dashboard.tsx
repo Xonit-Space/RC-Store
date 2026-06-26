@@ -149,7 +149,7 @@ export function AdminDashboard() {
                             <p className="text-sm text-muted-foreground">Customer {i}</p>
                           </div>
                           <div className="text-right">
-                            <p className="font-medium">${(Math.random() * 500 + 50).toFixed(2)}</p>
+                            <p className="font-medium">${(Math.random() * 500 + 50).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                             <Badge variant="outline">Processing</Badge>
                           </div>
                         </div>

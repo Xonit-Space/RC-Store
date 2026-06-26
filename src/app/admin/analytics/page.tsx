@@ -50,7 +50,7 @@ export default async function AdminAnalyticsPage() {
               Average Basket Value
             </p>
             <p className="font-sans text-3xl font-light text-foreground tracking-tight">
-              Rs. {avgBasket.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              Rs. {avgBasket.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
         </div>
@@ -66,7 +66,7 @@ export default async function AdminAnalyticsPage() {
               Annualized Run Rate
             </p>
             <p className="font-sans text-3xl font-light text-foreground tracking-tight">
-              Rs. {annualized.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              Rs. {annualized.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
         </div>
@@ -82,7 +82,7 @@ export default async function AdminAnalyticsPage() {
               Registered Clients
             </p>
             <p className="font-sans text-3xl font-light text-foreground tracking-tight">
-              {totalUsers.toLocaleString()} Accounts
+              {totalUsers.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Accounts
             </p>
           </div>
         </div>
@@ -113,7 +113,7 @@ export default async function AdminAnalyticsPage() {
                         style={{ height: `${heightPct}%` }}
                       />
                       <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute mt-[-2rem] bg-foreground text-background text-[9px] px-2 py-1 rounded">
-                        Rs.{Number(order.total).toLocaleString()}
+                        Rs.{Number(order.total).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </div>
                     </div>
                   )

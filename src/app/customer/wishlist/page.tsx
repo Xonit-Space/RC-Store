@@ -133,7 +133,7 @@ export default function CustomerWishlistPage() {
                         {product.name}
                       </h3>
                       <p className="text-sm font-mono text-muted-foreground mb-4">
-                        Rs. {Number(product.price).toLocaleString()}
+                        Rs. {Number(product.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </p>
                     </div>
 

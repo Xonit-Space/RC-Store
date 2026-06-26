@@ -121,12 +121,20 @@ export default function CustomerDashboardPage() {
             </h1>
             <p className="text-sm font-mono text-muted-foreground mt-4 uppercase">ID: {profile?.email}</p>
           </div>
-          <button
-            onClick={() => signOut({ callbackUrl: "/login" })}
-            className="text-[11px] font-mono tracking-[0.2em] uppercase text-muted-foreground hover:text-primary transition-colors border-b border-transparent hover:border-primary pb-1"
-          >
-            Log Out
-          </button>
+          <div className="flex flex-col items-end gap-2">
+            <button
+              onClick={() => signOut({ callbackUrl: "/login" })}
+              className="text-[11px] font-mono tracking-[0.2em] uppercase text-muted-foreground hover:text-primary transition-colors border-b border-transparent hover:border-primary pb-1"
+            >
+              Log Out
+            </button>
+            <a
+              href="/customer/gallery"
+              className="mt-4 px-4 py-2 bg-primary/10 border border-primary text-primary text-[10px] font-bold font-mono tracking-widest uppercase hover:bg-primary hover:text-primary-foreground transition-colors"
+            >
+              Upload to Gallery
+            </a>
+          </div>
         </div>
 
         {/* Members Status Row */}
@@ -144,7 +152,7 @@ export default function CustomerDashboardPage() {
           <div className="p-8 glass-dark border border-racing-yellow/20 hover:border-racing-yellow/50 transition-colors group relative overflow-hidden">
             <div className="absolute -right-4 -top-4 w-16 h-16 bg-racing-yellow/10 rounded-full blur-xl group-hover:bg-racing-yellow/20 transition-colors" />
             <p className="text-[9px] font-mono tracking-[0.25em] uppercase text-muted-foreground mb-6 group-hover:text-racing-yellow transition-colors">Store Credit</p>
-            <p className="font-heading text-4xl font-black text-foreground">Rs. {profile?.storeCredits?.[0]?.balance || 0}</p>
+            <p className="font-heading text-4xl font-black text-foreground">Rs. {Number(profile?.storeCredits?.[0]?.balance || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
             <p className="text-[11px] font-mono tracking-wider uppercase text-muted-foreground mt-1">Available Balance</p>
           </div>
         </div>
@@ -186,7 +194,7 @@ export default function CustomerDashboardPage() {
                           {order.status}
                         </span>
                         <p className="text-sm font-heading font-black text-foreground tracking-widest">
-                          Rs. {order.total.toLocaleString()}
+                          Rs. {order.total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </p>
                       </div>
                     </div>
@@ -211,7 +219,7 @@ export default function CustomerDashboardPage() {
                             </p>
                           </div>
                           <p className="text-sm font-mono text-muted-foreground">
-                            Rs. {(item.price * item.quantity).toLocaleString()}
+                            Rs. {(item.price * item.quantity).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </p>
                         </div>
                       ))}

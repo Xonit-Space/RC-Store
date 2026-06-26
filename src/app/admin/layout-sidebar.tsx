@@ -6,7 +6,7 @@ import { signOut } from "next-auth/react"
 import { 
   BarChart3, Package, Users, ShoppingCart, Settings, 
   Calculator, Coins, Database, LineChart, LogOut,
-  Newspaper
+  Newspaper, Image as ImageIcon
 } from "lucide-react"
 
 interface SidebarProps {
@@ -26,6 +26,7 @@ export function Sidebar({ role }: SidebarProps) {
     { id: "inventory", name: "Inventory Stock", icon: Database, path: "/admin/inventory" },
     { id: "coupons", name: "Coupon Codes", icon: Coins, path: "/admin/coupons" },
     { id: "blog", name: "Blog Posts", icon: Newspaper, path: "/admin/blog" },
+    { id: "gallery", name: "Community Gallery", icon: ImageIcon, path: "/admin/gallery" },
     { id: "analytics", name: "Telemetry Charts", icon: LineChart, path: "/admin/analytics" },
     { id: "settings", name: "Platform Settings", icon: Settings, path: "/admin/settings" },
   ]

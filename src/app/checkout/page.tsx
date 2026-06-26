@@ -296,7 +296,7 @@ export default function CheckoutPage() {
                     </p>
                   </div>
                   <span className="text-xs font-bold text-foreground">
-                    $ {(item.product.price * item.quantity).toLocaleString()}
+                    $ {(item.product.price * item.quantity).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
               ))}
@@ -305,20 +305,20 @@ export default function CheckoutPage() {
             <div className="space-y-2 pt-2 text-xs font-semibold text-muted/50">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span className="font-bold text-foreground">$ {subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                <span className="font-bold text-foreground">$ {subtotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between">
                 <span>Tax ({(taxRate * 100).toFixed(0)}%)</span>
-                <span className="font-bold text-foreground">$ {tax.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                <span className="font-bold text-foreground">$ {tax.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between">
                 <span>Stripe Ground Shipping</span>
-                <span className="font-bold text-foreground">$ {shipping.toFixed(2)}</span>
+                <span className="font-bold text-foreground">$ {shipping.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
               <div className="my-3 border-t border-dashed" />
               <div className="flex justify-between font-extrabold text-foreground text-sm pt-1">
                 <span>Order Total Due</span>
-                <span className="text-foreground">$ {grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                <span className="text-foreground">$ {grandTotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
             </div>
 

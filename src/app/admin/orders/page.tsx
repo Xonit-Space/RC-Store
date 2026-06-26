@@ -133,7 +133,7 @@ function OrdersPageInner() {
           Order Management
         </h2>
         <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-2">
-          {total.toLocaleString()} total orders
+          {total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} total orders
         </p>
       </div>
 
@@ -217,7 +217,7 @@ function OrdersPageInner() {
 
                 <div className="flex items-center gap-4 w-full md:w-auto">
                   <span className="text-base font-bold text-foreground">
-                    Rs. {Number(o.total).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                    Rs. {Number(o.total).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
 
                   <StatusBadge status={o.status} />
@@ -252,7 +252,7 @@ function OrdersPageInner() {
                       </div>
                       <p className="text-sm text-muted-foreground whitespace-nowrap shrink-0">
                         <span className="font-bold text-foreground">{item.quantity}</span>
-                        {" "}× Rs. {Number(item.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                        {" "}× Rs. {Number(item.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </p>
                     </div>
                   ))}

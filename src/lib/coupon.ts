@@ -23,7 +23,7 @@ export async function validateAndCalculateCoupon(code: string, subtotal: number)
   if (subtotal < Number(coupon.minOrderAmount)) {
     return {
       success: false,
-      error: `Minimum subtotal of $${Number(coupon.minOrderAmount).toFixed(2)} is required to apply this coupon`,
+      error: `Minimum subtotal of $${Number(coupon.minOrderAmount).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} is required to apply this coupon`,
     }
   }
 

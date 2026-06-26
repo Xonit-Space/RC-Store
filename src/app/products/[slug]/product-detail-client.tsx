@@ -178,9 +178,9 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 {product.name}
               </h1>
               <div className="flex items-center gap-4 text-sm pt-2">
-                <span className="text-foreground">Rs. {displayPrice.toLocaleString()}</span>
+                <span className="text-foreground">Rs. {displayPrice.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 {product.originalPrice && (
-                  <span className="text-muted-foreground line-through">Rs. {product.originalPrice.toLocaleString()}</span>
+                  <span className="text-muted-foreground line-through">Rs. {product.originalPrice.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 )}
               </div>
             </div>
@@ -274,7 +274,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                           <div className="flex-1">
                             <div className="flex justify-between">
                               <span className="text-sm font-medium text-foreground">{addon.name}</span>
-                              <span className="text-sm text-foreground">+ Rs. {Number(addon.price).toLocaleString()}</span>
+                              <span className="text-sm text-foreground">+ Rs. {Number(addon.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                             </div>
                             {addon.description && (
                               <p className="text-xs text-muted-foreground mt-1">{addon.description}</p>

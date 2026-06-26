@@ -152,7 +152,7 @@ export default function AdminAddonsPage() {
                   <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{addon.slug}</p>
                 </div>
                 <span className="text-sm font-bold text-foreground">
-                  Rs. {Number(addon.price).toFixed(2)}
+                  Rs. {Number(addon.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
               <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{addon.description || "No description"}</p>

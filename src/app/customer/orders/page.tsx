@@ -102,7 +102,7 @@ export default function CustomerOrdersPage() {
                       {order.status}
                     </Badge>
                     <span className="text-sm font-extrabold text-foreground">
-                      Total: Rs. {Number(order.total).toFixed(2)}
+                      Total: Rs. {Number(order.total).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
                 </div>
@@ -121,12 +121,12 @@ export default function CustomerOrdersPage() {
                         <div>
                           <p className="text-xs font-bold text-foreground leading-snug">{item.variant?.product?.name || "Product SKU variant"}</p>
                           <p className="text-[10px] text-muted-foreground mt-0.5 font-bold">
-                            Qty: {item.quantity} × Rs. {item.price}
+                            Qty: {item.quantity} × Rs. {Number(item.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </p>
                         </div>
                       </div>
                       <span className="text-xs font-extrabold text-foreground/70">
-                        Rs. {(item.quantity * Number(item.price)).toFixed(2)}
+                        Rs. {(item.quantity * Number(item.price)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                   ))}

@@ -34,7 +34,7 @@ export function StaffPicks() {
   // Use the first pick for the hero layout (could be rotated later)
   const mainPick = picks[0]
   const product = mainPick.product
-  const image = product.images?.[0]?.url || "https://images.unsplash.com/photo-1594819047050-99defca82545?q=80&w=600"
+  const image = product.images?.[0]?.url || "https://images.unsplash.com/photo-1589793463357-550912af4a4c?q=80&w=600"
   const rating = product.reviews?.length ? (product.reviews.reduce((acc: number, rev: any) => acc + rev.rating, 0) / product.reviews.length).toFixed(1) : "0.0"
   const reviewsCount = product.reviews?.length || 0
 
@@ -50,17 +50,17 @@ export function StaffPicks() {
           <h2 className="font-heading font-black text-4xl text-foreground uppercase tracking-wider mb-4">
             Staff Picks
           </h2>
-          <p className="text-muted-foreground max-w-xl text-sm">
+          <p className="text-foreground/70 dark:text-muted-foreground max-w-xl text-sm">
             Hand-selected machines and gear driven by our track-tested mechanics.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 bg-background border border-border p-8 md:p-12 relative overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 bg-background border border-border p-8 md:p-12 relative overflow-hidden items-center shadow-sm">
           <div className="absolute top-0 right-0 w-64 h-64 bg-racing-yellow/10 blur-[100px]" />
           
           {/* Staff Member Info */}
-          <div className="flex flex-col justify-center relative z-10 border-b lg:border-b-0 lg:border-r border-border pb-8 lg:pb-0 lg:pr-12">
-            <Quote className="w-12 h-12 text-white/5 mb-6 rotate-180" />
+          <div className="flex flex-col justify-center relative z-10 lg:border-r border-border pb-8 lg:pb-0 lg:pr-12">
+            <Quote className="w-12 h-12 text-border mb-6 rotate-180" />
             <p className="text-lg md:text-xl text-foreground font-serif italic leading-relaxed mb-8">
               &quot;{mainPick.quote}&quot;
             </p>
@@ -70,17 +70,17 @@ export function StaffPicks() {
               </div>
               <div>
                 <h4 className="font-heading font-black text-foreground uppercase tracking-widest text-lg">{mainPick.user.name}</h4>
-                <p className="font-mono text-[10px] text-primary uppercase tracking-widest">{mainPick.roleTitle}</p>
+                <p className="font-mono text-[10px] text-foreground/60 dark:text-primary uppercase tracking-widest">{mainPick.roleTitle}</p>
               </div>
             </div>
           </div>
 
           {/* Product Card */}
-          <div className="relative z-10 flex flex-col sm:flex-row items-center gap-8">
-            <div className="w-full sm:w-1/2 relative bg-muted/50 p-4 mix-blend-luminosity hover:mix-blend-normal transition-all">
-              <img src={image} alt={product.name} className="w-full h-auto" />
+          <div className="relative z-10 flex flex-col sm:flex-row items-center gap-8 bg-muted/30 p-6 rounded-lg border border-border">
+            <div className="w-full sm:w-1/2 relative bg-background aspect-square p-4 flex items-center justify-center rounded-md">
+              <img src={image} alt={product.name} className="w-full h-full object-contain" />
             </div>
-            <div className="w-full sm:w-1/2 flex flex-col">
+            <div className="w-full sm:w-1/2 flex flex-col justify-center">
               <div className="flex items-center gap-1 mb-2">
                 <Star className="w-3 h-3 fill-racing-yellow text-primary" />
                 <span className="text-[10px] font-mono text-muted-foreground">{rating} ({reviewsCount})</span>

@@ -91,7 +91,7 @@ export default async function PartFinderPage({
                   <PackageSearch className="w-12 h-12 text-muted-foreground mb-4 opacity-50" />
                   <h3 className="text-xl font-serif text-foreground mb-2">No parts linked yet</h3>
                   <p className="text-muted-foreground max-w-md mx-auto">
-                    We haven't verified any compatible parts for the {model.make.name} {model.name} yet. Check back soon!
+                    We haven&apos;t verified any compatible parts for the {model.make.name} {model.name} yet. Check back soon!
                   </p>
                 </div>
               ) : null}

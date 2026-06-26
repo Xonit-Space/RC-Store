@@ -15,21 +15,21 @@ export function BrandShowcase() {
             Premium Manufacturers
           </h2>
         </div>
-        <Link href="/brands" className="text-xs font-mono font-bold tracking-widest text-primary hover:text-white uppercase transition-colors">
+        <Link href="/brands" className="text-xs font-mono font-bold tracking-widest text-primary hover:text-foreground/80 dark:hover:text-white uppercase transition-colors">
           View All Brands
         </Link>
       </div>
 
       <div className="relative w-full flex overflow-x-hidden">
         {/* Left Gradient Fade */}
-        <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-carbon-dark to-transparent z-10" />
+        <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-background to-transparent z-10" />
         
         {/* Marquee Container */}
         <div className="flex animate-marquee whitespace-nowrap">
           {[...brands, ...brands, ...brands].map((brand, i) => (
             <div 
               key={i} 
-              className="mx-8 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 hover:text-primary transition-all duration-300 cursor-pointer text-3xl font-heading font-black tracking-widest text-foreground border-x border-border px-8"
+              className="mx-8 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 hover:text-primary transition-all duration-300 cursor-pointer text-3xl font-heading font-black tracking-widest text-foreground border-x border-border px-8 flex items-center"
             >
               {brand}
             </div>
@@ -37,7 +37,7 @@ export function BrandShowcase() {
         </div>
         
         {/* Right Gradient Fade */}
-        <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-carbon-dark to-transparent z-10" />
+        <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-background to-transparent z-10" />
       </div>
       
       <style dangerouslySetInnerHTML={{__html: `

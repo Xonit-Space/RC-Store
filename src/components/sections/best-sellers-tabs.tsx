@@ -60,7 +60,7 @@ export function BestSellersTabs() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in zoom-in-95 duration-500" key={activeTab}>
             {productsData[activeTab]?.map((product) => {
-              const image = product.images?.[0]?.url || "https://images.unsplash.com/photo-1594819047050-99defca82545?q=80&w=600"
+              const image = product.images?.[0]?.url || "https://images.unsplash.com/photo-1589793463357-550912af4a4c?q=80&w=600"
               const rating = product.reviews?.length ? (product.reviews.reduce((acc: number, rev: any) => acc + rev.rating, 0) / product.reviews.length).toFixed(1) : "0.0"
               const reviewsCount = product.reviews?.length || 0
 

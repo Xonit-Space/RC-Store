@@ -8,7 +8,7 @@ export function FeaturedProductCard() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-racing-yellow/50 to-transparent" />
       
       <div className="container mx-auto px-6 md:px-12 relative z-10">
-        <div className="glass-dark border border-border p-8 md:p-12 shadow-[0_0_50px_rgba(0,0,0,0.5)] relative">
+        <div className="glass-dark border border-border p-8 md:p-12 shadow-2xl dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] relative">
           <Link href="/products/traxxas-x-maxx" className="absolute inset-0 z-10" aria-label="View Traxxas X-Maxx" />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             
@@ -18,7 +18,7 @@ export function FeaturedProductCard() {
               <img 
                 src="https://images.unsplash.com/photo-1588612143093-4e44208d1326?q=80&w=2070" 
                 alt="Traxxas X-Maxx 8S" 
-                className="w-full h-auto object-cover relative z-10 scale-100 group-hover:scale-105 transition-transform duration-700"
+                className="w-full h-auto object-cover relative z-10 scale-100 group-hover:scale-105 transition-transform duration-700 rounded-lg"
               />
               <div className="absolute top-4 left-4 z-20 bg-primary text-primary-foreground font-mono font-bold text-[10px] tracking-widest px-3 py-1 uppercase shadow-[0_0_10px_rgba(255, 204, 0,0.5)]">
                 Featured Build
@@ -31,7 +31,7 @@ export function FeaturedProductCard() {
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Star key={star} className="w-4 h-4 fill-racing-yellow text-primary" />
                 ))}
-                <span className="text-xs font-mono text-muted-foreground ml-2">(128 Reviews)</span>
+                <span className="text-xs font-mono text-foreground/60 dark:text-muted-foreground ml-2">(128 Reviews)</span>
               </div>
               
               <h2 className="font-heading font-black text-4xl md:text-5xl text-foreground uppercase tracking-tight mb-4">
@@ -40,10 +40,10 @@ export function FeaturedProductCard() {
               
               <div className="flex items-baseline gap-4 mb-6">
                 <span className="text-3xl font-mono font-bold text-foreground">$1,099.95</span>
-                <span className="text-sm font-mono text-muted-foreground line-through">$1,299.95</span>
+                <span className="text-sm font-mono text-foreground/50 dark:text-muted-foreground line-through">$1,299.95</span>
               </div>
               
-              <p className="text-muted-foreground mb-8 max-w-lg leading-relaxed">
+              <p className="text-foreground/70 dark:text-muted-foreground mb-8 max-w-lg leading-relaxed">
                 Relentless 4X4 power, mammoth size, and award-winning innovation make X-Maxx the ultimate monster truck. Powered by extreme 8s LiPo muscle, it defies physics with brutal acceleration and 50+ mph speeds.
               </p>
 

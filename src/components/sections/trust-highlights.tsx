@@ -33,8 +33,8 @@ export function TrustHighlights() {
               <div className="w-16 h-16 rounded-full bg-background border border-border flex items-center justify-center mb-6 group-hover:border-racing-yellow transition-colors group-hover:shadow-[0_0_20px_rgba(255, 204, 0,0.2)]">
                 {item.icon}
               </div>
-              <h3 className="text-foreground font-heading font-black uppercase tracking-wider mb-2 group-hover:text-racing-yellow transition-colors">{item.title}</h3>
-              <p className="text-sm text-muted-foreground">{item.description}</p>
+              <h3 className="text-foreground font-heading font-black uppercase tracking-wider mb-2 dark:group-hover:text-racing-yellow transition-colors">{item.title}</h3>
+              <p className="text-sm text-foreground/70 dark:text-muted-foreground">{item.description}</p>
             </div>
           ))}
         </div>

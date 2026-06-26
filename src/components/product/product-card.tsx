@@ -14,7 +14,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
   const image = typeof product.images?.[0] === 'string' 
     ? product.images[0] 
     : product.images?.[0]?.url 
-      || "https://images.unsplash.com/photo-1594819047050-99defca82545?q=80&w=600";
+      || "https://images.unsplash.com/photo-1589793463357-550912af4a4c?q=80&w=600";
       
   const rating = product.reviews?.length 
     ? (product.reviews.reduce((acc: number, rev: any) => acc + rev.rating, 0) / product.reviews.length).toFixed(1) 
@@ -22,14 +22,14 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
   const reviewsCount = product.reviews?.length || 0;
 
   return (
-    <div className="relative bg-muted border border-border hover:border-racing-yellow/30 group flex flex-col h-full overflow-hidden transition-colors">
+    <div className="relative bg-muted border border-border hover:border-racing-yellow/30 group flex flex-col h-full overflow-hidden transition-colors rounded-lg">
       <Link href={`/products/${product.slug}`} className="absolute inset-0 z-10" aria-label={`View ${product.name}`} />
       
       {/* Image Box */}
-      <div className="relative aspect-square overflow-hidden bg-background/50 p-4">
+      <div className="relative aspect-square overflow-hidden bg-background p-4 flex items-center justify-center">
         <div className="absolute top-3 left-3 z-20 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <WishlistButton productId={product.id} />
-          <button className="relative z-20 w-8 h-8 bg-carbon-dark/80 backdrop-blur border border-border flex items-center justify-center text-foreground hover:text-primary hover:border-primary transition-colors">
+          <button className="relative z-20 w-8 h-8 bg-background/80 backdrop-blur border border-border flex items-center justify-center text-foreground hover:text-primary hover:border-primary transition-colors">
             <Repeat className="w-4 h-4" />
           </button>
         </div>
@@ -37,7 +37,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
           src={image} 
           alt={product.name}
           loading={priority ? "eager" : "lazy"}
-          className="w-full h-full object-contain mix-blend-luminosity group-hover:mix-blend-normal group-hover:scale-110 transition-all duration-500"
+          className="w-full h-full object-contain group-hover:scale-110 transition-all duration-500"
         />
       </div>
 
@@ -59,7 +59,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
           <span className="font-mono font-bold text-lg text-foreground">Rs. {product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
           <CartIconButton 
             product={product} 
-            className="relative z-20 w-10 h-10 bg-muted/50 border border-border flex items-center justify-center text-foreground hover:bg-racing-yellow hover:text-carbon-dark hover:border-primary transition-all"
+            className="relative z-20 w-10 h-10 bg-muted/50 border border-border flex items-center justify-center text-foreground hover:bg-racing-yellow hover:text-background hover:border-primary transition-all"
           />
         </div>
       </div>

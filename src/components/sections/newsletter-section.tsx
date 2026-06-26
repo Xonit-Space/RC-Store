@@ -65,7 +65,7 @@ export function NewsletterSection() {
                   name="firstName"
                   placeholder="FIRST NAME"
                   required
-                  className="w-full bg-background text-foreground px-6 py-4 font-mono text-sm border border-transparent focus:border-white outline-none transition-colors"
+                  className="w-full bg-background text-foreground px-6 py-4 font-mono text-sm border border-transparent focus:border-foreground outline-none transition-colors"
                 />
                 <div className="flex flex-col sm:flex-row gap-2">
                   <input 
@@ -73,12 +73,12 @@ export function NewsletterSection() {
                     name="email"
                     placeholder="EMAIL ADDRESS"
                     required
-                    className="flex-1 bg-background text-foreground px-6 py-4 font-mono text-sm border border-transparent focus:border-white outline-none transition-colors"
+                    className="flex-1 bg-background text-foreground px-6 py-4 font-mono text-sm border border-transparent focus:border-foreground outline-none transition-colors"
                   />
                   <button 
                     type="submit"
                     disabled={loading}
-                    className="bg-white text-primary-foreground px-8 py-4 font-heading font-black uppercase tracking-widest hover:bg-smoke-dark hover:text-white transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="bg-foreground text-background px-8 py-4 font-heading font-black uppercase tracking-widest hover:bg-foreground/80 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     {loading ? "Joining..." : "Subscribe"}
                     {!loading && <Send className="w-4 h-4" />}

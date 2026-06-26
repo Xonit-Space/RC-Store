@@ -3,11 +3,11 @@ import { ArrowUpRight } from "lucide-react"
 
 export function ShopCategories() {
   const categories = [
-    { name: "RC Cars & Trucks", image: "https://images.unsplash.com/photo-1594819047050-99defca82545?q=80&w=1000", colSpan: "col-span-1 md:col-span-2 row-span-2" },
+    { name: "RC Cars & Trucks", image: "https://images.unsplash.com/photo-1589793463357-550912af4a4c?q=80&w=1000", colSpan: "col-span-1 md:col-span-2 row-span-2" }, // Buggy
     { name: "Drones", image: "https://images.unsplash.com/photo-1508614589041-895b88991e3e?q=80&w=1000", colSpan: "col-span-1" },
-    { name: "RC Boats", image: "https://images.unsplash.com/photo-1563821731662-793dbfbd80e0?q=80&w=1000", colSpan: "col-span-1" },
-    { name: "RC Planes", image: "https://images.unsplash.com/photo-1474302770737-173ee21bab63?q=80&w=1000", colSpan: "col-span-1 md:col-span-2" },
-    { name: "Electronics", image: "https://images.unsplash.com/photo-1517420704952-d9f39e95b43e?q=80&w=1000", colSpan: "col-span-1" },
+    { name: "RC Boats", image: "https://images.unsplash.com/photo-1622345095360-14e38c92a688?q=80&w=1000", colSpan: "col-span-1" },
+    { name: "RC Planes", image: "https://images.unsplash.com/photo-1517420704952-d9f39e95b43e?q=80&w=1000", colSpan: "col-span-1 md:col-span-2" }, // Remote control
+    { name: "Electronics", image: "https://images.unsplash.com/photo-1601524909162-ae8725290836?q=80&w=1000", colSpan: "col-span-1" }, // Circuit/Electronics
     { name: "Upgrades", image: "https://images.unsplash.com/photo-1614083311899-7988591dff32?q=80&w=1000", colSpan: "col-span-1" },
   ]
 
@@ -36,14 +36,14 @@ export function ShopCategories() {
               key={idx}
               className={`relative group overflow-hidden ${cat.colSpan} bg-muted block min-h-[200px] border border-border hover:border-racing-yellow/50 transition-colors`}
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-carbon-dark via-carbon-dark/20 to-transparent z-10 opacity-80" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-10 opacity-90" />
               <img 
                 src={cat.image} 
                 alt={cat.name} 
                 className="absolute inset-0 w-full h-full object-cover scale-100 group-hover:scale-110 transition-transform duration-700 opacity-60 group-hover:opacity-100 mix-blend-luminosity group-hover:mix-blend-normal"
               />
               <div className="absolute bottom-0 left-0 p-6 z-20 w-full flex justify-between items-end">
-                <h3 className="font-heading font-bold text-2xl text-foreground uppercase tracking-widest group-hover:text-racing-yellow transition-colors">
+                <h3 className="font-heading font-bold text-2xl text-white uppercase tracking-widest group-hover:text-racing-yellow transition-colors">
                   {cat.name}
                 </h3>
                 <div className="w-10 h-10 rounded-full border border-border flex items-center justify-center bg-carbon-dark/50 group-hover:bg-racing-yellow group-hover:border-racing-yellow group-hover:text-carbon-dark transition-all">

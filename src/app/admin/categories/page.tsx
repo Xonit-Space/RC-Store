@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Plus, Trash2, Edit, X, RefreshCw, Layers } from "lucide-react"
+import { Plus, Trash2, Edit, X, RefreshCw, Layers, Image as ImageIcon } from "lucide-react"
 import { toast } from "sonner"
 import { getCategories, createCategory, updateCategory, deleteCategory, toggleCategoryStatus } from "@/actions/categories"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
@@ -25,6 +25,8 @@ export default function AdminCategoriesPage() {
   const [description, setDescription] = useState("")
   const [isActive, setIsActive] = useState(true)
   const [sortOrder, setSortOrder] = useState(0)
+  const [image, setImage] = useState("")
+  const [imageFile, setImageFile] = useState<File | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const openCreateModal = () => {
@@ -35,6 +37,8 @@ export default function AdminCategoriesPage() {
     setDescription("")
     setIsActive(true)
     setSortOrder(0)
+    setImage("")
+    setImageFile(null)
     setIsOpen(true)
   }
 
@@ -46,6 +50,8 @@ export default function AdminCategoriesPage() {
     setDescription(category.description || "")
     setIsActive(category.isActive)
     setSortOrder(category.sortOrder)
+    setImage(category.image || "")
+    setImageFile(null)
     setIsOpen(true)
   }
 
@@ -58,10 +64,28 @@ export default function AdminCategoriesPage() {
 
     setIsSubmitting(true)
     try {
+      let uploadedUrl = image
+      if (imageFile) {
+        const formData = new FormData()
+        formData.append("file", imageFile)
+        const uploadRes = await fetch("/api/admin/categories/upload", {
+          method: "POST",
+          body: formData
+        })
+        const uploadData = await uploadRes.json()
+        if (!uploadData.success) {
+          toast.error(uploadData.error || "Failed to upload image")
+          setIsSubmitting(false)
+          return
+        }
+        uploadedUrl = uploadData.url
+      }
+
       const payload = {
         name,
         slug,
         description,
+        image: uploadedUrl,
         isActive,
         sortOrder: Number(sortOrder)
       }
@@ -167,6 +191,12 @@ export default function AdminCategoriesPage() {
                   <h3 className="font-sans text-base font-bold text-foreground">{c.name}</h3>
                   <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{c.slug}</p>
                 </div>
+                {c.image && (
+                  <div className="w-10 h-10 border border-border/40 shrink-0 ml-4 hidden sm:block">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={c.image} alt={c.name} className="w-full h-full object-cover mix-blend-luminosity hover:mix-blend-normal transition-all" />
+                  </div>
+                )}
                 <div
                   onClick={() => handleToggleStatus(c.id, c.isActive)}
                   className={`text-[9px] uppercase tracking-widest font-bold px-2 py-0.5 cursor-pointer transition-colors ${
@@ -243,16 +273,58 @@ export default function AdminCategoriesPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">
-                    Description
-                  </label>
-                  <textarea
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    className="w-full min-h-[80px] p-3 bg-transparent border border-border/60 rounded-none text-sm focus:outline-none focus:border-foreground"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
+                    <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">
+                      Description
+                    </label>
+                    <textarea
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      className="w-full min-h-[80px] p-3 bg-transparent border border-border/60 rounded-none text-sm focus:outline-none focus:border-foreground"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">
+                      Category Image
+                    </label>
+                    <div className="flex items-center gap-4">
+                      {image || imageFile ? (
+                        <div className="relative w-16 h-16 border border-border/40 bg-muted/10 overflow-hidden">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img 
+                            src={imageFile ? URL.createObjectURL(imageFile) : image} 
+                            alt="Category preview" 
+                            className="w-full h-full object-cover" 
+                          />
+                          <button 
+                            type="button"
+                            onClick={() => { setImage(""); setImageFile(null); }}
+                            className="absolute top-0 right-0 p-1 bg-background/80 hover:bg-red-500/20 text-muted-foreground hover:text-red-500 transition-colors"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ) : (
+                        <label className="flex flex-col items-center justify-center w-16 h-16 border border-dashed border-border/60 hover:border-foreground/40 cursor-pointer bg-muted/5 transition-colors">
+                          <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                          <input 
+                            type="file" 
+                            accept="image/png, image/jpeg, image/webp"
+                            className="hidden" 
+                            onChange={(e) => {
+                              if (e.target.files && e.target.files[0]) {
+                                setImageFile(e.target.files[0])
+                              }
+                            }}
+                          />
+                        </label>
+                      )}
+                      <div className="text-[10px] text-muted-foreground">
+                        <p>Upload a category thumbnail</p>
+                        <p>Recommended: 800x800px, max 5MB (JPG/PNG/WEBP)</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">
                       Sort Order

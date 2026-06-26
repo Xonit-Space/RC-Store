@@ -333,7 +333,7 @@ export default function CheckoutPage() {
                 />
                 <Button 
                   type="button" 
-                  variant="outline" 
+                  variant="secondary" 
                   className="h-9 text-xs font-bold"
                   onClick={() => toast.success("Coupon will be applied at Stripe checkout if valid.")}
                 >

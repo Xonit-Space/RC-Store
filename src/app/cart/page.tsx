@@ -191,7 +191,7 @@ export default function CartPage() {
                 </div>
 
                 {subtotal < 150 && (
-                  <div className="p-3 bg-foreground border border-foreground text-foreground text-[10px] font-bold  flex items-center gap-1.5">
+                  <div className="p-3 bg-muted text-muted-foreground border border-border text-[10px] font-bold flex items-center gap-1.5">
                     <Info className="h-4 w-4 shrink-0" />
                     <span>Spend Rs. {(150 - subtotal).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} more to unlock FREE SHIPPING!</span>
                   </div>
@@ -207,15 +207,15 @@ export default function CartPage() {
 
               {/* Promo input field */}
               <div className="flex gap-2">
-                <Input placeholder="PROMO CODE" className="h-9 text-xs  bg-background" />
-                <Button variant="outline" size="sm" className="h-9  font-bold">
+                <Input placeholder="PROMO CODE" className="h-9 text-xs bg-background" />
+                <Button variant="secondary" size="sm" className="h-9 font-bold">
                   Apply
                 </Button>
               </div>
 
               {/* Checkout CTA */}
               <Link href="/checkout" className="block pt-2">
-                <Button className="w-full h-11 bg-gradient-to-r from-foreground to-foreground hover:from-foreground hover:to-foreground font-bold   active:scale-95 transition">
+                <Button className="w-full h-11 bg-foreground hover:bg-foreground/90 text-background font-bold active:scale-95 transition">
                   PROCEED TO SECURE CHECKOUT <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>

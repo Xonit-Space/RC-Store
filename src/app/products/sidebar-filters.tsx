@@ -5,18 +5,16 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { Slider } from "@/components/ui/slider"
 import { SlidersHorizontal, X } from "lucide-react"
 
-const CATEGORIES = [
-  { name: "Everything", slug: "" },
-  { name: "Electric Cars", slug: "electric" },
-  { name: "Nitro Cars", slug: "nitro" },
-  { name: "Crawlers", slug: "crawlers" },
-  { name: "Drift", slug: "drift" },
-  { name: "Transmitters", slug: "transmitters" },
-  { name: "Batteries", slug: "batteries" },
-  { name: "Suspension", slug: "suspension" },
-]
+interface CategoryItem {
+  name: string
+  slug: string
+}
 
-export function SidebarFilters() {
+interface SidebarFiltersProps {
+  categories: CategoryItem[]
+}
+
+export function SidebarFilters({ categories }: SidebarFiltersProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -82,7 +80,15 @@ export function SidebarFilters() {
           Category
         </label>
         <ul className="space-y-3">
-          {CATEGORIES.map((c) => (
+          <li>
+            <button
+              onClick={() => setCategory("")}
+              className={`text-sm transition-colors ${!category ? "text-accent font-medium" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              Everything
+            </button>
+          </li>
+          {categories.map((c) => (
             <li key={c.slug}>
               <button
                 onClick={() => setCategory(c.slug)}

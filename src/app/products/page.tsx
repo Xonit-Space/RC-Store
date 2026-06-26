@@ -1,4 +1,5 @@
 import { getProductsServer as getProducts } from "@/lib/server-api"
+import { getCategoriesTree } from "@/repositories/product"
 import { SidebarFilters } from "./sidebar-filters"
 import { CatalogHeader } from "./catalog-header"
 import { ProductCard } from "@/components/product/product-card"
@@ -33,6 +34,10 @@ export default async function ProductsPage({ searchParams }: PageProps) {
     page,
     limit: 12,
   })
+
+  // Fetch categories for sidebar
+  const categoryTree = await getCategoriesTree()
+  const filterCategories = categoryTree.map((c: any) => ({ name: c.name, slug: c.slug }))
 
   // Basic pagination logic for next/prev
   const currentParams = new URLSearchParams()
@@ -74,7 +79,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
 
           {/* ── SIDEBAR FILTERS ── */}
           <aside className="w-52 shrink-0 hidden md:block">
-            <SidebarFilters />
+            <SidebarFilters categories={filterCategories} />
           </aside>
 
           {/* ── PRODUCT GRID ── */}

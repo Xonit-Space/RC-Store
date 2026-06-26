@@ -141,7 +141,7 @@ export default function LoginPage() {
                     Password
                   </label>
                   <Link href="/forgot-password" className="text-[10px] font-mono font-bold uppercase tracking-[0.1em] text-muted-foreground hover:text-primary transition-colors">
-                    Override
+                    Forgot Password
                   </Link>
                 </div>
                 <Input
@@ -159,7 +159,7 @@ export default function LoginPage() {
                   disabled={loading}
                   className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-[0_0_20px_rgba(255, 204, 0,0.6)] rounded-none font-heading font-black text-sm tracking-[0.2em] uppercase transition-all"
                 >
-                  {loading ? "Establishing Link..." : "Initialize Link"}
+                  {loading ? "Signing in..." : "Login"}
                 </Button>
               </div>
 

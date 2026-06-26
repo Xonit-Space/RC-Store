@@ -235,7 +235,7 @@ export function ProductContentSections({ product }: ProductContentSectionsProps)
                   </div>
                   <p className="text-sm text-muted-foreground leading-relaxed">{review.comment}</p>
                   <span className="text-[10px] text-muted-foreground/60 mt-4 block">
-                    {new Date(review.createdAt).toLocaleDateString()}
+                    {new Date(review.createdAt).toLocaleDateString("en-US")}
                   </span>
                 </div>
               )) : (
@@ -252,12 +252,12 @@ export function ProductContentSections({ product }: ProductContentSectionsProps)
                 <div key={q.id} className="border-b border-border/40 pb-8">
                   <div className="mb-4">
                     <p className="text-sm font-bold text-foreground">Q: {q.question}</p>
-                    <span className="text-[10px] text-muted-foreground mt-1 block">Asked by {q.user?.name || "Customer"} on {new Date(q.createdAt).toLocaleDateString()}</span>
+                    <span className="text-[10px] text-muted-foreground mt-1 block">Asked by {q.user?.name || "Customer"} on {new Date(q.createdAt).toLocaleDateString("en-US")}</span>
                   </div>
                   {q.answers?.map((a: any) => (
                     <div key={a.id} className="bg-muted/10 p-4 border-l-2 border-primary mt-4">
                       <p className="text-sm text-muted-foreground">A: {a.answer}</p>
-                      <span className="text-[10px] text-muted-foreground/60 mt-2 block">Answered by {a.user?.name || "Staff"} on {new Date(a.createdAt).toLocaleDateString()}</span>
+                      <span className="text-[10px] text-muted-foreground/60 mt-2 block">Answered by {a.user?.name || "Staff"} on {new Date(a.createdAt).toLocaleDateString("en-US")}</span>
                     </div>
                   ))}
                 </div>

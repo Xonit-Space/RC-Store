@@ -42,7 +42,7 @@ export function ProductBreadcrumb({ product }: ProductBreadcrumbProps) {
       
       <ChevronRight className="w-3 h-3 flex-shrink-0" />
       
-      <span className="text-foreground font-medium truncate max-w-[200px] md:max-w-[400px]">
+      <span className="text-primary font-bold truncate max-w-[200px] md:max-w-[400px]">
         {product.name}
       </span>
     </nav>

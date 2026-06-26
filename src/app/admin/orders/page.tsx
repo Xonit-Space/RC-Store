@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react"
 import {
   RefreshCw, Search, ShoppingBag, ChevronLeft, ChevronRight,
   MapPin, Package, Clock, CheckCircle2, Truck, XCircle, RotateCcw,
-  CreditCard, Filter,
+  CreditCard, Filter, X
 } from "lucide-react"
 import { toast } from "sonner"
 import { adminUpdateOrderStatus } from "@/actions/order"
@@ -14,6 +14,13 @@ import { OrderStatus } from "@prisma/client"
 import { useDebounce } from "@/hooks/use-debounce"
 import { useAdminOrders } from "@/hooks/use-admin-data"
 import { useQueryClient } from "@tanstack/react-query"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet"
 
 // ─── Status config ────────────────────────────────────────────────────────────
 
@@ -62,6 +69,7 @@ function OrdersPageInner() {
 
   const [search, setSearch] = useState(currentSearch)
   const [activeStatus, setActiveStatus] = useState<FilterStatus>(currentStatus)
+  const [selectedOrder, setSelectedOrder] = useState<any | null>(null)
 
   const debouncedSearch = useDebounce(search, 400)
 
@@ -208,17 +216,22 @@ function OrdersPageInner() {
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {orders.map((o: any) => (
             <div
               key={o.id}
-              className="border border-border/40 bg-background transition-colors hover:border-foreground/20"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                setSelectedOrder(o)
+              }}
+              className="border border-border/40 bg-background transition-colors hover:border-foreground/30 cursor-pointer group"
             >
-              {/* Order header */}
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-muted/5 border-b border-border/40 px-6 py-4 gap-4">
+              {/* Order header row */}
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-muted/5 px-6 py-4 gap-4">
                 <div className="flex items-start gap-4">
                   <div>
-                    <p className="font-sans text-base font-medium text-foreground">
+                    <p className="font-sans text-base font-medium text-foreground group-hover:text-primary transition-colors">
                       Order #{o.orderNumber}
                     </p>
                     <p className="text-[10px] text-muted-foreground uppercase tracking-widest mt-0.5">
@@ -238,65 +251,155 @@ function OrdersPageInner() {
 
                   <StatusBadge status={o.status} />
 
-                  {/* Status change dropdown */}
-                  <select
-                    value={o.status}
-                    onChange={(e) => handleStatusChange(o.id, e.target.value as OrderStatus)}
-                    className="h-9 border border-border/40 bg-background text-[10px] font-bold text-foreground px-2 outline-none uppercase tracking-widest cursor-pointer focus:border-foreground ml-auto md:ml-0 min-w-[120px]"
-                  >
-                    {Object.entries(STATUS_CONFIG).map(([s, cfg]) => (
-                      <option key={s} value={s}>{cfg.label}</option>
-                    ))}
-                  </select>
+                  <button type="button" className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground hover:text-foreground transition-colors ml-4 md:ml-2">
+                    View Details →
+                  </button>
                 </div>
-              </div>
-
-              {/* Order manifest + shipping address */}
-              <div className="px-6 py-4 grid md:grid-cols-3 gap-6">
-                {/* Items */}
-                <div className="md:col-span-2 space-y-2">
-                  <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-[0.2em] mb-3 flex items-center gap-1.5">
-                    <Package className="w-3 h-3" /> Order Items
-                  </div>
-                  {o.items?.map((item: any) => (
-                    <div key={item.id} className="flex justify-between items-center gap-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 border border-border/30 bg-muted/10 shrink-0" />
-                        <p className="text-sm text-foreground line-clamp-1">
-                          {item.variant?.product?.name || "RC Product"}
-                        </p>
-                      </div>
-                      <p className="text-sm text-muted-foreground whitespace-nowrap shrink-0">
-                        <span className="font-bold text-foreground">{item.quantity}</span>
-                        {" "}× Rs. {Number(item.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Shipping address */}
-                {o.shippingAddress && (
-                  <div className="space-y-2">
-                    <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-[0.2em] mb-3 flex items-center gap-1.5">
-                      <MapPin className="w-3 h-3" /> Ship To
-                    </div>
-                    <div className="text-xs text-muted-foreground leading-relaxed">
-                      <p className="text-foreground font-medium">{o.shippingAddress.title}</p>
-                      <p>{o.shippingAddress.line1}</p>
-                      {o.shippingAddress.line2 && <p>{o.shippingAddress.line2}</p>}
-                      <p>{o.shippingAddress.city}, {o.shippingAddress.state} {o.shippingAddress.postalCode}</p>
-                      <p>{o.shippingAddress.country}</p>
-                      {o.shippingAddress.phone && (
-                        <p className="mt-1 font-medium text-foreground">{o.shippingAddress.phone}</p>
-                      )}
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           ))}
         </div>
       )}
+
+      {/* ── Order Details Slide Panel ── */}
+      <Sheet open={!!selectedOrder} onOpenChange={(open) => !open && setSelectedOrder(null)}>
+        <SheetContent className="w-full sm:max-w-xl overflow-y-auto border-l border-border/40 bg-background/95 backdrop-blur-sm p-0">
+          {selectedOrder && (
+            <div className="h-full flex flex-col font-sans">
+              <div className="p-6 border-b border-border/40 bg-muted/5">
+                <SheetHeader>
+                  <SheetTitle className="font-sans text-2xl font-light">Order #{selectedOrder.orderNumber}</SheetTitle>
+                  <SheetDescription className="text-[10px] uppercase tracking-widest">
+                    {new Date(selectedOrder.createdAt).toLocaleString()}
+                  </SheetDescription>
+                </SheetHeader>
+                
+                <div className="flex items-center justify-between mt-6">
+                  <div>
+                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-1">Current Status</p>
+                    <StatusBadge status={selectedOrder.status} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-1">Update Status</p>
+                    <select
+                      value={selectedOrder.status}
+                      onChange={(e) => {
+                        handleStatusChange(selectedOrder.id, e.target.value as OrderStatus)
+                        setSelectedOrder({ ...selectedOrder, status: e.target.value })
+                      }}
+                      className="h-9 border border-border/40 bg-background text-[10px] font-bold text-foreground px-2 outline-none uppercase tracking-widest cursor-pointer focus:border-foreground"
+                    >
+                      {Object.entries(STATUS_CONFIG).map(([s, cfg]) => (
+                        <option key={s} value={s}>{cfg.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 flex-1 space-y-8">
+                {/* Items */}
+                <div className="space-y-4">
+                  <div className="text-[10px] text-muted-foreground font-bold uppercase tracking-[0.2em] flex items-center gap-1.5 border-b border-border/40 pb-2">
+                    <Package className="w-3.5 h-3.5" /> Order Manifest
+                  </div>
+                  <div className="space-y-3">
+                    {selectedOrder.items?.map((item: any) => (
+                      <div key={item.id} className="flex justify-between items-center gap-4 group">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-10 h-10 border border-border/30 bg-muted/10 shrink-0 flex items-center justify-center overflow-hidden">
+                            {item.variant?.product?.images?.[0] ? (
+                              <img src={typeof item.variant.product.images[0] === 'string' ? item.variant.product.images[0] : (item.variant.product.images[0]?.url || "")} alt="" className="w-full h-full object-cover mix-blend-luminosity opacity-80" />
+                            ) : (
+                              <Package className="w-4 h-4 text-muted-foreground/30" />
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-foreground line-clamp-1">
+                              {item.variant?.product?.name || "RC Product"}
+                            </p>
+                            <p className="text-[10px] uppercase tracking-wider text-muted-foreground mt-0.5 truncate">
+                              {item.variant?.name || "Standard Edition"}
+                            </p>
+                          </div>
+                        </div>
+                        <p className="text-sm text-muted-foreground whitespace-nowrap shrink-0">
+                          <span className="font-bold text-foreground">{item.quantity}</span>
+                          {" "}× Rs. {Number(item.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Customer Details */}
+                <div className="space-y-4">
+                  <div className="text-[10px] text-muted-foreground font-bold uppercase tracking-[0.2em] flex items-center gap-1.5 border-b border-border/40 pb-2">
+                    <MapPin className="w-3.5 h-3.5" /> Fulfillment Details
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold mb-1">Customer</p>
+                      <p className="text-sm text-foreground font-medium">{selectedOrder.user?.name || "Guest"}</p>
+                      <p className="text-[11px] text-muted-foreground">{selectedOrder.user?.email}</p>
+                    </div>
+                    
+                    {selectedOrder.shippingAddress && (
+                      <div>
+                        <p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold mb-1">Shipping Address</p>
+                        <div className="text-xs text-muted-foreground leading-relaxed">
+                          <p className="text-foreground font-medium">{selectedOrder.shippingAddress.title || "Home"}</p>
+                          <p>{selectedOrder.shippingAddress.line1}</p>
+                          {selectedOrder.shippingAddress.line2 && <p>{selectedOrder.shippingAddress.line2}</p>}
+                          <p>{selectedOrder.shippingAddress.city}, {selectedOrder.shippingAddress.state} {selectedOrder.shippingAddress.postalCode}</p>
+                          <p>{selectedOrder.shippingAddress.country}</p>
+                          {selectedOrder.shippingAddress.phone && (
+                            <p className="mt-2 font-bold text-foreground bg-muted/10 p-2 inline-block border border-border/40">
+                              📞 {selectedOrder.shippingAddress.phone}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Financial Summary */}
+                <div className="space-y-4">
+                  <div className="text-[10px] text-muted-foreground font-bold uppercase tracking-[0.2em] flex items-center gap-1.5 border-b border-border/40 pb-2">
+                    <CreditCard className="w-3.5 h-3.5" /> Financial Summary
+                  </div>
+                  <div className="bg-muted/5 border border-border/40 p-4 space-y-2 text-sm">
+                    <div className="flex justify-between text-muted-foreground">
+                      <span>Subtotal</span>
+                      <span>Rs. {Number(selectedOrder.subtotal).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    </div>
+                    <div className="flex justify-between text-muted-foreground">
+                      <span>Shipping</span>
+                      <span>Rs. {Number(selectedOrder.shippingCost).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    </div>
+                    <div className="flex justify-between text-muted-foreground">
+                      <span>Tax</span>
+                      <span>Rs. {Number(selectedOrder.tax).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    </div>
+                    {Number(selectedOrder.discount) > 0 && (
+                      <div className="flex justify-between text-emerald-500">
+                        <span>Discount</span>
+                        <span>- Rs. {Number(selectedOrder.discount).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-foreground font-bold text-base pt-2 border-t border-border/40 mt-2">
+                      <span>Total Paid</span>
+                      <span>Rs. {Number(selectedOrder.total).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
 
       {/* ── Pagination ── */}
       {totalPages > 1 && (

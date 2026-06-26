@@ -102,19 +102,19 @@ export default async function AdminAnalyticsPage() {
           ) : (
             <div className="flex items-end gap-2 h-48 w-full">
               {(() => {
-                const maxTotal = Math.max(...recentOrders.map(o => Number(o.total)), 1)
+                const maxTotal = Math.max(...recentOrders.map(o => Number(o.total?.toString() || 0)), 1)
                 return [...recentOrders].reverse().map((order) => {
-                  const heightPct = Math.max((Number(order.total) / maxTotal) * 100, 5)
+                  const heightPct = Math.max((Number(order.total?.toString() || 0) / maxTotal) * 100, 5)
                   
                   return (
-                    <div key={order.id} className="flex-1 flex flex-col items-center gap-2 group relative">
+                    <div key={order.id} className="flex-1 h-full flex flex-col justify-end items-center group relative">
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 bg-foreground text-background text-[9px] px-2 py-1 rounded whitespace-nowrap z-10">
+                        Rs.{Number(order.total?.toString() || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </div>
                       <div 
-                        className="w-full bg-forest/20 group-hover:bg-forest/50 transition-colors"
+                        className="w-full bg-forest/20 group-hover:bg-forest/50 transition-colors rounded-t-sm"
                         style={{ height: `${heightPct}%` }}
                       />
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute mt-[-2rem] bg-foreground text-background text-[9px] px-2 py-1 rounded">
-                        Rs.{Number(order.total).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </div>
                     </div>
                   )
                 })

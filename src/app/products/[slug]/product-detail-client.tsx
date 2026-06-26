@@ -381,6 +381,8 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             <ProductSidebarRelated relatedProducts={product.relatedSource} />
           </div>
         </div>
+      </div>
+      </div>
 
       {/* ── LOWER SECTION: CONTENT BLOCKS ── */}
       <ProductContentSections product={product} />

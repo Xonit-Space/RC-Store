@@ -70,10 +70,6 @@ const SheetContent = React.forwardRef<
         <span className="sr-only">Close</span>
       </SheetPrimitive.Close>
 
-      {/* Universal Cancel Button for Sheet */}
-      <SheetPrimitive.Close className="absolute left-6 bottom-4 text-sm text-muted-foreground hover:text-white transition-colors underline-offset-4 hover:underline">
-        Cancel
-      </SheetPrimitive.Close>
     </SheetPrimitive.Content>
   </SheetPortal>
 ))

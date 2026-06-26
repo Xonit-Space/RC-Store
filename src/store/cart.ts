@@ -13,7 +13,9 @@ export interface CartProduct {
 
 export interface LocalCartItem {
   id: string          // unique line identifier
-  variantId: string
+  variantId?: string
+  addonId?: string
+  parentProductId?: string
   quantity: number
   product: CartProduct
 }
@@ -57,13 +59,19 @@ export const useCartStore = create<CartStore>()(
           // Sync with database asynchronously
           await addCartItem(
             newItem.variantId,
+            newItem.addonId,
+            newItem.parentProductId,
             newItem.quantity,
             userId,
             guestSessionId || undefined
           )
         }
 
-        const existingItemIndex = items.findIndex((i) => i.variantId === newItem.variantId)
+        const existingItemIndex = items.findIndex((i) => 
+          i.variantId === newItem.variantId && 
+          i.addonId === newItem.addonId && 
+          i.parentProductId === newItem.parentProductId
+        )
 
         if (existingItemIndex > -1) {
           const updatedItems = [...items]

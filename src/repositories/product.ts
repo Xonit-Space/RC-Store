@@ -162,6 +162,9 @@ export async function getProductBySlug(slug: string) {
           where: { isActive: true },
           include: { inventory: true },
         },
+        addons: {
+          include: { addon: true },
+        },
         attributes: true,
         // Limit reviews to most recent 20 — avoids full table load on high-review products
         reviews: {

@@ -63,6 +63,7 @@ export class AiService {
     // 3. Aggregate occurrences frequency
     const productFrequency: Record<string, number> = {}
     for (const item of correlatedItems) {
+      if (!item.variant) continue
       const pId = item.variant.productId
       productFrequency[pId] = (productFrequency[pId] || 0) + item.quantity
     }

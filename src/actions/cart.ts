@@ -5,12 +5,16 @@ import { ActionResponse } from "./auth"
 import { z } from "zod"
 
 const AddCartItemSchema = z.object({
-  variantId: z.string().min(1, "Variant ID is required"),
+  variantId: z.string().optional(),
+  addonId: z.string().optional(),
+  parentProductId: z.string().optional(),
   quantity: z.number().int().positive("Quantity must be a positive integer"),
   userId: z.string().optional(),
   guestSessionId: z.string().optional()
 }).refine(data => data.userId || data.guestSessionId, {
   message: "Either User ID or Guest Session ID is required"
+}).refine(data => data.variantId || data.addonId, {
+  message: "Either Variant ID or Addon ID is required"
 })
 
 const UpdateQtySchema = z.object({
@@ -38,6 +42,7 @@ export async function getCart(userId?: string, guestSessionId?: string) {
               },
             },
           },
+          addon: true,
         },
       },
     },
@@ -45,21 +50,25 @@ export async function getCart(userId?: string, guestSessionId?: string) {
 }
 
 export async function addCartItem(
-  variantId: string,
+  variantId: string | undefined,
+  addonId: string | undefined,
+  parentProductId: string | undefined,
   quantity: number,
   userId?: string,
   guestSessionId?: string
 ): Promise<ActionResponse> {
-  const parsed = AddCartItemSchema.safeParse({ variantId, quantity, userId, guestSessionId })
+  const parsed = AddCartItemSchema.safeParse({ variantId, addonId, parentProductId, quantity, userId, guestSessionId })
   if (!parsed.success) {
     return { success: false, error: parsed.error.errors[0].message }
   }
 
   try {
-    // 1. Verify stock limits first
-    const inventory = await db.inventory.findUnique({ where: { variantId } })
-    if (!inventory || inventory.quantity < quantity) {
-      return { success: false, error: "Requested quantity is not available in stock" }
+    // 1. Verify stock limits first (only for variants)
+    if (variantId) {
+      const inventory = await db.inventory.findUnique({ where: { variantId } })
+      if (!inventory || inventory.quantity < quantity) {
+        return { success: false, error: "Requested quantity is not available in stock" }
+      }
     }
 
     // 2. Fetch or create dynamic Cart
@@ -80,20 +89,32 @@ export async function addCartItem(
       })
     }
 
-    // 3. Upsert Cart Item
-    await db.cartItem.upsert({
+    // 3. Upsert Cart Item manually because Prisma doesn't allow nulls in @@unique where clauses
+    const existingItem = await db.cartItem.findFirst({
       where: {
-        cartId_variantId: { cartId: cart.id, variantId },
-      },
-      update: {
-        quantity: { increment: quantity },
-      },
-      create: {
         cartId: cart.id,
-        variantId,
-        quantity,
-      },
+        variantId: variantId || null,
+        addonId: addonId || null,
+        parentProductId: parentProductId || null
+      }
     })
+
+    if (existingItem) {
+      await db.cartItem.update({
+        where: { id: existingItem.id },
+        data: { quantity: existingItem.quantity + quantity },
+      })
+    } else {
+      await db.cartItem.create({
+        data: {
+          cartId: cart.id,
+          variantId: variantId || null,
+          addonId: addonId || null,
+          parentProductId: parentProductId || null,
+          quantity,
+        },
+      })
+    }
 
     return { success: true }
   } catch (error: any) {
@@ -122,12 +143,14 @@ export async function updateCartItemQty(
 
     if (!cartItem) return { success: false, error: "Item not found" }
 
-    const inventory = await db.inventory.findUnique({
-      where: { variantId: cartItem.variantId },
-    })
+    if (cartItem.variantId) {
+      const inventory = await db.inventory.findUnique({
+        where: { variantId: cartItem.variantId },
+      })
 
-    if (!inventory || inventory.quantity < quantity) {
-      return { success: false, error: "Insufficient stock available" }
+      if (!inventory || inventory.quantity < quantity) {
+        return { success: false, error: "Insufficient stock available" }
+      }
     }
 
     await db.cartItem.update({
@@ -182,19 +205,31 @@ export async function mergeGuestCart(guestSessionId: string, userId: string): Pr
 
     // Merge each item with inventory checks
     for (const item of guestCart.items) {
-      await db.cartItem.upsert({
+      const existingItem = await db.cartItem.findFirst({
         where: {
-          cartId_variantId: { cartId: activeUserCart.id, variantId: item.variantId },
-        },
-        update: {
-          quantity: { increment: item.quantity },
-        },
-        create: {
           cartId: activeUserCart.id,
-          variantId: item.variantId,
-          quantity: item.quantity,
-        },
+          variantId: item.variantId || null,
+          addonId: item.addonId || null,
+          parentProductId: item.parentProductId || null
+        }
       })
+
+      if (existingItem) {
+        await db.cartItem.update({
+          where: { id: existingItem.id },
+          data: { quantity: existingItem.quantity + item.quantity },
+        })
+      } else {
+        await db.cartItem.create({
+          data: {
+            cartId: activeUserCart.id,
+            variantId: item.variantId || null,
+            addonId: item.addonId || null,
+            parentProductId: item.parentProductId || null,
+            quantity: item.quantity,
+          },
+        })
+      }
     }
 
     // Purge the temporary guest cart

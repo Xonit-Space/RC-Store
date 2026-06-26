@@ -35,6 +35,17 @@ export async function processStripeCheckout(
 
     // 2. Map Items for Stripe Processing
     const checkoutItems: CheckoutItem[] = cart.items.map((item: any) => {
+      if (item.addon) {
+        return {
+          name: `${item.addon.name} (Addon)`,
+          images: item.addon.image ? [item.addon.image] : [],
+          price: item.addon.price,
+          quantity: item.quantity,
+          variantId: null,
+          addonId: item.addon.id,
+        }
+      }
+
       const price = item.variant.price || item.variant.product.price
       return {
         name: `${item.variant.product.name} (${item.variant.size} - ${item.variant.colorName || item.variant.color})`,

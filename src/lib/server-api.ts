@@ -18,7 +18,7 @@ export async function getProductBySlugServer(slug: string) {
   if (!product) return null
   return serializeForClient({
     ...product,
-    images: product.images?.map((img: any) => img.url) || ["/placeholder.svg"],
-    tags: product.createdAt && (new Date(product.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) ? ["new"] : [],
+    images: (product as any).images?.map((img: any) => img.url) || ["/placeholder.svg"],
+    tags: (product as any).createdAt && (new Date((product as any).createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) ? ["new"] : [],
   })
 }

@@ -115,13 +115,22 @@ export default function CartPage() {
                       {item.product.name}
                     </h3>
                     <div className="flex flex-wrap gap-1.5 justify-center sm:justify-start text-[10px] font-bold text-muted/50">
-                      <Badge variant="outline" className="text-[9px] py-0 px-2 uppercase">
-                        Size: {item.product.size}
-                      </Badge>
-                      <Badge variant="outline" className="text-[9px] py-0 px-2 uppercase flex items-center gap-1">
-                        <span className="h-2.5 w-2.5 rounded-full border shadow-inner shrink-0" style={{ backgroundColor: item.product.color }} />
-                        Color
-                      </Badge>
+                      {item.product.size && (
+                        <Badge variant="outline" className="text-[9px] py-0 px-2 uppercase">
+                          Size: {item.product.size}
+                        </Badge>
+                      )}
+                      {item.product.color && (
+                        <Badge variant="outline" className="text-[9px] py-0 px-2 uppercase flex items-center gap-1">
+                          <span className="h-2.5 w-2.5 rounded-full border shadow-inner shrink-0" style={{ backgroundColor: item.product.color }} />
+                          Color
+                        </Badge>
+                      )}
+                      {item.addonId && (
+                        <Badge variant="outline" className="text-[9px] py-0 px-2 uppercase text-terracotta border-terracotta/30 bg-terracotta/5">
+                          Addon
+                        </Badge>
+                      )}
                     </div>
                     <p className="text-sm font-extrabold text-foreground">
                       Rs. {item.product.price.toLocaleString()}

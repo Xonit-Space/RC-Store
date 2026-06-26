@@ -35,7 +35,8 @@ export interface CheckoutItem {
   images: string[]
   price: number // in USD
   quantity: number
-  variantId: string
+  variantId: string | null
+  addonId?: string
 }
 
 export interface CheckoutSessionOptions {
@@ -53,7 +54,9 @@ export async function createCheckoutSession(options: CheckoutSessionOptions) {
 
   // 1. Pessimistically reserve stock for items in transaction before generating session
   for (const item of items) {
-    await reserveStock({ variantId: item.variantId, quantity: item.quantity })
+    if (item.variantId) {
+      await reserveStock({ variantId: item.variantId, quantity: item.quantity })
+    }
   }
 
   const lineItems = items.map((item) => ({
@@ -63,7 +66,8 @@ export async function createCheckoutSession(options: CheckoutSessionOptions) {
         name: item.name,
         images: item.images.length > 0 ? [item.images[0]] : [],
         metadata: {
-          variantId: item.variantId,
+          variantId: item.variantId || null,
+          addonId: item.addonId || null,
         },
       },
       unit_amount: Math.round(item.price * 100), // Stripe expects amounts in cents
@@ -82,7 +86,7 @@ export async function createCheckoutSession(options: CheckoutSessionOptions) {
         {
           action: "RELEASE_RESERVATION",
           orderNumber,
-          items: items.map(item => ({ variantId: item.variantId, quantity: item.quantity }))
+          items: items.filter(item => item.variantId).map(item => ({ variantId: item.variantId, quantity: item.quantity }))
         },
         {
           delay: 15 * 60 * 1000 // 15 minutes delay
@@ -105,7 +109,7 @@ export async function createCheckoutSession(options: CheckoutSessionOptions) {
       userId,
       orderNumber,
       variantMapping: JSON.stringify(
-        items.map((item) => ({ variantId: item.variantId, quantity: item.quantity }))
+        items.map((item) => ({ variantId: item.variantId, addonId: item.addonId, quantity: item.quantity }))
       ),
     },
     shipping_address_collection: {

@@ -49,7 +49,7 @@ export async function POST(req: Request) {
 
     const session = event.data.object as any
     const { userId, orderNumber, variantMapping } = session.metadata ?? {}
-    const items: { variantId: string; quantity: number }[] = JSON.parse(variantMapping || "[]")
+    const items: { variantId?: string; addonId?: string; quantity: number }[] = JSON.parse(variantMapping || "[]")
 
     if (!userId || !orderNumber) {
       logger.error({ message: `Stripe webhook missing metadata for event ${event.id}`, context: { eventId: event.id } })
@@ -72,14 +72,26 @@ export async function POST(req: Request) {
 
     const defaultAddressId = userWithAddress?.addresses[0]?.id ?? undefined
 
-    // FIX API-002: Fetch actual variant prices from DB for accurate order line-item recording
-    const variantIds = items.map((i) => i.variantId)
-    const variants = await db.productVariant.findMany({
-      where: { id: { in: variantIds } },
-      include: { product: { select: { price: true } } },
-    })
-    const priceMap = new Map(
+    // FIX API-002: Fetch actual variant and addon prices from DB for accurate order line-item recording
+    const variantIds = items.filter((i) => i.variantId).map((i) => i.variantId as string)
+    const addonIds = items.filter((i) => i.addonId).map((i) => i.addonId as string)
+    
+    const [variants, addons] = await Promise.all([
+      variantIds.length > 0 ? db.productVariant.findMany({
+        where: { id: { in: variantIds } },
+        include: { product: { select: { price: true } } },
+      }) : [],
+      addonIds.length > 0 ? db.addon.findMany({
+        where: { id: { in: addonIds } },
+        select: { id: true, price: true },
+      }) : []
+    ])
+
+    const variantPriceMap = new Map(
       variants.map((v) => [v.id, Number(v.price ?? v.product.price)])
+    )
+    const addonPriceMap = new Map(
+      addons.map((a) => [a.id, Number(a.price)])
     )
 
     // FIX ERR-001: Wrap the entire fulfillment in a transaction so no partial state can occur
@@ -125,10 +137,14 @@ export async function POST(req: Request) {
             billingAddressId: addressId,
             items: {
               create: items.map((item) => {
-                // FIX API-002: Use the actual variant price fetched from DB
-                const unitPrice = priceMap.get(item.variantId) ?? 0
+                // FIX API-002: Use the actual price fetched from DB
+                const unitPrice = item.variantId 
+                  ? (variantPriceMap.get(item.variantId) ?? 0)
+                  : (item.addonId ? (addonPriceMap.get(item.addonId) ?? 0) : 0)
+                  
                 return {
-                  variantId: item.variantId,
+                  variantId: item.variantId || null,
+                  addonId: item.addonId || null,
                   quantity: item.quantity,
                   price: unitPrice,
                   total: unitPrice * item.quantity,

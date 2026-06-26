@@ -64,7 +64,7 @@ export function CartIconButton({ product, className, children }: { product?: any
     <button 
       onClick={handleAddToCart}
       disabled={loading}
-      className={className || "relative z-20 w-10 h-10 bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-racing-yellow hover:text-carbon-dark hover:border-racing-yellow transition-all disabled:opacity-50"}
+      className={className || "relative z-20 w-10 h-10 bg-muted/50 border border-border flex items-center justify-center text-foreground hover:bg-racing-yellow hover:text-carbon-dark hover:border-primary transition-all disabled:opacity-50"}
     >
       {children || <ShoppingCart className="w-4 h-4" />}
     </button>

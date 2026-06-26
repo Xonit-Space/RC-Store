@@ -23,8 +23,8 @@ export default function CampaignsPage() {
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
         
         <div className="px-6 md:px-12 lg:px-24 max-w-[1400px] mx-auto w-full mb-16 relative z-10 fade-up-section visible">
-          <p className="text-[10px] font-heading tracking-[0.3em] uppercase text-racing-yellow mb-4 flex items-center gap-2">
-            <span className="w-4 h-px bg-racing-yellow inline-block" />
+          <p className="text-[10px] font-heading tracking-[0.3em] uppercase text-primary mb-4 flex items-center gap-2">
+            <span className="w-4 h-px bg-primary inline-block" />
             Elite Access
           </p>
           <h1 className="font-heading text-4xl md:text-6xl font-black text-foreground dark:text-white uppercase drop-shadow-[0_0_15px_rgba(255, 204, 0,0.3)]">Pro Racing League</h1>
@@ -45,8 +45,8 @@ export default function CampaignsPage() {
                     <div className="absolute inset-0 bg-gradient-to-t from-carbon-dark/80 to-transparent pointer-events-none" />
                   </div>
                 </div>
-                <div className={`md:col-span-5 space-y-6 ${index % 2 !== 0 ? 'md:order-1' : ''} glass-dark p-8 border-l-2 border-transparent hover:border-racing-yellow transition-colors`}>
-                  <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-racing-yellow font-bold">
+                <div className={`md:col-span-5 space-y-6 ${index % 2 !== 0 ? 'md:order-1' : ''} glass-dark p-8 border-l-2 border-transparent hover:border-primary transition-colors`}>
+                  <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary font-bold">
                     {campaign.season}
                   </p>
                   <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-black text-foreground dark:text-white uppercase leading-tight tracking-tight">
@@ -56,7 +56,7 @@ export default function CampaignsPage() {
                     {campaign.description}
                   </p>
                   <div className="pt-8">
-                    <Link href="/products" className="inline-block text-[12px] font-heading tracking-[0.2em] uppercase font-bold border-b border-border text-foreground dark:text-white hover:text-racing-yellow hover:border-racing-yellow transition-colors pb-1">
+                    <Link href="/products" className="inline-block text-[12px] font-heading tracking-[0.2em] uppercase font-bold border-b border-border text-foreground dark:text-white hover:text-primary hover:border-primary transition-colors pb-1">
                       Shop Collection
                     </Link>
                   </div>

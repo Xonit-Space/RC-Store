@@ -20,7 +20,7 @@ const SeoAboutContent = nextDynamic(() => import("@/components/sections/seo-abou
 const Footer = nextDynamic(() => import("@/components/layout/footer").then(m => m.Footer))
 
 function SectionSkeleton({ heightClass = "h-96" }) {
-  return <div className={`w-full ${heightClass} bg-smoke-dark animate-pulse`} />
+  return <div className={`w-full ${heightClass} bg-muted animate-pulse`} />
 }
 
 export default function HomePage() {

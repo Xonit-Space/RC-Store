@@ -21,7 +21,7 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      "fixed inset-0 z-50 bg-background/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className
     )}
     {...props}
@@ -44,13 +44,13 @@ const DialogContent = React.forwardRef<
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-all hover:opacity-100 hover:text-racing-yellow hover:shadow-[0_0_15px_rgba(255, 204, 0,0.5)] focus:outline-none focus:ring-2 focus:ring-racing-yellow focus:ring-offset-2 focus:ring-offset-background disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground p-1">
+      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-all hover:opacity-100 hover:text-primary hover:shadow-[0_0_15px_rgba(255, 204, 0,0.5)] focus:outline-none focus:ring-2 focus:ring-racing-yellow focus:ring-offset-2 focus:ring-offset-background disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground p-1">
         <X className="h-4 w-4" />
         <span className="sr-only">Close</span>
       </DialogPrimitive.Close>
       
       {/* Universal Cancel Button */}
-      <DialogPrimitive.Close className="absolute left-6 bottom-4 text-sm text-gray-400 hover:text-white transition-colors underline-offset-4 hover:underline">
+      <DialogPrimitive.Close className="absolute left-6 bottom-4 text-sm text-muted-foreground hover:text-white transition-colors underline-offset-4 hover:underline">
         Cancel
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>

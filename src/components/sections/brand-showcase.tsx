@@ -8,14 +8,14 @@ export function BrandShowcase() {
   ]
 
   return (
-    <section className="bg-carbon-dark py-16 border-y border-white/5 overflow-hidden">
+    <section className="bg-background py-16 border-y border-border overflow-hidden">
       <div className="container mx-auto px-6 md:px-12 mb-8 flex justify-between items-end">
         <div>
-          <h2 className="font-heading font-black text-2xl text-white uppercase tracking-widest">
+          <h2 className="font-heading font-black text-2xl text-foreground uppercase tracking-widest">
             Premium Manufacturers
           </h2>
         </div>
-        <Link href="/brands" className="text-xs font-mono font-bold tracking-widest text-racing-yellow hover:text-white uppercase transition-colors">
+        <Link href="/brands" className="text-xs font-mono font-bold tracking-widest text-primary hover:text-white uppercase transition-colors">
           View All Brands
         </Link>
       </div>
@@ -29,7 +29,7 @@ export function BrandShowcase() {
           {[...brands, ...brands, ...brands].map((brand, i) => (
             <div 
               key={i} 
-              className="mx-8 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 hover:text-racing-yellow transition-all duration-300 cursor-pointer text-3xl font-heading font-black tracking-widest text-white border-x border-white/5 px-8"
+              className="mx-8 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 hover:text-primary transition-all duration-300 cursor-pointer text-3xl font-heading font-black tracking-widest text-foreground border-x border-border px-8"
             >
               {brand}
             </div>

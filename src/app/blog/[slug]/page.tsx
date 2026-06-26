@@ -14,19 +14,19 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
   }
 
   return (
-    <main className="min-h-screen bg-black text-white selection:bg-racing-yellow selection:text-carbon-dark">
+    <main className="min-h-screen bg-background text-foreground selection:bg-racing-yellow selection:text-carbon-dark">
             
       <article className="pt-32 pb-24 container mx-auto px-6 md:px-12">
         <div className="max-w-3xl mx-auto space-y-12">
           
-          <Link href="/blog" className="inline-flex items-center gap-2 text-[10px] font-mono tracking-widest uppercase text-white/50 hover:text-racing-yellow transition-colors">
+          <Link href="/blog" className="inline-flex items-center gap-2 text-[10px] font-mono tracking-widest uppercase text-white/50 hover:text-primary transition-colors">
             <ArrowLeft className="w-3 h-3" /> BACK TO CIRCUIT
           </Link>
 
           <header className="space-y-6 fade-up-section visible">
             <div className="flex items-center gap-4 text-[10px] font-mono tracking-widest uppercase text-white/50">
               {post.category && (
-                <span className="text-racing-yellow border border-racing-yellow/30 px-2 py-0.5">
+                <span className="text-primary border border-racing-yellow/30 px-2 py-0.5">
                   {post.category.name}
                 </span>
               )}

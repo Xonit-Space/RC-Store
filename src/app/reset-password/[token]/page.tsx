@@ -55,7 +55,7 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex font-sans bg-carbon-dark">
+    <div className="min-h-screen flex font-sans bg-background">
       {/* Column 1: Visual / Video Background (Hidden on Mobile, 2/3 width on Desktop) */}
       <div className="hidden lg:flex lg:w-2/3 relative flex-col justify-between p-10 overflow-hidden">
         {/* Video Background */}
@@ -70,14 +70,14 @@ export default function ResetPasswordPage() {
         </video>
 
         {/* Overlay to ensure text/logo readability */}
-        <div className="absolute inset-0 bg-black/60 z-10" />
+        <div className="absolute inset-0 bg-background/60 z-10" />
 
         {/* Minimal Navbar / Top area */}
         <div className="relative z-20 flex items-center justify-between w-full">
           <Link href="/">
             <img src="/Transparent/logo yellow1.png" alt="Aussie Rigs Arena" className="h-20 w-auto object-contain" />
           </Link>
-          <Link href="/" className="text-white text-[10px] font-mono font-bold tracking-widest uppercase border border-white/20 px-4 py-2 hover:bg-white/10 hover:border-racing-yellow transition-all">
+          <Link href="/" className="text-foreground text-[10px] font-mono font-bold tracking-widest uppercase border border-border px-4 py-2 hover:bg-white/10 hover:border-primary transition-all">
             Back to Arena
           </Link>
         </div>
@@ -96,7 +96,7 @@ export default function ResetPasswordPage() {
       </div>
 
       {/* Column 2: Form Container (Full width on mobile, 1/3 on desktop) */}
-      <div className="w-full lg:w-1/3 flex flex-col justify-center items-center px-6 py-12 relative z-10 border-l border-white/10 bg-carbon-dark shadow-[-20px_0_50px_rgba(0,0,0,0.5)]">
+      <div className="w-full lg:w-1/3 flex flex-col justify-center items-center px-6 py-12 relative z-10 border-l border-border bg-background shadow-[-20px_0_50px_rgba(0,0,0,0.5)]">
         
         {/* Grid Background Decor */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
@@ -109,10 +109,10 @@ export default function ResetPasswordPage() {
           </div>
 
           <div className="text-left mb-8">
-            <h1 className="text-3xl font-heading font-black tracking-widest text-white uppercase drop-shadow-[0_0_10px_rgba(255, 204, 0,0.5)]">
+            <h1 className="text-3xl font-heading font-black tracking-widest text-foreground uppercase drop-shadow-[0_0_10px_rgba(255, 204, 0,0.5)]">
               New Key
             </h1>
-            <p className="mt-2 text-[10px] tracking-[0.4em] uppercase text-racing-yellow font-mono font-bold animate-pulse">
+            <p className="mt-2 text-[10px] tracking-[0.4em] uppercase text-primary font-mono font-bold animate-pulse">
               Security Reset
             </p>
           </div>
@@ -130,7 +130,7 @@ export default function ResetPasswordPage() {
                 )}
 
                 <div className="space-y-2">
-                  <label className="block text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-gray-400">
+                  <label className="block text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-muted-foreground">
                     New Security Key
                   </label>
                   <Input
@@ -138,12 +138,12 @@ export default function ResetPasswordPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="h-12 bg-smoke-dark border-white/10 rounded-none text-white focus-visible:ring-0 focus-visible:border-racing-yellow focus-visible:shadow-[0_0_10px_rgba(255, 204, 0,0.3)] transition-all font-mono"
+                    className="h-12 bg-muted border-border rounded-none text-foreground focus-visible:ring-0 focus-visible:border-racing-yellow focus-visible:shadow-[0_0_10px_rgba(255, 204, 0,0.3)] transition-all font-mono"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="block text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-gray-400">
+                  <label className="block text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-muted-foreground">
                     Confirm Security Key
                   </label>
                   <Input
@@ -151,7 +151,7 @@ export default function ResetPasswordPage() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
-                    className="h-12 bg-smoke-dark border-white/10 rounded-none text-white focus-visible:ring-0 focus-visible:border-racing-yellow focus-visible:shadow-[0_0_10px_rgba(255, 204, 0,0.3)] transition-all font-mono"
+                    className="h-12 bg-muted border-border rounded-none text-foreground focus-visible:ring-0 focus-visible:border-racing-yellow focus-visible:shadow-[0_0_10px_rgba(255, 204, 0,0.3)] transition-all font-mono"
                   />
                 </div>
 
@@ -159,7 +159,7 @@ export default function ResetPasswordPage() {
                   <Button
                     type="submit"
                     disabled={loading}
-                    className="w-full h-12 bg-racing-yellow text-carbon-dark hover:bg-neon-yellow hover:shadow-[0_0_20px_rgba(255, 204, 0,0.6)] rounded-none font-heading font-black text-sm tracking-[0.2em] uppercase transition-all mt-4"
+                    className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-[0_0_20px_rgba(255, 204, 0,0.6)] rounded-none font-heading font-black text-sm tracking-[0.2em] uppercase transition-all mt-4"
                   >
                     {loading ? "Updating..." : "Confirm New Key"}
                   </Button>
@@ -167,18 +167,18 @@ export default function ResetPasswordPage() {
               </form>
             ) : (
               <div className="flex flex-col items-center justify-center py-4 text-center space-y-6">
-                <div className="w-16 h-16 rounded-full border border-racing-yellow flex items-center justify-center">
-                  <CheckCircle2 className="h-8 w-8 text-racing-yellow" />
+                <div className="w-16 h-16 rounded-full border border-primary flex items-center justify-center">
+                  <CheckCircle2 className="h-8 w-8 text-primary" />
                 </div>
                 <div className="space-y-2">
-                  <h3 className="font-heading font-bold text-xl text-white">Key Updated</h3>
-                  <p className="text-[10px] font-mono text-gray-400 uppercase tracking-widest leading-relaxed">
+                  <h3 className="font-heading font-bold text-xl text-foreground">Key Updated</h3>
+                  <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest leading-relaxed">
                     Your security key has been successfully updated.
                   </p>
                 </div>
                 <Button
                   onClick={() => router.push("/login")}
-                  className="w-full h-12 border border-racing-yellow bg-transparent text-racing-yellow hover:bg-racing-yellow/10 rounded-none font-heading font-black text-sm tracking-[0.2em] uppercase transition-all mt-4"
+                  className="w-full h-12 border border-primary bg-transparent text-primary hover:bg-racing-yellow/10 rounded-none font-heading font-black text-sm tracking-[0.2em] uppercase transition-all mt-4"
                 >
                   Return to Login
                 </Button>

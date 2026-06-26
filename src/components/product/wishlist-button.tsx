@@ -33,8 +33,8 @@ export function WishlistButton({ productId, className, variant = "default" }: { 
   }
 
   const baseStyles = variant === "minimal" 
-    ? "text-muted-foreground hover:text-racing-yellow transition-colors disabled:opacity-50"
-    : "relative z-20 w-8 h-8 bg-carbon-dark/80 backdrop-blur border border-white/10 flex items-center justify-center text-white hover:text-racing-yellow hover:border-racing-yellow transition-colors disabled:opacity-50";
+    ? "text-muted-foreground hover:text-primary transition-colors disabled:opacity-50"
+    : "relative z-20 w-8 h-8 bg-carbon-dark/80 backdrop-blur border border-border flex items-center justify-center text-foreground hover:text-primary hover:border-primary transition-colors disabled:opacity-50";
 
   return (
     <button 

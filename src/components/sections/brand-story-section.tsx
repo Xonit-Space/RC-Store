@@ -28,31 +28,31 @@ export function BrandStorySection() {
           {/* Left: text content & reviews */}
           <div className="md:col-span-5 space-y-12 fade-up-section visible">
             <div>
-              <p className="text-[12px] font-heading font-bold tracking-[0.3em] uppercase text-racing-yellow mb-4 flex items-center gap-2">
-                <span className="w-4 h-px bg-racing-yellow inline-block" />
+              <p className="text-[12px] font-heading font-bold tracking-[0.3em] uppercase text-primary mb-4 flex items-center gap-2">
+                <span className="w-4 h-px bg-primary inline-block" />
                 Pro League Verified
               </p>
               <h2 className="font-heading text-4xl md:text-5xl font-black leading-tight text-foreground dark:text-white uppercase tracking-tighter drop-shadow-[0_0_10px_rgba(255, 204, 0,0.2)]">
                 Track Tested<br />
-                <span className="text-racing-yellow">Pilot Approved</span>
+                <span className="text-primary">Pilot Approved</span>
               </h2>
             </div>
 
             <div className="space-y-6">
               {reviews.map(review => (
                 <div key={review.id} className="glass-dark p-6 border border-border hover:border-racing-yellow/40 transition-colors">
-                  <div className="flex gap-1 mb-3 text-racing-yellow">
+                  <div className="flex gap-1 mb-3 text-primary">
                     {[...Array(review.rating)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
                   </div>
                   <p className="text-muted-foreground font-sans text-sm leading-relaxed mb-4">&quot;{review.comment}&quot;</p>
-                  <p className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">PILOT // {review.user}</p>
+                  <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">PILOT // {review.user}</p>
                 </div>
               ))}
             </div>
 
             <Link
               href="/community"
-              className="inline-flex items-center gap-3 text-[12px] font-heading font-bold tracking-[0.25em] uppercase text-foreground dark:text-white border-b border-border pb-2 hover:border-racing-yellow hover:text-racing-yellow transition-all duration-300 group mt-4"
+              className="inline-flex items-center gap-3 text-[12px] font-heading font-bold tracking-[0.25em] uppercase text-foreground dark:text-white border-b border-border pb-2 hover:border-primary hover:text-primary transition-all duration-300 group mt-4"
             >
               Access Community Logs
               <ArrowRight strokeWidth={2} className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

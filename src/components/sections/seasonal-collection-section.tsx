@@ -34,8 +34,8 @@ export function SeasonalCollectionSection() {
         <div className="flex items-end justify-between mb-16 md:mb-24 fade-up-section visible">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Crosshair className="w-4 h-4 text-racing-yellow animate-pulse" />
-              <p className="text-[12px] font-heading font-bold tracking-[0.3em] uppercase text-racing-yellow">
+              <Crosshair className="w-4 h-4 text-primary animate-pulse" />
+              <p className="text-[12px] font-heading font-bold tracking-[0.3em] uppercase text-primary">
                 Racing Ecosystem
               </p>
             </div>
@@ -45,7 +45,7 @@ export function SeasonalCollectionSection() {
           </div>
           <Link
             href="/collections"
-            className="hidden md:flex items-center gap-2 text-[12px] font-heading font-bold tracking-[0.2em] uppercase text-muted-foreground hover:text-racing-yellow hover:drop-shadow-[0_0_8px_rgba(255, 204, 0,0.8)] transition-all group"
+            className="hidden md:flex items-center gap-2 text-[12px] font-heading font-bold tracking-[0.2em] uppercase text-muted-foreground hover:text-primary hover:drop-shadow-[0_0_8px_rgba(255, 204, 0,0.8)] transition-all group"
           >
             All Categories
             <ArrowRight strokeWidth={2} className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -56,7 +56,7 @@ export function SeasonalCollectionSection() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
 
           {/* Large featured collection */}
-          <Link href={collections[0].href} className="md:col-span-7 group relative overflow-hidden block aspect-[3/4] md:aspect-auto md:h-[680px] border border-border hover:border-racing-yellow hover:shadow-[0_0_30px_rgba(255, 204, 0,0.3)] transition-all duration-500 fade-up-section visible">
+          <Link href={collections[0].href} className="md:col-span-7 group relative overflow-hidden block aspect-[3/4] md:aspect-auto md:h-[680px] border border-border hover:border-primary hover:shadow-[0_0_30px_rgba(255, 204, 0,0.3)] transition-all duration-500 fade-up-section visible">
             <img
               src={collections[0].image}
               alt={collections[0].title}
@@ -64,11 +64,11 @@ export function SeasonalCollectionSection() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-carbon-dark via-carbon-dark/40 to-transparent" />
             <div className="absolute bottom-8 left-8 z-10">
-              <p className="text-[10px] font-heading tracking-[0.4em] uppercase text-racing-yellow mb-2">{collections[0].season}</p>
+              <p className="text-[10px] font-heading tracking-[0.4em] uppercase text-primary mb-2">{collections[0].season}</p>
               <h3 className="font-heading text-3xl md:text-5xl font-black text-foreground dark:text-white uppercase tracking-tighter">{collections[0].title}</h3>
             </div>
             <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-              <div className="bg-racing-yellow p-3 flex items-center justify-center">
+              <div className="bg-primary p-3 flex items-center justify-center">
                 <ArrowRight strokeWidth={2} className="w-6 h-6 text-foreground dark:text-white" />
               </div>
             </div>
@@ -77,7 +77,7 @@ export function SeasonalCollectionSection() {
           {/* Two smaller collections stacked */}
           <div className="md:col-span-5 flex flex-col gap-6 md:gap-8">
             {collections.slice(1).map((col, i) => (
-              <Link key={col.id} href={col.href} className="group relative overflow-hidden block aspect-[4/3] md:flex-1 md:aspect-auto border border-border hover:border-racing-yellow hover:shadow-[0_0_30px_rgba(255, 204, 0,0.3)] transition-all duration-500 fade-up-section visible" style={{ transitionDelay: `${(i+1)*0.2}s` }}>
+              <Link key={col.id} href={col.href} className="group relative overflow-hidden block aspect-[4/3] md:flex-1 md:aspect-auto border border-border hover:border-primary hover:shadow-[0_0_30px_rgba(255, 204, 0,0.3)] transition-all duration-500 fade-up-section visible" style={{ transitionDelay: `${(i+1)*0.2}s` }}>
                 <img
                   src={col.image}
                   alt={col.title}
@@ -85,7 +85,7 @@ export function SeasonalCollectionSection() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-carbon-dark via-carbon-dark/40 to-transparent" />
                 <div className="absolute bottom-6 left-6 z-10">
-                  <p className="text-[9px] font-heading tracking-[0.3em] uppercase text-racing-yellow mb-1">{col.season}</p>
+                  <p className="text-[9px] font-heading tracking-[0.3em] uppercase text-primary mb-1">{col.season}</p>
                   <h3 className="font-heading text-xl md:text-3xl font-black text-foreground dark:text-white uppercase tracking-tighter">{col.title}</h3>
                 </div>
               </Link>

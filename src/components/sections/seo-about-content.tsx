@@ -1,9 +1,9 @@
 export function SeoAboutContent() {
   return (
-    <section className="bg-carbon-dark py-16 border-t border-white/5">
+    <section className="bg-background py-16 border-t border-border">
       <div className="container mx-auto px-6 md:px-12">
         <div className="max-w-4xl mx-auto text-center space-y-6">
-          <h2 className="font-heading font-black text-2xl md:text-3xl text-white uppercase tracking-wider mb-6">
+          <h2 className="font-heading font-black text-2xl md:text-3xl text-foreground uppercase tracking-wider mb-6">
             Aussie Rigs Arena: Your Ultimate Destination for RC Hobby Mastery
           </h2>
           <div className="text-muted-foreground text-sm leading-relaxed space-y-4 font-sans">

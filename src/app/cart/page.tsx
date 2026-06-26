@@ -145,7 +145,7 @@ export default function CartPage() {
                     </span>
                     <button
                       onClick={() => handleUpdateQty(item.id, item.quantity + 1)}
-                      className="h-7 w-7 bg-foreground hover:bg-foreground text-white  font-extrabold flex items-center justify-center active:scale-95 transition"
+                      className="h-7 w-7 bg-foreground hover:bg-foreground text-foreground  font-extrabold flex items-center justify-center active:scale-95 transition"
                     >
                       <Plus className="h-3.5 w-3.5" />
                     </button>

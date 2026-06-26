@@ -69,7 +69,7 @@ export const AddToCartClientButton = memo(function AddToCartClientButton({
   return (
     <Button
       size="sm"
-      className="w-full bg-foreground text-white font-bold rounded-none h-9.5 text-xs shadow-md mt-2 hover:bg-foreground active:scale-95 transition"
+      className="w-full bg-foreground text-foreground font-bold rounded-none h-9.5 text-xs shadow-md mt-2 hover:bg-foreground active:scale-95 transition"
       onClick={handleAddToCart}
       disabled={isPending}
     >

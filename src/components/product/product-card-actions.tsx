@@ -72,7 +72,7 @@ export const ProductCardActions = memo(function ProductCardActions({ product }: 
         onClick={toggleWishlist}
         className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity"
       >
-        <Heart strokeWidth={1} className={`w-5 h-5 ${inWishlist ? "fill-racing-yellow text-racing-yellow" : "text-foreground dark:text-white"}`} />
+        <Heart strokeWidth={1} className={`w-5 h-5 ${inWishlist ? "fill-racing-yellow text-primary" : "text-foreground dark:text-white"}`} />
       </button>
 
       <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">

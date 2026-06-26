@@ -21,7 +21,7 @@ export async function AIRecommendations() {
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-16 fade-up-section visible">
           <div className="flex flex-col items-center justify-center gap-3 mb-6">
-            <Cpu className="h-10 w-10 text-racing-yellow animate-pulse" />
+            <Cpu className="h-10 w-10 text-primary animate-pulse" />
             <h2 className="text-4xl md:text-5xl font-heading font-black tracking-tighter text-foreground dark:text-white uppercase drop-shadow-[0_0_10px_rgba(255, 204, 0,0.5)]">
               Racing Intelligence System
             </h2>
@@ -32,7 +32,7 @@ export async function AIRecommendations() {
         </div>
 
         <Tabs defaultValue="personalized" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 max-w-xl mx-auto mb-10 bg-black/50 border border-border p-1 rounded-none">
+          <TabsList className="grid w-full grid-cols-3 max-w-xl mx-auto mb-10 bg-background/50 border border-border p-1 rounded-none">
             <TabsTrigger value="personalized" className="flex items-center justify-center gap-2 text-xs font-heading font-bold py-3 rounded-none data-[state=active]:bg-racing-yellow data-[state=active]:text-foreground dark:text-white data-[state=active]:shadow-[0_0_15px_rgba(255, 204, 0,0.5)] uppercase tracking-wider transition-all">
               <Zap className="h-4 w-4" />
               Pilot Match
@@ -50,7 +50,7 @@ export async function AIRecommendations() {
           <TabsContent value="personalized" className="animate-in fade-in-50 duration-500 outline-none">
             <div className="border border-racing-yellow/20 shadow-[0_0_30px_rgba(255, 204, 0,0.05)] rounded-none p-6 md:p-8 bg-background/80 backdrop-blur-md">
               <div className="flex items-center gap-3 mb-8 border-b border-border pb-4">
-                <Zap className="h-6 w-6 text-racing-yellow" />
+                <Zap className="h-6 w-6 text-primary" />
                 <h3 className="text-lg font-heading font-black text-foreground dark:text-white uppercase tracking-widest">Calculated For Your Driving Style</h3>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
@@ -64,7 +64,7 @@ export async function AIRecommendations() {
           <TabsContent value="trending" className="animate-in fade-in-50 duration-500 outline-none">
             <div className="border border-racing-yellow/20 shadow-[0_0_30px_rgba(255, 204, 0,0.05)] rounded-none p-6 md:p-8 bg-background/80 backdrop-blur-md">
               <div className="flex items-center gap-3 mb-8 border-b border-border pb-4">
-                <Activity className="h-6 w-6 text-racing-yellow" />
+                <Activity className="h-6 w-6 text-primary" />
                 <h3 className="text-lg font-heading font-black text-foreground dark:text-white uppercase tracking-widest">High Performance Trending</h3>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
@@ -78,7 +78,7 @@ export async function AIRecommendations() {
           <TabsContent value="recent" className="animate-in fade-in-50 duration-500 outline-none">
             <div className="border border-racing-yellow/20 shadow-[0_0_30px_rgba(255, 204, 0,0.05)] rounded-none p-6 md:p-8 bg-background/80 backdrop-blur-md">
               <div className="flex items-center gap-3 mb-8 border-b border-border pb-4">
-                <ShieldAlert className="h-6 w-6 text-racing-yellow" />
+                <ShieldAlert className="h-6 w-6 text-primary" />
                 <h3 className="text-lg font-heading font-black text-foreground dark:text-white uppercase tracking-widest">Previously Scanned Models</h3>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">

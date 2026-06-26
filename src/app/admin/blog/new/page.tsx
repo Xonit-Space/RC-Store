@@ -162,7 +162,7 @@ export default function NewBlogPostPage() {
             <Button 
               type="submit" 
               disabled={loading}
-              className="h-12 rounded-none bg-racing-yellow text-carbon-dark text-xs font-bold uppercase tracking-widest px-8 hover:bg-neon-yellow transition-colors"
+              className="h-12 rounded-none bg-primary text-primary-foreground text-xs font-bold uppercase tracking-widest px-8 hover:bg-primary/90 transition-colors"
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
               {loading ? "Creating..." : "Create Post"}

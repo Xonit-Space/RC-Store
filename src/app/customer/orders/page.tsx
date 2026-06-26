@@ -78,7 +78,7 @@ export default function CustomerOrdersPage() {
               <ShoppingBag className="h-14 w-14 mx-auto text-muted-foreground/30 mb-3" />
               <p className="text-sm font-bold text-foreground">No purchases found</p>
               <p className="text-xs text-muted-foreground pt-1 mb-6">You have not completed any checkouts yet.</p>
-              <a href="/products" className="inline-flex h-11 items-center justify-center px-6 rounded-none bg-primary hover:bg-primary/95 text-white text-xs font-bold transition">
+              <a href="/products" className="inline-flex h-11 items-center justify-center px-6 rounded-none bg-primary hover:bg-primary/95 text-foreground text-xs font-bold transition">
                 Browse Products
               </a>
             </CardContent>

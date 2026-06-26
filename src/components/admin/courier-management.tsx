@@ -340,7 +340,7 @@ export function CourierManagement() {
 
       {/* ── ADD COURIER MODAL ── */}
       {isAddCourierOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-background/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-card border border-border/40 rounded-none p-6 w-full max-w-md shadow-2xl animate-in scale-in duration-200">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-bold text-foreground">Add New Courier Driver</h3>
@@ -400,7 +400,7 @@ export function CourierManagement() {
 
               <button
                 type="submit"
-                className="w-full h-12 bg-primary text-white rounded-none text-xs font-bold hover:bg-primary/95 transition mt-6 active:scale-95 shadow"
+                className="w-full h-12 bg-primary text-foreground rounded-none text-xs font-bold hover:bg-primary/95 transition mt-6 active:scale-95 shadow"
               >
                 Save My Profile
               </button>
@@ -468,7 +468,7 @@ export function CourierManagement() {
 
                 <div className="border-t-2 border-dashed border-muted-foreground/30 pt-4 flex flex-col items-center justify-center space-y-1">
                   {/* Mock Barcode Block */}
-                  <div className="w-48 h-8 bg-foreground flex items-center justify-center text-white text-[9px] tracking-[6px] font-extrabold">
+                  <div className="w-48 h-8 bg-foreground flex items-center justify-center text-foreground text-[9px] tracking-[6px] font-extrabold">
                     *SL123456789*
                   </div>
                   <p className="text-[8px] text-muted-foreground font-bold uppercase tracking-wider">Scan waybill upon delivery arrival</p>
@@ -486,7 +486,7 @@ export function CourierManagement() {
               </button>
               <button
                 onClick={() => window.print()}
-                className="flex-1 h-11 bg-foreground text-white hover:bg-foreground rounded-none text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95 shadow"
+                className="flex-1 h-11 bg-foreground text-foreground hover:bg-foreground rounded-none text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95 shadow"
               >
                 <Printer className="h-4 w-4" /> Print Thermal
               </button>

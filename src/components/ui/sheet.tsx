@@ -21,7 +21,7 @@ const SheetOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SheetPrimitive.Overlay
     className={cn(
-      "fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      "fixed inset-0 z-50 bg-background/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className
     )}
     {...props}
@@ -65,13 +65,13 @@ const SheetContent = React.forwardRef<
       {...props}
     >
       {children}
-      <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-all hover:opacity-100 hover:text-racing-yellow hover:shadow-[0_0_15px_rgba(255, 204, 0,0.5)] focus:outline-none focus:ring-2 focus:ring-racing-yellow focus:ring-offset-2 disabled:pointer-events-none p-1">
+      <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-all hover:opacity-100 hover:text-primary hover:shadow-[0_0_15px_rgba(255, 204, 0,0.5)] focus:outline-none focus:ring-2 focus:ring-racing-yellow focus:ring-offset-2 disabled:pointer-events-none p-1">
         <X className="h-4 w-4" />
         <span className="sr-only">Close</span>
       </SheetPrimitive.Close>
 
       {/* Universal Cancel Button for Sheet */}
-      <SheetPrimitive.Close className="absolute left-6 bottom-4 text-sm text-gray-400 hover:text-white transition-colors underline-offset-4 hover:underline">
+      <SheetPrimitive.Close className="absolute left-6 bottom-4 text-sm text-muted-foreground hover:text-white transition-colors underline-offset-4 hover:underline">
         Cancel
       </SheetPrimitive.Close>
     </SheetPrimitive.Content>

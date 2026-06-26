@@ -18,7 +18,7 @@ const AlertDialogOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Overlay
     className={cn(
-      "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      "fixed inset-0 z-50 bg-background/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className
     )}
     {...props}
@@ -43,13 +43,13 @@ const AlertDialogContent = React.forwardRef<
     >
       {props.children}
       {/* Universal X close button for Alert Dialog */}
-      <AlertDialogPrimitive.Cancel className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-all hover:opacity-100 hover:text-racing-yellow hover:shadow-[0_0_15px_rgba(255, 204, 0,0.5)] focus:outline-none focus:ring-2 focus:ring-racing-yellow focus:ring-offset-2 focus:ring-offset-background disabled:pointer-events-none p-1">
+      <AlertDialogPrimitive.Cancel className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-all hover:opacity-100 hover:text-primary hover:shadow-[0_0_15px_rgba(255, 204, 0,0.5)] focus:outline-none focus:ring-2 focus:ring-racing-yellow focus:ring-offset-2 focus:ring-offset-background disabled:pointer-events-none p-1">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         <span className="sr-only">Close</span>
       </AlertDialogPrimitive.Cancel>
 
       {/* Universal Cancel Button for Alert Dialog */}
-      <AlertDialogPrimitive.Cancel className="absolute left-6 bottom-4 text-sm text-gray-400 hover:text-white transition-colors underline-offset-4 hover:underline">
+      <AlertDialogPrimitive.Cancel className="absolute left-6 bottom-4 text-sm text-muted-foreground hover:text-white transition-colors underline-offset-4 hover:underline">
         Cancel
       </AlertDialogPrimitive.Cancel>
     </AlertDialogPrimitive.Content>

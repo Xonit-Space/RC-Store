@@ -34,8 +34,8 @@ export default async function CollectionsPage() {
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
         
         <div className="mb-16 relative z-10 fade-up-section visible">
-          <p className="text-[10px] font-heading tracking-[0.3em] uppercase text-racing-yellow mb-4 flex items-center gap-2">
-            <span className="w-4 h-px bg-racing-yellow inline-block" />
+          <p className="text-[10px] font-heading tracking-[0.3em] uppercase text-primary mb-4 flex items-center gap-2">
+            <span className="w-4 h-px bg-primary inline-block" />
             Machine Classification
           </p>
           <h1 className="font-heading text-4xl md:text-6xl font-black text-foreground dark:text-white uppercase drop-shadow-[0_0_15px_rgba(255, 204, 0,0.3)]">Racing Ecosystem</h1>
@@ -61,7 +61,7 @@ export default async function CollectionsPage() {
               <div className="space-y-3 glass-dark p-6 border-l-2 border-transparent group-hover:border-racing-yellow transition-all">
                 <div className="flex justify-between items-baseline">
                   <h2 className="font-heading text-2xl font-black text-foreground dark:text-white uppercase tracking-tight group-hover:text-racing-yellow transition-colors">{collection.name}</h2>
-                  <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-gray-500">
+                  <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-foreground">
                     {collection._count.products} MACHINES
                   </span>
                 </div>

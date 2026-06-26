@@ -27,25 +27,25 @@ export function MembershipSection() {
           <div className="md:col-span-5 space-y-10 fade-up-section visible">
             <div>
               <div className="flex items-center gap-2 mb-6">
-                <Trophy className="w-5 h-5 text-racing-yellow" />
-                <p className="text-[12px] font-heading font-bold tracking-[0.35em] uppercase text-racing-yellow">
+                <Trophy className="w-5 h-5 text-primary" />
+                <p className="text-[12px] font-heading font-bold tracking-[0.35em] uppercase text-primary">
                   Elite Access
                 </p>
               </div>
               <h2 className="font-heading text-4xl md:text-6xl font-black leading-[1.05] tracking-tighter uppercase drop-shadow-[0_0_15px_rgba(255, 204, 0,0.3)]">
                 Pro Racing<br />
-                <span className="text-racing-yellow">League</span>
+                <span className="text-primary">League</span>
               </h2>
             </div>
 
-            <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-sm glass-dark p-4 border-l-2 border-racing-yellow">
+            <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-sm glass-dark p-4 border-l-2 border-primary">
               Reserved for pilots who demand the absolute best. Gain access to elite engineering support, beta firmware, and VIP track events.
             </p>
 
             <Link
               href="/membership"
               id="membership-cta"
-              className="inline-flex items-center justify-center gap-3 bg-racing-yellow text-foreground dark:text-white px-8 py-4 font-heading font-bold tracking-widest uppercase hover:bg-neon-yellow transition-all duration-300 shadow-[0_0_15px_rgba(255, 204, 0,0.4)] hover:shadow-[0_0_30px_rgba(255, 204, 0,0.8)] border border-racing-yellow hover:scale-105 group"
+              className="inline-flex items-center justify-center gap-3 bg-primary text-foreground dark:text-white px-8 py-4 font-heading font-bold tracking-widest uppercase hover:bg-primary/90 transition-all duration-300 shadow-[0_0_15px_rgba(255, 204, 0,0.4)] hover:shadow-[0_0_30px_rgba(255, 204, 0,0.8)] border border-primary hover:scale-105 group"
             >
               Apply For Pro License
               <ArrowRight strokeWidth={2} className="w-5 h-5 group-hover:translate-x-2 transition-transform" />

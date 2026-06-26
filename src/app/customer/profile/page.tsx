@@ -128,7 +128,7 @@ export default function CustomerProfilePage() {
                 <Button
                   type="submit"
                   disabled={saving}
-                  className="h-11 px-6 rounded-none bg-primary hover:bg-primary/95 text-white text-xs font-bold transition active:scale-95 shadow-md shadow-primary/10"
+                  className="h-11 px-6 rounded-none bg-primary hover:bg-primary/95 text-foreground text-xs font-bold transition active:scale-95 shadow-md shadow-primary/10"
                 >
                   {saving ? "Saving Changes..." : "Save Changes"}
                 </Button>

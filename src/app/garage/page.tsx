@@ -10,10 +10,10 @@ export default function GaragePage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
             <main className="flex-grow flex flex-col items-center justify-center text-center px-6 py-24">
-        <div className="w-20 h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-8">
-          <Wrench className="w-10 h-10 text-racing-yellow" />
+        <div className="w-20 h-20 rounded-full bg-muted/50 border border-border flex items-center justify-center mb-8">
+          <Wrench className="w-10 h-10 text-primary" />
         </div>
-        <h1 className="font-heading font-black text-4xl md:text-5xl text-white uppercase tracking-widest mb-4">
+        <h1 className="font-heading font-black text-4xl md:text-5xl text-foreground uppercase tracking-widest mb-4">
           My Garage
         </h1>
         <p className="text-muted-foreground text-base max-w-md mb-8 leading-relaxed">
@@ -22,13 +22,13 @@ export default function GaragePage() {
         <div className="flex flex-col sm:flex-row gap-4">
           <Link
             href="/products"
-            className="bg-racing-yellow text-carbon-dark font-heading font-black uppercase tracking-widest px-8 py-3 text-sm hover:bg-racing-yellow/90 transition-colors"
+            className="bg-primary text-primary-foreground font-heading font-black uppercase tracking-widest px-8 py-3 text-sm hover:bg-racing-yellow/90 transition-colors"
           >
             Shop Parts
           </Link>
           <Link
             href="/part-finder"
-            className="bg-white/5 border border-white/10 text-white font-heading font-black uppercase tracking-widest px-8 py-3 text-sm hover:bg-white/10 transition-colors"
+            className="bg-muted/50 border border-border text-foreground font-heading font-black uppercase tracking-widest px-8 py-3 text-sm hover:bg-white/10 transition-colors"
           >
             Find Compatible Parts
           </Link>

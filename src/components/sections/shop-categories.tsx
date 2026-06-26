@@ -12,19 +12,19 @@ export function ShopCategories() {
   ]
 
   return (
-    <section className="bg-carbon-dark py-24">
+    <section className="bg-background py-24">
       <div className="container mx-auto px-6 md:px-12">
         <div className="flex justify-between items-end mb-12">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="w-2 h-2 rounded-full bg-racing-yellow animate-pulse" />
-              <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-racing-yellow">Shop By Department</p>
+              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-primary">Shop By Department</p>
             </div>
-            <h2 className="font-heading font-black text-4xl text-white uppercase tracking-wider">
+            <h2 className="font-heading font-black text-4xl text-foreground uppercase tracking-wider">
               Explore Categories
             </h2>
           </div>
-          <Link href="/categories" className="hidden md:flex text-sm font-mono font-bold tracking-widest text-muted-foreground hover:text-racing-yellow uppercase transition-colors">
+          <Link href="/categories" className="hidden md:flex text-sm font-mono font-bold tracking-widest text-muted-foreground hover:text-primary uppercase transition-colors">
             View All Categories
           </Link>
         </div>
@@ -34,7 +34,7 @@ export function ShopCategories() {
             <Link 
               href={`/products?category=${cat.name.toLowerCase().replace(/ /g, '-')}`} 
               key={idx}
-              className={`relative group overflow-hidden ${cat.colSpan} bg-smoke-dark block min-h-[200px] border border-white/5 hover:border-racing-yellow/50 transition-colors`}
+              className={`relative group overflow-hidden ${cat.colSpan} bg-muted block min-h-[200px] border border-border hover:border-racing-yellow/50 transition-colors`}
             >
               <div className="absolute inset-0 bg-gradient-to-t from-carbon-dark via-carbon-dark/20 to-transparent z-10 opacity-80" />
               <img 
@@ -43,10 +43,10 @@ export function ShopCategories() {
                 className="absolute inset-0 w-full h-full object-cover scale-100 group-hover:scale-110 transition-transform duration-700 opacity-60 group-hover:opacity-100 mix-blend-luminosity group-hover:mix-blend-normal"
               />
               <div className="absolute bottom-0 left-0 p-6 z-20 w-full flex justify-between items-end">
-                <h3 className="font-heading font-bold text-2xl text-white uppercase tracking-widest group-hover:text-racing-yellow transition-colors">
+                <h3 className="font-heading font-bold text-2xl text-foreground uppercase tracking-widest group-hover:text-racing-yellow transition-colors">
                   {cat.name}
                 </h3>
-                <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center bg-carbon-dark/50 group-hover:bg-racing-yellow group-hover:border-racing-yellow group-hover:text-carbon-dark transition-all">
+                <div className="w-10 h-10 rounded-full border border-border flex items-center justify-center bg-carbon-dark/50 group-hover:bg-racing-yellow group-hover:border-racing-yellow group-hover:text-carbon-dark transition-all">
                   <ArrowUpRight className="w-5 h-5" />
                 </div>
               </div>

@@ -31,7 +31,7 @@ export function NewsletterSection() {
   }
 
   return (
-    <section className="bg-racing-yellow py-24 relative overflow-hidden">
+    <section className="bg-primary py-24 relative overflow-hidden">
       {/* Background Graphic */}
       <div className="absolute -right-20 -top-20 opacity-10 pointer-events-none">
         <svg width="400" height="400" viewBox="0 0 100 100" className="animate-spin-slow">
@@ -43,7 +43,7 @@ export function NewsletterSection() {
         <div className="max-w-3xl mx-auto flex flex-col md:flex-row items-center gap-12">
           
           <div className="flex-1 text-center md:text-left">
-            <h2 className="font-heading font-black text-4xl md:text-5xl text-carbon-dark uppercase tracking-wider mb-4">
+            <h2 className="font-heading font-black text-4xl md:text-5xl text-primary-foreground uppercase tracking-wider mb-4">
               Join the Pits
             </h2>
             <p className="text-carbon-dark/80 font-medium">
@@ -53,9 +53,9 @@ export function NewsletterSection() {
 
           <div className="flex-1 w-full">
             {success ? (
-              <div className="bg-carbon-dark p-6 flex flex-col items-center justify-center text-center gap-4 animate-in fade-in zoom-in">
-                <CheckCircle2 className="w-12 h-12 text-racing-yellow" />
-                <h3 className="font-heading font-bold text-white text-xl uppercase tracking-widest">You&apos;re on the list</h3>
+              <div className="bg-background p-6 flex flex-col items-center justify-center text-center gap-4 animate-in fade-in zoom-in">
+                <CheckCircle2 className="w-12 h-12 text-primary" />
+                <h3 className="font-heading font-bold text-foreground text-xl uppercase tracking-widest">You&apos;re on the list</h3>
                 <p className="text-muted-foreground text-sm">Welcome to the crew. Watch your inbox for updates.</p>
               </div>
             ) : (
@@ -65,7 +65,7 @@ export function NewsletterSection() {
                   name="firstName"
                   placeholder="FIRST NAME"
                   required
-                  className="w-full bg-carbon-dark text-white px-6 py-4 font-mono text-sm border border-transparent focus:border-white outline-none transition-colors"
+                  className="w-full bg-background text-foreground px-6 py-4 font-mono text-sm border border-transparent focus:border-white outline-none transition-colors"
                 />
                 <div className="flex flex-col sm:flex-row gap-2">
                   <input 
@@ -73,12 +73,12 @@ export function NewsletterSection() {
                     name="email"
                     placeholder="EMAIL ADDRESS"
                     required
-                    className="flex-1 bg-carbon-dark text-white px-6 py-4 font-mono text-sm border border-transparent focus:border-white outline-none transition-colors"
+                    className="flex-1 bg-background text-foreground px-6 py-4 font-mono text-sm border border-transparent focus:border-white outline-none transition-colors"
                   />
                   <button 
                     type="submit"
                     disabled={loading}
-                    className="bg-white text-carbon-dark px-8 py-4 font-heading font-black uppercase tracking-widest hover:bg-smoke-dark hover:text-white transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="bg-white text-primary-foreground px-8 py-4 font-heading font-black uppercase tracking-widest hover:bg-smoke-dark hover:text-white transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     {loading ? "Joining..." : "Subscribe"}
                     {!loading && <Send className="w-4 h-4" />}

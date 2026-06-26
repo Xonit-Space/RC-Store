@@ -49,7 +49,7 @@ export default function AdminBlogPage() {
           </h2>
         </div>
         <Link href="/admin/blog/new">
-          <Button className="rounded-none bg-racing-yellow text-carbon-dark font-bold uppercase tracking-widest text-xs hover:bg-neon-yellow transition-colors">
+          <Button className="rounded-none bg-primary text-primary-foreground font-bold uppercase tracking-widest text-xs hover:bg-primary/90 transition-colors">
             <Plus className="w-4 h-4 mr-2" /> New Post
           </Button>
         </Link>
@@ -85,7 +85,7 @@ export default function AdminBlogPage() {
                   <td className="p-4 font-medium text-foreground">{post.title}</td>
                   <td className="p-4 text-muted-foreground">{post.category?.name || "Uncategorized"}</td>
                   <td className="p-4">
-                    <span className={`text-[9px] uppercase tracking-widest px-2 py-1 font-bold border ${post.published ? "bg-forest/10 text-forest border-forest/20" : "bg-racing-yellow/10 text-racing-yellow border-racing-yellow/20"}`}>
+                    <span className={`text-[9px] uppercase tracking-widest px-2 py-1 font-bold border ${post.published ? "bg-forest/10 text-forest border-forest/20" : "bg-racing-yellow/10 text-primary border-racing-yellow/20"}`}>
                       {post.published ? "Published" : "Draft"}
                     </span>
                   </td>

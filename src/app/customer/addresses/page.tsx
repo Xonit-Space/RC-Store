@@ -113,7 +113,7 @@ export default function CustomerAddressesPage() {
           </div>
           <Button
             onClick={() => setIsAddAddressOpen(true)}
-            className="h-11 px-5 rounded-none bg-primary hover:bg-primary/95 text-white text-xs font-bold transition active:scale-95 shadow-md shadow-primary/10"
+            className="h-11 px-5 rounded-none bg-primary hover:bg-primary/95 text-foreground text-xs font-bold transition active:scale-95 shadow-md shadow-primary/10"
           >
             <Plus className="h-4.5 w-4.5 mr-2" /> Add Address
           </Button>
@@ -277,7 +277,7 @@ export default function CustomerAddressesPage() {
                   <Button
                     type="submit"
                     disabled={addressLoading}
-                    className="h-10 rounded-none bg-primary text-white"
+                    className="h-10 rounded-none bg-primary text-foreground"
                   >
                     {addressLoading ? "Saving..." : "Save Address"}
                   </Button>

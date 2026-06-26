@@ -33,8 +33,8 @@ export function HeroSection() {
         <div className="max-w-4xl cinematic-enter">
           {/* Season Tag */}
           <div className="flex items-center gap-2 mb-6">
-            <span className="w-2 h-2 rounded-full bg-racing-yellow animate-pulse" />
-            <p className="text-[12px] font-bold tracking-[0.4em] uppercase text-racing-yellow">
+            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+            <p className="text-[12px] font-bold tracking-[0.4em] uppercase text-primary">
               MASSIVE CLEARANCE EVENT
             </p>
           </div>
@@ -46,7 +46,7 @@ export function HeroSection() {
           </h1>
 
           {/* Subline */}
-          <p className="text-base md:text-lg text-muted-foreground dark:text-gray-300 max-w-lg leading-relaxed font-sans mb-10 border-l-2 border-racing-yellow pl-4">
+          <p className="text-base md:text-lg text-muted-foreground dark:text-gray-300 max-w-lg leading-relaxed font-sans mb-10 border-l-2 border-primary pl-4">
             Up to 40% off on all high-performance electric and nitro-powered machines, parts, and accessories. Gear up for ultimate dominance.
           </p>
 
@@ -55,7 +55,7 @@ export function HeroSection() {
             <Link
               href="/products?sale=true"
               id="hero-cta-explore"
-              className="group w-full sm:w-auto flex items-center justify-center gap-3 bg-racing-yellow text-carbon-dark px-8 py-4 font-heading font-black tracking-widest uppercase hover:bg-neon-yellow transition-all duration-300 shadow-[0_0_15px_rgba(255, 204, 0,0.4)] hover:shadow-[0_0_30px_rgba(255, 204, 0,0.8)] border border-racing-yellow hover:scale-105"
+              className="group w-full sm:w-auto flex items-center justify-center gap-3 bg-primary text-primary-foreground px-8 py-4 font-heading font-black tracking-widest uppercase hover:bg-primary/90 transition-all duration-300 shadow-[0_0_15px_rgba(255, 204, 0,0.4)] hover:shadow-[0_0_30px_rgba(255, 204, 0,0.8)] border border-primary hover:scale-105"
             >
               Shop Now
               <ArrowRight strokeWidth={2.5} className="w-5 h-5 transition-transform group-hover:translate-x-2" />
@@ -63,9 +63,9 @@ export function HeroSection() {
             
             <Link
               href="/collections/new-arrivals"
-              className="group w-full sm:w-auto flex items-center justify-center gap-3 bg-transparent text-foreground dark:text-white px-8 py-4 font-heading font-bold tracking-widest uppercase border border-white/20 hover:border-racing-yellow/80 hover:bg-racing-yellow/10 transition-all duration-300 glass-dark hover:scale-105"
+              className="group w-full sm:w-auto flex items-center justify-center gap-3 bg-transparent text-foreground dark:text-white px-8 py-4 font-heading font-bold tracking-widest uppercase border border-border hover:border-racing-yellow/80 hover:bg-racing-yellow/10 transition-all duration-300 glass-dark hover:scale-105"
             >
-              <Zap strokeWidth={2} className="w-5 h-5 text-racing-yellow group-hover:animate-pulse" />
+              <Zap strokeWidth={2} className="w-5 h-5 text-primary group-hover:animate-pulse" />
               View New Arrivals
             </Link>
           </div>

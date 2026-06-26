@@ -109,7 +109,7 @@ export default function RegisterPage() {
               Register
             </h1>
             <p className="mt-2 text-[10px] tracking-[0.4em] uppercase text-racing-yellow font-mono font-bold animate-pulse">
-              Client Onboarding
+              Create a new account
             </p>
           </div>
 
@@ -151,7 +151,7 @@ export default function RegisterPage() {
 
                 <div className="space-y-2">
                   <label className="block text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-gray-400">
-                    Driver Tag (Email)
+                    Email Address
                   </label>
                   <Input
                     type="email"
@@ -164,7 +164,7 @@ export default function RegisterPage() {
 
                 <div className="space-y-2">
                   <label className="block text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-gray-400">
-                    Security Key
+                    Password
                   </label>
                   <Input
                     type="password"

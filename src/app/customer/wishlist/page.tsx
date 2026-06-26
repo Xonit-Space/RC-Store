@@ -92,7 +92,7 @@ export default function CustomerWishlistPage() {
         
         <div className="mb-8">
           <Link href="/customer" className="inline-flex items-center gap-2 text-[10px] font-mono tracking-widest uppercase text-white/50 hover:text-racing-yellow transition-colors mb-6">
-            <ArrowLeft className="w-3 h-3" /> Base Coordinates
+            <ArrowLeft className="w-3 h-3" /> My Addresses
           </Link>
           <h1 className="font-heading text-4xl md:text-5xl font-black text-white leading-none uppercase drop-shadow-[0_0_10px_rgba(255, 204, 0,0.3)]">
             Wishlist & Alerts
@@ -103,7 +103,7 @@ export default function CustomerWishlistPage() {
           <div className="py-24 text-center glass-dark border border-white/10">
             <p className="font-heading text-2xl font-black text-gray-500 mb-4 uppercase">Wishlist is empty</p>
             <Link href="/products" className="text-[11px] font-mono tracking-[0.2em] uppercase text-racing-yellow border-b border-racing-yellow pb-1 inline-flex items-center gap-2 group hover:text-neon-yellow transition-colors">
-              Explore Showroom
+              Continue Shopping
             </Link>
           </div>
         ) : (

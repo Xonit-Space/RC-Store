@@ -402,7 +402,7 @@ export function CourierManagement() {
                 type="submit"
                 className="w-full h-12 bg-primary text-white rounded-none text-xs font-bold hover:bg-primary/95 transition mt-6 active:scale-95 shadow"
               >
-                Save Driver Profile
+                Save My Profile
               </button>
             </form>
           </div>

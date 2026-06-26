@@ -138,7 +138,7 @@ export default function LoginPage() {
 
               <div className="space-y-2">
                 <label className="block text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-gray-400">
-                  Driver Tag (Email)
+                  Email Address
                 </label>
                 <Input
                   type="email"
@@ -152,7 +152,7 @@ export default function LoginPage() {
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <label className="block text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-gray-400">
-                    Security Key
+                    Password
                   </label>
                   <Link href="/forgot-password" className="text-[10px] font-mono font-bold uppercase tracking-[0.1em] text-gray-500 hover:text-racing-yellow transition-colors">
                     Override
@@ -217,7 +217,7 @@ export default function LoginPage() {
           </div>
 
           <p className="mt-8 text-center text-[10px] font-mono uppercase tracking-[0.1em] text-gray-500">
-            No Driver Profile?{" "}
+            No My Profile?{" "}
             <Link href="/register" className="font-bold text-white border-b border-racing-yellow/50 hover:border-racing-yellow transition-colors pb-0.5">
               Register Tag
             </Link>

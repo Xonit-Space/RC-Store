@@ -84,7 +84,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
 
           {/* ── PRODUCT GRID ── */}
           <div className="flex-1">
-            <CatalogHeader totalCount={products.length} />
+            <CatalogHeader totalCount={products.length} categories={filterCategories} />
 
             {products.length === 0 ? (
               <div className="py-24 text-center space-y-4">

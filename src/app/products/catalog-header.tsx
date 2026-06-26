@@ -12,11 +12,17 @@ const SORT_OPTIONS = [
   { value: "popular", label: "Best Sellers" },
 ]
 
-interface CatalogHeaderProps {
-  totalCount: number;
+interface CategoryItem {
+  name: string
+  slug: string
 }
 
-export function CatalogHeader({ totalCount }: CatalogHeaderProps) {
+interface CatalogHeaderProps {
+  totalCount: number;
+  categories: CategoryItem[];
+}
+
+export function CatalogHeader({ totalCount, categories }: CatalogHeaderProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const currentSort = searchParams.get("sort") || "newest"
@@ -37,11 +43,13 @@ export function CatalogHeader({ totalCount }: CatalogHeaderProps) {
             Filters
           </button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-[300px] sm:w-[400px] overflow-y-auto pt-12">
-          <SheetHeader className="mb-6">
-            <SheetTitle className="text-left font-serif font-light text-2xl">Filters</SheetTitle>
-          </SheetHeader>
-          <SidebarFilters />
+        <SheetContent side="left" className="w-[300px] sm:w-[400px] pt-12 flex flex-col p-0">
+          <div className="flex-1 overflow-y-auto p-6 pt-12">
+            <SheetHeader className="mb-6">
+              <SheetTitle className="font-heading uppercase tracking-widest text-left">Filters</SheetTitle>
+            </SheetHeader>
+            <SidebarFilters categories={categories} />
+          </div>
         </SheetContent>
       </Sheet>
 

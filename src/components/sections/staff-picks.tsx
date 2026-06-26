@@ -87,7 +87,7 @@ export function StaffPicks() {
               </div>
               <h3 className="font-heading font-black text-xl text-foreground uppercase mb-2">{product.name}</h3>
               <p className="text-xs text-muted-foreground mb-4 line-clamp-2">{product.description}</p>
-              <div className="text-2xl font-mono font-bold text-primary mb-6">${Number(product.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+              <div className="text-2xl font-mono font-bold text-primary mb-6">{Number(product.price).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</div>
               <CartIconButton 
                 product={product} 
                 className="bg-muted hover:bg-racing-yellow text-foreground hover:text-carbon-dark border border-border hover:border-primary font-heading font-bold uppercase tracking-widest py-3 px-4 flex items-center justify-center gap-2 transition-colors text-sm w-fit"

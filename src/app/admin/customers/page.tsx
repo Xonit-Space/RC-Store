@@ -45,7 +45,7 @@ export default function AdminCustomersPage() {
           User Accounts
         </h2>
         <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-2">
-          {total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} registered accounts
+          {total.toLocaleString("en-AU", { style: 'currency', currency: 'AUD' })} registered accounts
         </p>
       </div>
 

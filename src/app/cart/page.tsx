@@ -128,7 +128,7 @@ export default function CartPage() {
                       )}
                     </div>
                     <p className="text-sm font-extrabold text-foreground">
-                      $ {item.product.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {item.product.price.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}
                     </p>
                   </div>
 
@@ -171,11 +171,11 @@ export default function CartPage() {
               <div className="space-y-3.5 pt-1 text-xs font-semibold text-muted/50">
                 <div className="flex justify-between">
                   <span>Bag Subtotal</span>
-                  <span className="font-bold text-foreground">$ {subtotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  <span className="font-bold text-foreground">{subtotal.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>GST Tax (8%)</span>
-                  <span className="font-bold text-foreground">$ {tax.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  <span className="font-bold text-foreground">{tax.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="flex items-center gap-1">
@@ -185,7 +185,7 @@ export default function CartPage() {
                     {shipping === 0 ? (
                       <span className="text-emerald-600 font-extrabold">FREE</span>
                     ) : (
-                      `$ ${shipping.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                      `$ {shipping.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}`
                     )}
                   </span>
                 </div>
@@ -193,7 +193,7 @@ export default function CartPage() {
                 {subtotal < 150 && (
                   <div className="p-3 bg-muted text-muted-foreground border border-border text-[10px] font-bold flex items-center gap-1.5">
                     <Info className="h-4 w-4 shrink-0" />
-                    <span>Spend $ {(150 - subtotal).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} more to unlock FREE SHIPPING!</span>
+                    <span>Spend {(150 - subtotal).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})} more to unlock FREE SHIPPING!</span>
                   </div>
                 )}
               </div>
@@ -202,7 +202,7 @@ export default function CartPage() {
 
               <div className="flex justify-between font-extrabold text-foreground text-base pt-1">
                 <span>Total Amount Due</span>
-                <span className="text-foreground">$ {grandTotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span className="text-foreground">{grandTotal.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
               </div>
 
               {/* Promo input field */}

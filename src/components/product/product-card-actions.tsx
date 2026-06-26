@@ -31,7 +31,7 @@ export const ProductCardActions = memo(function ProductCardActions({ product }: 
     
     if (!session) {
       toast.error("Please sign in to add items to your cart", { 
-        style: { background: "#0e0918", color: "#facc15", border: "1px solid #ef4444" } 
+        className: "bg-background text-primary border-destructive"
       })
       router.push("/login")
       return

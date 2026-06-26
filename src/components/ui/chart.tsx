@@ -240,7 +240,7 @@ const ChartTooltipContent = React.forwardRef<
                       </div>
                       {item.value && (
                         <span className="font-mono font-medium tabular-nums text-foreground">
-                          {item.value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          {item.value.toLocaleString("en-AU", { style: 'currency', currency: 'AUD' })}
                         </span>
                       )}
                     </div>

@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic"
 
 import { useState, useEffect } from "react"
 import { useCartStore } from "@/store/cart"
-import { processStripeCheckout } from "@/actions/order"
+import { processStripeCheckout, checkCoupon } from "@/actions/order"
 import { getTaxRateByRegionCode } from "@/actions/tax"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -35,6 +35,7 @@ export default function CheckoutPage() {
   const [country, setCountry] = useState("US")
   const [phone, setPhone] = useState("")
   const [couponCode, setCouponCode] = useState("")
+  const [couponDiscount, setCouponDiscount] = useState(0)
   const [taxRate, setTaxRate] = useState(0.08)
 
   const [error, setError] = useState<string | null>(null)
@@ -49,6 +50,22 @@ export default function CheckoutPage() {
   useEffect(() => {
     getTaxRateByRegionCode(country).then(rate => setTaxRate(rate))
   }, [country])
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode) {
+      toast.error("Please enter a coupon code");
+      return;
+    }
+    const subtotal = cartStore.getSubtotal();
+    const result = await checkCoupon(couponCode, subtotal);
+    if (result.success && result.data) {
+      setCouponDiscount(result.data.discount);
+      toast.success(`Coupon applied! -${result.data.discount.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}`);
+    } else {
+      setCouponDiscount(0);
+      toast.error(result.error || "Invalid coupon");
+    }
+  };
 
   const handleCheckoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -137,9 +154,10 @@ export default function CheckoutPage() {
 
   const items = cartStore.items
   const subtotal = cartStore.getSubtotal()
-  const tax = subtotal * taxRate
+  const taxableAmount = Math.max(0, subtotal - couponDiscount)
+  const tax = taxableAmount * taxRate
   const shipping = 15
-  const grandTotal = subtotal + tax + shipping
+  const grandTotal = taxableAmount + tax + shipping
 
   return (
     <div className="min-h-screen bg-background flex flex-col justify-between">
@@ -296,7 +314,7 @@ export default function CheckoutPage() {
                     </p>
                   </div>
                   <span className="text-xs font-bold text-foreground">
-                    $ {(item.product.price * item.quantity).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {(item.product.price * item.quantity).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}
                   </span>
                 </div>
               ))}
@@ -305,20 +323,26 @@ export default function CheckoutPage() {
             <div className="space-y-2 pt-2 text-xs font-semibold text-muted/50">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span className="font-bold text-foreground">$ {subtotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span className="font-bold text-foreground">{subtotal.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
               </div>
+              {couponDiscount > 0 && (
+                <div className="flex justify-between text-emerald-500">
+                  <span>Discount</span>
+                  <span className="font-bold">-{couponDiscount.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span>Tax ({(taxRate * 100).toFixed(0)}%)</span>
-                <span className="font-bold text-foreground">$ {tax.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span className="font-bold text-foreground">{tax.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
               </div>
               <div className="flex justify-between">
                 <span>Stripe Ground Shipping</span>
-                <span className="font-bold text-foreground">$ {shipping.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span className="font-bold text-foreground">{shipping.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
               </div>
               <div className="my-3 border-t border-dashed" />
               <div className="flex justify-between font-extrabold text-foreground text-sm pt-1">
                 <span>Order Total Due</span>
-                <span className="text-foreground">$ {grandTotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span className="text-foreground">{grandTotal.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
               </div>
             </div>
 
@@ -335,7 +359,7 @@ export default function CheckoutPage() {
                   type="button" 
                   variant="secondary" 
                   className="h-9 text-xs font-bold"
-                  onClick={() => toast.success("Coupon will be applied at Stripe checkout if valid.")}
+                  onClick={handleApplyCoupon}
                 >
                   Apply
                 </Button>

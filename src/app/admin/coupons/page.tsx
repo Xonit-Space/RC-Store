@@ -89,7 +89,7 @@ export default function AdminCouponsPage() {
                 <div>
                   <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Discount Value</span>
                   <span className="font-sans text-xl text-foreground">
-                    {c.discountType === "PERCENTAGE" ? `${c.discountValue}%` : `$ ${c.discountValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                    {c.discountType === "PERCENTAGE" ? `{c.discountValue}%` : `${c.discountValue.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}`}
                   </span>
                 </div>
                 <div>
@@ -99,7 +99,7 @@ export default function AdminCouponsPage() {
               </div>
               <div className="pt-2">
                 <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Min. Order $</span>
-                <span className="text-xs font-bold text-foreground">{c.minOrderAmount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span className="text-xs font-bold text-foreground">{c.minOrderAmount.toLocaleString("en-AU", { style: 'currency', currency: 'AUD' })}</span>
               </div>
             </div>
           </div>

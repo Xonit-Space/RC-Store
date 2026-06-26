@@ -246,7 +246,7 @@ function OrdersPageInner() {
 
                 <div className="flex items-center gap-4 w-full md:w-auto">
                   <span className="text-base font-bold text-foreground">
-                    $ {Number(o.total).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {Number(o.total).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}
                   </span>
 
                   <StatusBadge status={o.status} />
@@ -325,7 +325,7 @@ function OrdersPageInner() {
                         </div>
                         <p className="text-sm text-muted-foreground whitespace-nowrap shrink-0">
                           <span className="font-bold text-foreground">{item.quantity}</span>
-                          {" "}× $ {Number(item.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          {" "}× {Number(item.price).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}
                         </p>
                       </div>
                     ))}
@@ -373,25 +373,25 @@ function OrdersPageInner() {
                   <div className="bg-muted/5 border border-border/40 p-4 space-y-2 text-sm">
                     <div className="flex justify-between text-muted-foreground">
                       <span>Subtotal</span>
-                      <span>$ {Number(selectedOrder.subtotal).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                      <span>{Number(selectedOrder.subtotal).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
                     </div>
                     <div className="flex justify-between text-muted-foreground">
                       <span>Shipping</span>
-                      <span>$ {Number(selectedOrder.shippingCost).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                      <span>{Number(selectedOrder.shippingCost).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
                     </div>
                     <div className="flex justify-between text-muted-foreground">
                       <span>Tax</span>
-                      <span>$ {Number(selectedOrder.tax).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                      <span>{Number(selectedOrder.tax).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
                     </div>
                     {Number(selectedOrder.discount) > 0 && (
                       <div className="flex justify-between text-emerald-500">
                         <span>Discount</span>
-                        <span>- $ {Number(selectedOrder.discount).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        <span>- {Number(selectedOrder.discount).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
                       </div>
                     )}
                     <div className="flex justify-between text-foreground font-bold text-base pt-2 border-t border-border/40 mt-2">
                       <span>Total Paid</span>
-                      <span>$ {Number(selectedOrder.total).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                      <span>{Number(selectedOrder.total).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
                     </div>
                   </div>
                 </div>

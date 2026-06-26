@@ -231,7 +231,7 @@ export default function AdminInventoryPage() {
             <Database className="w-4 h-4 text-muted-foreground" />
             <p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold">Total Units</p>
           </div>
-          <p className="text-2xl font-light text-foreground">{totalUnits.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+          <p className="text-2xl font-light text-foreground">{totalUnits.toLocaleString("en-AU", { style: 'currency', currency: 'AUD' })}</p>
         </div>
         <div className="border border-amber-500/30 p-5 bg-amber-500/5">
           <div className="flex items-center gap-2 mb-2">

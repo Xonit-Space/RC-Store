@@ -98,7 +98,7 @@ export default function AdminProductDetailsPage({ params }: { params: { productI
             {product.name}
           </h2>
           <p className="text-[10px] tracking-widest uppercase text-muted-foreground mt-2">
-            Base Price: $ {Number(product.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} | {product.category?.name}
+            Base Price: {Number(product.price).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})} | {product.category?.name}
           </p>
         </div>
       </div>
@@ -135,7 +135,7 @@ export default function AdminProductDetailsPage({ params }: { params: { productI
                     <div className="flex items-center gap-6">
                       <div className="text-right">
                         <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Price</p>
-                        <p className="text-sm font-bold">$ {v.price ? Number(v.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : Number(product.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                        <p className="text-sm font-bold">{v.price ? Number(v.price).toLocaleString("en-AU", { style: 'currency', currency: 'AUD' }) : Number(product.price).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Stock</p>

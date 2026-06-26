@@ -19,7 +19,7 @@ export function CartIconButton({ product, className, children }: { product?: any
 
     if (!session) {
       toast.error("Please sign in to add items to your cart", { 
-        style: { background: "#0e0918", color: "#facc15", border: "1px solid #ef4444" } 
+        className: "bg-background text-primary border-destructive" 
       })
       router.push("/login")
       return
@@ -27,7 +27,7 @@ export function CartIconButton({ product, className, children }: { product?: any
 
     if (!product) {
       toast.error("This is a demo product. No supply lines established.", { 
-        style: { background: "#0e0918", color: "#facc15", border: "1px solid #ef4444" } 
+        className: "bg-background text-primary border-destructive" 
       })
       return
     }
@@ -51,7 +51,7 @@ export function CartIconButton({ product, className, children }: { product?: any
         session?.user?.id
       )
       toast.success(`${product.name} loaded into transport.`, {
-        style: { background: "#0e0918", color: "#10b981", border: "1px solid #10b981" }
+        className: "bg-background text-emerald-500 border-emerald-500"
       })
     } catch (err) {
       toast.error("SYSTEM MALFUNCTION: Failed to add item.")

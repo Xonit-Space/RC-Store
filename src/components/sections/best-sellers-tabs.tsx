@@ -95,7 +95,7 @@ export function BestSellersTabs() {
                       {product.name}
                     </Link>
                     <div className="mt-auto flex items-center justify-between">
-                      <span className="font-mono font-bold text-lg text-foreground">${Number(product.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                      <span className="font-mono font-bold text-lg text-foreground">{Number(product.price).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
                       <CartIconButton 
                         product={product} 
                         className="relative z-20 w-10 h-10 bg-muted/50 border border-border flex items-center justify-center text-foreground hover:bg-racing-yellow hover:text-carbon-dark hover:border-primary transition-all"

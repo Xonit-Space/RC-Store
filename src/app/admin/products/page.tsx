@@ -501,7 +501,7 @@ export default function AdminProductsPage() {
                         {p.name}
                       </h3>
                       <span className="text-sm font-bold text-foreground whitespace-nowrap shrink-0">
-                        $ {Number(p.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {Number(p.price).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}
                       </span>
                     </div>
                     <p className="text-[9px] uppercase tracking-widest text-muted-foreground">
@@ -788,7 +788,7 @@ export default function AdminProductsPage() {
                             className="w-4 h-4 rounded-sm border-border bg-transparent text-foreground focus:ring-0 focus:ring-offset-0"
                           />
                           <span className="text-xs text-foreground font-medium">
-                            {addon.name} <span className="text-muted-foreground">($ {Number(addon.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</span>
+                            {addon.name} <span className="text-muted-foreground">({Number(addon.price).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})})</span>
                           </span>
                         </label>
                       ))

@@ -23,7 +23,7 @@ export function mapEventToNotification(envelope: DomainEventEnvelope): Normalize
         userId: payload.userId || "admin",
         type: "ORDER",
         title: "Order Created Successfully",
-        message: `Thank you! Your order #${payload.orderId} of total $${payload.total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} has been registered.`,
+        message: `Thank you! Your order #{payload.orderId} of total ${payload.total.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})} has been registered.`,
         metadata: { orderId: payload.orderId, total: payload.total },
       }
 
@@ -32,7 +32,7 @@ export function mapEventToNotification(envelope: DomainEventEnvelope): Normalize
         userId: payload.userId || "admin", // Fallback to admin if no user ID mapped
         type: "PAYMENT",
         title: "Payment Processed",
-        message: `Payment of $${payload.amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} for order #${payload.orderId} was processed successfully.`,
+        message: `Payment of ${payload.amount.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})} for order #${payload.orderId} was processed successfully.`,
         metadata: { orderId: payload.orderId, paymentId: payload.paymentId, amount: payload.amount },
       }
 
@@ -77,7 +77,7 @@ export function mapEventToNotification(envelope: DomainEventEnvelope): Normalize
         userId: "admin",
         type: "PAYMENT",
         title: "Refund Processed",
-        message: `A refund of $${payload.amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} has been processed for order #${payload.orderId}.`,
+        message: `A refund of ${payload.amount.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})} has been processed for order #${payload.orderId}.`,
         metadata: { refundId: payload.refundId, orderId: payload.orderId, amount: payload.amount },
       }
 

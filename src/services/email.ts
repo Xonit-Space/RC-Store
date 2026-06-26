@@ -86,7 +86,7 @@ export async function sendOrderConfirmation(to: string, orderNumber: string, tot
       <p>We have successfully received your payment for order <strong>#${orderNumber}</strong> and our team is prepping it for shipment.</p>
       <div style="background-color: #F6F3EE; padding: 15px; border-radius: 6px; margin: 20px 0;">
         <p style="margin: 0; font-size: 14px; color: #4b5563;">Order Total:</p>
-        <h3 style="margin: 5px 0 0 0; color: #1C1C1A;">$${total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3>
+        <h3 style="margin: 5px 0 0 0; color: #1C1C1A;">${total.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</h3>
       </div>
       <p>We will email you a tracking code as soon as your premium streetwear is in transit.</p>
       <p>Best regards,<br>The RC Store Team</p>

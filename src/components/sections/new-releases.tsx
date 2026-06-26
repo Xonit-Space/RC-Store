@@ -75,7 +75,7 @@ export function NewReleases() {
                   </p>
                   
                   <div className="mt-auto flex items-center justify-between">
-                    <span className="font-mono font-bold text-xl text-foreground">${Number(product.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    <span className="font-mono font-bold text-xl text-foreground">{Number(product.price).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
                     <CartIconButton 
                       product={product} 
                       className="bg-muted/50 hover:bg-neon-blue text-foreground hover:text-carbon-dark border border-border hover:border-neon-blue p-3 transition-colors"

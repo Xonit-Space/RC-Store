@@ -32,7 +32,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
               )}
               <span className="flex items-center gap-1">
                 <Calendar className="w-3 h-3" />
-                {new Date(post.publishedAt || post.createdAt).toLocaleDateString()}
+                {new Date(post.publishedAt || post.createdAt).toLocaleDateString("en-US")}
               </span>
               <span className="flex items-center gap-1">
                 <User className="w-3 h-3" />

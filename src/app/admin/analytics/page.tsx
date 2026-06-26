@@ -50,7 +50,7 @@ export default async function AdminAnalyticsPage() {
               Average Basket Value
             </p>
             <p className="font-sans text-3xl font-light text-foreground tracking-tight">
-              $ {avgBasket.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              {avgBasket.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}
             </p>
           </div>
         </div>
@@ -66,7 +66,7 @@ export default async function AdminAnalyticsPage() {
               Annualized Run Rate
             </p>
             <p className="font-sans text-3xl font-light text-foreground tracking-tight">
-              $ {annualized.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              {annualized.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}
             </p>
           </div>
         </div>
@@ -82,7 +82,7 @@ export default async function AdminAnalyticsPage() {
               Registered Clients
             </p>
             <p className="font-sans text-3xl font-light text-foreground tracking-tight">
-              {totalUsers.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Accounts
+              {totalUsers.toLocaleString("en-AU", { style: 'currency', currency: 'AUD' })} Accounts
             </p>
           </div>
         </div>
@@ -109,7 +109,7 @@ export default async function AdminAnalyticsPage() {
                   return (
                     <div key={order.id} className="flex-1 h-full flex flex-col justify-end items-center group relative">
                       <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 bg-foreground text-background text-[9px] px-2 py-1 rounded whitespace-nowrap z-10">
-                        ${Number(order.total?.toString() || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {Number(order.total?.toString() || 0).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}
                       </div>
                       <div 
                         className="w-full bg-forest/20 group-hover:bg-forest/50 transition-colors rounded-t-sm"

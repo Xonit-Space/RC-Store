@@ -160,7 +160,7 @@ export default function CustomerDashboardPage() {
           <div className="p-8 glass-dark border border-racing-yellow/20 hover:border-racing-yellow/50 transition-colors group relative overflow-hidden">
             <div className="absolute -right-4 -top-4 w-16 h-16 bg-racing-yellow/10 rounded-full blur-xl group-hover:bg-racing-yellow/20 transition-colors" />
             <p className="text-[9px] font-mono tracking-[0.25em] uppercase text-muted-foreground mb-6 group-hover:text-racing-yellow transition-colors">Store Credit</p>
-            <p className="font-heading text-4xl font-black text-foreground">$ {Number(profile?.storeCredits?.[0]?.balance || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+            <p className="font-heading text-4xl font-black text-foreground">{Number(profile?.storeCredits?.[0]?.balance || 0).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</p>
             <p className="text-[11px] font-mono tracking-wider uppercase text-muted-foreground mt-1">Available Balance</p>
           </div>
         </div>
@@ -202,7 +202,7 @@ export default function CustomerDashboardPage() {
                           {order.status}
                         </span>
                         <p className="text-sm font-heading font-black text-foreground tracking-widest">
-                          $ {order.total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          {order.total.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}
                         </p>
                       </div>
                     </div>
@@ -227,7 +227,7 @@ export default function CustomerDashboardPage() {
                             </p>
                           </div>
                           <p className="text-sm font-mono text-muted-foreground">
-                            $ {(item.price * item.quantity).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            {(item.price * item.quantity).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}
                           </p>
                         </div>
                       ))}

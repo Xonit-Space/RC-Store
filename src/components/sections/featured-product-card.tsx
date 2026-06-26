@@ -22,7 +22,9 @@ export async function FeaturedProductCard() {
   
   const price = Number(product.price)
   const originalPrice = product.originalPrice ? Number(product.originalPrice) : null
-  const imageUrl = product.images?.[0]?.url || "https://images.unsplash.com/photo-1588612143093-4e44208d1326?q=80&w=2070"
+  const imageUrl = typeof product.images?.[0] === 'string' 
+    ? product.images[0] 
+    : product.images?.[0]?.url || "https://images.unsplash.com/photo-1588612143093-4e44208d1326?q=80&w=2070"
   
   // Format features based on actual product features or fallback
   const featureList = product.features.length >= 3 ? product.features.slice(0, 3) : [
@@ -76,9 +78,9 @@ export async function FeaturedProductCard() {
               </h2>
               
               <div className="flex items-baseline gap-4 mb-6">
-                <span className="text-3xl font-mono font-bold text-foreground">$ {price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span className="text-3xl font-mono font-bold text-foreground">{price.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
                 {originalPrice && (
-                  <span className="text-sm font-mono text-foreground/50 dark:text-muted-foreground line-through">$ {originalPrice.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  <span className="text-sm font-mono text-foreground/50 dark:text-muted-foreground line-through">{originalPrice.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
                 )}
               </div>
               

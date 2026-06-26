@@ -58,7 +58,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const handleAddToCart = async () => {
     if (!session) {
       toast.error("CONNECTION DENIED: You must be authenticated to request supplies.", {
-        style: { background: "#0e0918", color: "#facc15", border: "1px solid #ef4444" }
+        className: "bg-background text-primary border-destructive"
       })
       router.push("/login")
       return
@@ -185,9 +185,9 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               </div>
 
               <div className="flex items-center gap-4 text-sm pt-2">
-                <span className="text-foreground">$ {displayPrice.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span className="text-foreground">{displayPrice.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
                 {product.originalPrice && (
-                  <span className="text-muted-foreground line-through">$ {product.originalPrice.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  <span className="text-muted-foreground line-through">{product.originalPrice.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
                 )}
               </div>
             </div>
@@ -281,7 +281,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                           <div className="flex-1">
                             <div className="flex justify-between">
                               <span className="text-sm font-medium text-foreground">{addon.name}</span>
-                              <span className="text-sm text-foreground">+ $ {Number(addon.price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                              <span className="text-sm text-foreground">+ {Number(addon.price).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
                             </div>
                             {addon.description && (
                               <p className="text-xs text-muted-foreground mt-1">{addon.description}</p>
@@ -358,7 +358,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               <div className="pt-6 space-y-4 border-t border-border/40">
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
                   <CreditCard className="w-4 h-4 text-foreground" />
-                  <span>Pay in 4 interest-free payments of <strong>$ {(displayPrice / 4).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></span>
+                  <span>Pay in 4 interest-free payments of <strong>{(displayPrice / 4).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</strong></span>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">

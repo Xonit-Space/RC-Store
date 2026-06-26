@@ -208,7 +208,7 @@ export function ProductContentSections({ product }: ProductContentSectionsProps)
                   <Image src={item.related?.images?.[0]?.url || item.related?.images?.[0] || "/placeholder.svg"} alt={item.related?.name} fill className="object-cover mix-blend-luminosity group-hover:mix-blend-normal" />
                 </div>
                 <h4 className="text-sm font-bold truncate">{item.related?.name}</h4>
-                <p className="text-xs text-muted-foreground mt-1">$ {Number(item.related?.price).toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground mt-1">{Number(item.related?.price).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</p>
               </a>
             ))}
           </div>
@@ -281,7 +281,7 @@ export function ProductContentSections({ product }: ProductContentSectionsProps)
                   <Image src={item.related?.images?.[0]?.url || item.related?.images?.[0] || "/placeholder.svg"} alt={item.related?.name} fill className="object-cover mix-blend-luminosity group-hover:mix-blend-normal" />
                 </div>
                 <h4 className="text-sm font-bold truncate">{item.related?.name}</h4>
-                <p className="text-xs text-muted-foreground mt-1">$ {Number(item.related?.price).toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground mt-1">{Number(item.related?.price).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</p>
               </a>
             ))}
           </div>

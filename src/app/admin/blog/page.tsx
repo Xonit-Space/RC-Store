@@ -90,7 +90,7 @@ export default function AdminBlogPage() {
                     </span>
                   </td>
                   <td className="p-4 text-muted-foreground">
-                    {new Date(post.createdAt).toLocaleDateString()}
+                    {new Date(post.createdAt).toLocaleDateString("en-US")}
                   </td>
                   <td className="p-4 text-right space-x-2">
                     {post.published && (

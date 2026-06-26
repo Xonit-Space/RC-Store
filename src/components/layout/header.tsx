@@ -79,10 +79,10 @@ export function Header() {
   return (
     <header 
       suppressHydrationWarning 
-      className={`fixed top-0 z-50 w-full transition-all duration-300 ${
+      className={`fixed top-0 z-50 w-full transition-all duration-300 bg-background/70 backdrop-blur-md ${
         scrolled 
-          ? "bg-background/85 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.1)]" 
-          : "bg-background"
+          ? "shadow-[0_4px_30px_rgba(0,0,0,0.1)] border-b border-border/50" 
+          : "border-b border-transparent"
       }`}
     >
       {/* Promotion Bar */}
@@ -143,7 +143,7 @@ export function Header() {
           {mounted && (
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="p-2 text-muted-foreground hover:bg-muted hover:text-foreground rounded-full transition-colors hidden sm:flex items-center justify-center"
+              className="p-2 text-muted-foreground hover:bg-muted hover:text-foreground rounded-full transition-colors flex items-center justify-center"
               aria-label="Toggle Theme"
             >
               {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}

@@ -152,7 +152,7 @@ export function Header() {
 
           {/* User Menu */}
           <div className="relative hidden sm:block">
-            {session ? (
+            {session?.user ? (
               <button 
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                 className="flex items-center gap-2 p-2 hover:bg-muted rounded-full transition-colors focus:outline-none"
@@ -172,7 +172,7 @@ export function Header() {
             )}
 
             {/* User Dropdown */}
-            {isUserMenuOpen && session && (
+            {isUserMenuOpen && session?.user && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setIsUserMenuOpen(false)}></div>
                 <div className="absolute right-0 mt-2 w-56 bg-card border border-border rounded-md shadow-lg z-50 py-1 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
@@ -278,7 +278,7 @@ export function Header() {
 
           <div className="my-2 border-t border-border"></div>
 
-          {session ? (
+          {session?.user ? (
             <div className="space-y-1">
               <div className="px-4 py-2 mb-2">
                 <p className="text-sm font-medium text-foreground">{session.user.name || "User Account"}</p>

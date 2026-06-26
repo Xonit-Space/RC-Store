@@ -42,7 +42,7 @@ export default function LoginPage() {
         const role = (session?.user as any)?.role
         
         let targetUrl = callbackUrl
-        if (targetUrl === "/") {
+        if (targetUrl === "/" || targetUrl.includes("/login")) {
           if (role === "ADMIN" || role === "SUPER_ADMIN") {
             targetUrl = "/admin"
           } else {
@@ -50,8 +50,7 @@ export default function LoginPage() {
           }
         }
 
-        router.push(targetUrl)
-        router.refresh()
+        window.location.href = targetUrl
       }
     } catch (err: any) {
       setError("SYSTEM MALFUNCTION. RETRY CONNECTION.")

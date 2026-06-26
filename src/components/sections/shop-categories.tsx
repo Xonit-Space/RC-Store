@@ -57,7 +57,7 @@ export async function ShopCategories() {
               key={idx}
               className={`relative group overflow-hidden ${cat.colSpan} bg-muted block min-h-[200px] border border-border hover:border-racing-yellow/50 transition-colors`}
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-10" />
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent z-10 opacity-90" />
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img 
                 src={cat.image} 
@@ -65,10 +65,10 @@ export async function ShopCategories() {
                 className="absolute inset-0 w-full h-full object-cover scale-100 group-hover:scale-110 transition-transform duration-700 opacity-60 group-hover:opacity-100 mix-blend-luminosity group-hover:mix-blend-normal"
               />
               <div className="absolute bottom-0 left-0 p-6 z-20 w-full flex justify-between items-end">
-                <h3 className="font-heading font-bold text-2xl text-white uppercase tracking-widest group-hover:text-racing-yellow transition-colors">
+                <h3 className="font-heading font-bold text-2xl text-foreground uppercase tracking-widest group-hover:text-primary transition-colors">
                   {cat.name}
                 </h3>
-                <div className="w-10 h-10 rounded-full border border-border flex items-center justify-center bg-carbon-dark/50 group-hover:bg-racing-yellow group-hover:border-racing-yellow group-hover:text-carbon-dark transition-all">
+                <div className="w-10 h-10 rounded-full border border-border flex items-center justify-center bg-background/50 group-hover:bg-primary group-hover:border-primary group-hover:text-primary-foreground transition-all text-foreground">
                   <ArrowUpRight className="w-5 h-5" />
                 </div>
               </div>

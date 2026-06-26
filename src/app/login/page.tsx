@@ -37,20 +37,7 @@ export default function LoginPage() {
         toast.error("CONNECTION DENIED")
       } else {
         toast.success("CONNECTION SECURED")
-        
-        const session = await getSession()
-        const role = (session?.user as any)?.role
-        
-        let targetUrl = callbackUrl
-        if (targetUrl === "/" || targetUrl.includes("/login")) {
-          if (role === "ADMIN" || role === "SUPER_ADMIN") {
-            targetUrl = "/admin"
-          } else {
-            targetUrl = "/customer"
-          }
-        }
-
-        window.location.href = targetUrl
+        window.location.href = `/auth-redirect?callbackUrl=${encodeURIComponent(callbackUrl)}`
       }
     } catch (err: any) {
       setError("SYSTEM MALFUNCTION. RETRY CONNECTION.")

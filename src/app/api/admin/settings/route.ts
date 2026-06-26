@@ -1,55 +1,59 @@
-import { NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "@/lib/auth"
 
-export async function GET() {
-  const session = await getServerSession(authOptions)
-  
-  if (!session?.user || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
-
+export async function GET(req: NextRequest) {
   try {
+    const session = await getServerSession(authOptions)
+    if (!session || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
+    }
+
     const settings = await db.siteSetting.findMany()
-    const settingsMap = settings.reduce((acc, setting) => {
-      acc[setting.key] = setting.value
-      return acc
-    }, {} as Record<string, string>)
+    
+    // Convert array to key-value map
+    const settingsMap: Record<string, string> = {}
+    settings.forEach(setting => {
+      settingsMap[setting.key] = setting.value
+    })
 
     return NextResponse.json({ success: true, data: settingsMap })
-  } catch (error) {
-    console.error("Fetch settings error:", error)
-    return NextResponse.json({ success: false, error: "Failed to fetch settings" }, { status: 500 })
+  } catch (error: any) {
+    console.error("Settings GET error:", error)
+    return NextResponse.json(
+      { success: false, error: "Failed to fetch settings" },
+      { status: 500 }
+    )
   }
 }
 
-export async function PATCH(req: Request) {
-  const session = await getServerSession(authOptions)
-  
-  if (!session?.user || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
-
+export async function PATCH(req: NextRequest) {
   try {
+    const session = await getServerSession(authOptions)
+    if (!session || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
+      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
+    }
+
     const body = await req.json()
     
     // Process each key-value pair and upsert
-    const updates = Object.entries(body).map(async ([key, value]) => {
-      if (typeof value === 'string') {
-        return db.siteSetting.upsert({
-          where: { key },
-          update: { value },
-          create: { key, value }
-        })
-      }
+    const updatePromises = Object.entries(body).map(([key, value]) => {
+      return db.siteSetting.upsert({
+        where: { key },
+        update: { value: String(value) },
+        create: { key, value: String(value) }
+      })
     })
 
-    await Promise.all(updates)
+    await Promise.all(updatePromises)
 
-    return NextResponse.json({ success: true, message: "Settings updated" })
-  } catch (error) {
-    console.error("Update settings error:", error)
-    return NextResponse.json({ success: false, error: "Failed to update settings" }, { status: 500 })
+    return NextResponse.json({ success: true })
+  } catch (error: any) {
+    console.error("Settings PATCH error:", error)
+    return NextResponse.json(
+      { success: false, error: "Failed to save settings" },
+      { status: 500 }
+    )
   }
 }

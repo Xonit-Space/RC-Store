@@ -10,21 +10,58 @@ import { useRouter } from "next/navigation"
 import { useDebounce } from "@/hooks/use-debounce"
 
 function AnnouncementBar() {
-  const [timeLeft, setTimeLeft] = useState({ days: 2, hours: 14, mins: 45, secs: 30 })
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, mins: 0, secs: 0 })
+  const [promoTitle, setPromoTitle] = useState("EOFY Sale")
+  const [targetDate, setTargetDate] = useState<Date | null>(null)
+  const [isActive, setIsActive] = useState(true) // assume true to prevent flash of hidden content
 
   useEffect(() => {
+    async function loadPromo() {
+      try {
+        const res = await fetch("/api/promotion")
+        if (res.ok) {
+          const json = await res.json()
+          if (json.success && json.data) {
+            setPromoTitle(json.data.title)
+            setTargetDate(new Date(json.data.endDate))
+            setIsActive(true)
+          } else {
+            setIsActive(false)
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load promo")
+      }
+    }
+    loadPromo()
+  }, [])
+
+  useEffect(() => {
+    if (!targetDate) return
+
     const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        let { days, hours, mins, secs } = prev
-        secs--
-        if (secs < 0) { secs = 59; mins-- }
-        if (mins < 0) { mins = 59; hours-- }
-        if (hours < 0) { hours = 23; days-- }
-        return { days, hours, mins, secs }
+      const now = new Date().getTime()
+      const distance = targetDate.getTime() - now
+
+      if (distance < 0) {
+        clearInterval(timer)
+        setTimeLeft({ days: 0, hours: 0, mins: 0, secs: 0 })
+        setIsActive(false)
+        return
+      }
+
+      setTimeLeft({
+        days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+        mins: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+        secs: Math.floor((distance % (1000 * 60)) / 1000)
       })
     }, 1000)
+
     return () => clearInterval(timer)
-  }, [])
+  }, [targetDate])
+
+  if (!isActive) return null;
 
   return (
     <div suppressHydrationWarning className="w-full bg-racing-yellow text-carbon-dark py-2 px-6 flex flex-col md:flex-row items-center justify-between text-[10px] font-mono font-bold uppercase tracking-widest relative z-[60]">
@@ -33,7 +70,7 @@ function AnnouncementBar() {
         <span className="opacity-50">|</span>
         <Link href="/blog" className="hover:text-white transition-colors">Blog</Link>
         <span className="opacity-50">|</span>
-        <Link href="/garage" className="hover:text-white transition-colors">My Garage</Link>
+        <Link href="/customer" className="hover:text-white transition-colors">My Garage</Link>
         <span className="opacity-50">|</span>
         <Link href="/wishlist" className="hover:text-white transition-colors flex items-center gap-1">
           <Heart className="h-3 w-3" /> Wishlist
@@ -41,7 +78,7 @@ function AnnouncementBar() {
       </div>
       <div className="flex items-center gap-2">
         <Clock className="h-4 w-4 animate-pulse" />
-        <span>EOFY Sale Ends In:</span>
+        <span>{promoTitle} Ends In:</span>
         <span className="bg-carbon-dark text-racing-yellow px-2 py-0.5 rounded-sm">
           {timeLeft.days}d {timeLeft.hours}h {timeLeft.mins}m {timeLeft.secs}s
         </span>
@@ -98,7 +135,7 @@ export function Header() {
 
   return (
     <>
-      <header suppressHydrationWarning className={`fixed top-0 z-50 w-full transition-all duration-500 ${scrolled ? "glass-dark border-b border-racing-yellow/40 shadow-[0_0_20px_rgba(255, 204, 0,0.1)]" : "bg-gradient-to-b from-carbon-dark/90 to-transparent"}`}>
+      <header suppressHydrationWarning className={`fixed top-0 z-50 w-full transition-all duration-500 ${scrolled ? "glass-dark border-b border-racing-yellow/40 shadow-[0_0_20px_rgba(255, 204, 0,0.1)]" : "bg-gradient-to-b from-black to-carbon-dark/80"}`}>
       <AnnouncementBar />
       <div className={`transition-all duration-500 ${scrolled ? "py-2" : "py-4"}`}>
         <div className="container mx-auto px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-4">
@@ -115,7 +152,7 @@ export function Header() {
             {/* Mobile Actions */}
             <div className="flex md:hidden items-center gap-4">
               <button onClick={() => setIsSearchOpen(true)}>
-                <Search className="h-5 w-5 text-muted-foreground" />
+                <Search className="h-5 w-5 text-white/80 hover:text-white transition-colors" />
               </button>
               <Link href="/cart" className="relative">
                 <Terminal className="h-5 w-5 text-racing-yellow" />
@@ -130,14 +167,14 @@ export function Header() {
           <div className="hidden md:flex flex-1 max-w-2xl px-8 relative">
             <div className="relative w-full group">
               <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                 <Search className="h-4 w-4 text-muted-foreground group-focus-within:text-racing-yellow transition-colors" />
+                 <Search className="h-4 w-4 text-white/70 group-focus-within:text-racing-yellow transition-colors" />
               </div>
               <input 
                 type="text" 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="SEARCH RC CARS, DRONES, PARTS..." 
-                className="w-full h-10 bg-white/5 border border-white/10 hover:border-racing-yellow/50 focus:border-racing-yellow text-sm font-mono text-foreground pl-12 pr-28 outline-none placeholder:text-muted-foreground/50 uppercase tracking-wider transition-all"
+                className="w-full h-10 bg-white/5 border border-white/10 hover:border-racing-yellow/50 focus:border-racing-yellow text-sm font-mono text-white pl-12 pr-28 outline-none placeholder:text-white/50 uppercase tracking-wider transition-all"
               />
               <button onClick={handleSearch} className="absolute right-0 top-0 h-full px-4 bg-racing-yellow text-carbon-dark text-[10px] font-mono font-bold tracking-[0.1em] uppercase hover:bg-neon-yellow transition-colors">
                 Search
@@ -151,13 +188,13 @@ export function Header() {
               <Terminal className="h-3 w-3" /> Part Finder
             </Link>
 
-            <Link href="/help" className="text-muted-foreground hover:text-racing-yellow transition-colors">
+            <Link href="/help" className="text-white/80 hover:text-racing-yellow transition-colors">
               <HelpCircle className="h-5 w-5" />
             </Link>
 
             {session ? (
               <div className="flex items-center gap-4">
-                <Link href={accountUrl} className="text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-muted-foreground hover:text-white transition-colors">
+                <Link href={accountUrl} className="text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-white hover:text-racing-yellow transition-colors">
                   Account
                 </Link>
                 <button onClick={() => signOut({ callbackUrl: '/' })} className="text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-red-500 hover:text-red-400 transition-colors">
@@ -165,12 +202,12 @@ export function Header() {
                 </button>
               </div>
             ) : (
-              <Link href="/login" className="text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-muted-foreground hover:text-white transition-colors">
+              <Link href="/login" className="text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-white hover:text-racing-yellow transition-colors">
                 Login
               </Link>
             )}
 
-            <Link href="/cart" className="flex items-center gap-2 text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-muted-foreground hover:text-racing-yellow transition-colors">
+            <Link href="/cart" className="flex items-center gap-2 text-[11px] font-mono font-bold tracking-[0.2em] uppercase text-white hover:text-racing-yellow transition-colors">
               Cart {mounted && cartCount > 0 ? <span className="bg-racing-yellow text-carbon-dark px-1.5 py-0.5 rounded-sm">{cartCount}</span> : null}
             </Link>
           </div>
@@ -191,7 +228,7 @@ export function Header() {
           <Link href="/products" onClick={() => setIsMenuOpen(false)} className="font-heading font-black uppercase text-3xl tracking-widest text-foreground hover:text-racing-yellow transition-colors">
             Shop All
           </Link>
-          <Link href="/garage" onClick={() => setIsMenuOpen(false)} className="font-heading font-black uppercase text-3xl tracking-widest text-foreground hover:text-racing-yellow transition-colors">
+          <Link href="/customer" onClick={() => setIsMenuOpen(false)} className="font-heading font-black uppercase text-3xl tracking-widest text-foreground hover:text-racing-yellow transition-colors">
             My Garage
           </Link>
           <Link href={accountUrl} onClick={() => setIsMenuOpen(false)} className="font-heading font-black uppercase text-3xl tracking-widest text-foreground hover:text-racing-yellow transition-colors">

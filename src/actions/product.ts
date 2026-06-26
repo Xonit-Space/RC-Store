@@ -136,3 +136,150 @@ export async function adminDeleteProduct(adminId: string, productId: string): Pr
     return { success: false, error: "Failed to delete product" }
   }
 }
+
+export async function adminAddProductVideo(productId: string, data: any): Promise<ActionResponse> {
+  const session = await getServerSession(authOptions)
+  if (!session?.user || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {
+    return { success: false, error: "Unauthorized access" }
+  }
+  try {
+    const video = await db.productVideo.create({
+      data: {
+        productId,
+        title: data.title,
+        url: data.url,
+        type: data.type || "DEMO",
+      }
+    })
+    return { success: true, data: video }
+  } catch (error) {
+    console.error("Add Video Error:", error)
+    return { success: false, error: "Failed to add video" }
+  }
+}
+
+export async function adminDeleteProductVideo(videoId: string): Promise<ActionResponse> {
+  const session = await getServerSession(authOptions)
+  if (!session?.user || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {
+    return { success: false, error: "Unauthorized access" }
+  }
+  try {
+    await db.productVideo.delete({ where: { id: videoId } })
+    return { success: true }
+  } catch (error) {
+    console.error("Delete Video Error:", error)
+    return { success: false, error: "Failed to delete video" }
+  }
+}
+
+export async function adminAddProductDocument(productId: string, data: any): Promise<ActionResponse> {
+  const session = await getServerSession(authOptions)
+  if (!session?.user || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {
+    return { success: false, error: "Unauthorized access" }
+  }
+  try {
+    const doc = await db.productDocument.create({
+      data: {
+        productId,
+        name: data.name,
+        url: data.url,
+        type: data.type || "MANUAL",
+      }
+    })
+    return { success: true, data: doc }
+  } catch (error) {
+    console.error("Add Document Error:", error)
+    return { success: false, error: "Failed to add document" }
+  }
+}
+
+export async function adminDeleteProductDocument(documentId: string): Promise<ActionResponse> {
+  const session = await getServerSession(authOptions)
+  if (!session?.user || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {
+    return { success: false, error: "Unauthorized access" }
+  }
+  try {
+    await db.productDocument.delete({ where: { id: documentId } })
+    return { success: true }
+  } catch (error) {
+    console.error("Delete Document Error:", error)
+    return { success: false, error: "Failed to delete document" }
+  }
+}
+
+export async function adminAddProductFeatureBlock(productId: string, data: any): Promise<ActionResponse> {
+  const session = await getServerSession(authOptions)
+  if (!session?.user || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {
+    return { success: false, error: "Unauthorized access" }
+  }
+  try {
+    const block = await db.productFeatureBlock.create({
+      data: {
+        productId,
+        title: data.title,
+        description: data.description,
+        image: data.image || null,
+      }
+    })
+    return { success: true, data: block }
+  } catch (error) {
+    console.error("Add Feature Block Error:", error)
+    return { success: false, error: "Failed to add feature block" }
+  }
+}
+
+export async function adminDeleteProductFeatureBlock(blockId: string): Promise<ActionResponse> {
+  const session = await getServerSession(authOptions)
+  if (!session?.user || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {
+    return { success: false, error: "Unauthorized access" }
+  }
+  try {
+    await db.productFeatureBlock.delete({ where: { id: blockId } })
+    return { success: true }
+  } catch (error) {
+    console.error("Delete Feature Block Error:", error)
+    return { success: false, error: "Failed to delete feature block" }
+  }
+}
+
+export async function adminAddRelatedProduct(productId: string, data: any): Promise<ActionResponse> {
+  const session = await getServerSession(authOptions)
+  if (!session?.user || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {
+    return { success: false, error: "Unauthorized access" }
+  }
+  try {
+    const related = await db.relatedProduct.create({
+      data: {
+        productId,
+        relatedId: data.relatedId,
+        relationType: data.relationType || "COMPATIBLE",
+      }
+    })
+    return { success: true, data: related }
+  } catch (error) {
+    console.error("Add Related Product Error:", error)
+    return { success: false, error: "Failed to add related product (maybe duplicate?)" }
+  }
+}
+
+export async function adminDeleteRelatedProduct(relatedId: string, productId: string): Promise<ActionResponse> {
+  const session = await getServerSession(authOptions)
+  if (!session?.user || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {
+    return { success: false, error: "Unauthorized access" }
+  }
+  try {
+    // Delete by unique constraint
+    await db.relatedProduct.delete({
+      where: {
+        productId_relatedId: {
+          productId,
+          relatedId
+        }
+      }
+    })
+    return { success: true }
+  } catch (error) {
+    console.error("Delete Related Product Error:", error)
+    return { success: false, error: "Failed to delete related product" }
+  }
+}

@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation"
 export default function CustomerGalleryUploadPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const [imageUrl, setImageUrl] = useState("")
+  const [imageFile, setImageFile] = useState<File | null>(null)
   const [caption, setCaption] = useState("")
   const [authorName, setAuthorName] = useState("")
 
@@ -20,20 +20,37 @@ export default function CustomerGalleryUploadPage() {
     e.preventDefault()
     setLoading(true)
 
-    const res = await uploadGalleryImage({
-      imageUrl,
-      caption,
-      authorName: authorName || undefined,
-    })
+    if (!imageFile) {
+      toast.error("Please select an image file")
+      setLoading(false)
+      return
+    }
 
-    if (res.success) {
-      toast.success("Image submitted for approval!")
-      setImageUrl("")
-      setCaption("")
-      setAuthorName("")
-      router.push("/customer")
-    } else {
-      toast.error(res.error || "Failed to submit image")
+    try {
+      const formData = new FormData()
+      formData.append("file", imageFile)
+      formData.append("folder", "rc-store/gallery")
+      
+      const uploadRes = await fetch("/api/upload", { method: "POST", body: formData })
+      const uploadData = await uploadRes.json()
+      
+      if (!uploadData.success) throw new Error(uploadData.error)
+
+      const res = await uploadGalleryImage({
+        imageUrl: uploadData.url,
+        caption,
+        authorName: authorName || undefined,
+      })
+
+      if (res.success) {
+        toast.success("Image submitted for approval!")
+        setImageFile(null)
+        setCaption("")
+        setAuthorName("")
+        router.push("/customer")
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to submit image")
     }
     setLoading(false)
   }
@@ -60,18 +77,17 @@ export default function CustomerGalleryUploadPage() {
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="space-y-3">
               <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground block">
-                Image URL
+                Image File
               </label>
               <Input 
                 required
-                type="url"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://example.com/image.jpg"
-                className="h-12 bg-muted/50 border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-primary transition-colors font-mono text-sm"
+                type="file"
+                accept="image/*"
+                onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+                className="h-12 bg-muted/50 border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-primary transition-colors font-mono text-sm p-2"
               />
               <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
-                Please provide a direct URL to your image (Imgur, Cloudinary, etc.)
+                Max file size: 5MB. JPG, PNG, WEBP allowed.
               </p>
             </div>
 

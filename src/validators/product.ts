@@ -31,6 +31,10 @@ export const CmsProductSchema = z.object({
     name: z.string().min(1, "Attribute name required"),
     value: z.string().min(1, "Attribute value required"),
   })).default([]),
+  features: z.array(z.string()).default([]),
+  includedItems: z.array(z.string()).default([]),
+  requiredItems: z.array(z.string()).default([]),
+  notes: z.string().optional().nullable(),
 })
 
 export const CmsProductVariantSchema = z.object({

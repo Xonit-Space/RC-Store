@@ -21,7 +21,21 @@ export async function GET(req: Request, { params }: { params: { productId: strin
             inventory: true
           }
         },
-        images: true
+        images: true,
+        videos: {
+          orderBy: { sortOrder: 'asc' }
+        },
+        documents: true,
+        featureBlocks: {
+          orderBy: { sortOrder: 'asc' }
+        },
+        relatedSource: {
+          include: {
+            related: {
+              select: { id: true, name: true, slug: true, price: true, images: true }
+            }
+          }
+        }
       }
     })
 
@@ -48,7 +62,7 @@ export async function PATCH(req: Request, { params }: { params: { productId: str
 
   try {
     const body = await req.json()
-    const { name, slug, description, price, categoryId, brandId, gender, isActive } = body
+    const { name, slug, description, price, categoryId, brandId, gender, isActive, features, includedItems, requiredItems, notes } = body
 
     const product = await db.product.update({
       where: { id: params.productId },
@@ -61,6 +75,10 @@ export async function PATCH(req: Request, { params }: { params: { productId: str
         ...(brandId !== undefined && { brandId }),
         ...(gender && { gender }),
         ...(isActive !== undefined && { isActive }),
+        ...(features !== undefined && { features }),
+        ...(includedItems !== undefined && { includedItems }),
+        ...(requiredItems !== undefined && { requiredItems }),
+        ...(notes !== undefined && { notes }),
       }
     })
 

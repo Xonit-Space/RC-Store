@@ -234,6 +234,10 @@ export default function AdminProductsPage() {
   const [scale, setScale] = useState("N/A")
   const [isFeatured, setIsFeatured] = useState(false)
   const [isActive, setIsActive] = useState(true)
+  const [featuresText, setFeaturesText] = useState("")
+  const [includedItemsText, setIncludedItemsText] = useState("")
+  const [requiredItemsText, setRequiredItemsText] = useState("")
+  const [notes, setNotes] = useState("")
   const [imageSlots, setImageSlots] = useState<ImageSlot[]>([])
   const [selectedAddonIds, setSelectedAddonIds] = useState<string[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -311,6 +315,10 @@ export default function AdminProductsPage() {
     setScale("N/A")
     setIsFeatured(false)
     setIsActive(true)
+    setFeaturesText("")
+    setIncludedItemsText("")
+    setRequiredItemsText("")
+    setNotes("")
     setImageSlots([])
     setSelectedAddonIds([])
     setIsOpen(true)
@@ -329,6 +337,10 @@ export default function AdminProductsPage() {
     setScale("N/A")
     setIsFeatured(product.isFeatured || false)
     setIsActive(product.isActive !== false)
+    setFeaturesText(product.features ? product.features.join("\n") : "")
+    setIncludedItemsText(product.includedItems ? product.includedItems.join("\n") : "")
+    setRequiredItemsText(product.requiredItems ? product.requiredItems.join("\n") : "")
+    setNotes(product.notes || "")
     setImageSlots([])
     setSelectedAddonIds([])
     setIsOpen(true)
@@ -368,6 +380,10 @@ export default function AdminProductsPage() {
         ],
         isActive,
         isFeatured,
+        features: featuresText.split("\n").map(f => f.trim()).filter(Boolean),
+        includedItems: includedItemsText.split("\n").map(i => i.trim()).filter(Boolean),
+        requiredItems: requiredItemsText.split("\n").map(i => i.trim()).filter(Boolean),
+        notes: notes || null,
       }
 
       let res
@@ -738,6 +754,56 @@ export default function AdminProductsPage() {
                         <option key={cat.id} value={cat.id}>{cat.name}</option>
                       ))}
                     </select>
+                  </div>
+                </div>
+
+                {/* Extended Details */}
+                <div className="space-y-6 pt-4 border-t border-border/40">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">
+                      Features (One per line)
+                    </label>
+                    <textarea
+                      value={featuresText}
+                      onChange={(e) => setFeaturesText(e.target.value)}
+                      placeholder="e.g. Brushless motor\nWaterproof ESC\n4WD Drivetrain"
+                      className="w-full min-h-[80px] p-3 bg-transparent border border-border/60 rounded-none focus:outline-none focus:border-foreground text-sm resize-y"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">
+                        Included Items (One per line)
+                      </label>
+                      <textarea
+                        value={includedItemsText}
+                        onChange={(e) => setIncludedItemsText(e.target.value)}
+                        placeholder="e.g. 1x Vehicle\n1x Transmitter"
+                        className="w-full min-h-[80px] p-3 bg-transparent border border-border/60 rounded-none focus:outline-none focus:border-foreground text-sm resize-y"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">
+                        Required Items (One per line)
+                      </label>
+                      <textarea
+                        value={requiredItemsText}
+                        onChange={(e) => setRequiredItemsText(e.target.value)}
+                        placeholder="e.g. 4x AA Batteries\nLiPo Battery Charger"
+                        className="w-full min-h-[80px] p-3 bg-transparent border border-border/60 rounded-none focus:outline-none focus:border-foreground text-sm resize-y"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">
+                      Important Notes
+                    </label>
+                    <textarea
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder="e.g. Warning: Contains small parts..."
+                      className="w-full min-h-[80px] p-3 bg-transparent border border-border/60 rounded-none focus:outline-none focus:border-foreground text-sm resize-y"
+                    />
                   </div>
                 </div>
 

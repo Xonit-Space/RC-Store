@@ -23,6 +23,10 @@ export class ProductService {
               value: attr.value,
             })),
           },
+          features: data.features || [],
+          includedItems: data.includedItems || [],
+          requiredItems: data.requiredItems || [],
+          notes: data.notes || null,
         },
       })
 
@@ -55,6 +59,10 @@ export class ProductService {
           collectionId: data.collectionId,
           isActive: data.isActive,
           isFeatured: data.isFeatured,
+          features: data.features || [],
+          includedItems: data.includedItems || [],
+          requiredItems: data.requiredItems || [],
+          notes: data.notes || null,
         },
       })
 

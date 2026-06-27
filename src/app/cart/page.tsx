@@ -15,6 +15,8 @@ import { useLoading } from "@/components/providers/loading-provider"
 import { useEffect, useState } from "react"
 import { CartAddonModal } from "@/components/cart/cart-addon-modal"
 import { getAddons } from "@/actions/addons"
+import { calculateShippingCost } from "@/actions/shipping"
+import { getTaxRateByRegionCode } from "@/actions/tax"
 
 export default function CartPage() {
   const { data: session } = useSession()
@@ -28,6 +30,11 @@ export default function CartPage() {
   const [selectedCartItem, setSelectedCartItem] = useState<any | null>(null)
   const [standaloneAddon, setStandaloneAddon] = useState<any | null>(null)
 
+  const [shipping, setShipping] = useState(15)
+  const [taxRate, setTaxRate] = useState(0.08)
+
+  const subtotal = cartStore.getSubtotal()
+
   useEffect(() => {
     cartStore.initializeGuestSession()
     // Trigger Zustand persistence rehydration
@@ -35,7 +42,14 @@ export default function CartPage() {
     setIsHydrated(true)
     
     getAddons().then(data => setAllAddons(data || []))
+    getTaxRateByRegionCode("US").then(rate => setTaxRate(rate))
   }, [])
+
+  useEffect(() => {
+    if (isHydrated) {
+      calculateShippingCost(subtotal).then(cost => setShipping(cost))
+    }
+  }, [subtotal, isHydrated])
 
   const handleUpdateQty = async (itemId: string, newQty: number) => {
     try {
@@ -87,9 +101,7 @@ export default function CartPage() {
   }
 
   const items = cartStore.items
-  const subtotal = cartStore.getSubtotal()
-  const tax = subtotal * 0.08
-  const shipping = subtotal > 150 ? 0 : subtotal > 0 ? 15 : 0
+  const tax = subtotal * taxRate
   const grandTotal = subtotal + tax + shipping
 
   return (
@@ -216,7 +228,7 @@ export default function CartPage() {
                   <span className="font-bold text-foreground">{subtotal.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>GST Tax (8%)</span>
+                  <span>GST Tax ({(taxRate * 100).toFixed(0)}%)</span>
                   <span className="font-bold text-foreground">{tax.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
                 </div>
                 <div className="flex justify-between items-center">
@@ -232,10 +244,11 @@ export default function CartPage() {
                   </span>
                 </div>
 
-                {subtotal < 150 && (
+                {/* Optionally display dynamic hint based on rules if needed, but for now we hide the static one if subtotal > 150 */}
+                {shipping > 0 && (
                   <div className="p-3 bg-muted text-muted-foreground border border-border text-[10px] font-bold flex items-center gap-1.5">
                     <Info className="h-4 w-4 shrink-0" />
-                    <span>Spend {(150 - subtotal).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})} more to unlock FREE SHIPPING!</span>
+                    <span>Check if adding more items qualifies you for free shipping!</span>
                   </div>
                 )}
               </div>

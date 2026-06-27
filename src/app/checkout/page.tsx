@@ -5,6 +5,7 @@ export const dynamic = "force-dynamic"
 import { useState, useEffect } from "react"
 import { useCartStore } from "@/store/cart"
 import { processStripeCheckout, checkCoupon } from "@/actions/order"
+import { calculateShippingCost } from "@/actions/shipping"
 import { getTaxRateByRegionCode } from "@/actions/tax"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -37,6 +38,7 @@ export default function CheckoutPage() {
   const [couponCode, setCouponCode] = useState("")
   const [couponDiscount, setCouponDiscount] = useState(0)
   const [taxRate, setTaxRate] = useState(0.08)
+  const [shipping, setShipping] = useState(15)
 
   const [error, setError] = useState<string | null>(null)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
@@ -50,6 +52,12 @@ export default function CheckoutPage() {
   useEffect(() => {
     getTaxRateByRegionCode(country).then(rate => setTaxRate(rate))
   }, [country])
+
+  useEffect(() => {
+    if (isHydrated) {
+      calculateShippingCost(cartStore.getSubtotal()).then(cost => setShipping(cost))
+    }
+  }, [cartStore.getSubtotal(), isHydrated])
 
   const handleApplyCoupon = async () => {
     if (!couponCode) {
@@ -106,7 +114,7 @@ export default function CheckoutPage() {
         `${baseUrl}/customer`, // Success URL redirects to orders tab
         `${baseUrl}/checkout`, // Cancel URL
         couponCode || undefined, // Coupon code
-        15 // Shipping cost snapshot
+        shipping // Shipping cost
       )
 
       if (response.success && response.data?.checkoutUrl) {
@@ -156,7 +164,6 @@ export default function CheckoutPage() {
   const subtotal = cartStore.getSubtotal()
   const taxableAmount = Math.max(0, subtotal - couponDiscount)
   const tax = taxableAmount * taxRate
-  const shipping = 15
   const grandTotal = taxableAmount + tax + shipping
 
   return (

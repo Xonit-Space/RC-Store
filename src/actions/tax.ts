@@ -20,3 +20,28 @@ export async function getTaxRateByRegionCode(code: string): Promise<number> {
     return 0.08
   }
 }
+
+export async function getTaxRates() {
+  try {
+    const rates = await db.taxRate.findMany({
+      include: { region: true },
+    })
+    return { success: true, data: rates }
+  } catch (error: any) {
+    console.error("Failed to fetch tax rates", error)
+    return { success: false, error: "Failed to fetch tax rates" }
+  }
+}
+
+export async function updateTaxRate(id: string, rate: number, isActive: boolean) {
+  try {
+    const updated = await db.taxRate.update({
+      where: { id },
+      data: { rate, isActive },
+    })
+    return { success: true, data: updated }
+  } catch (error: any) {
+    console.error("Failed to update tax rate", error)
+    return { success: false, error: "Failed to update tax rate" }
+  }
+}

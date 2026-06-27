@@ -1110,6 +1110,19 @@ model ShippingZone {
   @@map("shipping_zones")
 }
 
+model ShippingRule {
+  id              String   @id @default(cuid())
+  name            String
+  minOrderAmount  Decimal?
+  maxOrderAmount  Decimal?
+  shippingCost    Decimal
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("shipping_rules")
+}
+
 // ==========================================
 // 8. TELEMETRY, LOGGING & FEATURE CONTROLS
 // ==========================================

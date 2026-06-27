@@ -7,7 +7,7 @@ import {
   LayoutDashboard, Package, Tags, Puzzle, ShoppingCart, 
   Users, Warehouse, Ticket, Wrench, Star, 
   Newspaper, Image as ImageIcon, BarChart2, Settings, LogOut,
-  ChevronRight
+  ChevronRight, Calculator, Truck
 } from "lucide-react"
 
 interface SidebarProps {
@@ -52,6 +52,8 @@ const navGroups = [
     label: "System",
     items: [
       { id: "settings", name: "Settings", icon: Settings, path: "/admin/settings" },
+      { id: "tax", name: "Tax Rates", icon: Calculator, path: "/admin/settings/tax" },
+      { id: "shipping", name: "Shipping Rules", icon: Truck, path: "/admin/settings/shipping" },
     ],
   },
 ]

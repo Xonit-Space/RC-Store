@@ -16,8 +16,19 @@ export async function generateMetadata({ params }: ProductDetailPageProps) {
   const product = await getProductBySlug(slug)
   if (!product) return { title: "Product Not Found" }
   return {
-    title: `${product.name} | Aussie Rigs Arena`,
+    title: product.name,
     description: product.description,
+    openGraph: {
+      title: `${product.name} | AUSSIE RIGS ARENA`,
+      description: product.description,
+      images: product.images?.length ? [product.images[0].url] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: product.name,
+      description: product.description,
+      images: product.images?.length ? [product.images[0].url] : [],
+    }
   }
 }
 
@@ -38,8 +49,34 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
     )
   }
 
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://aussierigs.com";
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": product.name,
+    "image": product.images?.length ? product.images.map((img: any) => img.url) : [],
+    "description": product.description,
+    "sku": product.id,
+    "brand": {
+      "@type": "Brand",
+      "name": product.brand || "AUSSIE RIGS ARENA"
+    },
+    "offers": {
+      "@type": "Offer",
+      "url": `${baseUrl}/products/${product.slug}`,
+      "priceCurrency": "AUD",
+      "price": product.price,
+      "itemCondition": "https://schema.org/NewCondition",
+      "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <main className="flex-1 mt-20 md:mt-24">
         <ProductBreadcrumb product={product} />
         <ProductDetailClient product={product} />

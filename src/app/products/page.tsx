@@ -9,6 +9,15 @@ import Link from "next/link"
 // ISR: revalidate catalog every 60 seconds
 export const revalidate = 60
 
+export const metadata = {
+  title: "Catalog | RC Cars & Parts",
+  description: "Browse our entire collection of ultra-premium remote control cars, upgrades, and parts.",
+  openGraph: {
+    title: "Catalog | RC Cars & Parts | AUSSIE RIGS ARENA",
+    description: "Browse our entire collection of ultra-premium remote control cars, upgrades, and parts.",
+  }
+}
+
 interface PageProps {
   searchParams: { [key: string]: string | string[] | undefined }
 }
@@ -64,8 +73,26 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   const nextParams = new URLSearchParams(currentParams.toString())
   nextParams.set("page", (page + 1).toString())
 
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://aussierigs.com";
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "AUSSIE RIGS ARENA Product Catalog",
+    "description": "Browse our entire collection of ultra-premium remote control cars, upgrades, and parts.",
+    "url": `${baseUrl}/products`,
+    "hasPart": products.map(p => ({
+      "@type": "Product",
+      "name": p.name,
+      "url": `${baseUrl}/products/${p.slug}`
+    }))
+  }
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       
       {/* Page Title Bar */}
       <div className="pt-24 pb-10 md:pt-32 md:pb-12 px-6 md:px-12 border-b border-border/40">

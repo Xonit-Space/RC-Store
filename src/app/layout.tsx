@@ -22,8 +22,25 @@ const outfit = Outfit({
 })
 
 export const metadata: Metadata = {
-  title: "AUSSIE RIGS ARENA | Racing Control",
-  description: "Ultra-Premium RC Cars & Remote Racing Experience Platform"
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://aussierigs.com"),
+  title: {
+    default: "AUSSIE RIGS ARENA | Racing Control",
+    template: "%s | AUSSIE RIGS ARENA"
+  },
+  description: "Ultra-Premium RC Cars & Remote Racing Experience Platform. Find the best remote control cars, parts, and upgrades.",
+  openGraph: {
+    type: "website",
+    locale: "en_AU",
+    url: "/",
+    title: "AUSSIE RIGS ARENA | Racing Control",
+    description: "Ultra-Premium RC Cars & Remote Racing Experience Platform",
+    siteName: "AUSSIE RIGS ARENA",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AUSSIE RIGS ARENA | Racing Control",
+    description: "Ultra-Premium RC Cars & Remote Racing Experience Platform",
+  },
 }
 
 // Nonces are per-request; pages using CSP must be dynamically rendered.
@@ -36,8 +53,27 @@ export default function RootLayout({
 }) {
   const nonce = headers().get("x-nonce") ?? undefined
 
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://aussierigs.com";
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "AUSSIE RIGS ARENA",
+    "url": baseUrl,
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": `${baseUrl}/products?search={search_term_string}`,
+      "query-input": "required name=search_term_string"
+    }
+  }
+
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className={`${jakarta.variable} ${outfit.variable} font-sans antialiased bg-background text-foreground selection:bg-racing-yellow selection:text-white`}>
         <WebVitals />
         <SessionProvider>

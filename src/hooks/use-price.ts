@@ -10,11 +10,16 @@ export function usePrice() {
   const [isHydrated, setIsHydrated] = useState(false)
 
   useEffect(() => {
-    // Rehydrate state from localStorage
+    // Rehydrate state from localStorage ONCE on mount
     useCurrencyStore.persist.rehydrate()
-    setActiveCurrency(storeCurrency)
     setIsHydrated(true)
-  }, [storeCurrency])
+  }, [])
+
+  useEffect(() => {
+    if (isHydrated) {
+      setActiveCurrency(storeCurrency)
+    }
+  }, [storeCurrency, isHydrated])
 
   const formatPrice = (amountInAud: number) => {
     // If we're not hydrated yet, we format using AUD to match SSR output

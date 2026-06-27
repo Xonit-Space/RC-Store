@@ -86,7 +86,7 @@ export default function CartPage() {
                 Looks like you haven&apos;t added any premium designer items to your checkout cart yet.
               </p>
               <Link href="/products" className="inline-block">
-                <Button className="bg-gradient-to-r from-foreground to-foreground hover:from-foreground hover:to-foreground font-bold  active:scale-95 transition">
+                <Button className="font-bold active:scale-95 transition">
                   Browse Catalog
                 </Button>
               </Link>
@@ -129,7 +129,7 @@ export default function CartPage() {
                         </Badge>
                       )}
                       {item.addonId && (
-                        <Badge variant="outline" className="text-[9px] py-0 px-2 uppercase text-terracotta border-terracotta/30 bg-terracotta/5">
+                        <Badge variant="outline" className="text-[9px] py-0 px-2 uppercase text-primary border-primary/30 bg-primary/5">
                           Addon
                         </Badge>
                       )}
@@ -140,10 +140,10 @@ export default function CartPage() {
                   </div>
 
                   {/* Quantity adjustment meters */}
-                  <div className="flex items-center gap-2 shrink-0 border border-border/40/60 p-1.5 bg-background ">
+                  <div className="flex items-center gap-2 shrink-0 border border-border p-1.5 bg-background rounded-sm">
                     <button
                       onClick={() => handleUpdateQty(item.id, item.quantity - 1)}
-                      className="h-7 w-7  hover:bg-border/40 text-foreground font-extrabold flex items-center justify-center active:scale-95 transition"
+                      className="h-7 w-7 hover:bg-muted text-foreground font-extrabold flex items-center justify-center active:scale-95 transition rounded-sm"
                     >
                       <Minus className="h-3.5 w-3.5" />
                     </button>
@@ -152,7 +152,7 @@ export default function CartPage() {
                     </span>
                     <button
                       onClick={() => handleUpdateQty(item.id, item.quantity + 1)}
-                      className="h-7 w-7 bg-foreground hover:bg-foreground text-foreground  font-extrabold flex items-center justify-center active:scale-95 transition"
+                      className="h-7 w-7 bg-primary text-black hover:bg-primary/90 font-extrabold flex items-center justify-center active:scale-95 transition rounded-sm"
                     >
                       <Plus className="h-3.5 w-3.5" />
                     </button>
@@ -171,7 +171,7 @@ export default function CartPage() {
                     </button>
                     <button
                       onClick={() => handleRemoveItem(item.id)}
-                      className="h-9 w-9 border border-red-100 text-yellow-500 hover:bg-red-50 flex items-center justify-center shrink-0 transition"
+                      className="h-9 w-9 border border-destructive/30 text-destructive hover:bg-destructive/10 flex items-center justify-center shrink-0 transition"
                     >
                       <Trash2 className="h-4.5 w-4.5" />
                     </button>
@@ -186,7 +186,7 @@ export default function CartPage() {
                 Order Summary
               </h3>
 
-              <div className="space-y-3.5 pt-1 text-xs font-semibold text-muted/50">
+              <div className="space-y-3.5 pt-1 text-xs font-semibold text-foreground">
                 <div className="flex justify-between">
                   <span>Bag Subtotal</span>
                   <span className="font-bold text-foreground">{subtotal.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
@@ -197,7 +197,7 @@ export default function CartPage() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="flex items-center gap-1">
-                    <Truck className="h-4 w-4 text-muted-foreground" /> Ground Shipping
+                    <Truck className="h-4 w-4 text-foreground" /> Ground Shipping
                   </span>
                   <span className="font-bold text-foreground">
                     {shipping === 0 ? (

@@ -112,7 +112,7 @@ export default async function AdminAnalyticsPage() {
                         {Number(order.total?.toString() || 0).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}
                       </div>
                       <div 
-                        className="w-full bg-forest/20 group-hover:bg-forest/50 transition-colors rounded-t-sm"
+                        className="w-full bg-primary/20 group-hover:bg-primary/50 transition-colors rounded-t-sm"
                         style={{ height: `${heightPct}%` }}
                       />
                     </div>

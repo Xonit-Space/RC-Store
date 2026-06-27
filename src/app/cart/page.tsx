@@ -13,6 +13,8 @@ import { useSession } from "next-auth/react"
 import { toast } from "sonner"
 import { useLoading } from "@/components/providers/loading-provider"
 import { useEffect, useState } from "react"
+import { CartAddonModal } from "@/components/cart/cart-addon-modal"
+import { getAddons } from "@/actions/addons"
 
 export default function CartPage() {
   const { data: session } = useSession()
@@ -21,12 +23,17 @@ export default function CartPage() {
   
   // Local state to track hydration completion to prevent SSR mismatches
   const [isHydrated, setIsHydrated] = useState(false)
+  const [allAddons, setAllAddons] = useState<any[]>([])
+  const [addonModalOpen, setAddonModalOpen] = useState(false)
+  const [selectedCartItem, setSelectedCartItem] = useState<any | null>(null)
 
   useEffect(() => {
     cartStore.initializeGuestSession()
     // Trigger Zustand persistence rehydration
     useCartStore.persist.rehydrate()
     setIsHydrated(true)
+    
+    getAddons().then(data => setAllAddons(data || []))
   }, [])
 
   const handleUpdateQty = async (itemId: string, newQty: number) => {
@@ -151,13 +158,24 @@ export default function CartPage() {
                     </button>
                   </div>
 
-                  {/* Remove action */}
-                  <button
-                    onClick={() => handleRemoveItem(item.id)}
-                    className="h-9 w-9  border border-red-100 text-yellow-500 hover:bg-red-50 flex items-center justify-center shrink-0 transition"
-                  >
-                    <Trash2 className="h-4.5 w-4.5" />
-                  </button>
+                  {/* Actions */}
+                  <div className="flex flex-col sm:flex-row gap-2 shrink-0">
+                    <button
+                      onClick={() => {
+                        setSelectedCartItem(item)
+                        setAddonModalOpen(true)
+                      }}
+                      className="h-9 px-3 text-xs font-bold border border-primary text-primary hover:bg-primary/10 flex items-center justify-center transition whitespace-nowrap"
+                    >
+                      <Plus className="h-3 w-3 mr-1" /> Addons
+                    </button>
+                    <button
+                      onClick={() => handleRemoveItem(item.id)}
+                      className="h-9 w-9 border border-red-100 text-yellow-500 hover:bg-red-50 flex items-center justify-center shrink-0 transition"
+                    >
+                      <Trash2 className="h-4.5 w-4.5" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -223,7 +241,34 @@ export default function CartPage() {
 
           </div>
         )}
+
+        {/* ── BOTTOM: RELATED ADDONS ── */}
+        {isHydrated && items.length > 0 && allAddons.length > 0 && (
+          <div className="mt-16 pt-8 border-t border-border/40 space-y-6">
+            <h3 className="text-xl font-bold uppercase tracking-wide">Recommended Addons</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {allAddons.slice(0, 4).map(addon => (
+                <Card key={addon.id} className="overflow-hidden group hover:border-primary transition-colors cursor-pointer bg-background">
+                  <div className="aspect-square bg-muted/10 border-b border-border/40">
+                    <img src={addon.image || "/placeholder.svg"} alt={addon.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                  </div>
+                  <CardContent className="p-4">
+                    <h4 className="font-bold text-sm truncate mb-1">{addon.name}</h4>
+                    <p className="text-primary font-semibold text-sm">{addon.price.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
       </main>
+
+      <CartAddonModal 
+        isOpen={addonModalOpen} 
+        onClose={() => setAddonModalOpen(false)} 
+        cartItem={selectedCartItem} 
+      />
 
           </div>
   )

@@ -32,7 +32,7 @@ export default async function AdminOverviewPage() {
   const kpiCards = [
     {
       label: "Total Revenue",
-      value: `$ {Number(stats.totalRevenue).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}`,
+      value: `${Number(stats.totalRevenue).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}`,
       sub: "Lifetime earnings",
       icon: TrendingUp,
       color: "text-primary",

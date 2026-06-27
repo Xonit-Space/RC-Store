@@ -30,9 +30,32 @@ export class EmailStrategy implements NotificationStrategy {
     }
 
     if (notification.type === "ORDER" && notification.title.includes("Created")) {
-      const orderId = notification.metadata?.orderId || "unknown"
-      const total = notification.metadata?.total || 0
-      return await sendOrderConfirmation(email, orderId, total)
+      const orderId = notification.metadata?.orderId
+      if (orderId) {
+        const order = await db.order.findUnique({
+          where: { orderNumber: orderId },
+          include: { items: { include: { variant: { include: { product: true } }, addon: true } }, shippingAddress: true }
+        })
+        if (order) {
+          const sd = order.shippingAddress
+          return await sendOrderConfirmation({
+            email,
+            orderNumber: order.orderNumber,
+            customerName: name,
+            items: order.items.map(item => ({
+              id: item.id,
+              name: item.variant?.product.name || item.addon?.name || "Product",
+              quantity: item.quantity,
+              price: Number(item.price),
+            })),
+            subtotal: Number(order.subtotal),
+            tax: Number(order.tax),
+            shipping: Number(order.shippingCost),
+            total: Number(order.total),
+            shippingAddress: sd ? `${sd.line1}, ${sd.city}, ${sd.state} ${sd.postalCode}, ${sd.country}` : "Address provided at checkout",
+          })
+        }
+      }
     }
   }
 }

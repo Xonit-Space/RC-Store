@@ -43,8 +43,8 @@ export const OrderShippedEmail = ({
             <Text style={trackingLabel}>Tracking Number:</Text>
             <Text style={trackingNumberText}>{trackingNumber}</Text>
             
-            <Button pX={20} pY={12} style={btn} href={trackingUrl}>
-              Track Your Package
+            <Button style={{...btn, padding: "12px 20px"}} href={trackingUrl}>
+              Track Package
             </Button>
           </Section>
 

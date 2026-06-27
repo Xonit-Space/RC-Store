@@ -287,7 +287,7 @@ export default function CheckoutPage() {
                       <select
                         value={country}
                         onChange={(e) => setCountry(e.target.value)}
-                        className="w-full h-10 border border-border/40 bg-background text-xs font-semibold px-2.5  outline-none"
+                        className="w-full h-10 border border-border/40 bg-background text-xs font-semibold px-2.5 outline-none dark:text-white text-black"
                       >
                         <option value="US">United States</option>
                         <option value="CA">Canada</option>
@@ -334,8 +334,8 @@ export default function CheckoutPage() {
 
             <div className="space-y-2 pt-2 text-xs font-semibold text-foreground">
               <div className="flex justify-between">
-                <span>Subtotal</span>
-                <span className="font-bold text-foreground">{formatPrice(subtotal)}</span>
+                <span className="dark:text-white text-black">Subtotal</span>
+                <span className="font-bold dark:text-white text-black">{formatPrice(subtotal)}</span>
               </div>
               {couponDiscount > 0 && (
                 <div className="flex justify-between text-emerald-600">
@@ -344,17 +344,17 @@ export default function CheckoutPage() {
                 </div>
               )}
               <div className="flex justify-between">
-                <span>Tax ({(taxRate * 100).toFixed(0)}%)</span>
-                <span className="font-bold text-foreground">{formatPrice(tax)}</span>
+                <span className="dark:text-white text-black">Tax ({(taxRate * 100).toFixed(0)}%)</span>
+                <span className="font-bold dark:text-white text-black">{formatPrice(tax)}</span>
               </div>
               <div className="flex justify-between">
-                <span>Stripe Ground Shipping</span>
-                <span className="font-bold text-foreground">{shipping === 0 ? "FREE" : formatPrice(shipping)}</span>
+                <span className="dark:text-white text-black">Stripe Ground Shipping</span>
+                <span className="font-bold dark:text-white text-black">{shipping === 0 ? "FREE" : formatPrice(shipping)}</span>
               </div>
               <div className="my-3 border-t border-dashed" />
-              <div className="flex justify-between font-extrabold text-foreground text-sm pt-1">
+              <div className="flex justify-between font-extrabold dark:text-white text-black text-sm pt-1">
                 <span>Order Total Due</span>
-                <span className="text-foreground">{formatPrice(grandTotal)}</span>
+                <span className="dark:text-white text-black">{formatPrice(grandTotal)}</span>
               </div>
             </div>
 

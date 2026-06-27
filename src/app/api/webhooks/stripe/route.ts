@@ -80,11 +80,11 @@ export async function POST(req: Request) {
     const [variants, addons] = await Promise.all([
       variantIds.length > 0 ? db.productVariant.findMany({
         where: { id: { in: variantIds } },
-        include: { product: { select: { price: true } } },
+        include: { product: { select: { name: true, price: true } } },
       }) : [],
       addonIds.length > 0 ? db.addon.findMany({
         where: { id: { in: addonIds } },
-        select: { id: true, price: true },
+        select: { id: true, price: true, name: true },
       }) : []
     ])
 

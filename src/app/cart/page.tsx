@@ -16,7 +16,6 @@ import { useEffect, useState } from "react"
 import { CartAddonModal } from "@/components/cart/cart-addon-modal"
 import { getAddons } from "@/actions/addons"
 import { calculateShippingCost } from "@/actions/shipping"
-import { calculateShippingCost } from "@/actions/shipping"
 import { getTaxRateByRegionCode } from "@/actions/tax"
 import { CheckoutStepper } from "@/components/cart/checkout-stepper"
 import { usePrice } from "@/hooks/use-price"
@@ -207,7 +206,7 @@ export default function CartPage() {
                         setStandaloneAddon(null)
                         setAddonModalOpen(true)
                       }}
-                      className="h-9 px-3 text-xs font-bold border border-primary text-primary hover:bg-primary/10 flex items-center justify-center transition whitespace-nowrap"
+                      className="h-9 px-3 text-xs font-bold bg-yellow-400 text-black hover:bg-yellow-500 flex items-center justify-center transition whitespace-nowrap rounded-sm"
                     >
                       <Plus className="h-3 w-3 mr-1" /> Addons
                     </button>
@@ -230,16 +229,16 @@ export default function CartPage() {
 
               <div className="space-y-3.5 pt-1 text-xs font-semibold text-foreground">
                 <div className="flex justify-between">
-                  <span>Bag Subtotal</span>
-                  <span className="font-bold text-foreground">{formatPrice(subtotal)}</span>
+                  <span className="dark:text-white text-black">Bag Subtotal</span>
+                  <span className="font-bold dark:text-white text-black">{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>GST Tax ({(taxRate * 100).toFixed(0)}%)</span>
-                  <span className="font-bold text-foreground">{formatPrice(tax)}</span>
+                  <span className="dark:text-white text-black">GST Tax ({(taxRate * 100).toFixed(0)}%)</span>
+                  <span className="font-bold dark:text-white text-black">{formatPrice(tax)}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="flex items-center gap-1">
-                    <Truck className="h-4 w-4 text-foreground" /> Ground Shipping
+                  <span className="flex items-center gap-1 dark:text-white text-black">
+                    <Truck className="h-4 w-4" /> Ground Shipping
                   </span>
                   <span className="font-bold text-foreground">
                     {shipping === 0 ? (

@@ -53,7 +53,7 @@ export const OrderConfirmationEmail = ({
             Hi {customerName},
           </Text>
           <Text style={text}>
-            We've received your order and are getting it ready to ship. We will notify you when it has been sent.
+            We&apos;ve received your order and are getting it ready to ship. We will notify you when it has been sent.
           </Text>
           
           <Section style={orderSection}>

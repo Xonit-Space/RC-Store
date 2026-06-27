@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Slider } from "@/components/ui/slider"
 import { SlidersHorizontal, X } from "lucide-react"
+import { usePrice } from "@/hooks/use-price"
 
 interface CategoryItem {
   name: string
@@ -12,15 +13,24 @@ interface CategoryItem {
 
 interface SidebarFiltersProps {
   categories: CategoryItem[]
+  availableSizes?: string[]
+  availableColors?: string[]
 }
 
-export function SidebarFilters({ categories }: SidebarFiltersProps) {
+export function SidebarFilters({ categories, availableSizes = [], availableColors = [] }: SidebarFiltersProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { formatPrice } = usePrice()
 
   const [search, setSearch] = useState(searchParams.get("search") || "")
   const [category, setCategory] = useState(searchParams.get("category") || "")
   const [gender, setGender] = useState(searchParams.get("gender") || "")
+  
+  const initialSizes = searchParams.get("sizes") ? searchParams.get("sizes")!.split(",") : []
+  const initialColors = searchParams.get("colors") ? searchParams.get("colors")!.split(",") : []
+  const [selectedSizes, setSelectedSizes] = useState<string[]>(initialSizes)
+  const [selectedColors, setSelectedColors] = useState<string[]>(initialColors)
+  
   const [priceRange, setPriceRange] = useState<number[]>([
     Number(searchParams.get("minPrice")) || 0,
     Number(searchParams.get("maxPrice")) || 1500
@@ -33,6 +43,8 @@ export function SidebarFilters({ categories }: SidebarFiltersProps) {
       if (search) params.set("search", search)
       if (category) params.set("category", category)
       if (gender) params.set("gender", gender)
+      if (selectedSizes.length > 0) params.set("sizes", selectedSizes.join(","))
+      if (selectedColors.length > 0) params.set("colors", selectedColors.join(","))
       if (priceRange[0] > 0) params.set("minPrice", priceRange[0].toString())
       if (priceRange[1] < 1500) params.set("maxPrice", priceRange[1].toString())
       
@@ -43,19 +55,29 @@ export function SidebarFilters({ categories }: SidebarFiltersProps) {
     }, 400)
     
     return () => clearTimeout(timer)
-  }, [search, category, gender, priceRange, router, searchParams])
+  }, [search, category, gender, selectedSizes, selectedColors, priceRange, router, searchParams])
 
   const resetFilters = () => {
     setSearch("")
     setCategory("")
     setGender("")
+    setSelectedSizes([])
+    setSelectedColors([])
     setPriceRange([0, 1500])
   }
 
-  const hasActiveFilters = search || category || gender || priceRange[0] > 0 || priceRange[1] < 1500
+  const toggleSize = (size: string) => {
+    setSelectedSizes(prev => prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size])
+  }
+
+  const toggleColor = (color: string) => {
+    setSelectedColors(prev => prev.includes(color) ? prev.filter(c => c !== color) : [...prev, color])
+  }
+
+  const hasActiveFilters = search || category || gender || selectedSizes.length > 0 || selectedColors.length > 0 || priceRange[0] > 0 || priceRange[1] < 1500
 
   return (
-    <div className="sticky top-28 space-y-10">
+    <div className="sticky top-28 space-y-10 max-h-[calc(100vh-120px)] overflow-y-auto pb-10 pr-4">
       {/* Search */}
       <div className="space-y-4">
         <label className="text-[10px] tracking-[0.25em] uppercase text-foreground font-medium block">
@@ -71,8 +93,6 @@ export function SidebarFilters({ categories }: SidebarFiltersProps) {
           />
         </div>
       </div>
-
-
 
       {/* Categories */}
       <div className="space-y-4">
@@ -101,6 +121,54 @@ export function SidebarFilters({ categories }: SidebarFiltersProps) {
         </ul>
       </div>
 
+      {/* Sizes */}
+      {availableSizes.length > 0 && (
+        <div className="space-y-4">
+          <label className="text-[10px] tracking-[0.25em] uppercase text-foreground font-medium block">
+            Size
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {availableSizes.map(size => (
+              <button
+                key={size}
+                onClick={() => toggleSize(size)}
+                className={`px-3 py-1.5 text-xs border transition-colors ${
+                  selectedSizes.includes(size)
+                    ? "border-foreground bg-foreground text-background"
+                    : "border-border text-muted-foreground hover:border-foreground hover:text-foreground"
+                }`}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Colors */}
+      {availableColors.length > 0 && (
+        <div className="space-y-4">
+          <label className="text-[10px] tracking-[0.25em] uppercase text-foreground font-medium block">
+            Color
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {availableColors.map(color => (
+              <button
+                key={color}
+                onClick={() => toggleColor(color)}
+                className={`px-3 py-1.5 text-xs border transition-colors ${
+                  selectedColors.includes(color)
+                    ? "border-foreground bg-foreground text-background"
+                    : "border-border text-muted-foreground hover:border-foreground hover:text-foreground"
+                }`}
+              >
+                {color}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Price */}
       <div className="space-y-4">
         <div className="flex justify-between items-baseline">
@@ -108,7 +176,7 @@ export function SidebarFilters({ categories }: SidebarFiltersProps) {
             Price
           </label>
           <span className="text-[10px] text-muted-foreground">
-            ${priceRange[0]} – ${priceRange[1]}
+            {formatPrice(priceRange[0])} – {formatPrice(priceRange[1])}
           </span>
         </div>
         <Slider

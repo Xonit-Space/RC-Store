@@ -1,5 +1,5 @@
 import "server-only"
-import { getProducts as repoGetProducts, getProductBySlug as repoGetProductBySlug } from "@/repositories/product"
+import { getProducts as repoGetProducts, getProductBySlug as repoGetProductBySlug, getAvailableSizesAndColors as repoGetAvailableSizesAndColors } from "@/repositories/product"
 import { serializeForClient } from "@/lib/serialize"
 
 export async function getProductsServer(options?: any) {
@@ -21,4 +21,8 @@ export async function getProductBySlugServer(slug: string) {
     images: (product as any).images?.map((img: any) => img.url) || ["/placeholder.svg"],
     tags: (product as any).createdAt && (new Date((product as any).createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) ? ["new"] : [],
   })
+}
+
+export async function getAvailableSizesAndColorsServer() {
+  return await repoGetAvailableSizesAndColors()
 }

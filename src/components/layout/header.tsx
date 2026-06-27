@@ -8,6 +8,7 @@ import { useSession, signOut } from "next-auth/react"
 import { useTheme } from "next-themes"
 import { useCartStore } from "@/store/cart"
 import { CurrencySwitcher } from "@/components/layout/currency-switcher"
+import { GlobalSearch } from "@/components/layout/global-search"
 
 export function Header() {
   const { data: session } = useSession()
@@ -139,6 +140,8 @@ export function Header() {
 
         {/* Right Actions */}
         <div className="flex items-center gap-2 sm:gap-4">
+          
+          <GlobalSearch />
           
           <CurrencySwitcher />
           

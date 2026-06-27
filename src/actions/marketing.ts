@@ -62,6 +62,12 @@ export async function runAbandonedCartJob(): Promise<ActionResponse> {
       },
       include: {
         user: { select: { email: true, name: true } },
+        items: {
+          include: { 
+            variant: { include: { product: { include: { images: { take: 1 } } } } },
+            addon: true
+          }
+        }
       },
     })
 
@@ -89,11 +95,17 @@ export async function runAbandonedCartJob(): Promise<ActionResponse> {
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || "http://localhost:3000"
         
         // Fire Resend campaign
-        await sendAbandonedCartRecovery(
-          userEmail,
-          userName,
-          `${baseUrl}/cart`
-        )
+        await sendAbandonedCartRecovery({
+          email: userEmail,
+          customerName: userName,
+          items: cart.items.map(item => ({
+            id: item.id,
+            name: item.variant?.product?.name || item.addon?.name || "Product",
+            price: Number(item.variant?.price || item.variant?.product?.price || item.addon?.price || 0),
+            image: item.variant?.product?.images?.[0]?.url || item.addon?.image || undefined
+          })),
+          checkoutUrl: `${baseUrl}/cart`
+        })
       })
 
       emailsFired++

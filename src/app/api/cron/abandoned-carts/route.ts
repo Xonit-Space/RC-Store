@@ -36,7 +36,7 @@ export async function GET(req: Request) {
         items: {
           include: {
             variant: {
-              include: { product: true }
+              include: { product: { include: { images: { take: 1 } } } }
             },
             addon: true
           }
@@ -62,7 +62,7 @@ export async function GET(req: Request) {
           id: item.variant!.id,
           name: item.variant!.product.name,
           price: Number(item.variant!.price || item.variant!.product.price),
-          image: item.variant!.product.images ? JSON.parse(item.variant!.product.images as string)[0]?.url : undefined,
+          image: item.variant!.product.images?.[0]?.url || undefined,
         };
       });
 

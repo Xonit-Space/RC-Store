@@ -8,6 +8,42 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { db } from "@/lib/db"
 
+export async function searchProducts(query: string) {
+  if (!query || query.length < 2) return []
+
+  try {
+    const products = await db.product.findMany({
+      where: {
+        isActive: true,
+        OR: [
+          { name: { contains: query, mode: "insensitive" } },
+          { description: { contains: query, mode: "insensitive" } },
+        ]
+      },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        price: true,
+        images: true,
+        category: {
+          select: { name: true }
+        }
+      },
+      take: 5,
+    })
+
+    return products.map(p => ({
+      ...p,
+      price: Number(p.price),
+      imageUrl: p.images ? (typeof p.images[0] === 'string' ? p.images[0] : (p.images[0] as any)?.url) : null
+    }))
+  } catch (error) {
+    console.error("Search Action Error:", error)
+    return []
+  }
+}
+
 export async function submitReview(
   productId: string,
   userId: string,

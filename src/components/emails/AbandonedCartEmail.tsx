@@ -42,7 +42,7 @@ export const AbandonedCartEmail = ({
             Hi {customerName},
           </Text>
           <Text style={text}>
-            We noticed you left some great items in your shopping bag. They're selling fast, so we saved them for you.
+            We noticed you left some great items in your shopping bag. They&apos;re selling fast, so we saved them for you.
           </Text>
           <Text style={text}>
             Use code <strong>COMEBACK5</strong> at checkout for 5% off your entire order!
@@ -74,7 +74,7 @@ export const AbandonedCartEmail = ({
             )}
 
             <Section style={btnContainer}>
-              <Button pX={24} pY={14} style={btn} href={checkoutUrl}>
+              <Button style={{...btn, padding: "14px 24px"}} href={checkoutUrl}>
                 Complete Your Purchase
               </Button>
             </Section>

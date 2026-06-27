@@ -7,8 +7,8 @@ export interface GetProductsFilters {
   gender?: ProductGender
   collection?: string
   brand?: string
-  size?: string
-  color?: string
+  sizes?: string[]
+  colors?: string[]
   minPrice?: number
   maxPrice?: number
   search?: string
@@ -24,8 +24,8 @@ export async function getProducts(filters: GetProductsFilters) {
     gender,
     collection,
     brand,
-    size,
-    color,
+    sizes,
+    colors,
     minPrice = 0,
     maxPrice,
     search,
@@ -56,18 +56,20 @@ export async function getProducts(filters: GetProductsFilters) {
     }),
     ...(collection && { collection: { slug: collection } }),
     ...(brand && { brand: { slug: brand } }),
-    ...(size && {
+    ...(sizes && sizes.length > 0 && {
       variants: {
         some: {
-          size,
+          size: { in: sizes },
           isActive: true,
         },
       },
     }),
-    ...(color && {
+    ...(colors && colors.length > 0 && {
       variants: {
         some: {
-          colorName: { contains: color, mode: "insensitive" },
+          OR: colors.map(c => ({
+            colorName: { contains: c, mode: "insensitive" }
+          })),
           isActive: true,
         },
       },
@@ -254,4 +256,20 @@ export const getCategoriesTree = unstable_cache(
   },
   ["categories-tree"],
   { revalidate: 3600, tags: ["categories"] }
+)
+
+export const getAvailableSizesAndColors = unstable_cache(
+  async () => {
+    const variants = await db.productVariant.findMany({
+      where: { isActive: true },
+      select: { size: true, colorName: true }
+    })
+    
+    const sizes = Array.from(new Set(variants.map(v => v.size).filter(Boolean))) as string[]
+    const colors = Array.from(new Set(variants.map(v => v.colorName).filter(Boolean))) as string[]
+    
+    return { sizes, colors }
+  },
+  ["available-sizes-colors"],
+  { revalidate: 3600, tags: ["variants"] }
 )

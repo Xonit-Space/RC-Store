@@ -1,4 +1,4 @@
-import { getProductsServer as getProducts } from "@/lib/server-api"
+import { getProductsServer as getProducts, getAvailableSizesAndColorsServer } from "@/lib/server-api"
 import { getCategoriesTree } from "@/repositories/product"
 import { SidebarFilters } from "./sidebar-filters"
 import { CatalogHeader } from "./catalog-header"
@@ -24,10 +24,15 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   const maxPrice = typeof params.maxPrice === "string" ? Number(params.maxPrice) : 1500
   const page = typeof params.page === "string" ? Number(params.page) : 1
 
+  const sizes = typeof params.sizes === "string" ? params.sizes.split(",") : Array.isArray(params.sizes) ? params.sizes : undefined
+  const colors = typeof params.colors === "string" ? params.colors.split(",") : Array.isArray(params.colors) ? params.colors : undefined
+
   const products = await getProducts({
     category,
     gender: gender as any,
     search,
+    sizes,
+    colors,
     minPrice,
     maxPrice,
     sort,
@@ -35,8 +40,11 @@ export default async function ProductsPage({ searchParams }: PageProps) {
     limit: 12,
   })
 
-  // Fetch categories for sidebar
-  const categoryTree = await getCategoriesTree()
+  // Fetch categories, sizes, and colors for sidebar
+  const [categoryTree, availableVariants] = await Promise.all([
+    getCategoriesTree(),
+    getAvailableSizesAndColorsServer()
+  ])
   const filterCategories = categoryTree.map((c: any) => ({ name: c.name, slug: c.slug }))
 
   // Basic pagination logic for next/prev
@@ -44,6 +52,8 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   if (search) currentParams.set("search", search)
   if (category) currentParams.set("category", category)
   if (gender) currentParams.set("gender", gender)
+  if (sizes?.length) currentParams.set("sizes", sizes.join(","))
+  if (colors?.length) currentParams.set("colors", colors.join(","))
   if (minPrice > 0) currentParams.set("minPrice", minPrice.toString())
   if (maxPrice < 1500) currentParams.set("maxPrice", maxPrice.toString())
   if (sort) currentParams.set("sort", sort)
@@ -79,7 +89,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
 
           {/* ── SIDEBAR FILTERS ── */}
           <aside className="w-52 shrink-0 hidden md:block">
-            <SidebarFilters categories={filterCategories} />
+            <SidebarFilters categories={filterCategories} availableSizes={availableVariants.sizes} availableColors={availableVariants.colors} />
           </aside>
 
           {/* ── PRODUCT GRID ── */}

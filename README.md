@@ -1,42 +1,38 @@
-# 🌌 RC Store Ultra
+# 🌌 AUSSIE RIGS ARENA — RC Store Ultra
 
 [![Next.js](https://img.shields.io/badge/Next.js-14.2.16-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-18-blue?style=for-the-badge&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4.17-38bdf8?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
-[![Prisma ORM](https://img.shields.io/badge/Prisma-Latest-123547?style=for-the-badge&logo=prisma)](https://www.prisma.io/)
+[![Prisma ORM](https://img.shields.io/badge/Prisma-6-123547?style=for-the-badge&logo=prisma)](https://www.prisma.io/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-316192?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
+[![Stripe](https://img.shields.io/badge/Stripe-Payment-635BFF?style=for-the-badge&logo=stripe)](https://stripe.com/)
+[![Vercel](https://img.shields.io/badge/Deployed-Vercel-black?style=for-the-badge&logo=vercel)](https://rc-store.vercel.app)
 
-**RC Store Ultra** is an ultra-premium, full-stack e-commerce store built using Next.js 14 App Router, React 18, Tailwind CSS, Prisma, and Supabase PostgreSQL. The application is styled with a modern, responsive design using custom-tailored Radix UI micro-interactions, features real-time search logic, simulated AI recommendation engines, dynamic notifications, and a feature-rich admin dashboard portal.
+**AUSSIE RIGS ARENA** is a production-grade, ultra-premium full-stack e-commerce platform for remote control cars, built on Next.js 14 App Router. It features real Stripe payment processing, transactional email pipelines, dynamic tax & shipping rule engines, multi-currency support, faceted product search, per-user cart isolation, rich SEO structured data, and a comprehensive Admin Dashboard.
+
+> 🔗 **Live Production:** [rc-store.vercel.app](https://rc-store.vercel.app)
 
 ---
 
 ## 📖 Table of Contents
 
-- [🌌 RC Store Ultra](#-rc-store)
-  - [📖 Table of Contents](#-table-of-contents)
-  - [🛠️ Core Technology Stack](#️-core-technology-stack)
-  - [🏗️ Project Architecture](#️-project-architecture)
-  - [✨ Feature-by-Feature Breakdown](#-feature-by-feature-breakdown)
-    - [1. Global Navigation \& Header Toolbar](#1-global-navigation--header-toolbar)
-    - [2. Global UX Transition \& Loading Context](#2-global-ux-transition--loading-context)
-    - [3. Dynamic Autoplay Hero Slider](#3-dynamic-autoplay-hero-slider)
-    - [4. Featured Products Showcase](#4-featured-products-showcase)
-    - [5. Simulated AI Recommendation Engine](#5-simulated-ai-recommendation-engine)
-    - [6. Intelligent Search (SmartSearch)](#6-intelligent-search-smartsearch)
-    - [7. Interactive Notification Center](#7-interactive-notification-center)
-    - [8. Elite Administration Portal Dashboard](#8-elite-administration-portal-dashboard)
-  - [🗄️ Database & Schema Relations](#️-database--schema-relations)
-    - [Prisma Entity-Relationship Diagram](#prisma-entity-relationship-diagram)
-    - [Schema Models Explained](#schema-models-explained)
-  - [🚀 Installation \& Local Setup](#-installation--local-setup)
-    - [1. Clone \& Install Dependencies](#1-clone--install-dependencies)
-    - [2. Setup Database & Run Migrations](#2-setup-database--run-migrations)
-    - [3. Seed Mock Data](#3-seed-mock-data)
-    - [4. Spin up the Development Server](#4-spin-up-the-development-server)
-    - [5. Visualizing Database with Prisma Studio](#5-visualizing-database-with-prisma-studio)
-  - [⚡ Performance Optimization Roadmap](#-performance-optimization-roadmap)
+- [🛠️ Core Technology Stack](#️-core-technology-stack)
+- [🏗️ Project Architecture](#️-project-architecture)
+- [✨ Feature Breakdown](#-feature-breakdown)
+  - [Storefront & Shopping](#storefront--shopping)
+  - [Cart & Checkout](#cart--checkout)
+  - [Payments (Stripe)](#payments-stripe)
+  - [Transactional Emails](#transactional-emails)
+  - [Multi-Currency Support](#multi-currency-support)
+  - [Advanced Search & Filtering](#advanced-search--filtering)
+  - [Tax & Shipping Rules Engine](#tax--shipping-rules-engine)
+  - [Admin Dashboard](#admin-dashboard)
+  - [SEO & Rich Metadata](#seo--rich-metadata)
+- [🗄️ Database & Schema](#️-database--schema)
+- [🚀 Installation & Local Setup](#-installation--local-setup)
+- [🔑 Demo Accounts](#-demo-accounts)
 
 ---
 
@@ -44,14 +40,18 @@
 
 | Category | Technology | Purpose |
 | :--- | :--- | :--- |
-| **Framework** | **Next.js 14.2.16** | Client/Server rendering (App Router), static generation, and high-performance server actions/routing. |
-| **UI Components** | **Radix UI Primitives** | Fully accessible UI blocks styled via **shadcn/ui** configurations (Dialogs, Popovers, Tabs, Accordions, Toasts). |
-| **Styling & Motion**| **Tailwind CSS + Animate** | Premium utility-first styling with keyframe micro-animations and custom transitions. |
-| **Database & ORM** | **Prisma ORM & Supabase** | Type-safe queries, database schema migration management, and cloud PostgreSQL storage via Supabase. |
-| **Data Validation** | **Zod** | Rigid runtime typing, client-side/server-side form and API payload schema validation. |
-| **Form Management** | **React Hook Form** | Performant, flexible, and extensible form validation and submit states. |
-| **Data Charts** | **Recharts** | Fully customizable responsive graphs and data visualizations inside the admin dashboard. |
-| **Search Engine** | **Lodash Debounce** | Throttling user text inputs for performant database query lookups. |
+| **Framework** | Next.js 14.2.16 (App Router) | SSR, ISR, Server Actions, API routes |
+| **UI** | Radix UI + shadcn/ui + Tailwind CSS | Accessible, themeable component primitives |
+| **State** | Zustand (persisted) | Per-user cart isolation with server sync |
+| **Auth** | NextAuth.js v4 | JWT sessions, role-based access (SUPER_ADMIN / ADMIN / STAFF / CUSTOMER) |
+| **Database** | Prisma ORM + Supabase PostgreSQL 16 | Type-safe queries, migrations, relations |
+| **Payments** | Stripe Checkout + Webhooks | Idempotent order creation via webhook table |
+| **Email** | Resend + React Email | Branded transactional HTML emails |
+| **Queue** | BullMQ (Redis) | Background job processing (abandoned cart cron) |
+| **Search** | Lodash debounce + Prisma full-text | Instant debounced product/category/brand search |
+| **Charts** | Recharts | Admin revenue & analytics dashboards |
+| **Validation** | Zod | Runtime schema validation on all forms & actions |
+| **SEO** | Next.js Metadata API + JSON-LD | Dynamic OpenGraph tags + schema.org structured data |
 
 ---
 
@@ -59,298 +59,269 @@
 
 ```
 rc-store/
-├── app/                      # Next.js App Router (Pages, layouts, global CSS)
-│   ├── admin/                # Admin Panel Route Entry
-│   ├── globals.css           # Custom global CSS styling
-│   ├── layout.tsx            # Global layout configuration with provider wrappers
-│   └── page.tsx              # Public Storefront Home Page
-├── components/               # Modular React Components
-│   ├── admin/                # Back-office administration layouts & analytics components
-│   ├── features/             # Intelligent global features (Search, Notification Popover)
-│   ├── layout/               # General wrapper layouts (Sticky Header, Footer)
-│   ├── providers/            # React context providers (Global Theme, Global Loading transition)
-│   ├── sections/             # Public landing page sections (Hero, Featured Products, AI recommendations)
-│   └── ui/                   # Shared UI kit primitives (Buttons, Cards, Dialogs, Badges)
-├── hooks/                    # Reusable React hooks
-├── lib/                      # Helper utilities and Database layer
-│   ├── api.ts                # Prisma client queries (Products, Categories, Search, Recommendations)
-│   ├── db.ts                 # Prisma Client Singleton initialization
-│   ├── seed.ts               # Database Mock-data seeder script
-│   └── utils.ts              # Class name mergers (clsx, tailwind-merge helper)
-├── prisma/                   # Prisma Configuration
-│   └── schema.prisma         # Database Models, Enums, and Relations
-└── public/                   # Static assets, fonts, icons, placeholders
+├── prisma/
+│   └── schema.prisma          # 40+ models: Products, Orders, Cart, Tax, Shipping, Currencies…
+├── src/
+│   ├── actions/               # Server Actions (auth, cart, tax, shipping, orders, coupons…)
+│   ├── app/
+│   │   ├── (storefront)/      # Public-facing pages
+│   │   │   ├── page.tsx       # Home – Hero, Featured, Best Sellers, New Releases
+│   │   │   ├── products/      # Catalog + [slug] product detail with JSON-LD
+│   │   │   ├── cart/          # Cart page with stepper + addon modal
+│   │   │   └── checkout/      # Secure checkout with Stripe redirect
+│   │   ├── admin/             # Admin Dashboard (role-gated)
+│   │   │   ├── products/      # CRUD product management + image uploads
+│   │   │   ├── orders/        # Order management + status updates + shipping labels
+│   │   │   ├── coupons/       # Coupon code management
+│   │   │   ├── inventory/     # Variant-level stock control
+│   │   │   └── settings/
+│   │   │       ├── tax/       # Adjustable tax rates per region
+│   │   │       └── shipping/  # Shipping rule builder (min/max order amount)
+│   │   ├── customer/          # Customer self-service dashboard
+│   │   └── api/               # REST API routes (webhooks, admin, cron)
+│   ├── components/
+│   │   ├── layout/            # Header (with cart sync), Footer, Currency Switcher, GlobalSearch
+│   │   ├── cart/              # CheckoutStepper, CartAddonModal
+│   │   ├── product/           # ProductCard, AddToCartButton, ProductBreadcrumb
+│   │   ├── emails/            # React Email templates (OrderConfirmation, Shipped, AbandonedCart)
+│   │   └── ui/                # shadcn/ui primitives
+│   ├── store/
+│   │   └── cart.ts            # Zustand cart store with syncWithServer() + clearCart()
+│   ├── hooks/                 # usePrice (multi-currency), useCurrency
+│   ├── notifications/         # Event-driven notification pipeline (Email + BullMQ strategies)
+│   └── lib/                   # db.ts, server-api.ts, bootstrap.ts
 ```
 
 ---
 
-## ✨ Feature-by-Feature Breakdown
+## ✨ Feature Breakdown
 
-### 1. Global Navigation & Header Toolbar
-* **File location:** [components/layout/header.tsx](file:///Users/asithalakmal/Documents/web/rc-store/components/layout/header.tsx)
-* **Description:** Represents the sticky storefront top navigation bar. Engineered with `backdrop-filter: blur` to support translucent glassy visual layouts on scroll. 
-* **Key Features:**
-  * **Brand Identity**: Custom visual icon matching standard modern styles with a blue-to-purple background gradient.
-  * **Intelligent Omnibox Integration**: Integrated Search bar (displays as inline omnibox on desktops, switches to a collapsable full-width mobile input block).
-  * **Dynamic Action Triggers**: Instant interactive buttons mapped to Theme Toggle, Notifications, Wishlist (includes a badge counting saved items), Cart (real-time increment count badge), and User Profile access.
-  * **Adaptive Mobile Layout**: Hidden side burger menu on smaller devices keeping the header fully responsive.
+### Storefront & Shopping
 
-### 2. Global UX Transition & Loading Context
-* **File location:** [components/providers/loading-provider.tsx](file:///Users/asithalakmal/Documents/web/rc-store/components/providers/loading-provider.tsx)
-* **Description:** Prevents flash-of-unstyled-content and raw database delay stutters by implementing a global React context wrapper managing asynchronous latency gracefully.
-* **Key Features:**
-  * **Promise-Based Interceptor**: Exposes a generic `withLoading` function wrapper that hooks into any Promise (DB fetches, addition requests, image queries) to lock loading states.
-  * **Global Spinner Overlay**: Mounts a modern, pulsing full-page translucent loader (`<PageLoader />`) during active state loops.
-  * **Safe Boundary Execution**: Guarantees recovery from state locks using structured `try...finally` hooks to release visual locks even if api requests fail.
+- **Dynamic Home Page** — Hero slider, Featured Product, Trust Highlights, Shop Categories, Best Sellers tabs, Brand Showcase, Part Finder Banner, Staff Picks, New Releases, Customer Gallery, Newsletter section, SEO content block.
+- **Product Catalog** (`/products`) — ISR (60s revalidation), faceted sidebar filters (size, color, category, price range), sort options (newest / price asc/desc / best sellers), pagination.
+- **Product Detail** (`/products/[slug]`) — ISR (5 min), variant picker (size/color), stock validation, add-to-cart, add-to-wishlist, reviews, product Q&A, related products.
+- **Wishlist** — Persistent per-user wishlist with move-to-cart support.
+- **Collections** — Curated marketing collections (New Arrivals, etc.)
 
-### 3. Dynamic Autoplay Hero Slider
-* **File location:** [components/sections/hero-section.tsx](file:///Users/asithalakmal/Documents/web/rc-store/components/sections/hero-section.tsx)
-* **Description:** Implements a visually arresting, interactive sliding hero banner showing promotional highlights on the home screen.
-* **Key Features:**
-  * **Autoplay Mechanism**: Standard custom `setInterval` timer (configured to auto-cycle slides every 5 seconds) paired with cleanup events on unmount to prevent browser memory leaks.
-  * **Rich Metadata Badges**: Highlighting specific values with interactive animated badges ("New AI Features", "Same Day Delivery", "100% Secure").
-  * **Interactive Indicators**: Clickable dot-navigation matching active slide index.
-  * **Micro-Animations**: Hover translation slide effects moving the primary buttons and sliding product mockups.
+### Cart & Checkout
 
-### 4. Featured Products Showcase
-* **File location:** [components/sections/featured-products.tsx](file:///Users/asithalakmal/Documents/web/rc-store/components/sections/featured-products.tsx)
-* **Description:** A primary storefront display rendering promotional and high-priority store inventory fetched directly from the PostgreSQL database.
-* **Key Features:**
-  * **Prisma Dynamic Querying**: Pulls active, featured products from the PostgreSQL database with fallback average-review aggregation algorithms.
-  * **Interactive Hover Overlays**: Images scale subtly on hover. Actions like "Quick Wishlist Toggle" (pulsing visual status) and "Quick Eye Preview" fade in, sliding up from the bottom boundary.
-  * **Smart Tag Indicators**: Automatically processes inventory metadata tags to display high-contrast contextual labels like "New" (pulsing green) or calculate discount percentages (e.g., "-10% Sale" in red).
-  * **UX Skeleton Shimmers**: Integrates dynamic `<ProductGridSkeleton />` loading placeholder blocks, preventing layout shift while fetching from the database.
+- **Per-User Cart Isolation** — Cart state is backed by the database. On login, `syncWithServer()` fetches the user's real DB cart and replaces local Zustand state. On logout, `clearCart()` wipes local storage so no data leaks between accounts.
+- **Guest Cart** — Anonymous shoppers get a `guestSessionId`. On sign-in, guest items are merged into the user's account cart via `mergeGuestCart()`.
+- **Checkout Stepper** — Three-step visual progress indicator (Shopping Bag → Shipping Details → Secure Payment) with clickable navigation between completed steps.
+- **Addon Modal** — In-cart addon upsell modal with full detail view and add-to-cart.
+- **Coupon Codes** — Validated server-side against the `Coupon` table with usage limits and expiry.
+- **Dynamic Tax & Shipping** — Calculated live from the Rules Engine (see below).
 
-### 5. Simulated AI Recommendation Engine
-* **File location:** [components/sections/ai-recommendations.tsx](file:///Users/asithalakmal/Documents/web/rc-store/components/sections/ai-recommendations.tsx)
-* **Description:** The centerpiece feature showing smart product selections filtered by user habits and simulated machine learning weights.
-* **Key Features:**
-  * **Tabbed Navigation Matrix**: Splits recommendation algorithms into three separate views:
-    * 👤 **For You**: Highly personalized items mapped directly to the current user's profile interest.
-    * 📈 **Trending**: Products experiencing high click-through rates and volumes.
-    * 🕒 **Recent**: Tracked browser history matches.
-  * **AI Tag Badging**: Dynamic "AI Pick" badges render on recommend cards with pulsing animations.
-  * **Smooth Tab Transitions**: Leverages Tailwind's `animate-in fade-in` classes to ensure tabs switch seamlessly.
+### Payments (Stripe)
 
-### 6. Intelligent Search (SmartSearch)
-* **File location:** [components/features/smart-search.tsx](file:///Users/asithalakmal/Documents/web/rc-store/components/features/smart-search.tsx)
-* **Description:** An advanced search utility designed for instant, zero-page-refresh navigation queries.
-* **Key Features:**
-  * **Debounced Key Input**: Uses a 300ms `lodash/debounce` callback. Only hits the Prisma DB if query inputs are 2 or more characters, keeping processing footprints minimal.
-  * **Rich Entity Tagging**: Suggestions are returned in a custom popover card matching three distinct types:
-    * 📦 **Product** name matches.
-    * 📁 **Category** matches (with result counts).
-    * 🏷️ **Brand** matches (with result counts).
-  * **Speech Recognition Integration**: Hooks into native browser HTML5 speech translation APIs (`webkitSpeechRecognition`) to support hands-free voice searching. Shows a pulsing red recording mic during listening cycles.
-  * **Visual Image Lookup**: Native camera trigger button placeholder to support automated image upload analysis.
+- Stripe Checkout Session created from cart contents + applied coupon discount.
+- Idempotent webhook handler (`/api/webhooks/stripe`) uses a `WebhookEvent` deduplication table to prevent duplicate order creation on retry.
+- Post-payment: order created, inventory decremented, loyalty points awarded, confirmation email dispatched.
 
-### 7. Interactive Notification Center
-* **File location:** [components/features/notification-center.tsx](file:///Users/asithalakmal/Documents/web/rc-store/components/features/notification-center.tsx)
-* **Description:** Keeps users informed of changes in their shopping workflow through an elegant drop-down card portal.
-* **Key Features:**
-  * **Categorized Alerts**: Maps events into distinct visual templates matching icons:
-    * 📦 `order`: Updates like shipping alerts (Package icon).
-    * ❤️ `wishlist`: Price reduction warnings (Heart icon).
-    * 🏷️ `promotion`: Limited-time flash discount alerts (Tag icon).
-  * **Unread State Visualizer**: Displays a dynamic badge indicating remaining unread messages.
-  * **Interactive Actions**: Supports "Mark as Read" trigger highlights and a clear option (`X` button) to purge notices from the list.
+### Transactional Emails
 
-### 8. Elite Administration Portal Dashboard
-* **File locations:** 
-  * [app/admin/page.tsx](file:///Users/asithalakmal/Documents/web/rc-store/app/admin/page.tsx)
-  * [components/admin/admin-dashboard.tsx](file:///Users/asithalakmal/Documents/web/rc-store/components/admin/admin-dashboard.tsx)
-* **Description:** A dedicated, clean, back-office administration panel providing complete visibility of the shop's key performance metrics.
-* **Key Features:**
-  * **Sidebar Navigation Router**: Single-page navigation controller switching panels between *Overview*, *Products*, *Orders*, *Customers*, and *Settings*.
-  * **Store KPI Grid**: Dynamic card indicators visualizing:
-    * 💵 **Total Revenue** (with green percentage growth tags).
-    * 🛒 **Active Order Counts** (with monthly change summaries).
-    * 📦 **Total Products Listed** (catalog size tracking).
-    * 👥 **Total Customer Database Growth**.
-  * **Interactive Analytics Canvas**: A dedicated charting screen designed for rich sales graphs using **Recharts** wrappers.
-  * **Recent Orders Tracker**: Listing recent purchases with custom visual badges representing checkout states (e.g., "Processing", "Shipped").
+Built with **React Email** + **Resend**:
+
+| Email | Trigger |
+|---|---|
+| **Order Confirmation** | Stripe `checkout.session.completed` webhook |
+| **Order Shipped** | Admin marks order as `SHIPPED` in dashboard |
+| **Abandoned Cart Recovery** | Cron job (`/api/cron/abandoned-carts`) runs every 24h; sends reminder with a 5% discount code to logged-in users who left items in cart |
+
+### Multi-Currency Support
+
+- Admin can create `Currency` records with an `exchangeRate` relative to the base currency (AUD).
+- A **Currency Switcher** dropdown in the Navbar lets shoppers select their preferred currency.
+- All prices across the storefront multiply through the selected exchange rate in real-time via the `usePrice()` hook.
+
+### Advanced Search & Filtering
+
+- **Global Search** — Debounced header search bar with live product suggestion cards (name, image, price) and keyboard navigation.
+- **Faceted Sidebar** — `/products` sidebar supports multi-select sizes, colors, categories, and a price range slider — all synced to URL params for shareable links.
+- **Sort** — Newest, Price Low→High, Price High→Low, Best Sellers.
+
+### Tax & Shipping Rules Engine
+
+#### Tax Rates (`/admin/settings/tax`)
+- Tax rates are stored in the `TaxRate` model linked to `Region`.
+- Admins can adjust the rate (decimal) and toggle active status per region.
+- Checkout fetches the applicable rate via `getTaxRateByRegionCode()`.
+
+#### Shipping Rules (`/admin/settings/shipping`)
+- Admin creates rules with **name**, **min order amount**, **max order amount**, and **shipping cost**.
+- `calculateShippingCost(subtotal)` evaluates all active rules in descending min-amount order and returns the first matching rule's fee.
+- Default fallback: $15 if no rule matches.
+- Both Cart and Checkout pages calculate shipping dynamically via this engine.
+
+### Admin Dashboard
+
+Role-gated (`SUPER_ADMIN`, `ADMIN`, `STAFF`) portal at `/admin`:
+
+| Section | Capability |
+|---|---|
+| **Dashboard** | Revenue KPIs, order counts, customer growth, sales charts |
+| **Products** | Full CRUD, image uploads (Supabase Storage), variant management, addon linking |
+| **Categories** | Tree-structured category management with parent/child hierarchy |
+| **Inventory** | Variant-level stock adjustment with low-stock alerts |
+| **Orders** | Status management (Pending → Processing → Shipped → Delivered), assign courier, generate shipping labels |
+| **Customers** | View customer profiles, order history, loyalty points |
+| **Coupons** | Create/edit discount codes (percentage or fixed), usage caps, expiry dates |
+| **Reviews** | Moderate, approve, or remove customer reviews |
+| **Tax Settings** | Edit tax rates per region |
+| **Shipping Rules** | Create, edit, delete tiered shipping fee rules |
+| **Blog** | Rich text blog post management |
+| **Gallery** | Customer gallery moderation |
+
+### SEO & Rich Metadata
+
+- **Global** (`layout.tsx`) — `metadataBase`, OpenGraph site tags, Twitter cards, `schema.org/WebSite` JSON-LD with SearchAction.
+- **Catalog** (`/products`) — `schema.org/CollectionPage` JSON-LD listing all rendered products.
+- **Product Pages** (`/products/[slug]`) — Dynamic `generateMetadata()` outputs product-specific `<title>`, OpenGraph image, Twitter card. Injects `schema.org/Product` JSON-LD with Price, Availability (from variant stock), Brand, SKU — enabling Google Rich Snippets in search results.
 
 ---
 
-## 🗄️ Database & Schema Relations
+## 🗄️ Database & Schema
 
-RC Store Ultra leverages a Supabase PostgreSQL database, managed with type-safe relational schemas via Prisma ORM.
-
-### Prisma Entity-Relationship Diagram
+RC Store Ultra uses Supabase PostgreSQL with 40+ Prisma models. Key models:
 
 ```mermaid
 erDiagram
-    users {
-        string id PK
-        string email UK
-        string name
-        string avatar
-        datetime createdAt
-        datetime updatedAt
-    }
+    User ||--o{ Cart : "has"
+    User ||--o{ Order : "places"
+    User ||--o{ Review : "writes"
+    User ||--o{ WishlistItem : "saves"
 
-    categories {
-        string id PK
-        string name
-        string slug UK
-        string description
-        string image
-        string parentId FK
-    }
+    Cart ||--o{ CartItem : "contains"
+    CartItem }o--|| ProductVariant : "references"
+    CartItem }o--|| ProductAddon : "optionally references"
 
-    products {
-        string id PK
-        string name
-        string slug UK
-        string description
-        float price
-        float originalPrice
-        string sku UK
-        int stock
-        string images "JSON String"
-        string tags "JSON String"
-        boolean isActive
-        boolean isFeatured
-        string categoryId FK
-        datetime createdAt
-        datetime updatedAt
-    }
+    Product ||--o{ ProductVariant : "has"
+    Product ||--o{ ProductImage : "has"
+    Product ||--o{ ProductAddon : "has"
+    Product ||--o{ Review : "receives"
+    Product }o--|| Category : "belongs to"
+    Product }o--|| Brand : "made by"
 
-    orders {
-        string id PK
-        string orderNumber UK
-        enum status
-        float total
-        float subtotal
-        float tax
-        float shipping
-        string userId FK
-        json shippingAddress
-        json billingAddress
-        datetime createdAt
-        datetime updatedAt
-    }
+    Order ||--o{ OrderItem : "contains"
+    OrderItem }o--|| ProductVariant : "references"
 
-    order_items {
-        string id PK
-        int quantity
-        float price
-        string orderId FK
-        string productId FK
-    }
+    Region ||--o| TaxRate : "has"
+    ShippingRule ||--o{ Order : "applied to"
+    Coupon ||--o{ Order : "discounts"
 
-    reviews {
-        string id PK
-        int rating
-        string comment
-        string userId FK
-        string productId FK
-        datetime createdAt
-    }
-
-    wishlist_items {
-        string id PK
-        string userId FK
-        string productId FK
-        datetime createdAt
-    }
-
-    cart_items {
-        string id PK
-        int quantity
-        string userId FK
-        string productId FK
-        datetime createdAt
-        datetime updatedAt
-    }
-
-    users ||--o{ orders : "places"
-    users ||--o{ reviews : "writes"
-    users ||--o{ wishlist_items : "saves"
-    users ||--o{ cart_items : "adds"
-
-    categories ||--o{ products : "contains"
-    categories ||--o{ categories : "CategoryHierarchy (Self-relation parentId)"
-
-    products ||--o{ order_items : "ordered in"
-    products ||--o{ reviews : "reviewed in"
-    products ||--o{ wishlist_items : "wishlisted in"
-    products ||--o{ cart_items : "stored in"
-
-    orders ||--o{ order_items : "comprises"
+    Currency ||--o{ Order : "denominated in"
 ```
 
-### Schema Models Explained
+### Key Models
 
-1. **`User`**: Core accounts file tracking details, linked to purchase logs, reviews, shopping carts, and saved items.
-2. **`Category`**: Supports multi-level tree catalog arrays using a self-referencing relationship (e.g. `parentId` links child items like `Smartphones` to their parent `Electronics`).
-3. **`Product`**: Tracks inventory quantities, dynamic discount options (comparing `price` to `originalPrice`), search tags, and features.
-4. **`Order` & `OrderItem`**: Captures finalized billing/shipping details, processing status enums (`PENDING`, `PROCESSING`, `SHIPPED`, `DELIVERED`, `CANCELLED`), and exact items bought at purchase-time pricing.
-5. **`Review`**: Enables product performance feedback loops scoring products from 1 to 5.
-6. **`WishlistItem` & `CartItem`**: Tracks user items in transition state. Mapped with `@@unique([userId, productId])` index constraints to prevent duplicate lines.
+| Model | Description |
+|---|---|
+| `User` | Accounts with roles (SUPER_ADMIN, ADMIN, STAFF, CUSTOMER) |
+| `Product` / `ProductVariant` | Stock lives on variants (size/color/SKU), not the parent product |
+| `Cart` / `CartItem` | Per-user OR per-guest (`guestSessionId`) — never shared |
+| `Order` / `OrderItem` | Finalized at Stripe webhook; captures price snapshot at purchase time |
+| `TaxRate` | Linked to `Region`; admin-adjustable decimal rate |
+| `ShippingRule` | Min/max order threshold rules evaluated at checkout |
+| `Currency` | Exchange rates relative to base AUD; powers multi-currency display |
+| `Coupon` | Discount codes with type (PERCENTAGE/FIXED), max uses, expiry |
+| `WebhookEvent` | Stripe idempotency — prevents duplicate order creation on retries |
 
 ---
 
 ## 🚀 Installation & Local Setup
 
-Get RC Store Ultra running on your local machine by following this setup guide.
+### Prerequisites
+- Node.js v18+
+- A Supabase PostgreSQL database
+- A Stripe account (test keys)
+- A Resend account (for emails)
+- Redis (for BullMQ workers, optional in dev)
 
-### 1. Clone & Install Dependencies
-First, ensure you have **Node.js (v18+)** installed. In your terminal, run:
+### 1. Clone & Install
+
 ```bash
-# Install package dependencies
+git clone https://github.com/Xonit-Space/RC-Store.git
+cd RC-Store
 npm install
 ```
 
-### 2. Setup Database & Run Migrations
-Synchronize your local Prisma Schema definitions with the Supabase PostgreSQL database:
-```bash
-# Push schema definitions directly to the database
-npx prisma db push
+### 2. Environment Variables
+
+Create a `.env.local` file:
+
+```env
+# Database
+DATABASE_URL="postgresql://..."
+
+# Auth
+NEXTAUTH_SECRET="your-secret"
+NEXTAUTH_URL="http://localhost:3000"
+
+# Stripe
+STRIPE_SECRET_KEY="sk_test_..."
+STRIPE_PUBLISHABLE_KEY="pk_test_..."
+STRIPE_WEBHOOK_SECRET="whsec_..."
+
+# Email (Resend)
+RESEND_API_KEY="re_..."
+
+# Redis (optional in dev)
+REDIS_URL="redis://localhost:6379"
+
+# App
+NEXT_PUBLIC_BASE_URL="http://localhost:3000"
 ```
 
-### 3. Seed Mock Data
-Inject rich sample products (e.g. premium high-performance RC cars and parts), category paths, and default demo user accounts:
-- **Super Admin**: `superadmin@rcstore.com`
-- **Admin**: `admin@rcstore.com`
-- **Customer**: `demo@rcstore.com`
-*(Password for all accounts: `rc_secure_password_2026`)*
+### 3. Database Setup
 
 ```bash
-# Execute the database seeder script
+# Push schema to your database
+npx prisma db push
+
+# Seed demo data
 npx prisma db seed
 ```
 
-### 4. Spin up the Development Server
-Launch the development server to check the storefront and admin panel locally:
+### 4. Run Development Server
+
 ```bash
-# Launch server
 npm run dev
 ```
-* **Storefront Home:** Open [http://localhost:3000](http://localhost:3000)
-* **Admin Dashboard Portal:** Open [http://localhost:3000/admin](http://localhost:3000/admin)
 
-### 5. Visualizing Database with Prisma Studio
-Manage data models, products, reviews, categories, and active carts visually in the browser:
+- **Storefront:** [http://localhost:3000](http://localhost:3000)
+- **Admin Dashboard:** [http://localhost:3000/admin](http://localhost:3000/admin)
+
+### 5. Prisma Studio (Database GUI)
+
 ```bash
-# Run Prisma Studio GUI
 npm run db:studio
 ```
-Prisma Studio will load at [http://localhost:5555](http://localhost:5555) automatically!
+
+Opens at [http://localhost:5555](http://localhost:5555)
+
+### 6. Stripe Webhook (Local Testing)
+
+```bash
+stripe listen --forward-to localhost:3000/api/webhooks/stripe
+```
 
 ---
 
-## ⚡ Performance Optimization Roadmap
+## 🔑 Demo Accounts
 
-We are actively optimizing RC Store Ultra to handle 100K+ monthly users efficiently. See our comprehensive [Performance Optimization Roadmap](PERFORMANCE.md) detailing the ongoing transition from Client Components to Server Components, PostgreSQL tuning, streaming, and caching strategies.
+| Role | Email | Password |
+|------|-------|----------|
+| **Admin** (Super Admin Access) | `admin@rc.com` | `rcadmin123` |
+| **Customer** (Standard Access) | `racer@rc.com` | `rcadmin123` |
 
+> ⚠️ These credentials are for local development / demo only. Change them before any public deployment.
 
-Admin Account (Super Admin Access)
+---
 
-Email: admin@rc.com
-Password: rcadmin123
+## ⚡ Performance Notes
 
-Customer Account (Standard Access)
-
-Email: racer@rc.com
-Password: rcadmin123
+- All product listing pages use **ISR** (Incremental Static Regeneration) — catalog revalidates every 60s, product detail every 5 minutes.
+- Below-the-fold homepage sections are **lazy-loaded** with `next/dynamic` to minimize LCP impact.
+- Cart and Checkout are `force-dynamic` to always reflect live pricing and stock.
+- BullMQ workers are disabled in development by default. Set `ENABLE_QUEUE_WORKERS=true` and use `npm start` to test background jobs.

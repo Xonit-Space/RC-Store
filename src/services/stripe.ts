@@ -49,6 +49,8 @@ export interface CheckoutSessionOptions {
   shippingCost?: number
 }
 
+import { validateAndCalculateCoupon } from "@/lib/coupon"
+
 export async function createCheckoutSession(options: CheckoutSessionOptions) {
   const { userId, email, items, successUrl, cancelUrl, couponCode, shippingCost = 0 } = options
 
@@ -97,6 +99,35 @@ export async function createCheckoutSession(options: CheckoutSessionOptions) {
     }
   }
 
+  // Handle dynamic coupons
+  let stripeCouponId: string | undefined = undefined;
+  if (couponCode) {
+    const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    const couponResult = await validateAndCalculateCoupon(couponCode, subtotal);
+    
+    if (couponResult.success && couponResult.data) {
+      try {
+        try {
+          const existingCoupon = await getStripeClient().coupons.retrieve(couponCode);
+          stripeCouponId = existingCoupon.id;
+        } catch (e) {
+          // Doesn't exist, create it in Stripe
+          const stripeCoupon = await getStripeClient().coupons.create({
+            id: couponCode,
+            amount_off: couponResult.data.discountType === 'FIXED_AMOUNT' ? Math.round(Number(couponResult.data.discountValue) * 100) : undefined,
+            percent_off: couponResult.data.discountType === 'PERCENTAGE' ? Number(couponResult.data.discountValue) : undefined,
+            currency: couponResult.data.discountType === 'FIXED_AMOUNT' ? 'aud' : undefined,
+            duration: 'once',
+            name: couponCode
+          });
+          stripeCouponId = stripeCoupon.id;
+        }
+      } catch (err) {
+        console.error("Stripe coupon error:", err);
+      }
+    }
+  }
+
   // Map session payload parameters
   const sessionCreateParams: Stripe.Checkout.SessionCreateParams = {
     payment_method_types: ["card"],
@@ -116,6 +147,10 @@ export async function createCheckoutSession(options: CheckoutSessionOptions) {
       allowed_countries: ["US", "CA", "GB", "AU", "LK"], // Target primary delivery hubs
     },
     billing_address_collection: "required",
+  }
+
+  if (stripeCouponId) {
+    sessionCreateParams.discounts = [{ coupon: stripeCouponId }]
   }
 
   // Inject additional custom shipping additions if needed

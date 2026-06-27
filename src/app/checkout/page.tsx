@@ -128,7 +128,7 @@ export default function CheckoutPage() {
                 <div className="flex-1 flex items-center justify-center p-12">
           <div className="flex flex-col items-center gap-2">
             <RefreshCw className="h-10 w-10 text-primary animate-spin" />
-            <span className="text-sm font-bold text-muted/50">Checking auth session...</span>
+            <span className="text-sm font-bold text-foreground">Checking auth session...</span>
           </div>
         </div>
               </div>
@@ -187,7 +187,7 @@ export default function CheckoutPage() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-muted/50 block">Address Label</label>
+                      <label className="text-xs font-bold text-foreground block">Address Label</label>
                       <Input
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
@@ -198,7 +198,7 @@ export default function CheckoutPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-muted/50 block">Phone Number</label>
+                      <label className="text-xs font-bold text-foreground block">Phone Number</label>
                       <div className="relative">
                         <Phone className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
@@ -213,7 +213,7 @@ export default function CheckoutPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-muted/50 block">Street Address Line 1</label>
+                    <label className="text-xs font-bold text-foreground block">Street Address Line 1</label>
                     <div className="relative">
                       <MapPin className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -227,7 +227,7 @@ export default function CheckoutPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-muted/50 block">Apartment, Suite, Unit (Optional)</label>
+                    <label className="text-xs font-bold text-foreground block">Apartment, Suite, Unit (Optional)</label>
                     <Input
                       value={line2}
                       onChange={(e) => setLine2(e.target.value)}
@@ -238,7 +238,7 @@ export default function CheckoutPage() {
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="space-y-2 col-span-2 md:col-span-1">
-                      <label className="text-xs font-bold text-muted/50 block">City</label>
+                      <label className="text-xs font-bold text-foreground block">City</label>
                       <Input
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
@@ -249,7 +249,7 @@ export default function CheckoutPage() {
                     </div>
 
                     <div className="space-y-2 col-span-2 md:col-span-1">
-                      <label className="text-xs font-bold text-muted/50 block">State</label>
+                      <label className="text-xs font-bold text-foreground block">State</label>
                       <Input
                         value={state}
                         onChange={(e) => setState(e.target.value)}
@@ -260,7 +260,7 @@ export default function CheckoutPage() {
                     </div>
 
                     <div className="space-y-2 col-span-2 md:col-span-1">
-                      <label className="text-xs font-bold text-muted/50 block">Postal Code</label>
+                      <label className="text-xs font-bold text-foreground block">Postal Code</label>
                       <Input
                         value={postalCode}
                         onChange={(e) => setPostalCode(e.target.value)}
@@ -271,7 +271,7 @@ export default function CheckoutPage() {
                     </div>
 
                     <div className="space-y-2 col-span-2 md:col-span-1">
-                      <label className="text-xs font-bold text-muted/50 block">Country</label>
+                      <label className="text-xs font-bold text-foreground block">Country</label>
                       <select
                         value={country}
                         onChange={(e) => setCountry(e.target.value)}
@@ -320,7 +320,7 @@ export default function CheckoutPage() {
               ))}
             </div>
 
-            <div className="space-y-2 pt-2 text-xs font-semibold text-muted/50">
+            <div className="space-y-2 pt-2 text-xs font-semibold text-foreground">
               <div className="flex justify-between">
                 <span>Subtotal</span>
                 <span className="font-bold text-foreground">{subtotal.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
@@ -347,7 +347,7 @@ export default function CheckoutPage() {
             </div>
 
             <div className="pt-4 border-t border-border/40 space-y-2">
-              <label className="text-xs font-bold text-muted/50 block">Discount / Promo Code</label>
+              <label className="text-xs font-bold text-foreground block">Discount / Promo Code</label>
               <div className="flex gap-2">
                 <Input
                   value={couponCode}

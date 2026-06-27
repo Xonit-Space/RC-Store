@@ -1,6 +1,6 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
-import { addCartItem, updateCartItemQty, deleteCartItem } from "@/actions/cart"
+import { addCartItem, updateCartItemQty, deleteCartItem, getCart } from "@/actions/cart"
 
 export interface CartProduct {
   id: string
@@ -30,6 +30,8 @@ interface CartStore {
   removeItem: (id: string, userId?: string) => Promise<void>
   updateQuantity: (id: string, qty: number, userId?: string) => Promise<void>
   clearCart: () => void
+  setItems: (items: LocalCartItem[]) => void
+  syncWithServer: (userId?: string, guestSessionId?: string) => Promise<void>
   
   // Computed values
   getSubtotal: () => number
@@ -125,6 +127,37 @@ export const useCartStore = create<CartStore>()(
       },
 
       clearCart: () => set({ items: [] }),
+
+      setItems: (items) => set({ items }),
+
+      syncWithServer: async (userId, guestSessionId) => {
+        if (!userId && !guestSessionId) return;
+        try {
+          const serverCart = await getCart(userId, guestSessionId);
+          if (serverCart && serverCart.items) {
+            const mappedItems: LocalCartItem[] = serverCart.items.map((item: any) => ({
+              id: item.id,
+              variantId: item.variantId || undefined,
+              addonId: item.addonId || undefined,
+              parentProductId: item.parentProductId || undefined,
+              quantity: item.quantity,
+              product: {
+                id: item.variant?.product?.id || item.addon?.id || "",
+                name: item.variant?.product?.name || item.addon?.name || "",
+                price: Number(item.variant?.product?.price || item.addon?.price || 0),
+                imageUrl: item.variant?.product?.images?.[0]?.url || item.addon?.image || "/placeholder.svg",
+                size: item.variant?.size || "",
+                color: item.variant?.color || ""
+              }
+            }))
+            set({ items: mappedItems })
+          } else {
+            set({ items: [] })
+          }
+        } catch (error) {
+          console.error("Failed to sync cart", error)
+        }
+      },
 
       getSubtotal: () => {
         return get().items.reduce((sum, item) => sum + item.product.price * item.quantity, 0)

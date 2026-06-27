@@ -11,12 +11,14 @@ import { toast } from "sonner"
 import { useLoading } from "@/components/providers/loading-provider"
 import { useCustomer } from "@/components/providers/customer-provider"
 import { AddressSchema } from "@/validators/auth"
+import { useCartStore } from "@/store/cart"
 
 export default function CustomerDashboardPage() {
   const router = useRouter()
   const { data: session, status } = useSession()
   const { withLoading } = useLoading()
   const { profile } = useCustomer()
+  const cartStore = useCartStore()
 
   const [orders, setOrders] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -123,7 +125,10 @@ export default function CustomerDashboardPage() {
           </div>
           <div className="flex flex-col items-end gap-2">
             <button
-              onClick={() => signOut({ callbackUrl: "/login" })}
+              onClick={() => {
+                cartStore.clearCart()
+                signOut({ callbackUrl: "/login" })
+              }}
               className="text-[11px] font-mono tracking-[0.2em] uppercase text-muted-foreground hover:text-primary transition-colors border-b border-transparent hover:border-primary pb-1"
             >
               Log Out

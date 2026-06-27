@@ -67,7 +67,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
       "priceCurrency": "AUD",
       "price": product.price,
       "itemCondition": "https://schema.org/NewCondition",
-      "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+      "availability": product.variants?.some((v: any) => v.stock > 0) ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
     }
   }
 

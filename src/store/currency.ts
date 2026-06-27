@@ -27,7 +27,7 @@ export const useCurrencyStore = create<CurrencyState>()(
     }),
     {
       name: "currency-storage",
-      skipHydration: true, // we handle hydration manually if needed, or just let Zustand handle it since we don't have complex hydration logic here, wait actually skipHydration is safer to prevent hydration mismatch
+      skipHydration: false,
     }
   )
 )

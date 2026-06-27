@@ -6,24 +6,15 @@ export function usePrice() {
   
   // To avoid hydration mismatch errors on SSR, we start with the base currency
   // and only use the stored currency after the component has mounted on the client.
-  const [activeCurrency, setActiveCurrency] = useState(BASE_CURRENCY)
-  const [isHydrated, setIsHydrated] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
-    // Rehydrate state from localStorage ONCE on mount
-    useCurrencyStore.persist.rehydrate()
-    setIsHydrated(true)
+    setIsMounted(true)
   }, [])
 
-  useEffect(() => {
-    if (isHydrated) {
-      setActiveCurrency(storeCurrency)
-    }
-  }, [storeCurrency, isHydrated])
-
   const formatPrice = (amountInAud: number) => {
-    // If we're not hydrated yet, we format using AUD to match SSR output
-    const currency = isHydrated ? activeCurrency : BASE_CURRENCY
+    // If we haven't mounted yet, we format using AUD to match SSR output
+    const currency = isMounted ? storeCurrency : BASE_CURRENCY
     const convertedAmount = amountInAud * currency.exchangeRate
 
     // Format the number based on the currency code, or fall back to just adding the symbol manually
@@ -39,5 +30,5 @@ export function usePrice() {
     }
   }
 
-  return { formatPrice, activeCurrency, isHydrated }
+  return { formatPrice, activeCurrency: isMounted ? storeCurrency : BASE_CURRENCY, isHydrated: isMounted }
 }

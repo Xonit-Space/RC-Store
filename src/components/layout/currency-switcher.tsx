@@ -54,7 +54,6 @@ export function CurrencySwitcher() {
   }, [activeCurrency, setCurrency])
 
   useEffect(() => {
-    useCurrencyStore.persist.rehydrate()
     setIsHydrated(true)
     fetchRates(true) // silent initial load
 

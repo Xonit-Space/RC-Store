@@ -17,6 +17,7 @@ import { CartAddonModal } from "@/components/cart/cart-addon-modal"
 import { getAddons } from "@/actions/addons"
 import { calculateShippingCost } from "@/actions/shipping"
 import { getTaxRateByRegionCode } from "@/actions/tax"
+import { CheckoutStepper } from "@/components/cart/checkout-stepper"
 
 export default function CartPage() {
   const { data: session } = useSession()
@@ -108,7 +109,9 @@ export default function CartPage() {
     <div className="min-h-screen bg-background flex flex-col justify-between">
       
       <main className="flex-grow container mx-auto px-4 md:px-12 max-w-6xl pt-32 pb-24">
-        <h1 className="text-2xl font-extrabold text-foreground mb-6 flex items-center gap-2">
+        <CheckoutStepper currentStep={1} />
+        
+        <h1 className="text-2xl font-extrabold text-foreground mb-6 flex items-center gap-2 mt-12">
           <ShoppingCart className="h-6 w-6 text-primary" /> Your Shopping Bag
         </h1>
 

@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { AddressSchema } from "@/validators/auth"
 import { useLoading } from "@/components/providers/loading-provider"
+import { CheckoutStepper } from "@/components/cart/checkout-stepper"
 
 export default function CheckoutPage() {
   const router = useRouter()
@@ -170,7 +171,9 @@ export default function CheckoutPage() {
     <div className="min-h-screen bg-background flex flex-col justify-between">
       
       <main className="flex-1 container mx-auto px-4 md:px-12 max-w-6xl pt-32 pb-24">
-        <h1 className="text-2xl font-extrabold text-foreground mb-6 flex items-center gap-2">
+        <CheckoutStepper currentStep={2} />
+        
+        <h1 className="text-2xl font-extrabold text-foreground mb-6 flex items-center gap-2 mt-12">
           <ShieldCheck className="h-6 w-6 text-emerald-600" /> Secure Checkout
         </h1>
 

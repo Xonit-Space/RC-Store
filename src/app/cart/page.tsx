@@ -26,6 +26,7 @@ export default function CartPage() {
   const [allAddons, setAllAddons] = useState<any[]>([])
   const [addonModalOpen, setAddonModalOpen] = useState(false)
   const [selectedCartItem, setSelectedCartItem] = useState<any | null>(null)
+  const [standaloneAddon, setStandaloneAddon] = useState<any | null>(null)
 
   useEffect(() => {
     cartStore.initializeGuestSession()
@@ -41,6 +42,28 @@ export default function CartPage() {
       await withLoading(cartStore.updateQuantity(itemId, newQty, session?.user?.id))
     } catch (error: any) {
       toast.error(error.message || "Failed to update item quantity")
+    }
+  }
+
+  const handleAddStandaloneToCart = async (addon: any) => {
+    try {
+      await withLoading(cartStore.addItem({
+        variantId: addon.id,
+        addonId: addon.id,
+        parentProductId: undefined,
+        quantity: 1,
+        product: {
+          id: addon.id,
+          name: addon.name,
+          price: addon.price,
+          imageUrl: addon.image || "/placeholder.svg",
+          size: "",
+          color: ""
+        }
+      }, session?.user?.id))
+      toast.success("Addon added to cart")
+    } catch (error: any) {
+      toast.error(error.message || "Failed to add addon")
     }
   }
 
@@ -163,6 +186,7 @@ export default function CartPage() {
                     <button
                       onClick={() => {
                         setSelectedCartItem(item)
+                        setStandaloneAddon(null)
                         setAddonModalOpen(true)
                       }}
                       className="h-9 px-3 text-xs font-bold border border-primary text-primary hover:bg-primary/10 flex items-center justify-center transition whitespace-nowrap"
@@ -248,13 +272,33 @@ export default function CartPage() {
             <h3 className="text-xl font-bold uppercase tracking-wide">Recommended Addons</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {allAddons.slice(0, 4).map(addon => (
-                <Card key={addon.id} className="overflow-hidden group hover:border-primary transition-colors cursor-pointer bg-background">
-                  <div className="aspect-square bg-muted/10 border-b border-border/40">
+                <Card 
+                  key={addon.id} 
+                  className="overflow-hidden group hover:border-primary transition-colors cursor-pointer bg-background flex flex-col"
+                  onClick={() => {
+                    setStandaloneAddon(addon)
+                    setSelectedCartItem(null)
+                    setAddonModalOpen(true)
+                  }}
+                >
+                  <div className="aspect-square bg-muted/10 border-b border-border/40 shrink-0">
                     <img src={addon.image || "/placeholder.svg"} alt={addon.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                   </div>
-                  <CardContent className="p-4">
-                    <h4 className="font-bold text-sm truncate mb-1">{addon.name}</h4>
-                    <p className="text-primary font-semibold text-sm">{addon.price.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</p>
+                  <CardContent className="p-4 flex-1 flex flex-col justify-between">
+                    <div>
+                      <h4 className="font-bold text-sm truncate mb-1">{addon.name}</h4>
+                      <p className="text-primary font-semibold text-sm">{addon.price.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</p>
+                    </div>
+                    <Button 
+                      size="sm" 
+                      className="w-full mt-4 font-bold"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleAddStandaloneToCart(addon)
+                      }}
+                    >
+                      Add to Cart
+                    </Button>
                   </CardContent>
                 </Card>
               ))}
@@ -268,6 +312,7 @@ export default function CartPage() {
         isOpen={addonModalOpen} 
         onClose={() => setAddonModalOpen(false)} 
         cartItem={selectedCartItem} 
+        standaloneAddon={standaloneAddon}
       />
 
           </div>

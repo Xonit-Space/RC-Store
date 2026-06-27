@@ -12,11 +12,13 @@ import { toast } from "sonner"
 export function CartAddonModal({
   isOpen,
   onClose,
-  cartItem
+  cartItem,
+  standaloneAddon
 }: {
   isOpen: boolean
   onClose: () => void
-  cartItem: any
+  cartItem?: any
+  standaloneAddon?: any
 }) {
   const [addons, setAddons] = useState<any[]>([])
   const [selectedAddon, setSelectedAddon] = useState<any | null>(null)
@@ -25,18 +27,26 @@ export function CartAddonModal({
   const { withLoading } = useLoading()
   
   useEffect(() => {
-    if (isOpen && cartItem) {
-      const productId = cartItem.product?.id
-      if (productId) {
-        getProductAddons(productId).then(data => {
-          setAddons(data || [])
-          if (data && data.length > 0) {
-            setSelectedAddon(data[0])
-          }
-        })
+    if (isOpen) {
+      if (cartItem) {
+        const productId = cartItem.product?.id
+        if (productId) {
+          getProductAddons(productId).then(data => {
+            setAddons(data || [])
+            if (data && data.length > 0) {
+              setSelectedAddon(data[0])
+            }
+          })
+        }
+      } else if (standaloneAddon) {
+        setAddons([standaloneAddon])
+        setSelectedAddon(standaloneAddon)
       }
+    } else {
+      setAddons([])
+      setSelectedAddon(null)
     }
-  }, [isOpen, cartItem])
+  }, [isOpen, cartItem, standaloneAddon])
 
   const handleAddToCart = async () => {
     if (!selectedAddon) return
@@ -44,7 +54,7 @@ export function CartAddonModal({
       await withLoading(cartStore.addItem({
         variantId: selectedAddon.id,
         addonId: selectedAddon.id,
-        parentProductId: cartItem.id,
+        parentProductId: cartItem ? cartItem.id : undefined,
         quantity: 1,
         product: {
           id: selectedAddon.id,

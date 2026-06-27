@@ -3,6 +3,7 @@ import { NextResponse } from "next/server"
 import { stripe } from "@/services/stripe"
 import { db } from "@/lib/db"
 import { sendOrderConfirmationSms } from "@/services/twilio"
+import { sendOrderConfirmation } from "@/services/email"
 import { logger } from "@/lib/logger"
 
 export async function POST(req: Request) {
@@ -191,6 +192,40 @@ export async function POST(req: Request) {
     if (phone) {
       await sendOrderConfirmationSms(phone, orderNumber, session.amount_total / 100)
         .catch((err) => logger.warn({ message: "SMS confirmation failed (non-critical)", error: err }))
+    }
+
+    // 4. Send HTML Email Confirmation
+    const email = session.customer_details?.email || userWithAddress?.addresses[0]?.phone ? "" : "customer@example.com" // Needs actual email, let's pull from user
+    const userEmail = await db.user.findUnique({ where: { id: userId }, select: { email: true, name: true } })
+    const targetEmail = session.customer_details?.email || userEmail?.email
+
+    if (targetEmail) {
+      // Map items for the email template
+      const emailItems = items.map((item) => {
+        const variant = variants.find(v => v.id === item.variantId)
+        const addon = addons.find(a => a.id === item.addonId)
+        return {
+          id: item.variantId || item.addonId || Math.random().toString(),
+          name: variant?.product.name || addon?.name || "Product",
+          quantity: item.quantity,
+          price: variantPriceMap.get(item.variantId!) ?? addonPriceMap.get(item.addonId!) ?? 0,
+        }
+      })
+
+      const sd = session.shipping_details?.address || session.customer_details?.address
+      const addressString = sd ? `${sd.line1}, ${sd.city}, ${sd.state} ${sd.postal_code}, ${sd.country}` : "Address provided at checkout"
+
+      await sendOrderConfirmation({
+        email: targetEmail,
+        orderNumber,
+        customerName: session.customer_details?.name || userEmail?.name || "Customer",
+        items: emailItems,
+        subtotal: session.amount_subtotal / 100,
+        tax: session.total_details?.amount_tax ? session.total_details.amount_tax / 100 : 0,
+        shipping: session.total_details?.amount_shipping ? session.total_details.amount_shipping / 100 : 0,
+        total: session.amount_total / 100,
+        shippingAddress: addressString,
+      }).catch((err) => logger.warn({ message: "Email confirmation failed (non-critical)", error: err }))
     }
   }
 

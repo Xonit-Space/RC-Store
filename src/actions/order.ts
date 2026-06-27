@@ -7,6 +7,7 @@ import { ActionResponse } from "./auth"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { sendOrderStatusUpdateSms } from "@/services/twilio"
+import { sendOrderShippedEmail } from "@/services/email"
 import { validateAndCalculateCoupon } from "@/lib/coupon"
 
 export async function checkCoupon(code: string, subtotal: number): Promise<ActionResponse> {
@@ -110,14 +111,23 @@ export async function adminUpdateOrderStatus(
       }
     }).catch(() => {})
 
-    // Send SMS notification if status is updated to SHIPPED or DELIVERED
+    // Send notifications if status is updated to SHIPPED or DELIVERED
     if (status === "SHIPPED" || status === "DELIVERED") {
       const orderDetails = await db.order.findUnique({
         where: { id: orderId },
-        include: { shippingAddress: true }
+        include: { shippingAddress: true, user: true }
       })
       if (orderDetails?.shippingAddress?.phone && orderDetails.shippingAddress.phone !== "0000000000") {
         sendOrderStatusUpdateSms(orderDetails.shippingAddress.phone, orderDetails.orderNumber, status).catch(console.error)
+      }
+      
+      if (status === "SHIPPED" && orderDetails?.user?.email) {
+        sendOrderShippedEmail({
+          email: orderDetails.user.email,
+          orderNumber: orderDetails.orderNumber,
+          customerName: orderDetails.user.name || "Customer",
+          // trackingNumber can be fetched if tracking details are stored, for now we mock it
+        }).catch(console.error)
       }
     }
 

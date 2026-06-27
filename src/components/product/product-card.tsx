@@ -1,8 +1,11 @@
+"use client"
+
 import Link from "next/link"
 import { memo } from "react"
 import { Star, Heart, Repeat } from "lucide-react"
 import { CartIconButton } from "./cart-icon-button"
 import { WishlistButton } from "./wishlist-button"
+import { usePrice } from "@/hooks/use-price"
 
 interface ProductCardProps {
   product: any;
@@ -20,6 +23,8 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
     ? (product.reviews.reduce((acc: number, rev: any) => acc + rev.rating, 0) / product.reviews.length).toFixed(1) 
     : "0.0";
   const reviewsCount = product.reviews?.length || 0;
+
+  const { formatPrice } = usePrice();
 
   return (
     <div className="relative bg-muted border border-border hover:border-racing-yellow/30 group flex flex-col h-full overflow-hidden transition-colors rounded-lg">
@@ -56,7 +61,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
         </Link>
         
         <div className="mt-auto flex items-center justify-between pt-4">
-          <span className="font-mono font-bold text-lg text-foreground">{product.price.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
+          <span className="font-mono font-bold text-lg text-foreground">{formatPrice(product.price)}</span>
           <CartIconButton 
             product={product} 
             className="relative z-20 w-10 h-10 bg-muted/50 border border-border flex items-center justify-center text-foreground hover:bg-racing-yellow hover:text-background hover:border-primary transition-all"

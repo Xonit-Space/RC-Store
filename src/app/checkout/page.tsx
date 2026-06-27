@@ -17,12 +17,14 @@ import { toast } from "sonner"
 import { AddressSchema } from "@/validators/auth"
 import { useLoading } from "@/components/providers/loading-provider"
 import { CheckoutStepper } from "@/components/cart/checkout-stepper"
+import { usePrice } from "@/hooks/use-price"
 
 export default function CheckoutPage() {
   const router = useRouter()
   const { data: session, status } = useSession()
   const cartStore = useCartStore()
   const { withLoading } = useLoading()
+  const { formatPrice } = usePrice()
 
   // Hydration safeguard
   const [isHydrated, setIsHydrated] = useState(false)
@@ -69,7 +71,7 @@ export default function CheckoutPage() {
     const result = await checkCoupon(couponCode, subtotal);
     if (result.success && result.data) {
       setCouponDiscount(result.data.discount);
-      toast.success(`Coupon applied! -${result.data.discount.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}`);
+      toast.success(`Coupon applied! -${formatPrice(result.data.discount)}`);
     } else {
       setCouponDiscount(0);
       toast.error(result.error || "Invalid coupon");
@@ -324,7 +326,7 @@ export default function CheckoutPage() {
                     </p>
                   </div>
                   <span className="text-xs font-bold text-foreground">
-                    {(item.product.price * item.quantity).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}
+                    {formatPrice(item.product.price * item.quantity)}
                   </span>
                 </div>
               ))}
@@ -333,26 +335,26 @@ export default function CheckoutPage() {
             <div className="space-y-2 pt-2 text-xs font-semibold text-foreground">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span className="font-bold text-foreground">{subtotal.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
+                <span className="font-bold text-foreground">{formatPrice(subtotal)}</span>
               </div>
               {couponDiscount > 0 && (
-                <div className="flex justify-between text-emerald-500">
-                  <span>Discount</span>
-                  <span className="font-bold">-{couponDiscount.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
+                <div className="flex justify-between text-emerald-600">
+                  <span>Discount ({couponCode})</span>
+                  <span className="font-bold">-{formatPrice(couponDiscount)}</span>
                 </div>
               )}
               <div className="flex justify-between">
                 <span>Tax ({(taxRate * 100).toFixed(0)}%)</span>
-                <span className="font-bold text-foreground">{tax.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
+                <span className="font-bold text-foreground">{formatPrice(tax)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Stripe Ground Shipping</span>
-                <span className="font-bold text-foreground">{shipping.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
+                <span className="font-bold text-foreground">{shipping === 0 ? "FREE" : formatPrice(shipping)}</span>
               </div>
               <div className="my-3 border-t border-dashed" />
               <div className="flex justify-between font-extrabold text-foreground text-sm pt-1">
                 <span>Order Total Due</span>
-                <span className="text-foreground">{grandTotal.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
+                <span className="text-foreground">{formatPrice(grandTotal)}</span>
               </div>
             </div>
 

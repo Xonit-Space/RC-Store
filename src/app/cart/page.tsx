@@ -16,13 +16,16 @@ import { useEffect, useState } from "react"
 import { CartAddonModal } from "@/components/cart/cart-addon-modal"
 import { getAddons } from "@/actions/addons"
 import { calculateShippingCost } from "@/actions/shipping"
+import { calculateShippingCost } from "@/actions/shipping"
 import { getTaxRateByRegionCode } from "@/actions/tax"
 import { CheckoutStepper } from "@/components/cart/checkout-stepper"
+import { usePrice } from "@/hooks/use-price"
 
 export default function CartPage() {
   const { data: session } = useSession()
   const cartStore = useCartStore()
   const { withLoading } = useLoading()
+  const { formatPrice } = usePrice()
   
   // Local state to track hydration completion to prevent SSR mismatches
   const [isHydrated, setIsHydrated] = useState(false)
@@ -173,7 +176,7 @@ export default function CartPage() {
                       )}
                     </div>
                     <p className="text-sm font-extrabold text-foreground">
-                      {item.product.price.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}
+                      {formatPrice(item.product.price)}
                     </p>
                   </div>
 
@@ -228,11 +231,11 @@ export default function CartPage() {
               <div className="space-y-3.5 pt-1 text-xs font-semibold text-foreground">
                 <div className="flex justify-between">
                   <span>Bag Subtotal</span>
-                  <span className="font-bold text-foreground">{subtotal.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
+                  <span className="font-bold text-foreground">{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>GST Tax ({(taxRate * 100).toFixed(0)}%)</span>
-                  <span className="font-bold text-foreground">{tax.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
+                  <span className="font-bold text-foreground">{formatPrice(tax)}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="flex items-center gap-1">
@@ -242,7 +245,7 @@ export default function CartPage() {
                     {shipping === 0 ? (
                       <span className="text-emerald-600 font-extrabold">FREE</span>
                     ) : (
-                      `$ {shipping.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}`
+                      formatPrice(shipping)
                     )}
                   </span>
                 </div>
@@ -260,7 +263,7 @@ export default function CartPage() {
 
               <div className="flex justify-between font-extrabold text-foreground text-base pt-1">
                 <span>Total Amount Due</span>
-                <span className="text-foreground">{grandTotal.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
+                <span className="text-foreground">{formatPrice(grandTotal)}</span>
               </div>
 
               {/* Promo input field */}
@@ -303,7 +306,7 @@ export default function CartPage() {
                   <CardContent className="p-4 flex-1 flex flex-col justify-between">
                     <div>
                       <h4 className="font-bold text-sm truncate mb-1">{addon.name}</h4>
-                      <p className="text-primary font-semibold text-sm">{addon.price.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</p>
+                      <p className="text-primary font-semibold text-sm">{formatPrice(addon.price)}</p>
                     </div>
                     <Button 
                       size="sm" 

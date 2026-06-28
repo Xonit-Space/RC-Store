@@ -40,13 +40,11 @@ export function FullProductEditModal({
   initialProductId = "",
   dbCategories = [],
   availableAddons = [],
-  initialVehicleModelId,
   onSuccess
 }: {
   isOpen: boolean
   onClose: () => void
   initialProductId?: string
-  initialVehicleModelId?: string
   dbCategories?: any[]
   availableAddons?: any[]
   onSuccess?: () => void
@@ -142,11 +140,9 @@ export function FullProductEditModal({
       } else {
         const res = await adminCreateProduct(session?.user?.id || "", payload)
         if (res.success) {
-          if (initialVehicleModelId) {
-            await linkProductToModel(res.data.id, initialVehicleModelId)
-          }
-          toast.success("Product created successfully! You can now add variants.")
+          toast.success("Product created successfully! You can now add media.")
           setProductId(res.data.id)
+          setActiveTab("media")
           if (onSuccess) onSuccess()
         } else {
           toast.error(res.error || "Failed to create product")
@@ -286,7 +282,7 @@ export function FullProductEditModal({
 
               <div className="flex justify-end pt-6">
                 <Button type="submit" disabled={isSubmitting} className="h-12 px-8 rounded-none bg-foreground text-background font-bold uppercase tracking-widest">
-                  {isSubmitting ? "Saving..." : isEditMode ? "Save Changes" : "Create Product"}
+                  {isSubmitting ? "Saving..." : isEditMode ? "Save Changes" : "Create & Add Media"}
                 </Button>
               </div>
             </form>

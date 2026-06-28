@@ -85,7 +85,7 @@ async function main() {
       create: {
         ...productData,
         images: {
-          create: images.map(url => ({ url, isMain: true, alt: part.name }))
+          create: images.map(url => ({ url, isFeatured: true, alt: part.name }))
         }
       }
     })
@@ -120,7 +120,7 @@ async function main() {
       description: 'The ultimate 1/10 scale short course truck with Velineon brushless power.',
       images: {
         create: [
-          { url: 'https://images.unsplash.com/photo-1594732159049-7cce677ec224?auto=format&fit=crop&q=80&w=600', isMain: true, alt: 'Slash 4x4' }
+          { url: 'https://images.unsplash.com/photo-1594732159049-7cce677ec224?auto=format&fit=crop&q=80&w=600', isFeatured: true, alt: 'Slash 4x4' }
         ]
       }
     }

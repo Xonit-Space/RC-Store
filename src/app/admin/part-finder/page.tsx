@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query"
 import { getCategories } from "@/actions/categories"
 import { getAddons } from "@/actions/addons"
 import { FullProductEditModal } from "@/components/admin/product/full-product-edit-modal"
+import { AddSparePartModal } from "@/components/admin/part-finder/add-spare-part-modal"
 import { ModelPartsGrid } from "@/components/admin/part-finder/model-parts-grid"
 
 export default function AdminPartFinderPage() {
@@ -54,18 +55,18 @@ export default function AdminPartFinderPage() {
   // ─── Modal state ────────────────────────────────────────────────────────────
   const [isProductModalOpen, setIsProductModalOpen] = useState(false)
   const [editingProductId, setEditingProductId] = useState("")
-  const [initialModelId, setInitialModelId] = useState("")
+
+  const [isAddSparePartModalOpen, setIsAddSparePartModalOpen] = useState(false)
+  const [addSparePartModelId, setAddSparePartModelId] = useState("")
 
   const openEditPartModal = (productId: string) => {
     setEditingProductId(productId)
-    setInitialModelId("")
     setIsProductModalOpen(true)
   }
 
   const openAddPartModal = (modelId: string) => {
-    setEditingProductId("")
-    setInitialModelId(modelId)
-    setIsProductModalOpen(true)
+    setAddSparePartModelId(modelId)
+    setIsAddSparePartModalOpen(true)
   }
 
   useEffect(() => {
@@ -385,11 +386,19 @@ export default function AdminPartFinderPage() {
         isOpen={isProductModalOpen}
         onClose={() => setIsProductModalOpen(false)}
         initialProductId={editingProductId}
-        initialVehicleModelId={initialModelId}
         dbCategories={dbCategories}
         availableAddons={availableAddons}
+        onSuccess={() => {}}
+      />
+
+      {/* Quick Add Spare Part Modal */}
+      <AddSparePartModal
+        isOpen={isAddSparePartModalOpen}
+        onClose={() => setIsAddSparePartModalOpen(false)}
+        vehicleModelId={addSparePartModelId}
+        dbCategories={dbCategories}
         onSuccess={() => {
-          // You could invalidate queries here, but the queries themselves handles invalidation on update
+          loadData() // optionally reload if needed, though react-query invalidation might handle it
         }}
       />
     </div>

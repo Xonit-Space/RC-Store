@@ -86,14 +86,14 @@ export default async function AdminOverviewPage() {
       {/* Page Header */}
       <div className="flex items-end justify-between border-b border-border/40 pb-6">
         <div>
-          <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-1 font-medium">
+          <p className="text-[10px] tracking-[0.3em] uppercase text-primary mb-1 font-semibold">
             Overview
           </p>
-          <h2 className="text-2xl font-semibold text-foreground">
+          <h2 className="text-3xl font-bold text-foreground tracking-tight">
             Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"} 👋
           </h2>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Here&apos;s what&apos;s happening in your store today.
+          <p className="text-sm text-muted-foreground mt-1.5">
+            Here's what's happening in your store today.
           </p>
         </div>
         <div className="text-right hidden md:block">
@@ -114,20 +114,20 @@ export default async function AdminOverviewPage() {
         {kpiCards.map((card) => (
           <div
             key={card.label}
-            className={`p-5 border ${card.border} ${card.bg} rounded-lg relative overflow-hidden group hover:shadow-sm transition-shadow`}
+            className={`p-5 border border-border bg-white dark:bg-muted rounded-lg relative overflow-hidden group transition-all duration-300 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:hover:shadow-[0_0_40px_rgba(255,204,0,0.2)]`}
           >
             <div className="flex items-start justify-between mb-3">
               <div className={`h-9 w-9 ${card.bg} border ${card.border} flex items-center justify-center rounded-md`}>
-                <card.icon strokeWidth={1.5} className={`h-4 w-4 ${card.color}`} />
+                <card.icon strokeWidth={2} className={`h-4 w-4 ${card.color}`} />
               </div>
             </div>
-            <p className="text-2xl font-bold text-foreground leading-none mb-1">
+            <p className="font-bold text-3xl text-foreground leading-none mb-2">
               {card.value}
             </p>
-            <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+            <p className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
               {card.label}
             </p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">
+            <p className="text-[11px] text-muted-foreground mt-1">
               {card.sub}
             </p>
           </div>
@@ -138,21 +138,21 @@ export default async function AdminOverviewPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
         {/* Quick Actions */}
-        <div className="lg:col-span-5 space-y-3">
-          <h3 className="text-sm font-semibold text-foreground">Quick Actions</h3>
+        <div className="lg:col-span-5 space-y-4">
+          <h3 className="font-semibold text-lg text-foreground tracking-tight">Quick Actions</h3>
           <div className="grid grid-cols-1 gap-2">
             {quickActions.map((action) => (
               <Link
                 key={action.href}
                 href={action.href}
-                className="flex items-center gap-4 p-4 border border-border/40 bg-background hover:bg-muted/30 hover:border-border/70 rounded-lg transition-all group"
+                className="flex items-center gap-4 p-4 border border-border bg-white dark:bg-muted hover:border-racing-yellow/50 rounded-lg transition-all duration-300 group hover:shadow-[0_5px_20px_rgba(255,204,0,0.1)]"
               >
-                <div className={`h-9 w-9 rounded-md bg-muted/60 flex items-center justify-center shrink-0 group-hover:bg-muted transition-colors`}>
-                  <action.icon strokeWidth={1.5} className={`h-4 w-4 ${action.color}`} />
+                <div className={`h-9 w-9 rounded-md bg-muted/60 flex items-center justify-center shrink-0 group-hover:bg-background transition-colors`}>
+                  <action.icon strokeWidth={2} className={`h-4 w-4 ${action.color}`} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground">{action.label}</p>
-                  <p className="text-[10px] text-muted-foreground truncate">{action.description}</p>
+                  <p className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">{action.label}</p>
+                  <p className="text-xs text-muted-foreground truncate">{action.description}</p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   {action.badge && (
@@ -160,7 +160,7 @@ export default async function AdminOverviewPage() {
                       {action.badge}
                     </span>
                   )}
-                  <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/40 group-hover:text-muted-foreground group-hover:translate-x-0.5 transition-all" />
+                  <ArrowRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-1 transition-all" />
                 </div>
               </Link>
             ))}
@@ -168,45 +168,45 @@ export default async function AdminOverviewPage() {
         </div>
 
         {/* Recent Orders */}
-        <div className="lg:col-span-7 space-y-3">
+        <div className="lg:col-span-7 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-foreground">Recent Orders</h3>
+            <h3 className="font-semibold text-lg text-foreground tracking-tight">Recent Orders</h3>
             <Link
               href="/admin/orders"
-              className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
+              className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
             >
               View all <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
 
-          <div className="border border-border/40 rounded-lg bg-background overflow-hidden">
+          <div className="border border-border rounded-lg bg-white dark:bg-muted overflow-hidden shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)]">
             {recentOrders.length === 0 ? (
               <div className="p-12 text-center">
                 <ShoppingCart className="h-8 w-8 text-muted-foreground/20 mx-auto mb-3" />
-                <p className="text-xs text-muted-foreground uppercase tracking-widest">
+                <p className="text-sm text-muted-foreground font-medium">
                   No orders yet
                 </p>
               </div>
             ) : (
-              <div className="divide-y divide-border/40">
+              <div className="divide-y divide-border">
                 {recentOrders.map((order) => {
                   const statusColor = ORDER_STATUS_COLORS[order.status] || "text-muted-foreground bg-muted/30 border-border/30"
                   return (
                     <Link
                       key={order.id}
                       href={`/admin/orders`}
-                      className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors group"
+                      className="flex items-center justify-between p-4 hover:bg-background transition-colors group"
                     >
                       <div className="min-w-0">
                         <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
                           #{order.orderNumber}
                         </p>
-                        <p className="text-[10px] text-muted-foreground truncate">
+                        <p className="text-xs text-muted-foreground truncate">
                           {order.user.name || order.user.email}
                         </p>
                       </div>
                       <div className="flex items-center gap-3 shrink-0">
-                        <span className={`text-[9px] font-bold tracking-widest uppercase px-2 py-0.5 border rounded-sm ${statusColor}`}>
+                        <span className={`text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 border rounded-sm ${statusColor}`}>
                           {order.status}
                         </span>
                         <p className="text-sm font-bold text-foreground hidden sm:block">

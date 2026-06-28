@@ -19,7 +19,7 @@ export function StaffPicks() {
 
   if (loading) {
     return (
-      <section className="bg-muted py-24 border-t border-border">
+      <section className="bg-white dark:bg-muted py-24 border-t border-border">
         <div className="container mx-auto px-6 md:px-12">
           <div className="h-[400px] w-full bg-background animate-pulse" />
         </div>
@@ -39,7 +39,7 @@ export function StaffPicks() {
   const reviewsCount = product.reviews?.length || 0
 
   return (
-    <section className="bg-muted py-24 border-t border-border">
+    <section className="bg-white dark:bg-muted py-24 border-t border-border">
       <div className="container mx-auto px-6 md:px-12">
         
         <div className="flex flex-col items-center mb-16 text-center">
@@ -55,7 +55,7 @@ export function StaffPicks() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 bg-background border border-border p-8 md:p-12 relative overflow-hidden items-center shadow-sm">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 bg-white dark:bg-background border border-border p-8 md:p-12 relative overflow-hidden items-center shadow-sm">
           <div className="absolute top-0 right-0 w-64 h-64 bg-racing-yellow/10 blur-[100px]" />
           
           {/* Staff Member Info */}
@@ -76,9 +76,9 @@ export function StaffPicks() {
           </div>
 
           {/* Product Card */}
-          <div className="relative z-10 flex flex-col sm:flex-row items-center gap-8 bg-white dark:bg-muted/30 p-6 rounded-lg border border-border shadow-2xl dark:shadow-[0_0_50px_rgba(0,0,0,0.5)]">
-            <div className="w-full sm:w-1/2 relative bg-background aspect-square p-4 flex items-center justify-center rounded-md">
-              <img src={image} alt={product.name} className="w-full h-full object-contain" />
+          <div className="relative z-10 flex flex-col sm:flex-row items-center gap-8 bg-white dark:bg-muted/30 p-6 rounded-lg border border-border transition-all duration-300 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)]">
+            <div className="w-full sm:w-1/2 relative bg-background aspect-square p-4 flex items-center justify-center rounded-md overflow-hidden">
+              <img src={image} alt={product.name} className="w-full h-full object-cover" />
             </div>
             <div className="w-full sm:w-1/2 flex flex-col justify-center">
               <div className="flex items-center gap-1 mb-2">

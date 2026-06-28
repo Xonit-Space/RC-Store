@@ -40,7 +40,7 @@ export function Header({ user }: HeaderProps) {
   const pageTitle = usePageTitle()
 
   return (
-    <header className="h-14 border-b border-border/40 bg-background/95 backdrop-blur-sm flex items-center px-4 md:px-6 shrink-0 sticky top-0 z-40 gap-4">
+    <header className="h-14 border-b border-border/40 bg-white/95 dark:bg-background/95 backdrop-blur-sm flex items-center px-4 md:px-6 shrink-0 sticky top-0 z-40 gap-4">
       {/* Left: Logo + Page Title */}
       <div className="flex items-center gap-3 min-w-0">
         <Link href="/" className="flex items-center gap-2 group shrink-0" title="Go to store">

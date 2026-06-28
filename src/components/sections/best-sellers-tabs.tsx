@@ -65,7 +65,7 @@ export function BestSellersTabs() {
               const reviewsCount = product.reviews?.length || 0
 
               return (
-                <div key={product.id} className="relative bg-white dark:bg-muted border border-border hover:border-racing-yellow/30 group flex flex-col shadow-2xl dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] rounded-lg">
+                <div key={product.id} className="relative bg-white dark:bg-muted border border-border hover:border-racing-yellow/50 group flex flex-col transition-all duration-300 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] rounded-lg">
                   <Link href={`/products/${product.slug}`} className="absolute inset-0 z-10" aria-label={`View ${product.name}`} />
                   
                   {/* Image Box */}
@@ -81,7 +81,7 @@ export function BestSellersTabs() {
                     <img 
                       src={image} 
                       alt={product.name}
-                      className="w-full h-full object-contain mix-blend-luminosity group-hover:mix-blend-normal group-hover:scale-110 transition-all duration-500"
+                      className="w-full h-full object-cover mix-blend-luminosity group-hover:mix-blend-normal group-hover:scale-110 transition-all duration-500"
                     />
                   </div>
 

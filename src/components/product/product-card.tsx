@@ -27,7 +27,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
   const { formatPrice } = usePrice();
 
   return (
-    <div className="relative bg-white dark:bg-muted border border-border hover:border-racing-yellow/30 group flex flex-col h-full overflow-hidden transition-colors rounded-lg shadow-2xl dark:shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+    <div className="relative bg-white dark:bg-muted border border-border hover:border-racing-yellow/50 group flex flex-col h-full overflow-hidden transition-all duration-300 rounded-lg shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)]">
       <Link href={`/products/${product.slug}`} className="absolute inset-0 z-10" aria-label={`View ${product.name}`} />
       
       {/* Image Box */}
@@ -42,7 +42,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
           src={image} 
           alt={product.name}
           loading={priority ? "eager" : "lazy"}
-          className="w-full h-full object-contain group-hover:scale-110 transition-all duration-500"
+          className="w-full h-full object-cover group-hover:scale-110 transition-all duration-500"
         />
       </div>
 

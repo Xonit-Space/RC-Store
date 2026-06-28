@@ -95,7 +95,7 @@ export function Header() {
   return (
     <header 
       suppressHydrationWarning 
-      className={`fixed top-0 z-50 w-full transition-all duration-500 bg-background/70 backdrop-blur-md ${
+      className={`fixed top-0 z-50 w-full transition-all duration-500 bg-white dark:bg-background/70 backdrop-blur-md ${
         scrolled 
           ? "shadow-md border-b border-border/50" 
           : "border-b border-transparent"

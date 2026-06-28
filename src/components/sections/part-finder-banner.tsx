@@ -21,7 +21,7 @@ export function PartFinderBanner() {
   const models = selectedMake ? selectedMake.models : []
 
   return (
-    <section className="relative bg-background py-24 border-t border-border overflow-hidden">
+    <section className="relative bg-white dark:bg-background py-24 border-t border-border overflow-hidden">
       {/* Background Image & Theme-aware Gradient */}
       <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1588612143093-4e44208d1326?q=80&w=2070')] bg-cover bg-center opacity-15 mix-blend-luminosity dark:opacity-20" />
       <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-transparent dark:from-background dark:via-background/90" />

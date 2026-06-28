@@ -62,11 +62,11 @@ export function Sidebar({ role }: SidebarProps) {
   const pathname = usePathname()
 
   return (
-    <aside className="w-60 border-r border-border/40 bg-background min-h-[calc(100vh-4rem)] shrink-0 sticky top-16 hidden md:flex md:flex-col">
+    <aside className="w-60 border-r border-border/40 bg-white dark:bg-background min-h-[calc(100vh-4rem)] shrink-0 sticky top-16 hidden md:flex md:flex-col">
       <nav className="flex-1 overflow-y-auto py-4 px-3">
         {navGroups.map((group) => (
           <div key={group.label} className="mb-5">
-            <p className="text-[9px] font-bold tracking-[0.25em] uppercase text-muted-foreground/50 px-3 mb-1.5">
+            <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-primary px-3 mb-2">
               {group.label}
             </p>
             <div className="space-y-0.5">
@@ -79,7 +79,7 @@ export function Sidebar({ role }: SidebarProps) {
                     <div
                       className={`flex items-center gap-3 h-9 px-3 rounded-md transition-all ${
                         isActive
-                          ? "bg-primary/10 text-primary font-semibold"
+                          ? "bg-primary/10 text-primary shadow-[0_0_10px_rgba(255,204,0,0.2)]"
                           : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
                       }`}
                     >
@@ -87,7 +87,7 @@ export function Sidebar({ role }: SidebarProps) {
                         strokeWidth={isActive ? 2 : 1.5}
                         className={`h-4 w-4 shrink-0 ${isActive ? "text-primary" : ""}`}
                       />
-                      <span className="text-[12px] tracking-wide flex-1">{item.name}</span>
+                      <span className={`text-xs flex-1 ${isActive ? 'font-bold' : 'font-medium'}`}>{item.name}</span>
                       {isActive && (
                         <ChevronRight className="h-3 w-3 text-primary opacity-60" />
                       )}

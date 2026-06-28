@@ -47,7 +47,7 @@ export async function FeaturedProductCard() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-racing-yellow/50 to-transparent" />
       
       <div className="container mx-auto px-6 md:px-12 relative z-10">
-        <div className="glass-dark border border-border p-8 md:p-12 shadow-2xl dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] relative">
+        <div className="glass-dark border border-border p-8 md:p-12 transition-all duration-300 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] relative">
           <Link href={`/products/${product.slug}`} className="absolute inset-0 z-10" aria-label={`View ${product.name}`} />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             

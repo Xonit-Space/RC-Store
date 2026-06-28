@@ -25,7 +25,7 @@ export function TrustHighlights() {
   ]
 
   return (
-    <section className="bg-muted py-16 border-y border-border">
+    <section className="bg-white dark:bg-muted py-16 border-y border-border">
       <div className="container mx-auto px-6 md:px-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {highlights.map((item, index) => (

@@ -17,6 +17,7 @@ const NewReleases = nextDynamic(() => import("@/components/sections/new-releases
 const CustomerGallery = nextDynamic(() => import("@/components/sections/customer-gallery").then(m => m.CustomerGallery))
 const NewsletterSection = nextDynamic(() => import("@/components/sections/newsletter-section").then(m => m.NewsletterSection))
 const SeoAboutContent = nextDynamic(() => import("@/components/sections/seo-about-content").then(m => m.SeoAboutContent))
+const BrandStorySection = nextDynamic(() => import("@/components/sections/brand-story-section").then(m => m.BrandStorySection))
 const Footer = nextDynamic(() => import("@/components/layout/footer").then(m => m.Footer))
 
 function SectionSkeleton({ heightClass = "h-96" }) {
@@ -70,6 +71,11 @@ export default function HomePage() {
         {/* 11. New Releases */}
         <Suspense fallback={<SectionSkeleton heightClass="h-[600px]" />}>
           <NewReleases />
+        </Suspense>
+
+        {/* 11.5. Brand Story & Testimonials */}
+        <Suspense fallback={<SectionSkeleton heightClass="h-[600px]" />}>
+          <BrandStorySection />
         </Suspense>
 
         {/* 12. Customer Gallery */}

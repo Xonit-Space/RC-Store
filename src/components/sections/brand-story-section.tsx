@@ -1,46 +1,25 @@
-"use client"
+import { Play } from "lucide-react"
+import { db } from "@/lib/db"
+import { BrandStorySlider } from "./brand-story-slider"
 
-import * as React from "react"
-import Link from "next/link"
-import { ArrowRight, Play, Star } from "lucide-react"
-import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel"
-import Autoplay from "embla-carousel-autoplay"
-
-const reviews = [
-  {
-    id: 1,
-    user: "Alex_Drift_99",
-    rating: 5,
-    comment: "Absolutely incredible control. The telemetry data is a game changer for track tuning.",
-    image: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=400&q=80"
-  },
-  {
-    id: 2,
-    user: "TrackMaster_X",
-    rating: 5,
-    comment: "Hit 110km/h on my first straight. The carbon chassis didn't even flinch when launched.",
-    image: "https://images.unsplash.com/photo-1532974297617-c0f05fe48bff?w=400&q=80"
-  },
-  {
-    id: 3,
-    user: "RC_Basher_42",
-    rating: 5,
-    comment: "Took it off a 15ft ramp. Landed perfectly. The suspension geometry is flawless out of the box.",
-    image: "https://images.unsplash.com/photo-1594819047050-99defca82545?w=400&q=80"
-  },
-  {
-    id: 4,
-    user: "Speed_Demon_YZ",
-    rating: 5,
-    comment: "Best ESC and motor combo I've ever ran. Stays cool even after back-to-back battery packs.",
-    image: "https://images.unsplash.com/photo-1511407397940-d57f68e81203?w=400&q=80"
-  }
-]
-
-export function BrandStorySection() {
-  const plugin = React.useRef(
-    Autoplay({ delay: 3500, stopOnInteraction: true })
-  )
+export async function BrandStorySection() {
+  const reviews = await db.review.findMany({
+    where: {
+      isApproved: true,
+    },
+    include: {
+      user: {
+        select: {
+          name: true,
+          email: true
+        }
+      }
+    },
+    take: 5,
+    orderBy: {
+      createdAt: 'desc'
+    }
+  })
 
   return (
     <section className="py-24 md:py-40 bg-background overflow-hidden border-t border-border relative">
@@ -62,38 +41,8 @@ export function BrandStorySection() {
             </div>
 
             <div className="w-full">
-              <Carousel
-                plugins={[plugin.current]}
-                className="w-full"
-                opts={{ loop: true }}
-                onMouseEnter={plugin.current.stop}
-                onMouseLeave={plugin.current.reset}
-              >
-                <CarouselContent>
-                  {reviews.map(review => (
-                    <CarouselItem key={review.id}>
-                      <div className="glass-dark p-6 border border-border hover:border-racing-yellow/40 transition-colors h-full flex flex-col justify-between">
-                        <div>
-                          <div className="flex gap-1 mb-3 text-primary">
-                            {[...Array(review.rating)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
-                          </div>
-                          <p className="text-muted-foreground font-sans text-sm leading-relaxed mb-6">&quot;{review.comment}&quot;</p>
-                        </div>
-                        <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">PILOT // {review.user}</p>
-                      </div>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-              </Carousel>
+              <BrandStorySlider reviews={reviews} />
             </div>
-
-            <Link
-              href="/community"
-              className="inline-flex items-center gap-3 text-[12px] font-heading font-bold tracking-[0.25em] uppercase text-foreground dark:text-white border-b border-border pb-2 hover:border-primary hover:text-primary transition-all duration-300 group mt-4"
-            >
-              Access Community Logs
-              <ArrowRight strokeWidth={2} className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
           </div>
 
           {/* Right: simulated video grid */}

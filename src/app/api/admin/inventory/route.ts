@@ -12,8 +12,22 @@ export const GET = withApiHandler(async (req: NextRequest) => {
   const limit = Math.min(parseInt(searchParams.get("limit") || "100"), 200)
   const skip = (page - 1) * limit
 
+  const search = searchParams.get("search") || ""
+
+  const whereClause: any = search
+    ? {
+        variant: {
+          OR: [
+            { sku: { contains: search, mode: "insensitive" } },
+            { product: { name: { contains: search, mode: "insensitive" } } },
+          ],
+        },
+      }
+    : {}
+
   const [inventories, total] = await Promise.all([
     db.inventory.findMany({
+      where: whereClause,
       skip,
       take: limit,
       // Use select instead of include: { variant: { include: { product: true } } }
@@ -39,7 +53,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
       },
       orderBy: { variantId: "asc" }
     }),
-    db.inventory.count(),
+    db.inventory.count({ where: whereClause }),
   ])
 
   return NextResponse.json({

@@ -10,7 +10,7 @@ export default function AdminLoading() {
       {/* Stats grid skeleton */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="p-6 md:p-8 bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 space-y-8">
+          <div key={i} className="p-6 md:p-8 bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] transition-all duration-300 space-y-8">
             <div className="flex justify-between items-start">
               <div className="h-10 w-10 bg-muted rounded-none" />
               <div className="h-3 w-16 bg-muted rounded-none" />
@@ -27,7 +27,7 @@ export default function AdminLoading() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-7 space-y-4">
           <div className="h-6 w-48 bg-muted rounded-none border-b border-border/40 pb-4" />
-          <div className="bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 p-8 space-y-4">
+          <div className="bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] transition-all duration-300 p-8 space-y-4">
             <div className="h-4 w-full bg-muted rounded-none" />
             <div className="h-4 w-3/4 bg-muted rounded-none" />
             <div className="h-4 w-1/2 bg-muted rounded-none" />
@@ -35,7 +35,7 @@ export default function AdminLoading() {
         </div>
         <div className="lg:col-span-5 space-y-4">
           <div className="h-6 w-48 bg-muted rounded-none border-b border-border/40 pb-4" />
-          <div className="bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 divide-y divide-border/40">
+          <div className="bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] transition-all duration-300 divide-y divide-border/40">
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="p-5 flex justify-between items-center">
                 <div className="space-y-2">

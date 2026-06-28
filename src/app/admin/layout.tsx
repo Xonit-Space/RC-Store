@@ -28,11 +28,11 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col text-foreground font-sans">
+    <div className="h-screen bg-background flex flex-col text-foreground font-sans overflow-hidden">
       <Header user={session.user} />
-      <div className="flex-grow flex">
+      <div className="flex-1 flex overflow-hidden">
         <Sidebar role={role} />
-        <main className="flex-grow p-6 md:p-10 bg-background overflow-y-auto">
+        <main className="flex-1 p-6 md:p-10 bg-background overflow-y-auto relative h-full">
           {children}
         </main>
       </div>

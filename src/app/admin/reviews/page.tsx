@@ -97,7 +97,7 @@ export default function AdminReviewsPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {reviews.map((review: any) => (
-              <div key={review.id} className="bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 transition-colors hover:border-foreground/30 flex flex-col">
+              <div key={review.id} className="bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] transition-all duration-300 transition-colors hover:border-foreground/30 flex flex-col">
                 <div className="p-5 flex-1">
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center gap-2">

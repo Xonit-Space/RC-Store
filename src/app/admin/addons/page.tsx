@@ -216,7 +216,7 @@ export default function AdminAddonsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {addons.map((addon: any) => (
-            <div key={addon.id} className="bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 flex flex-col group p-0 overflow-hidden">
+            <div key={addon.id} className="bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] transition-all duration-300 flex flex-col group p-0 overflow-hidden">
               {/* Image Header */}
               <div className="aspect-[16/9] w-full bg-muted border-b border-border/40 relative">
                 {addon.image ? (

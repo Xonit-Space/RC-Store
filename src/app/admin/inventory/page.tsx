@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   RefreshCw, Package, Plus, Minus, AlertTriangle,
   CheckCircle2, XCircle, X, Search, Database,
@@ -74,7 +74,7 @@ function RestockModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="max-w-sm w-full bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 p-8 relative">
+      <div className="max-w-sm w-full bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] transition-all duration-300 p-8 relative">
         <button
           onClick={onClose}
           className="absolute right-5 top-5 text-muted-foreground hover:text-foreground transition"
@@ -160,19 +160,26 @@ function RestockModal({
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export default function AdminInventoryPage() {
-  const { data: inventory = [], isLoading: loading } = useAdminInventory()
-  const queryClient = useQueryClient()
+  const [page, setPage] = useState(1)
+  const [limit] = useState(15)
   const [search, setSearch] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search)
+      setPage(1)
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [search])
+
+  const { data: response = { data: [], pagination: { total: 0, totalPages: 0, page: 1, limit: 15 } }, isLoading: loading } = useAdminInventory(page, limit, debouncedSearch)
+  const queryClient = useQueryClient()
   const [restockItem, setRestockItem] = useState<RestockItem | null>(null)
 
-  const filtered = inventory.filter((item: any) => {
-    if (!search) return true
-    const q = search.toLowerCase()
-    return (
-      item.variant?.product?.name?.toLowerCase().includes(q) ||
-      item.variant?.sku?.toLowerCase().includes(q)
-    )
-  })
+  const inventory = response.data || []
+  const pagination = response.pagination || { total: 0, totalPages: 0, page: 1, limit: 15 }
+
 
   // Summary stats
   const totalUnits = inventory.reduce((sum: number, i: any) => sum + (i.quantity || 0), 0)
@@ -226,21 +233,21 @@ export default function AdminInventoryPage() {
 
       {/* ── Summary cards ── */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="p-6 border border-border/40 bg-white dark:bg-background shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 space-y-2">
+        <div className="p-6 border border-border/40 bg-white dark:bg-background shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] transition-all duration-300 space-y-2">
           <div className="flex items-center gap-2 mb-2">
             <Database className="w-4 h-4 text-muted-foreground" />
             <p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold">Total Units</p>
           </div>
           <p className="text-2xl font-light text-foreground">{totalUnits.toLocaleString()}</p>
         </div>
-        <div className="p-6 border border-border/40 bg-white dark:bg-background shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-amber-500/50 transition-all duration-300 space-y-2">
+        <div className="p-6 border border-border/40 bg-white dark:bg-background shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] hover:border-amber-500/50 transition-all duration-300 space-y-2">
           <div className="flex items-center gap-2 mb-2">
             <AlertTriangle className="w-4 h-4 text-amber-500" />
             <p className="text-[9px] uppercase tracking-widest text-amber-500 font-bold">Low Stock</p>
           </div>
           <p className="text-2xl font-light text-amber-500">{lowStock}</p>
         </div>
-        <div className="p-6 border border-border/40 bg-white dark:bg-background shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-red-500/50 transition-all duration-300 space-y-2">
+        <div className="p-6 border border-border/40 bg-white dark:bg-background shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] hover:border-red-500/50 transition-all duration-300 space-y-2">
           <div className="flex items-center gap-2 mb-2">
             <XCircle className="w-4 h-4 text-red-500" />
             <p className="text-[9px] uppercase tracking-widest text-red-500 font-bold">Out of Stock</p>
@@ -261,7 +268,7 @@ export default function AdminInventoryPage() {
       </div>
 
       {/* ── Inventory table ── */}
-      <div className="bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 overflow-hidden">
+      <div className="bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] transition-all duration-300 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -284,7 +291,7 @@ export default function AdminInventoryPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border/40">
-              {filtered.length === 0 ? (
+              {inventory.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="p-12 text-center">
                     <Package className="h-10 w-10 text-muted-foreground/30 mx-auto mb-4" />
@@ -294,10 +301,10 @@ export default function AdminInventoryPage() {
                   </td>
                 </tr>
               ) : (
-                filtered.map((item: any) => {
+                inventory.map((item: any) => {
                   const available = item.quantity - item.reserved
                   return (
-                    <tr key={item.id} className="hover:bg-muted/5 transition-colors group">
+                    <tr key={item.id} className="transition-colors group">
                       <td className="p-4">
                         <p className="font-sans text-sm text-foreground line-clamp-1">
                           {item.variant?.product?.name || "Unknown Product"}
@@ -343,6 +350,38 @@ export default function AdminInventoryPage() {
             </tbody>
           </table>
         </div>
+        
+        {/* Pagination controls */}
+        {pagination.totalPages > 1 && (
+          <div className="flex items-center justify-between border-t border-border/40 px-4 py-3 bg-muted/5">
+            <p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">
+              Showing {(pagination.page - 1) * pagination.limit + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} entries
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={pagination.page <= 1}
+                className="h-8 rounded-none border-border/60 text-[10px] font-bold uppercase tracking-widest"
+              >
+                Previous
+              </Button>
+              <div className="text-[10px] font-bold text-foreground px-2">
+                Page {pagination.page} of {pagination.totalPages}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
+                disabled={pagination.page >= pagination.totalPages}
+                className="h-8 rounded-none border-border/60 text-[10px] font-bold uppercase tracking-widest"
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── Quick Restock Modal ── */}

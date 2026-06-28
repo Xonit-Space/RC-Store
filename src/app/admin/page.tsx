@@ -114,7 +114,7 @@ export default async function AdminOverviewPage() {
         {kpiCards.map((card) => (
           <div
             key={card.label}
-            className={`p-5 border border-border bg-white dark:bg-muted rounded-lg relative overflow-hidden group transition-all duration-300 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50`}
+            className={`p-5 border border-border bg-white dark:bg-muted rounded-lg relative overflow-hidden group transition-all duration-300 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)]`}
           >
             <div className="flex items-start justify-between mb-3">
               <div className={`h-9 w-9 ${card.bg} border ${card.border} flex items-center justify-center rounded-md`}>
@@ -145,7 +145,7 @@ export default async function AdminOverviewPage() {
               <Link
                 key={action.href}
                 href={action.href}
-                className="flex items-center gap-4 p-4 border border-border bg-white dark:bg-muted hover:border-racing-yellow/50 rounded-lg transition-all duration-300 group shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)]"
+                className="flex items-center gap-4 p-4 border border-border bg-white dark:bg-muted rounded-lg transition-all duration-300 group shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] "
               >
                 <div className={`h-9 w-9 rounded-md bg-muted/60 flex items-center justify-center shrink-0 group-hover:bg-background transition-colors`}>
                   <action.icon strokeWidth={2} className={`h-4 w-4 ${action.color}`} />
@@ -179,7 +179,7 @@ export default async function AdminOverviewPage() {
             </Link>
           </div>
 
-          <div className="border border-border rounded-lg bg-white dark:bg-muted overflow-hidden transition-all duration-300 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50">
+          <div className="border border-border rounded-lg bg-white dark:bg-muted overflow-hidden transition-all duration-300 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)]">
             {recentOrders.length === 0 ? (
               <div className="p-12 text-center">
                 <ShoppingCart className="h-8 w-8 text-muted-foreground/20 mx-auto mb-3" />
@@ -195,7 +195,7 @@ export default async function AdminOverviewPage() {
                     <Link
                       key={order.id}
                       href={`/admin/orders`}
-                      className="flex items-center justify-between p-4 hover:bg-background transition-colors group"
+                      className="flex items-center justify-between p-4 transition-colors group"
                     >
                       <div className="min-w-0">
                         <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">

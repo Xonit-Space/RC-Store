@@ -284,7 +284,7 @@ export function CourierManagement() {
               </thead>
               <tbody className="divide-y divide-muted/5">
                 {filteredDeliveries.map((d) => (
-                  <tr key={d.id} className="hover:bg-muted/5/50 transition">
+                  <tr key={d.id} className="transition">
                     <td className="py-3 pr-2">
                       <p className="font-extrabold text-foreground">{d.orderNumber}</p>
                       <p className="text-[9px] text-muted-foreground font-bold mt-0.5 truncate max-w-28">{d.trackingNumber}</p>

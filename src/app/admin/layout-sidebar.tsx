@@ -62,7 +62,7 @@ export function Sidebar({ role }: SidebarProps) {
   const pathname = usePathname()
 
   return (
-    <aside className="w-60 border-r border-border/40 bg-zinc-50 dark:bg-background min-h-[calc(100vh-4rem)] shrink-0 sticky top-16 hidden md:flex md:flex-col">
+    <aside className="w-60 border-r border-border/40 bg-zinc-50 dark:bg-background h-full shrink-0 flex flex-col hidden md:flex">
       <nav className="flex-1 overflow-y-auto py-4 px-3">
         {navGroups.map((group) => (
           <div key={group.label} className="mb-5">
@@ -71,8 +71,8 @@ export function Sidebar({ role }: SidebarProps) {
             </p>
             <div className="space-y-0.5">
               {group.items.map((item) => {
-                const isActive = item.path === "/admin"
-                  ? pathname === "/admin"
+                const isActive = item.path === "/admin" || item.path === "/admin/settings"
+                  ? pathname === item.path
                   : pathname.startsWith(item.path)
                 return (
                   <Link key={item.id} href={item.path}>

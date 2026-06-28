@@ -102,7 +102,7 @@ export default function ManagePartsPage({ params }: { params: { id: string } }) 
               <p className="text-xs text-muted-foreground italic border border-dashed border-border/40 p-8 text-center">No parts linked to this model yet.</p>
             ) : (
               compatibleParts.map(part => (
-                <div key={part.id} className="flex items-center gap-3 p-3 bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 group hover:border-foreground/30 transition-colors">
+                <div key={part.id} className="flex items-center gap-3 p-3 bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] transition-all duration-300 group hover:border-foreground/30 transition-colors">
                   <div className="h-10 w-10 shrink-0 bg-muted/10 border border-border/40 flex items-center justify-center overflow-hidden">
                     {part.images?.[0]?.url ? (
                       <Image src={part.images[0].url} alt="" width={40} height={40} className="object-cover" />
@@ -138,7 +138,7 @@ export default function ManagePartsPage({ params }: { params: { id: string } }) 
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="Search products by name or SKU..."
-              className="flex-1 bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 text-xs p-3 text-foreground focus:border-primary outline-none"
+              className="flex-1 bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] transition-all duration-300 text-xs p-3 text-foreground focus:border-primary outline-none"
             />
             <button type="submit" disabled={isSearching} className="bg-primary text-primary-foreground px-6 py-2 uppercase tracking-widest text-[10px] font-bold disabled:opacity-50 hover:opacity-90">
               Search

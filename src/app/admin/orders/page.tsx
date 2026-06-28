@@ -225,7 +225,7 @@ function OrdersPageInner() {
                 e.stopPropagation()
                 setSelectedOrder(o)
               }}
-              className="bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 transition-colors hover:border-foreground/30 cursor-pointer group"
+              className="bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] transition-all duration-300 transition-colors hover:border-foreground/30 cursor-pointer group"
             >
               {/* Order header row */}
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-muted/5 px-6 py-4 gap-4">
@@ -287,7 +287,7 @@ function OrdersPageInner() {
                         handleStatusChange(selectedOrder.id, e.target.value as OrderStatus)
                         setSelectedOrder({ ...selectedOrder, status: e.target.value })
                       }}
-                      className="h-9 bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 text-[10px] font-bold text-foreground px-2 outline-none uppercase tracking-widest cursor-pointer focus:border-foreground"
+                      className="h-9 bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] transition-all duration-300 text-[10px] font-bold text-foreground px-2 outline-none uppercase tracking-widest cursor-pointer focus:border-foreground"
                     >
                       {Object.entries(STATUS_CONFIG).map(([s, cfg]) => (
                         <option key={s} value={s}>{cfg.label}</option>

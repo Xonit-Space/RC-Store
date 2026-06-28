@@ -1,13 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 
-export function useAdminInventory() {
+export function useAdminInventory(page = 1, limit = 15, search = "") {
   return useQuery({
-    queryKey: ["admin", "inventory"],
+    queryKey: ["admin", "inventory", page, limit, search],
     queryFn: async () => {
-      const res = await fetch("/api/admin/inventory")
+      const params = new URLSearchParams({
+        page: String(page),
+        limit: String(limit),
+        ...(search ? { search } : {}),
+      })
+      const res = await fetch(`/api/admin/inventory?${params}`)
       if (!res.ok) throw new Error("Failed to load inventory allocations")
       const json = await res.json()
-      return json.data || []
+      return json || { data: [], pagination: { total: 0, totalPages: 0, page: 1, limit } }
     }
   })
 }

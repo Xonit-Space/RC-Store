@@ -52,7 +52,7 @@ export function Footer() {
               <li><Link href="/shipping" className="hover:text-primary transition-colors">Shipping & Delivery</Link></li>
               <li><Link href="/returns" className="hover:text-primary transition-colors">Returns & Refunds</Link></li>
               <li><Link href="/warranty" className="hover:text-primary transition-colors">Warranty Information</Link></li>
-              <li><Link href="/part-finder" className="hover:text-primary transition-colors text-primary">RC Part Finder</Link></li>
+              <li><Link href="/part-finder" className="hover:text-primary transition-colors">RC Part Finder</Link></li>
               <li><Link href="/contact" className="hover:text-primary transition-colors">Contact Us</Link></li>
             </ul>
           </div>

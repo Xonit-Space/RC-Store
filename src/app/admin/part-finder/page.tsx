@@ -222,7 +222,7 @@ export default function AdminPartFinderPage() {
                     ) : (
                       <div className="grid grid-cols-1 gap-6 mt-4">
                         {makeModels.map(model => (
-                          <div key={model.id} className="bg-white dark:bg-background border border-border/40 p-4 flex flex-col group hover:border-racing-yellow/50 transition-colors">
+                          <div key={model.id} className="bg-white dark:bg-background border border-border/40 p-4 flex flex-col group transition-colors">
                             
                             <div className="flex justify-between items-start">
                               <div>

@@ -145,7 +145,7 @@ function OrdersPageInner() {
         {activeStatus !== "ALL" && (
           <button
             onClick={() => setActiveStatus("ALL")}
-            className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground border border-border/40 px-3 py-1.5 rounded-md transition-colors flex items-center gap-1.5"
+            className="text-xs font-medium text-muted-foreground hover:text-foreground border border-border/40 px-3 py-1.5 rounded-md transition-colors flex items-center gap-1.5"
           >
             <X className="h-3 w-3" /> Clear filter
           </button>
@@ -184,7 +184,7 @@ function OrdersPageInner() {
             placeholder="Search by order # or customer..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-12 h-12 w-full bg-transparent border border-border/40 rounded-none focus:border-foreground focus:outline-none transition-colors placeholder:uppercase placeholder:tracking-wider placeholder:text-[10px] text-sm"
+            className="pl-12 h-12 w-full bg-white dark:bg-background border border-border/40 rounded-none focus:border-foreground focus:outline-none transition-colors placeholder:uppercase placeholder:tracking-wider placeholder:text-[10px] text-sm"
           />
         </div>
 
@@ -195,7 +195,7 @@ function OrdersPageInner() {
             <button
               key={s}
               onClick={() => setActiveStatus(s)}
-              className={`h-8 px-3 text-[9px] font-bold uppercase tracking-widest border transition-colors ${
+              className={`h-8 px-3 text-xs font-medium border transition-colors ${
                 activeStatus === s
                   ? "border-foreground bg-foreground text-background"
                   : "border-border/40 text-muted-foreground hover:border-foreground/40 hover:text-foreground"
@@ -225,7 +225,7 @@ function OrdersPageInner() {
                 e.stopPropagation()
                 setSelectedOrder(o)
               }}
-              className="border border-border/40 bg-background transition-colors hover:border-foreground/30 cursor-pointer group"
+              className="bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 transition-colors hover:border-foreground/30 cursor-pointer group"
             >
               {/* Order header row */}
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-muted/5 px-6 py-4 gap-4">
@@ -287,7 +287,7 @@ function OrdersPageInner() {
                         handleStatusChange(selectedOrder.id, e.target.value as OrderStatus)
                         setSelectedOrder({ ...selectedOrder, status: e.target.value })
                       }}
-                      className="h-9 border border-border/40 bg-background text-[10px] font-bold text-foreground px-2 outline-none uppercase tracking-widest cursor-pointer focus:border-foreground"
+                      className="h-9 bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 text-[10px] font-bold text-foreground px-2 outline-none uppercase tracking-widest cursor-pointer focus:border-foreground"
                     >
                       {Object.entries(STATUS_CONFIG).map(([s, cfg]) => (
                         <option key={s} value={s}>{cfg.label}</option>

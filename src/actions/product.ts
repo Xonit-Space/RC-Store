@@ -158,6 +158,34 @@ export async function adminAddVariant(
   }
 }
 
+export async function adminUpdateVariant(
+  adminId: string,
+  variantId: string,
+  variantData: any
+): Promise<ActionResponse> {
+  const session = await getServerSession(authOptions)
+  if (!session?.user || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {
+    return { success: false, error: "Unauthorized access" }
+  }
+
+  const result = CmsProductVariantSchema.safeParse(variantData)
+
+  if (!result.success) {
+    const errorMsg = result.error.errors.map((e) => e.message).join(", ")
+    return { success: false, error: errorMsg }
+  }
+
+  const data = result.data
+
+  try {
+    const variant = await ProductService.updateVariant(adminId, variantId, data)
+    return { success: true, data: variant }
+  } catch (error) {
+    console.error("CMS Variant Update Action Error:", error)
+    return { success: false, error: "Failed to update SKU variant" }
+  }
+}
+
 export async function adminDeleteProduct(adminId: string, productId: string): Promise<ActionResponse> {
   const session = await getServerSession(authOptions)
   if (!session?.user || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {

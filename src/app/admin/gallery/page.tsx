@@ -66,7 +66,7 @@ export default function AdminGalleryPage() {
           <p className="col-span-full text-center text-muted-foreground uppercase tracking-widest text-xs p-8">No images found.</p>
         ) : (
           images.map((img) => (
-            <div key={img.id} className="border border-border/40 bg-background flex flex-col group overflow-hidden">
+            <div key={img.id} className="bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 flex flex-col group overflow-hidden">
               <div className="relative aspect-square bg-muted">
                 <img src={img.imageUrl} alt={img.caption || "Gallery"} className="w-full h-full object-cover" />
                 <div className="absolute top-2 right-2">

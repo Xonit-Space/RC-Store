@@ -62,7 +62,7 @@ export function Sidebar({ role }: SidebarProps) {
   const pathname = usePathname()
 
   return (
-    <aside className="w-60 border-r border-border/40 bg-white dark:bg-background min-h-[calc(100vh-4rem)] shrink-0 sticky top-16 hidden md:flex md:flex-col">
+    <aside className="w-60 border-r border-border/40 bg-zinc-50 dark:bg-background min-h-[calc(100vh-4rem)] shrink-0 sticky top-16 hidden md:flex md:flex-col">
       <nav className="flex-1 overflow-y-auto py-4 px-3">
         {navGroups.map((group) => (
           <div key={group.label} className="mb-5">

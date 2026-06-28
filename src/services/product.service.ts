@@ -131,4 +131,55 @@ export class ProductService {
       return v
     })
   }
+
+  static async updateVariant(adminId: string, variantId: string, data: any) {
+    return db.$transaction(async (tx) => {
+      const v = await tx.productVariant.update({
+        where: { id: variantId },
+        data: {
+          sku: data.sku,
+          size: data.size,
+          color: data.color,
+          colorName: data.colorName,
+          price: data.price,
+        },
+      })
+
+      // Update inventory if stock/location provided
+      if (data.stock !== undefined) {
+        const inventory = await tx.inventory.findFirst({
+          where: { variantId }
+        })
+        if (inventory) {
+          await tx.inventory.update({
+            where: { id: inventory.id },
+            data: { 
+              quantity: data.stock,
+              location: data.location
+            }
+          })
+        } else {
+          await tx.inventory.create({
+            data: {
+              variantId,
+              quantity: data.stock,
+              location: data.location || ""
+            }
+          })
+        }
+      }
+
+      await tx.auditLog.create({
+        data: {
+          userId: adminId,
+          action: "VARIANT_UPDATE",
+          entity: "ProductVariant",
+          entityId: v.id,
+          changes: JSON.stringify(data),
+        },
+      })
+
+      return v
+    })
+  }
 }

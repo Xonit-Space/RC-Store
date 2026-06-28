@@ -93,13 +93,13 @@ export default async function AdminOverviewPage() {
             Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"} 👋
           </h2>
           <p className="text-sm text-muted-foreground mt-1.5">
-            Here's what's happening in your store today.
+            Here&apos;s what&apos;s happening in your store today.
           </p>
         </div>
         <div className="text-right hidden md:block">
           <div className="flex items-center gap-1.5 justify-end">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-500">
+            <p className="text-xs font-medium text-emerald-500">
               System Online
             </p>
           </div>
@@ -114,7 +114,7 @@ export default async function AdminOverviewPage() {
         {kpiCards.map((card) => (
           <div
             key={card.label}
-            className={`p-5 border border-border bg-white dark:bg-muted rounded-lg relative overflow-hidden group transition-all duration-300 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:hover:shadow-[0_0_40px_rgba(255,204,0,0.2)]`}
+            className={`p-5 border border-border bg-white dark:bg-muted rounded-lg relative overflow-hidden group transition-all duration-300 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50`}
           >
             <div className="flex items-start justify-between mb-3">
               <div className={`h-9 w-9 ${card.bg} border ${card.border} flex items-center justify-center rounded-md`}>
@@ -124,7 +124,7 @@ export default async function AdminOverviewPage() {
             <p className="font-bold text-3xl text-foreground leading-none mb-2">
               {card.value}
             </p>
-            <p className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
+            <p className="font-medium text-xs text-muted-foreground">
               {card.label}
             </p>
             <p className="text-[11px] text-muted-foreground mt-1">
@@ -145,7 +145,7 @@ export default async function AdminOverviewPage() {
               <Link
                 key={action.href}
                 href={action.href}
-                className="flex items-center gap-4 p-4 border border-border bg-white dark:bg-muted hover:border-racing-yellow/50 rounded-lg transition-all duration-300 group hover:shadow-[0_5px_20px_rgba(255,204,0,0.1)]"
+                className="flex items-center gap-4 p-4 border border-border bg-white dark:bg-muted hover:border-racing-yellow/50 rounded-lg transition-all duration-300 group shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)]"
               >
                 <div className={`h-9 w-9 rounded-md bg-muted/60 flex items-center justify-center shrink-0 group-hover:bg-background transition-colors`}>
                   <action.icon strokeWidth={2} className={`h-4 w-4 ${action.color}`} />
@@ -173,13 +173,13 @@ export default async function AdminOverviewPage() {
             <h3 className="font-semibold text-lg text-foreground tracking-tight">Recent Orders</h3>
             <Link
               href="/admin/orders"
-              className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
+              className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
             >
               View all <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
 
-          <div className="border border-border rounded-lg bg-white dark:bg-muted overflow-hidden shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)]">
+          <div className="border border-border rounded-lg bg-white dark:bg-muted overflow-hidden transition-all duration-300 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50">
             {recentOrders.length === 0 ? (
               <div className="p-12 text-center">
                 <ShoppingCart className="h-8 w-8 text-muted-foreground/20 mx-auto mb-3" />

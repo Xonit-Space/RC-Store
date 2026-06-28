@@ -55,7 +55,7 @@ export default function AdminBlogPage() {
         </Link>
       </div>
 
-      <div className="border border-border/40 bg-background overflow-x-auto">
+      <div className="bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead className="bg-muted/5 border-b border-border/40 text-[10px] uppercase tracking-widest text-muted-foreground">
             <tr>

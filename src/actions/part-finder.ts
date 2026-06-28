@@ -94,3 +94,15 @@ export async function getCompatibleParts(vehicleModelId: string) {
   })
   return compatibilities.map(c => c.product)
 }
+
+export async function getProductCompatibleModels(productId: string) {
+  const compatibilities = await db.partCompatibility.findMany({
+    where: { productId },
+    include: {
+      vehicleModel: {
+        include: { make: true }
+      }
+    }
+  })
+  return compatibilities.map(c => c.vehicleModel)
+}

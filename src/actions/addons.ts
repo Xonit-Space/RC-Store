@@ -158,3 +158,41 @@ export async function assignAddonsToProduct(productId: string, addonIds: string[
     return { success: false, error: "Failed to assign addons to product." }
   }
 }
+export async function getAddonProducts(addonId: string) {
+  const productAddons = await db.productAddon.findMany({
+    where: { addonId },
+    select: { productId: true }
+  })
+  return productAddons.map(pa => pa.productId)
+}
+
+export async function assignAddonToProducts(addonId: string, productIds: string[]): Promise<ActionResponse> {
+  try {
+    const existing = await db.productAddon.findMany({ where: { addonId } })
+    const existingIds = existing.map(e => e.productId)
+
+    const toAdd = productIds.filter(id => !existingIds.includes(id))
+    const toRemove = existingIds.filter(id => !productIds.includes(id))
+
+    if (toRemove.length > 0) {
+      await db.productAddon.deleteMany({
+        where: {
+          addonId,
+          productId: { in: toRemove }
+        }
+      })
+    }
+
+    if (toAdd.length > 0) {
+      await db.productAddon.createMany({
+        data: toAdd.map(productId => ({ addonId, productId }))
+      })
+    }
+
+    revalidatePath("/admin/addons")
+    return { success: true }
+  } catch (error: any) {
+    console.error("Assign Addon Error:", error)
+    return { success: false, error: "Failed to assign addon to products." }
+  }
+}

@@ -74,7 +74,7 @@ function RestockModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="max-w-sm w-full bg-background border border-border shadow-2xl p-8 relative">
+      <div className="max-w-sm w-full bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 p-8 relative">
         <button
           onClick={onClose}
           className="absolute right-5 top-5 text-muted-foreground hover:text-foreground transition"
@@ -226,21 +226,21 @@ export default function AdminInventoryPage() {
 
       {/* ── Summary cards ── */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="border border-border/40 p-5 bg-muted/5">
+        <div className="p-6 border border-border/40 bg-white dark:bg-background shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 space-y-2">
           <div className="flex items-center gap-2 mb-2">
             <Database className="w-4 h-4 text-muted-foreground" />
             <p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold">Total Units</p>
           </div>
-          <p className="text-2xl font-light text-foreground">{totalUnits.toLocaleString("en-AU", { style: 'currency', currency: 'AUD' })}</p>
+          <p className="text-2xl font-light text-foreground">{totalUnits.toLocaleString()}</p>
         </div>
-        <div className="border border-amber-500/30 p-5 bg-amber-500/5">
+        <div className="p-6 border border-border/40 bg-white dark:bg-background shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-amber-500/50 transition-all duration-300 space-y-2">
           <div className="flex items-center gap-2 mb-2">
             <AlertTriangle className="w-4 h-4 text-amber-500" />
             <p className="text-[9px] uppercase tracking-widest text-amber-500 font-bold">Low Stock</p>
           </div>
           <p className="text-2xl font-light text-amber-500">{lowStock}</p>
         </div>
-        <div className="border border-red-500/30 p-5 bg-red-500/5">
+        <div className="p-6 border border-border/40 bg-white dark:bg-background shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-red-500/50 transition-all duration-300 space-y-2">
           <div className="flex items-center gap-2 mb-2">
             <XCircle className="w-4 h-4 text-red-500" />
             <p className="text-[9px] uppercase tracking-widest text-red-500 font-bold">Out of Stock</p>
@@ -256,12 +256,12 @@ export default function AdminInventoryPage() {
           placeholder="Search by product or SKU..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pl-12 h-12 bg-transparent border-border/40 rounded-none focus-visible:ring-0 focus-visible:border-foreground placeholder:uppercase placeholder:tracking-wider placeholder:text-[10px]"
+          className="pl-12 h-12 bg-white dark:bg-background border-border/40 rounded-none focus-visible:ring-0 focus-visible:border-foreground placeholder:uppercase placeholder:tracking-wider placeholder:text-[10px]"
         />
       </div>
 
       {/* ── Inventory table ── */}
-      <div className="border border-border/40 bg-background overflow-hidden">
+      <div className="bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>

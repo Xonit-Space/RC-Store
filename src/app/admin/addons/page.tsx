@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Plus, Trash2, Edit, X, RefreshCw, PackagePlus } from "lucide-react"
 import { toast } from "sonner"
-import { getAddons, createAddon, updateAddon, deleteAddon } from "@/actions/addons"
+import { getAddons, createAddon, updateAddon, deleteAddon, assignAddonToProducts, getAddonProducts } from "@/actions/addons"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { useAdminProducts } from "@/hooks/use-admin-data"
 
 export default function AdminAddonsPage() {
   const queryClient = useQueryClient()
@@ -25,7 +26,18 @@ export default function AdminAddonsPage() {
   const [description, setDescription] = useState("")
   const [price, setPrice] = useState("")
   const [isActive, setIsActive] = useState(true)
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [currentImage, setCurrentImage] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Assign Products State
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false)
+  const [assigningAddonId, setAssigningAddonId] = useState("")
+  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([])
+  const [isAssigning, setIsAssigning] = useState(false)
+
+  const { data: allProductsData } = useAdminProducts(1, 1000)
+  const allProducts = allProductsData?.products || []
 
   const openCreateModal = () => {
     setIsEditMode(false)
@@ -34,6 +46,8 @@ export default function AdminAddonsPage() {
     setSlug("")
     setDescription("")
     setPrice("")
+    setCurrentImage("")
+    setImageFile(null)
     setIsActive(true)
     setIsOpen(true)
   }
@@ -44,9 +58,47 @@ export default function AdminAddonsPage() {
     setName(addon.name)
     setSlug(addon.slug)
     setDescription(addon.description || "")
+    setCurrentImage(addon.image || "")
+    setImageFile(null)
     setPrice(addon.price.toString())
     setIsActive(addon.isActive)
     setIsOpen(true)
+  }
+
+  const openAssignModal = async (addon: any) => {
+    setAssigningAddonId(addon.id)
+    setSelectedProductIds([])
+    setIsAssignModalOpen(true)
+    try {
+      const pIds = await getAddonProducts(addon.id)
+      setSelectedProductIds(pIds)
+    } catch {
+      toast.error("Failed to load assigned products")
+    }
+  }
+
+  const handleAssignSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsAssigning(true)
+    try {
+      const res = await assignAddonToProducts(assigningAddonId, selectedProductIds)
+      if (res.success) {
+        toast.success("Products assigned successfully!")
+        setIsAssignModalOpen(false)
+      } else {
+        toast.error(res.error || "Failed to assign products")
+      }
+    } catch {
+      toast.error("Failed to assign products")
+    } finally {
+      setIsAssigning(false)
+    }
+  }
+
+  const toggleProductSelection = (productId: string) => {
+    setSelectedProductIds(prev => 
+      prev.includes(productId) ? prev.filter(id => id !== productId) : [...prev, productId]
+    )
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -58,10 +110,22 @@ export default function AdminAddonsPage() {
 
     setIsSubmitting(true)
     try {
+      let finalImgUrl = currentImage
+      if (imageFile) {
+        const formData = new FormData()
+        formData.append("file", imageFile)
+        formData.append("folder", "rc-store/addons")
+        const uploadRes = await fetch("/api/admin/upload", { method: "POST", body: formData })
+        const uploadData = await uploadRes.json()
+        if (!uploadData.success) throw new Error(uploadData.error)
+        finalImgUrl = uploadData.url
+      }
+
       const payload = {
         name,
         slug,
         description,
+        image: finalImgUrl || null,
         price: parseFloat(price),
         isActive
       }
@@ -150,39 +214,66 @@ export default function AdminAddonsPage() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {addons.map((addon: any) => (
-            <div key={addon.id} className="border border-border/40 bg-background flex flex-col group transition-colors hover:border-foreground/30 p-4">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-sans text-base font-bold text-foreground line-clamp-1">{addon.name}</h3>
-                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{addon.slug}</p>
+            <div key={addon.id} className="bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 flex flex-col group p-0 overflow-hidden">
+              {/* Image Header */}
+              <div className="aspect-[16/9] w-full bg-muted border-b border-border/40 relative">
+                {addon.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={addon.image} alt={addon.name} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <PackagePlus className="w-8 h-8 text-muted-foreground/30" />
+                  </div>
+                )}
+                <div className="absolute top-2 right-2">
+                  <span className={`text-[9px] uppercase tracking-widest font-bold px-2 py-1 rounded-sm ${addon.isActive ? "text-emerald-500 bg-emerald-500/10 backdrop-blur-md" : "text-muted-foreground bg-muted/80 backdrop-blur-md"}`}>
+                    {addon.isActive ? "Active" : "Inactive"}
+                  </span>
                 </div>
-                <span className="text-sm font-bold text-foreground">
-                  {Number(addon.price).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}
-                </span>
               </div>
-              <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{addon.description || "No description"}</p>
-              <div className="mt-4 flex justify-between items-center">
-                <span className={`text-[9px] uppercase tracking-widest font-bold px-2 py-0.5 ${addon.isActive ? "text-emerald-500 bg-emerald-500/10" : "text-muted-foreground bg-muted/20"}`}>
-                  {addon.isActive ? "Active" : "Inactive"}
-                </span>
-              </div>
-              <div className="mt-4 pt-4 border-t border-border/40 flex items-center justify-end gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => openEditModal(addon)}
-                  className="h-8 rounded-none border-border/40 text-[9px] uppercase tracking-widest font-bold"
-                >
-                  <Edit className="w-3.5 h-3.5 mr-1.5" /> Edit
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => handleDelete(addon.id)}
-                  className="h-8 rounded-none border-border/40 text-[9px] uppercase tracking-widest font-bold text-red-500 hover:text-red-700 hover:border-red-500/40"
-                >
-                  <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Delete
-                </Button>
+              
+              <div className="p-4 flex-1 flex flex-col">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <h3 className="font-sans text-lg font-bold text-foreground line-clamp-1">{addon.name}</h3>
+                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{addon.slug}</p>
+                  </div>
+                  <span className="text-base font-bold text-foreground text-racing-yellow">
+                    {Number(addon.price).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}
+                  </span>
+                </div>
+                
+                <p className="text-sm text-muted-foreground line-clamp-2 mb-4 flex-1">
+                  {addon.description || "No description provided."}
+                </p>
+                
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => openAssignModal(addon)}
+                    className="flex-1 h-10 rounded-none bg-foreground text-background font-bold text-[10px] tracking-widest uppercase hover:bg-racing-yellow hover:text-black transition-colors"
+                  >
+                    Assign to Products
+                  </Button>
+                </div>
+                
+                <div className="mt-3 pt-3 border-t border-border/40 flex items-center justify-between">
+                  <Button
+                    variant="ghost"
+                    onClick={() => openEditModal(addon)}
+                    className="h-8 rounded-none text-[10px] uppercase tracking-widest font-bold px-2 text-muted-foreground hover:text-foreground hover:bg-muted/10"
+                  >
+                    <Edit className="w-3.5 h-3.5 mr-1.5" /> Edit
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleDelete(addon.id)}
+                    className="h-8 rounded-none text-[10px] uppercase tracking-widest font-bold px-2 text-terracotta hover:text-terracotta hover:bg-terracotta/10"
+                  >
+                    <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Delete
+                  </Button>
+                </div>
               </div>
             </div>
           ))}
@@ -191,18 +282,19 @@ export default function AdminAddonsPage() {
 
       {isOpen && (
         <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-background border border-border shadow-2xl relative">
-            <div className="flex items-start justify-between p-6 border-b border-border/40">
-              <h3 className="font-sans text-xl font-light text-foreground">
+          <div className="w-full max-w-2xl bg-white dark:bg-background border border-border/40 shadow-2xl transition-all duration-300 relative flex flex-col max-h-[90vh]">
+            <div className="flex items-start justify-between p-6 border-b border-border/40 shrink-0">
+              <h3 className="font-sans text-2xl font-light text-foreground">
                 {isEditMode ? "Edit Addon" : "New Addon"}
               </h3>
               <button onClick={() => setIsOpen(false)} className="text-muted-foreground hover:text-foreground transition">
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <div className="p-6">
-              <form onSubmit={handleSubmit} className="space-y-4" id="addon-form">
-                <div className="space-y-2">
+            <div className="p-6 overflow-y-auto">
+              <form onSubmit={handleSubmit} className="space-y-6" id="addon-form">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
                   <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">
                     Name <span className="text-red-400">*</span>
                   </label>
@@ -228,7 +320,9 @@ export default function AdminAddonsPage() {
                     required
                   />
                 </div>
-                <div className="space-y-2">
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
                   <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">
                     Price ($) <span className="text-red-400">*</span>
                   </label>
@@ -242,6 +336,7 @@ export default function AdminAddonsPage() {
                     required
                   />
                 </div>
+                
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">
                     Description
@@ -249,9 +344,29 @@ export default function AdminAddonsPage() {
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full min-h-[80px] p-3 bg-transparent border border-border/60 rounded-none text-sm focus:outline-none focus:border-foreground"
+                    className="w-full min-h-[80px] p-3 bg-white dark:bg-background border border-border/60 rounded-none text-sm focus:outline-none focus:border-foreground"
                   />
                 </div>
+                
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">
+                    Addon Image
+                  </label>
+                  <div className="flex gap-4 items-center">
+                    {currentImage && !imageFile && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={currentImage} alt="Current" className="w-16 h-16 object-cover border border-border/40" />
+                    )}
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+                      className="h-10 bg-white dark:bg-background border-border/60 rounded-none focus-visible:ring-0 p-1.5"
+                    />
+                  </div>
+                </div>
+                </div>
+
                 <div className="pt-2">
                   <label className="flex items-center gap-3 cursor-pointer group">
                     <div
@@ -267,10 +382,59 @@ export default function AdminAddonsPage() {
                 </div>
               </form>
             </div>
-            <div className="flex gap-4 justify-end px-6 py-4 border-t border-border/40 bg-muted/5">
-              <Button type="button" variant="outline" onClick={() => setIsOpen(false)} disabled={isSubmitting} className="rounded-none h-10 text-xs uppercase tracking-widest">Cancel</Button>
-              <Button type="submit" form="addon-form" disabled={isSubmitting} className="rounded-none h-10 bg-foreground text-background text-xs uppercase tracking-widest">
+            <div className="flex gap-4 justify-end px-6 py-4 border-t border-border/40 bg-muted/5 shrink-0">
+              <Button type="button" variant="outline" onClick={() => setIsOpen(false)} disabled={isSubmitting} className="rounded-none h-12 px-6 font-semibold uppercase tracking-widest text-xs">Cancel</Button>
+              <Button type="submit" form="addon-form" disabled={isSubmitting} className="rounded-none h-12 px-6 bg-foreground text-background font-semibold uppercase tracking-widest text-xs">
                 {isSubmitting ? "Saving..." : "Save Addon"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Assign Products Modal */}
+      {isAssignModalOpen && (
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="max-w-xl w-full max-h-[90vh] flex flex-col bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] relative">
+            <div className="flex items-start justify-between p-6 border-b border-border/40 shrink-0">
+              <div>
+                <h3 className="font-sans text-xl font-light text-foreground">
+                  Assign to Products
+                </h3>
+                <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-1">Select products that support this addon</p>
+              </div>
+              <button onClick={() => setIsAssignModalOpen(false)} className="text-muted-foreground hover:text-foreground transition">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <form id="assign-form" onSubmit={handleAssignSubmit} className="flex-1 overflow-y-auto p-6">
+              {allProducts.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No products found.</p>
+              ) : (
+                <div className="space-y-2">
+                  {allProducts.map((p: any) => (
+                    <label key={p.id} className="flex items-center gap-3 p-3 border border-border/40 hover:border-foreground/30 transition-colors cursor-pointer group">
+                      <input
+                        type="checkbox"
+                        checked={selectedProductIds.includes(p.id)}
+                        onChange={() => toggleProductSelection(p.id)}
+                        className="w-4 h-4 rounded-none border-border/60 text-foreground focus:ring-0 focus:ring-offset-0 bg-white dark:bg-background accent-foreground"
+                      />
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-foreground group-hover:text-racing-yellow transition-colors">{p.name}</p>
+                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{p.category?.name || "Uncategorized"}</p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </form>
+            
+            <div className="flex gap-4 justify-end px-6 py-4 border-t border-border/40 bg-muted/5 shrink-0">
+              <Button type="button" variant="outline" onClick={() => setIsAssignModalOpen(false)} disabled={isAssigning} className="rounded-none h-10 text-xs uppercase tracking-widest">Cancel</Button>
+              <Button type="submit" form="assign-form" disabled={isAssigning} className="rounded-none h-10 bg-foreground text-background text-xs uppercase tracking-widest">
+                {isAssigning ? "Saving..." : "Save Assignments"}
               </Button>
             </div>
           </div>

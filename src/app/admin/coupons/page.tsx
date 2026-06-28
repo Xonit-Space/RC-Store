@@ -73,7 +73,7 @@ export default function AdminCouponsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {coupons.map((c: any) => (
-          <div key={c.id} className="border border-border/40 bg-background flex flex-col justify-between group transition-colors hover:border-foreground/30">
+          <div key={c.id} className="bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 flex flex-col justify-between group transition-colors hover:border-foreground/30">
             <div className="p-6 space-y-6">
               <div className="flex justify-between items-start gap-4">
                 <div>
@@ -109,7 +109,7 @@ export default function AdminCouponsPage() {
       {/* Add Coupon Modal */}
       {isOpen && (
         <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="max-w-sm w-full bg-background border border-border shadow-2xl p-8 relative">
+          <div className="max-w-sm w-full bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 p-8 relative">
             <button
               onClick={() => setIsOpen(false)}
               className="absolute right-6 top-6 text-muted-foreground hover:text-foreground transition"

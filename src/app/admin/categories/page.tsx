@@ -185,7 +185,7 @@ export default function AdminCategoriesPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {categories.map((c: any) => (
-            <div key={c.id} className="border border-border/40 bg-background flex flex-col group transition-colors hover:border-foreground/30 p-4">
+            <div key={c.id} className="bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 flex flex-col group transition-colors hover:border-foreground/30 p-4">
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="font-sans text-base font-bold text-foreground">{c.name}</h3>
@@ -235,7 +235,7 @@ export default function AdminCategoriesPage() {
 
       {isOpen && (
         <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-background border border-border shadow-2xl relative">
+          <div className="max-w-md w-full bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 relative">
             <div className="flex items-start justify-between p-6 border-b border-border/40">
               <h3 className="font-sans text-xl font-light text-foreground">
                 {isEditMode ? "Edit Category" : "New Category"}

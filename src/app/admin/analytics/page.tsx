@@ -39,7 +39,7 @@ export default async function AdminAnalyticsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="p-8 border border-border/40 bg-background transition-colors hover:border-accent">
+        <div className="p-8 bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 transition-colors hover:border-accent">
           <div className="flex justify-between items-start mb-12">
             <div className="h-10 w-10 bg-brass/5 flex items-center justify-center">
               <DollarSign strokeWidth={1} className="h-5 w-5 text-brass" />
@@ -55,7 +55,7 @@ export default async function AdminAnalyticsPage() {
           </div>
         </div>
 
-        <div className="p-8 border border-border/40 bg-background transition-colors hover:border-accent">
+        <div className="p-8 bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 transition-colors hover:border-accent">
           <div className="flex justify-between items-start mb-12">
             <div className="h-10 w-10 bg-forest/5 flex items-center justify-center">
               <TrendingUp strokeWidth={1} className="h-5 w-5 text-forest" />
@@ -71,7 +71,7 @@ export default async function AdminAnalyticsPage() {
           </div>
         </div>
 
-        <div className="p-8 border border-border/40 bg-background transition-colors hover:border-accent">
+        <div className="p-8 bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300 transition-colors hover:border-accent">
           <div className="flex justify-between items-start mb-12">
             <div className="h-10 w-10 bg-charcoal/5 flex items-center justify-center">
               <Users strokeWidth={1} className="h-5 w-5 text-charcoal" />
@@ -88,7 +88,7 @@ export default async function AdminAnalyticsPage() {
         </div>
       </div>
 
-      <div className="border border-border/40 bg-background">
+      <div className="bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] hover:border-racing-yellow/50 transition-all duration-300">
         <div className="border-b border-border/40 p-6 md:p-8">
           <h3 className="font-sans text-2xl font-light text-foreground">Revenue Activity</h3>
           <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground mt-2">Latest 12 Transactions</p>

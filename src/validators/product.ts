@@ -35,6 +35,7 @@ export const CmsProductSchema = z.object({
   includedItems: z.array(z.string()).default([]),
   requiredItems: z.array(z.string()).default([]),
   notes: z.string().optional().nullable(),
+  stock: z.coerce.number().int().min(0, "Stock cannot be negative").default(0),
 })
 
 export const CmsProductVariantSchema = z.object({

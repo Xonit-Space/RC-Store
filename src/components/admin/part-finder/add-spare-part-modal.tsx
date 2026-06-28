@@ -37,6 +37,7 @@ export function AddSparePartModal({
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
   const [price, setPrice] = useState("")
+  const [stock, setStock] = useState("0")
   const [categoryId, setCategoryId] = useState("")
 
   // Images State
@@ -74,6 +75,7 @@ export function AddSparePartModal({
         name,
         description,
         price: Number(price),
+        stock: Number(stock),
         categoryId,
         isActive: true
       }
@@ -161,6 +163,10 @@ export function AddSparePartModal({
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">Initial Stock <span className="text-red-400">*</span></label>
+                  <Input type="number" step="1" min="0" value={stock} onChange={(e) => setStock(e.target.value)} required className="h-12 bg-white dark:bg-background border-border/60 rounded-none" />
+                </div>
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">Category</label>
                   <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} className="w-full h-12 bg-white dark:bg-background border border-border/60 rounded-none text-xs text-foreground px-3 outline-none focus:border-foreground">

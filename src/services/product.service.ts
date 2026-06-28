@@ -27,6 +27,24 @@ export class ProductService {
           includedItems: data.includedItems || [],
           requiredItems: data.requiredItems || [],
           notes: data.notes || null,
+          ...(data.stock !== undefined
+            ? {
+                variants: {
+                  create: {
+                    sku: `${slug}-DEFAULT`.toUpperCase(),
+                    size: "Default",
+                    color: "N/A",
+                    colorName: "N/A",
+                    price: data.price,
+                    inventory: {
+                      create: {
+                        quantity: data.stock,
+                      },
+                    },
+                  },
+                },
+              }
+            : {}),
         },
       })
 
@@ -75,6 +93,47 @@ export class ProductService {
           changes: JSON.stringify(data),
         },
       })
+
+      if (data.stock !== undefined) {
+        const firstVariant = await tx.productVariant.findFirst({
+          where: { productId },
+          orderBy: { createdAt: "asc" },
+        })
+        if (firstVariant) {
+          const inventory = await tx.inventory.findUnique({
+            where: { variantId: firstVariant.id },
+          })
+          if (inventory) {
+            await tx.inventory.update({
+              where: { id: inventory.id },
+              data: { quantity: data.stock },
+            })
+          } else {
+            await tx.inventory.create({
+              data: {
+                variantId: firstVariant.id,
+                quantity: data.stock,
+              },
+            })
+          }
+        } else {
+          await tx.productVariant.create({
+            data: {
+              productId,
+              sku: `${p.slug}-DEFAULT`.toUpperCase(),
+              size: "Default",
+              color: "N/A",
+              colorName: "N/A",
+              price: data.price,
+              inventory: {
+                create: {
+                  quantity: data.stock,
+                },
+              },
+            },
+          })
+        }
+      }
 
       return p
     })

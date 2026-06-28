@@ -65,6 +65,7 @@ export function FullProductEditModal({
   const [description, setDescription] = useState("")
   const [price, setPrice] = useState("")
   const [originalPrice, setOriginalPrice] = useState("")
+  const [stock, setStock] = useState("0")
   const [rcCategory, setRcCategory] = useState(RC_CATEGORIES[0])
   const [categoryId, setCategoryId] = useState("")
   const [brandName, setBrandName] = useState("")
@@ -90,6 +91,10 @@ export function FullProductEditModal({
       setScale(product.scale || "N/A")
       setIsFeatured(product.isFeatured || false)
       setIsActive(product.isActive ?? true)
+      
+      const totalStock = product.variants?.reduce((acc: number, v: any) => acc + (v.inventory?.quantity || 0), 0) || 0
+      setStock(totalStock.toString())
+
       setFeaturesText(product.features ? product.features.join("\n") : "")
       setIncludedItemsText(product.includedItems ? product.includedItems.join("\n") : "")
       setRequiredItemsText(product.requiredItems ? product.requiredItems.join("\n") : "")
@@ -106,6 +111,7 @@ export function FullProductEditModal({
       setScale("N/A")
       setIsFeatured(false)
       setIsActive(true)
+      setStock("0")
       setFeaturesText("")
       setIncludedItemsText("")
       setRequiredItemsText("")
@@ -120,6 +126,7 @@ export function FullProductEditModal({
     const payload = {
       name, description, price: Number(price), 
       originalPrice: originalPrice ? Number(originalPrice) : undefined,
+      stock: Number(stock),
       categoryId, brandName, scale, isFeatured, isActive,
       features: featuresText.split("\n").map((f) => f.trim()).filter(Boolean),
       includedItems: includedItemsText.split("\n").map((i) => i.trim()).filter(Boolean),
@@ -233,6 +240,13 @@ export function FullProductEditModal({
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">Original Price ($) (Optional)</label>
                   <Input type="number" step="0.01" value={originalPrice} onChange={(e) => setOriginalPrice(e.target.value)} className="h-12 bg-white dark:bg-background border-border/60 rounded-none" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">Base Stock <span className="text-red-400">*</span></label>
+                  <Input type="number" step="1" min="0" value={stock} onChange={(e) => setStock(e.target.value)} required className="h-12 bg-white dark:bg-background border-border/60 rounded-none" />
                 </div>
               </div>
 

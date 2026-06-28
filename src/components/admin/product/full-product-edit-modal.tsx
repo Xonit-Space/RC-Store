@@ -164,12 +164,12 @@ export function FullProductEditModal({
 
   const tabs = [
     { id: "basic", label: "Basic Details" },
-    { id: "variants", label: "Variants", disabled: !isEditMode },
-    { id: "media", label: "Media & Files", disabled: !isEditMode },
-    { id: "features", label: "Feature Blocks", disabled: !isEditMode },
-    { id: "related", label: "Related Products", disabled: !isEditMode },
-    { id: "addons", label: "Addons", disabled: !isEditMode },
-    { id: "compatibility", label: "Part Finder", disabled: !isEditMode },
+    { id: "variants", label: "Variants" },
+    { id: "media", label: "Media & Files" },
+    { id: "features", label: "Feature Blocks" },
+    { id: "related", label: "Related Products" },
+    { id: "addons", label: "Addons" },
+    { id: "compatibility", label: "Part Finder" },
   ]
 
   if (!isOpen) return null

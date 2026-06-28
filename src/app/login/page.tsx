@@ -12,7 +12,7 @@ import { toast } from "sonner"
 export default function LoginPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get("callbackUrl") || "/"
+  const callbackUrl = searchParams.get("callbackUrl") || "/admin"
   const errorParam = searchParams.get("error")
 
   const [email, setEmail] = useState("")

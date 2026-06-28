@@ -34,7 +34,7 @@ export function WishlistButton({ productId, className, variant = "default" }: { 
 
   const baseStyles = variant === "minimal" 
     ? "text-muted-foreground hover:text-primary transition-colors disabled:opacity-50"
-    : "relative z-20 w-8 h-8 bg-carbon-dark/80 backdrop-blur border border-border flex items-center justify-center text-foreground hover:text-primary hover:border-primary transition-colors disabled:opacity-50";
+    : "relative z-20 w-8 h-8 bg-white/80 dark:bg-carbon-dark/80 backdrop-blur border border-border flex items-center justify-center text-foreground hover:text-primary hover:border-primary transition-colors disabled:opacity-50";
 
   return (
     <button 

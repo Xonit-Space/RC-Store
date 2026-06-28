@@ -76,7 +76,7 @@ export function StaffPicks() {
           </div>
 
           {/* Product Card */}
-          <div className="relative z-10 flex flex-col sm:flex-row items-center gap-8 bg-muted/30 p-6 rounded-lg border border-border">
+          <div className="relative z-10 flex flex-col sm:flex-row items-center gap-8 bg-white dark:bg-muted/30 p-6 rounded-lg border border-border shadow-2xl dark:shadow-[0_0_50px_rgba(0,0,0,0.5)]">
             <div className="w-full sm:w-1/2 relative bg-background aspect-square p-4 flex items-center justify-center rounded-md">
               <img src={image} alt={product.name} className="w-full h-full object-contain" />
             </div>

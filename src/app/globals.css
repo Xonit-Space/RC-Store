@@ -27,13 +27,13 @@ body {
     --primary-foreground: 0 0% 4%;
     
     --secondary: 0 0% 96%; 
-    --secondary-foreground: 0 0% 9%;
+    --secondary-foreground: 0 0% 0%;
     
     --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
+    --muted-foreground: 0 0% 0%;
     
     --accent: 45 100% 50%;
-    --accent-foreground: 0 0% 4%;
+    --accent-foreground: 0 0% 0%;
     
     --destructive: 0 100% 44%;
     --destructive-foreground: 0 0% 100%;
@@ -89,6 +89,13 @@ body {
   /* Adding headings */
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading uppercase tracking-wider;
+  }
+  
+  html:not(.dark) .text-muted-foreground,
+  html:not(.dark) .text-foreground\/50,
+  html:not(.dark) .text-foreground\/60,
+  html:not(.dark) .text-foreground\/70 {
+    font-weight: 300 !important;
   }
 }
 

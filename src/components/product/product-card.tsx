@@ -27,7 +27,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
   const { formatPrice } = usePrice();
 
   return (
-    <div className="relative bg-muted border border-border hover:border-racing-yellow/30 group flex flex-col h-full overflow-hidden transition-colors rounded-lg">
+    <div className="relative bg-white dark:bg-muted border border-border hover:border-racing-yellow/30 group flex flex-col h-full overflow-hidden transition-colors rounded-lg shadow-2xl dark:shadow-[0_0_50px_rgba(0,0,0,0.5)]">
       <Link href={`/products/${product.slug}`} className="absolute inset-0 z-10" aria-label={`View ${product.name}`} />
       
       {/* Image Box */}

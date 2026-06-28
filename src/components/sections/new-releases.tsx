@@ -54,8 +54,8 @@ export function NewReleases() {
           {products.map((product, index) => {
             const image = product.images?.[0]?.url || "https://images.unsplash.com/photo-1594819047050-99defca82545?q=80&w=600"
             return (
-              <div key={product.id} className="group bg-muted border border-border flex flex-col sm:flex-row hover:border-neon-blue/30 transition-colors">
-                <div className="w-full sm:w-2/5 aspect-square bg-black/40 overflow-hidden relative p-4">
+              <div key={product.id} className="group bg-white dark:bg-muted border border-border flex flex-col sm:flex-row hover:border-neon-blue/30 transition-colors shadow-2xl dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] rounded-lg">
+                <div className="w-full sm:w-2/5 aspect-square bg-black/40 overflow-hidden relative p-4 rounded-l-lg sm:rounded-bl-lg sm:rounded-tr-none">
                   <div className="absolute top-2 left-2 bg-neon-blue text-primary-foreground font-mono font-bold text-[9px] uppercase tracking-widest px-2 py-1 z-10">
                     New
                   </div>

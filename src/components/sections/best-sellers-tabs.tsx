@@ -65,16 +65,16 @@ export function BestSellersTabs() {
               const reviewsCount = product.reviews?.length || 0
 
               return (
-                <div key={product.id} className="relative bg-muted border border-border hover:border-racing-yellow/30 group flex flex-col">
+                <div key={product.id} className="relative bg-white dark:bg-muted border border-border hover:border-racing-yellow/30 group flex flex-col shadow-2xl dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] rounded-lg">
                   <Link href={`/products/${product.slug}`} className="absolute inset-0 z-10" aria-label={`View ${product.name}`} />
                   
                   {/* Image Box */}
                   <div className="relative aspect-square overflow-hidden bg-background/50 p-4">
                     <div className="absolute top-3 left-3 z-20 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="relative z-20 w-8 h-8 bg-carbon-dark/80 backdrop-blur border border-border flex items-center justify-center text-foreground hover:text-primary hover:border-primary transition-colors">
+                      <button className="relative z-20 w-8 h-8 bg-white/80 dark:bg-carbon-dark/80 backdrop-blur border border-border flex items-center justify-center text-foreground hover:text-primary hover:border-primary transition-colors">
                         <Heart className="w-4 h-4" />
                       </button>
-                      <button className="relative z-20 w-8 h-8 bg-carbon-dark/80 backdrop-blur border border-border flex items-center justify-center text-foreground hover:text-primary hover:border-primary transition-colors">
+                      <button className="relative z-20 w-8 h-8 bg-white/80 dark:bg-carbon-dark/80 backdrop-blur border border-border flex items-center justify-center text-foreground hover:text-primary hover:border-primary transition-colors">
                         <Repeat className="w-4 h-4" />
                       </button>
                     </div>

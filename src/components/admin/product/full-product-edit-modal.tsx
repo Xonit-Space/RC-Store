@@ -197,13 +197,13 @@ export function FullProductEditModal({
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              disabled={tab.disabled}
+              type="button"
               onClick={() => setActiveTab(tab.id)}
               className={`px-6 py-4 text-xs tracking-widest uppercase font-bold border-b-2 transition-colors ${
                 activeTab === tab.id
                   ? "border-foreground text-foreground"
                   : "border-transparent text-muted-foreground hover:text-foreground"
-              } ${tab.disabled ? "opacity-30 cursor-not-allowed hover:text-muted-foreground" : ""}`}
+              }`}
             >
               {tab.label}
             </button>

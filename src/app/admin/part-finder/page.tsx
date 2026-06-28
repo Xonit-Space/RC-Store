@@ -5,6 +5,11 @@ import { toast } from "sonner"
 import { getVehicleMakes, getVehicleModels, createVehicleMake, createVehicleModel, deleteVehicleMake, deleteVehicleModel } from "@/actions/part-finder"
 import { Package, Plus, Trash2, FolderTree, ArrowRight, ChevronDown, ChevronRight, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useQuery } from "@tanstack/react-query"
+import { getCategories } from "@/actions/categories"
+import { getAddons } from "@/actions/addons"
+import { FullProductEditModal } from "@/components/admin/product/full-product-edit-modal"
+import { ModelPartsGrid } from "@/components/admin/part-finder/model-parts-grid"
 
 export default function AdminPartFinderPage() {
   const [makes, setMakes] = useState<any[]>([])
@@ -34,6 +39,33 @@ export default function AdminPartFinderPage() {
     } catch (error) {
       toast.error("Failed to load part finder data")
     }
+  }
+
+  // ─── Data fetching for Product Modal ───────────────────────────────────────
+  const { data: dbCategories = [] } = useQuery({
+    queryKey: ["admin", "categories-data"],
+    queryFn: () => getCategories()
+  })
+  const { data: availableAddons = [] } = useQuery({
+    queryKey: ["admin", "addons-data"],
+    queryFn: () => getAddons()
+  })
+
+  // ─── Modal state ────────────────────────────────────────────────────────────
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false)
+  const [editingProductId, setEditingProductId] = useState("")
+  const [initialModelId, setInitialModelId] = useState("")
+
+  const openEditPartModal = (productId: string) => {
+    setEditingProductId(productId)
+    setInitialModelId("")
+    setIsProductModalOpen(true)
+  }
+
+  const openAddPartModal = (modelId: string) => {
+    setEditingProductId("")
+    setInitialModelId(modelId)
+    setIsProductModalOpen(true)
   }
 
   useEffect(() => {
@@ -187,17 +219,29 @@ export default function AdminPartFinderPage() {
                     {makeModels.length === 0 ? (
                       <p className="text-[10px] uppercase tracking-widest text-muted-foreground p-4 text-center">No models added yet.</p>
                     ) : (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+                      <div className="grid grid-cols-1 gap-6 mt-4">
                         {makeModels.map(model => (
-                          <div key={model.id} className="bg-white dark:bg-background border border-border/40 p-3 flex justify-between items-center group hover:border-racing-yellow/50 transition-colors">
-                            <div>
-                              <p className="text-xs font-bold uppercase tracking-wider text-foreground">{model.name} <span className="opacity-50 font-normal">({model.scale})</span></p>
-                              <p className="text-[10px] text-muted-foreground uppercase tracking-widest">{model.type}</p>
+                          <div key={model.id} className="bg-white dark:bg-background border border-border/40 p-4 flex flex-col group hover:border-racing-yellow/50 transition-colors">
+                            
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <p className="text-sm font-bold uppercase tracking-wider text-foreground">{model.name} <span className="opacity-50 font-normal">({model.scale})</span></p>
+                                <p className="text-[10px] text-muted-foreground uppercase tracking-widest">{model.type}</p>
+                              </div>
+                              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Button variant="ghost" onClick={() => handleDeleteModel(model.id)} className="text-terracotta hover:bg-terracotta/10 hover:text-terracotta p-1.5 h-auto">
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </Button>
+                              </div>
                             </div>
-                            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Button variant="ghost" onClick={() => handleDeleteModel(model.id)} className="text-terracotta hover:bg-terracotta/10 hover:text-terracotta p-1.5 h-auto">
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </Button>
+                            
+                            {/* NEW: Parts Grid Rendered Inline */}
+                            <div className="mt-4 pt-4 border-t border-border/40">
+                              <ModelPartsGrid 
+                                modelId={model.id}
+                                onEditPart={openEditPartModal}
+                                onAddPart={() => openAddPartModal(model.id)}
+                              />
                             </div>
                           </div>
                         ))}
@@ -335,6 +379,19 @@ export default function AdminPartFinderPage() {
           </div>
         </div>
       )}
+
+      {/* Product Edit Modal */}
+      <FullProductEditModal 
+        isOpen={isProductModalOpen}
+        onClose={() => setIsProductModalOpen(false)}
+        initialProductId={editingProductId}
+        initialVehicleModelId={initialModelId}
+        dbCategories={dbCategories}
+        availableAddons={availableAddons}
+        onSuccess={() => {
+          // You could invalidate queries here, but the queries themselves handles invalidation on update
+        }}
+      />
     </div>
   )
 }

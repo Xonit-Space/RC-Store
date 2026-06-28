@@ -15,6 +15,7 @@ import {
   adminAddProductFeatureBlock, adminDeleteProductFeatureBlock,
   adminAddRelatedProduct, adminDeleteRelatedProduct
 } from "@/actions/product"
+import { linkProductToModel } from "@/actions/part-finder"
 import { useAdminProduct, useAdminProducts } from "@/hooks/use-admin-data"
 
 import { VariantsTab } from "./tabs/variants-tab"
@@ -39,11 +40,13 @@ export function FullProductEditModal({
   initialProductId = "",
   dbCategories = [],
   availableAddons = [],
+  initialVehicleModelId,
   onSuccess
 }: {
   isOpen: boolean
   onClose: () => void
   initialProductId?: string
+  initialVehicleModelId?: string
   dbCategories?: any[]
   availableAddons?: any[]
   onSuccess?: () => void
@@ -139,6 +142,9 @@ export function FullProductEditModal({
       } else {
         const res = await adminCreateProduct(session?.user?.id || "", payload)
         if (res.success) {
+          if (initialVehicleModelId) {
+            await linkProductToModel(res.data.id, initialVehicleModelId)
+          }
           toast.success("Product created successfully! You can now add variants.")
           setProductId(res.data.id)
           if (onSuccess) onSuccess()

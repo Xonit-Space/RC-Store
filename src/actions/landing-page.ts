@@ -222,3 +222,41 @@ export async function subscribeNewsletter(formData: FormData): Promise<ActionRes
     return { success: false, error: "Subscription failed" }
   }
 }
+
+const getCachedRandomPartImages = unstable_cache(
+  async () => {
+    try {
+      // Find all part images (limit to 50 to avoid massive query)
+      const images = await db.productImage.findMany({
+        where: {
+          product: {
+            category: {
+              slug: { contains: "parts" }
+            }
+          }
+        },
+        take: 50,
+      })
+      
+      if (images.length === 0) {
+        // Fallback to any product images if no parts found
+        const fallback = await db.productImage.findMany({ take: 20 })
+        const shuffled = fallback.sort(() => 0.5 - Math.random())
+        return shuffled.slice(0, 5).map(img => img.url)
+      }
+
+      // Shuffle and pick 5
+      const shuffled = images.sort(() => 0.5 - Math.random())
+      return shuffled.slice(0, 5).map(img => img.url)
+    } catch (error) {
+      console.error("Failed to fetch random part images:", error)
+      return [
+        "https://images.unsplash.com/photo-1563209503-623c2140f0c0?auto=format&fit=crop&q=80&w=600"
+      ]
+    }
+  }, ["landing-part-images"], { revalidate: 3600 }
+)
+
+export async function getRandomPartImages() {
+  return await getCachedRandomPartImages()
+}

@@ -3,19 +3,36 @@
 import { useState, useEffect } from "react"
 import { Search, Map, FileText } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { getVehicleMakesAndModels } from "@/actions/landing-page"
+import { getVehicleMakesAndModels, getRandomPartImages } from "@/actions/landing-page"
 
 export function PartFinderBanner() {
   const router = useRouter()
   const [makes, setMakes] = useState<any[]>([])
   const [makeId, setMakeId] = useState("")
   const [modelId, setModelId] = useState("")
+  const [carouselImages, setCarouselImages] = useState<string[]>([
+    "https://images.unsplash.com/photo-1563209503-623c2140f0c0?auto=format&fit=crop&q=80&w=1200"
+  ])
+  const [currentImageIdx, setCurrentImageIdx] = useState(0)
 
   useEffect(() => {
     getVehicleMakesAndModels().then(data => {
       setMakes(data)
     })
+    getRandomPartImages().then(images => {
+      if (images && images.length > 0) {
+        setCarouselImages(images)
+      }
+    })
   }, [])
+
+  useEffect(() => {
+    if (carouselImages.length <= 1) return
+    const interval = setInterval(() => {
+      setCurrentImageIdx(prev => (prev + 1) % carouselImages.length)
+    }, 4000)
+    return () => clearInterval(interval)
+  }, [carouselImages])
 
   const selectedMake = makes.find(m => m.id === makeId)
   const models = selectedMake ? selectedMake.models : []
@@ -99,23 +116,55 @@ export function PartFinderBanner() {
              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-72 h-72 bg-primary/20 rounded-full blur-3xl" />
              <div className="absolute right-20 top-20 w-40 h-40 bg-racing-yellow/10 rounded-full blur-2xl dark:bg-racing-yellow/10 bg-primary/20" />
              
-             <div className="relative z-10 w-[90%] max-w-[600px] aspect-video border border-border/50 shadow-2xl skew-x-[-5deg] hover:skew-x-0 transition-transform duration-700 ease-in-out overflow-hidden rounded-md bg-muted">
-               <img 
-                 src="https://images.unsplash.com/photo-1588612143093-4e44208d1326?q=80&w=1200&auto=format&fit=crop" 
-                 alt="RC Car Components" 
-                 className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity"
-               />
-               {/* Overlay graphic */}
-               <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-               <div className="absolute bottom-4 left-4 right-4 p-4 border border-border/40 bg-background/50 backdrop-blur-sm rounded-sm">
-                 <div className="flex items-center justify-between">
-                   <div className="space-y-1">
-                     <div className="h-1 w-12 bg-primary rounded-full"></div>
-                     <p className="text-[10px] font-mono text-foreground uppercase tracking-widest">System Scan Complete</p>
+             <div className="relative z-10 w-full aspect-video" style={{ perspective: '1500px' }}>
+               {carouselImages.length > 0 && carouselImages.map((img, i) => {
+                 const total = carouselImages.length
+                 let diff = (i - currentImageIdx) % total
+                 if (diff < -total / 2) diff += total
+                 if (diff > total / 2) diff -= total
+                 
+                 const isCenter = diff === 0
+                 const absDiff = Math.abs(diff)
+                 
+                 const translateX = diff * 50
+                 const scale = isCenter ? 1 : Math.max(0.6, 1 - absDiff * 0.15)
+                 const rotateY = diff * -25
+                 const zIndex = 20 - absDiff
+                 const opacity = isCenter ? 1 : Math.max(0, 0.8 - absDiff * 0.3)
+                 
+                 return (
+                   <div 
+                     key={i}
+                     className="absolute top-0 left-1/2 w-[80%] max-w-[500px] aspect-video border border-border/50 shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-md overflow-hidden transition-all duration-700 ease-in-out cursor-pointer"
+                     style={{
+                       transform: `translateX(-50%) translateX(${translateX}%) translateZ(${isCenter ? '50px' : '0px'}) rotateY(${rotateY}deg) scale(${scale})`,
+                       zIndex,
+                       opacity,
+                     }}
+                     onClick={() => setCurrentImageIdx(i)}
+                   >
+                     <img 
+                       src={img} 
+                       alt={`RC Part ${i + 1}`} 
+                       className="w-full h-full object-cover"
+                     />
+                     {isCenter && (
+                       <>
+                         <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
+                         <div className="absolute bottom-4 left-4 right-4 p-4 border border-border/40 bg-background/50 backdrop-blur-sm rounded-sm">
+                           <div className="flex items-center justify-between">
+                             <div className="space-y-1">
+                               <div className="h-1 w-12 bg-primary rounded-full"></div>
+                               <p className="text-[10px] font-mono text-foreground uppercase tracking-widest">Part Match Found</p>
+                             </div>
+                             <span className="text-xs font-bold text-primary">100% Fit</span>
+                           </div>
+                         </div>
+                       </>
+                     )}
                    </div>
-                   <span className="text-xs font-bold text-primary">100% Match</span>
-                 </div>
-               </div>
+                 )
+               })}
              </div>
           </div>
         </div>

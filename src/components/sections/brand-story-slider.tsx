@@ -11,11 +11,7 @@ export function BrandStorySlider({ reviews }: { reviews: any[] }) {
   )
 
   if (!reviews || reviews.length === 0) {
-    return (
-      <div className="glass-dark p-6 border border-border">
-        <p className="text-muted-foreground font-sans text-sm">No reviews available yet.</p>
-      </div>
-    )
+    return null
   }
 
   return (

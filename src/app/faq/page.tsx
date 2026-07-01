@@ -8,33 +8,27 @@ import {
 export default function FAQPage() {
   const faqs = [
     {
-      category: "Orders & Shipping",
+      category: "General",
       items: [
-        { q: "How long does shipping take?", a: "Standard shipping takes 3-5 business days. Express shipping takes 1-2 business days. International delivery varies between 7-14 days depending on the destination." },
-        { q: "Do you ship internationally?", a: "Yes, we ship to over 150 countries worldwide. Shipping costs and delivery times are calculated at checkout based on your location." },
-        { q: "Can I modify my order after placing it?", a: "Orders can only be modified within 1 hour of placement. Please contact our support team immediately if you need to make changes." }
-      ]
-    },
-    {
-      category: "Returns & Exchanges",
-      items: [
-        { q: "What is your return policy?", a: "We accept returns within 14 days of delivery. Items must be unworn, unwashed, and in their original condition with all tags attached." },
-        { q: "How do I process an exchange?", a: "To exchange an item, please process a return for the original item and place a new order for the desired size or color." },
-        { q: "Are returns free?", a: "Domestic returns are complimentary. International return shipping costs are the responsibility of the customer." }
-      ]
-    },
-    {
-      category: "Product & Care",
-      items: [
-        { q: "Where are your products manufactured?", a: "Our garments are ethically manufactured in specialized ateliers across Italy, Portugal, and Japan, depending on the material and required expertise." },
-        { q: "How should I care for my garments?", a: "Each product includes specific care instructions on the inner label. We generally recommend dry cleaning for structured pieces and cold hand-washing for delicate fabrics." }
+        { q: "What scale RC vehicles do you sell?", a: "We currently specialise in 1:10 scale RC vehicles." },
+        { q: "Are your RC vehicles suitable for beginners?", a: "Yes. We stock vehicles for beginners through to experienced hobbyists." },
+        { q: "Can I see or try the vehicles before purchasing?", a: "Yes. Visit our store to view selected models and experience many of them on our indoor RC tracks before buying." },
+        { q: "Can I customise my RC vehicle?", a: "Yes. Customisation and upgrades are available on many models. Please allow up to 2 business days." },
+        { q: "Where can I see available upgrades?", a: "Compatible upgrades are listed on each product page." },
+        { q: "What if my vehicle has a fault when I receive it?", a: "Please contact us as soon as possible if you believe your vehicle has a manufacturing fault." },
+        { q: "Do you offer after-sales support?", a: "Yes. Bring your vehicle to us for troubleshooting and setup assistance free of charge." },
+        { q: "Can you repair my RC vehicle?", a: "Yes. We'll diagnose the issue. If replacement parts are required due to accidental damage or wear and tear, parts and installation will be quoted before repairs." },
+        { q: "Do you sell spare parts?", a: "Yes. We stock a range of genuine spare parts and accessories." },
+        { q: "Does my vehicle include a battery and charger?", a: "Please refer to the product page, as inclusions vary by model." },
+        { q: "Are the vehicles waterproof?", a: "Some models are water-resistant. Please check the product specifications." },
+        { q: "Which payment methods do you accept?", a: "We accept the payment methods shown at checkout." }
       ]
     }
   ]
 
   return (
     <div className="min-h-screen bg-background flex flex-col font-sans">
-            <main className="flex-1 pt-32 pb-24 px-6 md:px-12 lg:px-24 max-w-[800px] mx-auto w-full">
+      <main className="flex-1 pt-32 pb-24 px-6 md:px-12 lg:px-24 max-w-[800px] mx-auto w-full">
         
         <div className="mb-16 text-center">
           <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-4">Support</p>
@@ -71,6 +65,6 @@ export default function FAQPage() {
         </div>
 
       </main>
-          </div>
+    </div>
   )
 }

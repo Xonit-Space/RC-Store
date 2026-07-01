@@ -73,7 +73,7 @@ export function AddSparePartModal({
       // 1. Create Base Product
       const payload = {
         name,
-        description,
+        description: description.trim().length < 10 ? (description.trim() + " Spare part for " + name).padEnd(10, ' ') : description,
         price: Number(price),
         stock: Number(stock),
         categoryId,
@@ -88,7 +88,7 @@ export function AddSparePartModal({
       const newProductId = res.data.id
 
       // 2. Link to Vehicle Model
-      await linkProductToModel(newProductId, vehicleModelId)
+      await linkProductToModel(vehicleModelId, newProductId)
 
       // 3. Upload Images
       let uploadedCount = 0
@@ -168,8 +168,8 @@ export function AddSparePartModal({
                   <Input type="number" step="1" min="0" value={stock} onChange={(e) => setStock(e.target.value)} required className="h-12 bg-white dark:bg-background border-border/60 rounded-none" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">Category</label>
-                  <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} className="w-full h-12 bg-white dark:bg-background border border-border/60 rounded-none text-xs text-foreground px-3 outline-none focus:border-foreground">
+                  <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">Category <span className="text-red-400">*</span></label>
+                  <select required value={categoryId} onChange={(e) => setCategoryId(e.target.value)} className="w-full h-12 bg-white dark:bg-background border border-border/60 rounded-none text-xs text-foreground px-3 outline-none focus:border-foreground">
                     <option value="">Select Category...</option>
                     {dbCategories.map((cat: any) => (
                       <option key={cat.id} value={cat.id}>{cat.name}</option>

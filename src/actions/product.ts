@@ -100,7 +100,7 @@ export async function adminCreateProduct(adminId: string, formData: any): Promis
   const data = result.data
   try {
     const product = await ProductService.createProduct(adminId, data)
-    return { success: true, data: product }
+    return { success: true, data: JSON.parse(JSON.stringify(product)) }
   } catch (error) {
     console.error("CMS Product Create Action Error:", error)
     return { success: false, error: "Failed to create catalog product" }

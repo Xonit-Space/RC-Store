@@ -48,7 +48,8 @@ export async function getVehicleModels(makeId?: string) {
 
 export async function createVehicleModel(data: { makeId: string; name: string; slug: string; scale?: string; type?: string; image?: string }) {
   await isAdmin()
-  return db.vehicleModel.create({ data })
+  const uniqueSlug = `${data.slug}-${Math.random().toString(36).substring(2, 6)}`
+  return db.vehicleModel.create({ data: { ...data, slug: uniqueSlug } })
 }
 
 export async function updateVehicleModel(id: string, data: { makeId: string; name: string; slug: string; scale?: string; type?: string; image?: string }) {

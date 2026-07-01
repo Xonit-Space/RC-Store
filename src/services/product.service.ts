@@ -2,7 +2,9 @@ import { db } from "@/lib/db"
 
 export class ProductService {
   static async createProduct(adminId: string, data: any) {
-    const slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "")
+    const baseSlug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "")
+    const slug = `${baseSlug}-${Math.random().toString(36).substring(2, 6)}`
+    
     return db.$transaction(async (tx) => {
       
       let finalBrandId = data.brandId

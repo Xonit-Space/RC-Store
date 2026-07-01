@@ -114,23 +114,26 @@ export function Header() {
       <div className={`border-b transition-colors duration-300 ${scrolled ? "border-border" : "border-transparent"}`}>
         <div className="container mx-auto px-4 lg:px-8 h-16 flex items-center justify-between">
         
-        {/* Mobile Hamburger */}
-        <button 
-          className="lg:hidden p-2 -ml-2 text-foreground hover:text-primary transition-colors focus:outline-none" 
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          aria-label="Toggle Menu"
-        >
-          {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+        {/* Left Section: Mobile Menu & Logo */}
+        <div className="flex items-center gap-2 sm:gap-4 lg:gap-0">
+          {/* Mobile Hamburger */}
+          <button 
+            className="lg:hidden p-2 -ml-2 text-foreground hover:text-primary transition-colors focus:outline-none" 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle Menu"
+          >
+            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
 
-        {/* Logo (Left) */}
-        <Link href="/" className="flex items-center gap-2 group mr-auto lg:mr-0 absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0">
-          <img 
-            src="/Transparent/logo yellow0.png" 
-            alt="Aussie Rigs Arena" 
-            className="h-8 w-auto object-contain scale-[3] origin-center lg:origin-left pointer-events-none group-hover:opacity-90 transition-opacity drop-shadow-sm" 
-          />
-        </Link>
+          {/* Logo */}
+          <Link href="/" className="flex items-center group">
+            <img 
+              src="/Transparent/logo yellow0.png" 
+              alt="Aussie Rigs Arena" 
+              className="h-6 sm:h-7 lg:h-8 w-auto object-contain scale-[2] sm:scale-[2.5] lg:scale-[3] origin-left pointer-events-none group-hover:opacity-90 transition-opacity drop-shadow-sm ml-4 sm:ml-6 lg:ml-0" 
+            />
+          </Link>
+        </div>
 
         {/* Main Menu (Center Desktop) */}
         <nav className="hidden lg:flex items-center justify-center flex-1 mx-8 gap-1">

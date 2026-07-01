@@ -214,62 +214,66 @@ export default function AdminAddonsPage() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
           {addons.map((addon: any) => (
-            <div key={addon.id} className="bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] transition-all duration-300 flex flex-col group p-0 overflow-hidden">
-              {/* Image Header */}
-              <div className="aspect-[16/9] w-full bg-muted border-b border-border/40 relative">
-                {addon.image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={addon.image} alt={addon.name} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <PackagePlus className="w-8 h-8 text-muted-foreground/30" />
+            <div key={addon.id} className="bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] transition-all duration-300 flex flex-col group transition-colors hover:border-foreground/30">
+              <div className="p-4 flex gap-4">
+                {/* Thumbnail */}
+                <div className="w-20 h-20 shrink-0 border border-border/30 overflow-hidden bg-muted/10 relative">
+                  {addon.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={addon.image} alt={addon.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <PackagePlus className="w-6 h-6 text-muted-foreground/30" />
+                    </div>
+                  )}
+                </div>
+                
+                {/* Info */}
+                <div className="flex-1 space-y-1 min-w-0">
+                  <div className="flex justify-between items-start gap-3">
+                    <h3 className="font-sans text-base font-light text-foreground line-clamp-1 leading-tight">
+                      {addon.name}
+                    </h3>
+                    <span className="text-sm font-bold text-foreground whitespace-nowrap shrink-0">
+                      {Number(addon.price).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}
+                    </span>
                   </div>
-                )}
-                <div className="absolute top-2 right-2">
-                  <span className={`text-[9px] uppercase tracking-widest font-bold px-2 py-1 rounded-sm ${addon.isActive ? "text-emerald-500 bg-emerald-500/10 backdrop-blur-md" : "text-muted-foreground bg-muted/80 backdrop-blur-md"}`}>
-                    {addon.isActive ? "Active" : "Inactive"}
-                  </span>
+                  <p className="text-[9px] uppercase tracking-widest text-muted-foreground">
+                    {addon.slug}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground line-clamp-1 leading-relaxed">
+                    {addon.description || "No description"}
+                  </p>
+                  <div className="flex items-center justify-between pt-1">
+                    <span className={`text-[9px] uppercase tracking-widest font-bold px-2 py-0.5 ${addon.isActive ? "text-emerald-500 bg-emerald-500/10" : "text-muted-foreground bg-muted/20"}`}>
+                      {addon.isActive ? "Active" : "Inactive"}
+                    </span>
+                  </div>
                 </div>
               </div>
-              
-              <div className="p-4 flex-1 flex flex-col">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <h3 className="font-sans text-lg font-bold text-foreground line-clamp-1">{addon.name}</h3>
-                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{addon.slug}</p>
-                  </div>
-                  <span className="text-base font-bold text-foreground text-racing-yellow">
-                    {Number(addon.price).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}
-                  </span>
-                </div>
-                
-                <p className="text-sm text-muted-foreground line-clamp-2 mb-4 flex-1">
-                  {addon.description || "No description provided."}
-                </p>
-                
-                <div className="flex gap-2">
+
+              <div className="border-t border-border/40 px-4 py-3 flex justify-between items-center bg-muted/5 gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => openAssignModal(addon)}
+                  className="h-8 rounded-none border-border/40 text-[9px] uppercase tracking-widest font-bold flex-1 max-w-[150px]"
+                >
+                  Assign Products
+                </Button>
+                <div className="flex items-center gap-2">
                   <Button
-                    onClick={() => openAssignModal(addon)}
-                    className="flex-1 h-10 rounded-none bg-foreground text-background font-bold text-[10px] tracking-widest uppercase hover:bg-racing-yellow hover:text-black transition-colors"
-                  >
-                    Assign to Products
-                  </Button>
-                </div>
-                
-                <div className="mt-3 pt-3 border-t border-border/40 flex items-center justify-between">
-                  <Button
-                    variant="ghost"
+                    variant="outline"
                     onClick={() => openEditModal(addon)}
-                    className="h-8 rounded-none text-[10px] uppercase tracking-widest font-bold px-2 text-muted-foreground hover:text-foreground hover:bg-muted/10"
+                    className="h-8 rounded-none border-border/40 text-[9px] uppercase tracking-widest font-bold"
                   >
                     <Edit className="w-3.5 h-3.5 mr-1.5" /> Edit
                   </Button>
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     onClick={() => handleDelete(addon.id)}
-                    className="h-8 rounded-none text-[10px] uppercase tracking-widest font-bold px-2 text-terracotta hover:text-terracotta hover:bg-terracotta/10"
+                    className="h-8 rounded-none border-border/40 text-[9px] uppercase tracking-widest font-bold text-red-500 hover:text-red-700 hover:border-red-500/40"
                   >
                     <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Delete
                   </Button>

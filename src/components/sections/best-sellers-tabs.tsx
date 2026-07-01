@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Star, Heart, Repeat } from "lucide-react"
+import { Star, Heart, Repeat, Package } from "lucide-react"
 import { getBestSellers } from "@/actions/landing-page"
 import { CartIconButton } from "../product/cart-icon-button"
 
@@ -60,7 +60,7 @@ export function BestSellersTabs() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in zoom-in-95 duration-500" key={activeTab}>
             {productsData[activeTab]?.map((product) => {
-              const image = product.images?.[0]?.url || "https://images.unsplash.com/photo-1589793463357-550912af4a4c?q=80&w=600"
+              const image = product.images?.[0]?.url || null
               const rating = product.reviews?.length ? (product.reviews.reduce((acc: number, rev: any) => acc + rev.rating, 0) / product.reviews.length).toFixed(1) : "0.0"
               const reviewsCount = product.reviews?.length || 0
 
@@ -78,11 +78,18 @@ export function BestSellersTabs() {
                         <Repeat className="w-4 h-4" />
                       </button>
                     </div>
-                    <img 
-                      src={image} 
-                      alt={product.name}
-                      className="w-full h-full object-cover mix-blend-luminosity group-hover:mix-blend-normal group-hover:scale-110 transition-all duration-500"
-                    />
+                    {image ? (
+                      <img 
+                        src={image} 
+                        alt={product.name}
+                        className="w-full h-full object-cover mix-blend-luminosity group-hover:mix-blend-normal group-hover:scale-110 transition-all duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center bg-muted/10 group-hover:bg-muted/20 transition-colors">
+                        <Package className="w-12 h-12 text-muted-foreground/30 mb-2" />
+                        <span className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-widest">No Image</span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Content Box */}

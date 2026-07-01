@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Star, ShoppingCart, Quote } from "lucide-react"
+import { Star, ShoppingCart, Quote, Package } from "lucide-react"
 import { getStaffPicks } from "@/actions/landing-page"
 import { CartIconButton } from "../product/cart-icon-button"
 
@@ -34,7 +34,7 @@ export function StaffPicks() {
   // Use the first pick for the hero layout (could be rotated later)
   const mainPick = picks[0]
   const product = mainPick.product
-  const image = product.images?.[0]?.url || "https://images.unsplash.com/photo-1589793463357-550912af4a4c?q=80&w=600"
+  const image = product.images?.[0]?.url || null
   const rating = product.reviews?.length ? (product.reviews.reduce((acc: number, rev: any) => acc + rev.rating, 0) / product.reviews.length).toFixed(1) : "0.0"
   const reviewsCount = product.reviews?.length || 0
 
@@ -78,7 +78,14 @@ export function StaffPicks() {
           {/* Product Card */}
           <div className="relative z-10 flex flex-col sm:flex-row items-center gap-8 bg-white dark:bg-muted/30 p-6 rounded-lg border border-border transition-all duration-300 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)]">
             <div className="w-full sm:w-1/2 relative bg-background aspect-square p-4 flex items-center justify-center rounded-md overflow-hidden">
-              <img src={image} alt={product.name} className="w-full h-full object-cover" />
+              {image ? (
+                <img src={image} alt={product.name} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center bg-muted/10">
+                  <Package className="w-12 h-12 text-muted-foreground/30 mb-2" />
+                  <span className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-widest">No Image</span>
+                </div>
+              )}
             </div>
             <div className="w-full sm:w-1/2 flex flex-col justify-center">
               <div className="flex items-center gap-1 mb-2">

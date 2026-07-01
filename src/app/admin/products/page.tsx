@@ -176,6 +176,7 @@ export default function AdminProductsPage() {
                         src={thumb}
                         alt={p.name}
                         fill
+                        unoptimized
                         className="object-cover"
                       />
                     ) : (

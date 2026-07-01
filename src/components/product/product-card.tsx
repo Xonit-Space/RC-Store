@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { memo } from "react"
-import { Star, Heart, Repeat } from "lucide-react"
+import { Star, Heart, Repeat, Package } from "lucide-react"
 import { CartIconButton } from "./cart-icon-button"
 import { WishlistButton } from "./wishlist-button"
 import { usePrice } from "@/hooks/use-price"
@@ -16,8 +16,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
   // Handle different image formats (from DB relations or direct URLs)
   const image = typeof product.images?.[0] === 'string' 
     ? product.images[0] 
-    : product.images?.[0]?.url 
-      || "https://images.unsplash.com/photo-1589793463357-550912af4a4c?q=80&w=600";
+    : product.images?.[0]?.url || null;
       
   const rating = product.reviews?.length 
     ? (product.reviews.reduce((acc: number, rev: any) => acc + rev.rating, 0) / product.reviews.length).toFixed(1) 
@@ -38,12 +37,19 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
             <Repeat className="w-4 h-4" />
           </button>
         </div>
-        <img 
-          src={image} 
-          alt={product.name}
-          loading={priority ? "eager" : "lazy"}
-          className="w-full h-full object-cover group-hover:scale-110 transition-all duration-500"
-        />
+        {image ? (
+          <img 
+            src={image} 
+            alt={product.name}
+            loading={priority ? "eager" : "lazy"}
+            className="w-full h-full object-cover group-hover:scale-110 transition-all duration-500"
+          />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center bg-muted/10 group-hover:bg-muted/20 transition-colors">
+            <Package className="w-12 h-12 text-muted-foreground/30 mb-2" />
+            <span className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-widest">No Image</span>
+          </div>
+        )}
       </div>
 
       {/* Content Box */}

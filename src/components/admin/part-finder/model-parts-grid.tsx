@@ -28,7 +28,7 @@ export function ModelPartsGrid({ modelId, onEditPart, onAddPart }: ModelPartsGri
     
     setIsUnlinking(productId)
     try {
-      await unlinkProductFromModel(productId, modelId)
+      await unlinkProductFromModel(modelId, productId)
       toast.success("Part unlinked from model")
       queryClient.invalidateQueries({ queryKey: ["admin", "model-parts", modelId] })
       queryClient.invalidateQueries({ queryKey: ["admin", "product-compatibility", productId] })
@@ -82,6 +82,7 @@ export function ModelPartsGrid({ modelId, onEditPart, onAddPart }: ModelPartsGri
                       src={thumb}
                       alt={p.name}
                       fill
+                      unoptimized
                       className="object-cover"
                     />
                   ) : (

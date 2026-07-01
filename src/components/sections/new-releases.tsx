@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { getNewReleases } from "@/actions/landing-page"
 import { CartIconButton } from "../product/cart-icon-button"
+import { Package } from "lucide-react"
 
 export function NewReleases() {
   const [products, setProducts] = useState<any[]>([])
@@ -52,18 +53,25 @@ export function NewReleases() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {products.map((product, index) => {
-            const image = product.images?.[0]?.url || "https://images.unsplash.com/photo-1594819047050-99defca82545?q=80&w=600"
+            const image = product.images?.[0]?.url || null
             return (
               <div key={product.id} className="group bg-white dark:bg-muted border border-border flex flex-col sm:flex-row hover:border-racing-yellow/50 transition-all duration-300 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_40px_rgba(255,204,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_0_50px_rgba(255,204,0,0.3)] rounded-lg">
                 <div className="w-full sm:w-2/5 aspect-square bg-black/40 overflow-hidden relative p-4 rounded-l-lg sm:rounded-bl-lg sm:rounded-tr-none">
                   <div className="absolute top-2 left-2 bg-neon-blue text-primary-foreground font-mono font-bold text-[9px] uppercase tracking-widest px-2 py-1 z-10">
                     New
                   </div>
-                  <img 
-                    src={image} 
-                    alt={product.name}
-                    className="w-full h-full object-cover mix-blend-luminosity group-hover:mix-blend-normal group-hover:scale-110 transition-all duration-500"
-                  />
+                  {image ? (
+                    <img 
+                      src={image} 
+                      alt={product.name}
+                      className="w-full h-full object-cover mix-blend-luminosity group-hover:mix-blend-normal group-hover:scale-110 transition-all duration-500"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-muted/10 group-hover:bg-muted/20 transition-colors">
+                      <Package className="w-12 h-12 text-muted-foreground/30 mb-2" />
+                      <span className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-widest">No Image</span>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="w-full sm:w-3/5 p-6 flex flex-col justify-center">

@@ -43,7 +43,7 @@ export function CartIconButton({ product, className, children }: { product?: any
             id: product.id,
             name: product.name,
             price: product.price,
-            imageUrl: typeof product.images?.[0] === 'string' ? product.images[0] : product.images?.[0]?.url || "https://images.unsplash.com/photo-1594819047050-99defca82545?q=80&w=600",
+            imageUrl: typeof product.images?.[0] === 'string' ? product.images[0] : product.images?.[0]?.url || "",
             size: "Standard",
             color: "Standard",
           },

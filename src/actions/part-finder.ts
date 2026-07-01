@@ -93,7 +93,10 @@ export async function getCompatibleParts(vehicleModelId: string) {
       }
     }
   })
-  return compatibilities.map(c => c.product)
+  
+  // JSON.stringify strips out Prisma Decimals and Dates, converting them to plain string/numbers.
+  // This prevents Next.js Server Actions from failing to serialize the objects to the client.
+  return JSON.parse(JSON.stringify(compatibilities.map(c => c.product)))
 }
 
 export async function getProductCompatibleModels(productId: string) {

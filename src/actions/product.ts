@@ -6,6 +6,7 @@ import { createProductReview } from "@/repositories/product"
 import { ActionResponse } from "./auth"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
+import { serializeForClient } from "@/lib/serialize"
 import { db } from "@/lib/db"
 import { revalidateTag } from "next/cache"
 
@@ -356,7 +357,7 @@ export async function getProducts() {
       orderBy: { createdAt: 'desc' },
       include: { images: true, category: true }
     })
-    return { success: true, products }
+    return { success: true, products: serializeForClient(products) }
   } catch (error) {
     return { success: false, error: "Failed to fetch products" }
   }
@@ -368,7 +369,7 @@ export async function getRelatedProducts(productId: string) {
       where: { productId },
       include: { related: { include: { images: true, category: true } } }
     })
-    return related.map((r: any) => r.related)
+    return serializeForClient(related.map((r: any) => r.related))
   } catch (error) {
     return []
   }
@@ -398,7 +399,7 @@ export async function assignRelatedProducts(productId: string, relatedIds: strin
 export async function getAddons() {
   try {
     const addons = await db.addon.findMany()
-    return addons
+    return serializeForClient(addons)
   } catch (error) {
     return []
   }
@@ -410,7 +411,7 @@ export async function getProductAddons(productId: string) {
       where: { productId },
       include: { addon: true }
     })
-    return productAddons.map((pa: any) => pa.addon)
+    return serializeForClient(productAddons.map((pa: any) => pa.addon))
   } catch (error) {
     return []
   }

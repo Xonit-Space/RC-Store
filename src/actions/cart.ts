@@ -3,6 +3,7 @@
 import { db } from "@/lib/db"
 import { ActionResponse } from "./auth"
 import { z } from "zod"
+import { serializeForClient } from "@/lib/serialize"
 
 const AddCartItemSchema = z.object({
   variantId: z.string().optional(),
@@ -47,6 +48,8 @@ export async function getCart(userId?: string, guestSessionId?: string) {
       },
     },
   })
+
+  return serializeForClient(cart)
 }
 
 export async function addCartItem(

@@ -9,6 +9,7 @@ import { authOptions } from "@/lib/auth"
 import { sendOrderStatusUpdateSms } from "@/services/twilio"
 import { sendOrderShippedEmail } from "@/services/email"
 import { validateAndCalculateCoupon } from "@/lib/coupon"
+import { serializeForClient } from "@/lib/serialize"
 
 export async function checkCoupon(code: string, subtotal: number): Promise<ActionResponse> {
   try {
@@ -131,7 +132,7 @@ export async function adminUpdateOrderStatus(
       }
     }
 
-    return { success: true, data: updated }
+    return { success: true, data: serializeForClient(updated) }
   } catch (err: any) {
     console.error("CMS Order Status Update Error:", err)
     return { success: false, error: err.message || "Failed to update order status" }

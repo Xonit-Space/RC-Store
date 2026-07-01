@@ -5,6 +5,7 @@ import { z } from "zod"
 import { revalidatePath } from "next/cache"
 import { ActionResponse } from "./auth"
 import { Prisma } from "@prisma/client"
+import { serializeForClient } from "@/lib/serialize"
 
 const AddonSchema = z.object({
   id: z.string().optional(),
@@ -26,15 +27,17 @@ function slugify(text: string) {
 }
 
 export async function getAddons() {
-  return db.addon.findMany({
+  const addons = await db.addon.findMany({
     orderBy: { createdAt: 'desc' },
   })
+  return serializeForClient(addons)
 }
 
 export async function getAddon(id: string) {
-  return db.addon.findUnique({
+  const addon = await db.addon.findUnique({
     where: { id }
   })
+  return serializeForClient(addon)
 }
 
 export async function createAddon(data: z.infer<typeof AddonSchema>): Promise<ActionResponse> {
@@ -124,7 +127,7 @@ export async function getProductAddons(productId: string) {
     where: { productId },
     include: { addon: true }
   })
-  return productAddons.map(pa => pa.addon)
+  return serializeForClient(productAddons.map(pa => pa.addon))
 }
 
 export async function assignAddonsToProduct(productId: string, addonIds: string[]): Promise<ActionResponse> {

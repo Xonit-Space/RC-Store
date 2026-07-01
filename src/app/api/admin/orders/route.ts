@@ -29,6 +29,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
         user: { select: { name: true, email: true } },
         shippingAddress: true,
         billingAddress: true,
+        payment: true,
         items: {
           include: {
             variant: {

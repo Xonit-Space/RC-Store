@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback, Suspense } from "react"
+import { useState, useCallback, Suspense } from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { useSession } from "next-auth/react"
 import {
@@ -11,7 +11,6 @@ import {
 import { toast } from "sonner"
 import { adminUpdateOrderStatus } from "@/actions/order"
 import { OrderStatus } from "@prisma/client"
-import { useDebounce } from "@/hooks/use-debounce"
 import { useAdminOrders } from "@/hooks/use-admin-data"
 import { useQueryClient } from "@tanstack/react-query"
 import {
@@ -67,22 +66,21 @@ function OrdersPageInner() {
   const currentSearch = searchParams.get("search") || ""
   const currentStatus = (searchParams.get("status") || "ALL") as FilterStatus
 
-  const [search, setSearch] = useState(currentSearch)
+  const [searchInput, setSearchInput] = useState(currentSearch)
   const [activeStatus, setActiveStatus] = useState<FilterStatus>(currentStatus)
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null)
 
-  const debouncedSearch = useDebounce(search, 400)
+  // Use the URL parameter for data fetching so it only searches when submitted
+  const { data: ordersData, isLoading: loading } = useAdminOrders(currentPage, PAGE_SIZE, currentSearch)
 
-  // Sync search + status filter → URL
-  useEffect(() => {
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
     const params = new URLSearchParams(searchParams.toString())
-    if (debouncedSearch) params.set("search", debouncedSearch)
+    if (searchInput) params.set("search", searchInput)
     else params.delete("search")
     params.set("page", "1")
     router.replace(`${pathname}?${params.toString()}`)
-  }, [debouncedSearch]) // eslint-disable-line
-
-  const { data: ordersData, isLoading: loading } = useAdminOrders(currentPage, PAGE_SIZE, debouncedSearch)
+  }
 
   const allOrders: any[] = ordersData?.data || []
   const totalPages = ordersData?.pagination?.totalPages || 1
@@ -178,15 +176,18 @@ function OrdersPageInner() {
 
       {/* ── Search + filter tabs ── */}
       <div className="flex flex-col md:flex-row gap-4">
-        <div className="relative flex-1 max-w-sm">
+        <form onSubmit={handleSearchSubmit} className="flex flex-1 max-w-lg relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             placeholder="Search by order # or customer..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
             className="pl-12 h-12 w-full bg-white dark:bg-background border border-border/40 rounded-none focus:border-foreground focus:outline-none transition-colors placeholder:uppercase placeholder:tracking-wider placeholder:text-[10px] text-sm"
           />
-        </div>
+          <button type="submit" className="h-12 px-6 bg-foreground text-background text-[10px] font-bold uppercase tracking-widest hover:bg-foreground/90 transition-colors">
+            Search
+          </button>
+        </form>
 
         {/* Status filter tabs */}
         <div className="flex items-center gap-1 flex-wrap">
@@ -217,47 +218,50 @@ function OrdersPageInner() {
         </div>
       ) : (
         <div className="space-y-3">
-          {orders.map((o: any) => (
-            <div
-              key={o.id}
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                setSelectedOrder(o)
-              }}
-              className="bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] transition-all duration-300 transition-colors hover:border-foreground/30 cursor-pointer group"
-            >
-              {/* Order header row */}
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-muted/5 px-6 py-4 gap-4">
-                <div className="flex items-start gap-4">
-                  <div>
-                    <p className="font-sans text-base font-medium text-foreground group-hover:text-primary transition-colors">
-                      Order #{o.orderNumber}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest mt-0.5">
-                      {o.user?.name || o.user?.email}
-                      <span className="mx-2 text-border">·</span>
-                      {new Date(o.createdAt).toLocaleDateString("en-US", {
-                        day: "numeric", month: "short", year: "numeric"
-                      })}
-                    </p>
+          {orders.map((o: any) => {
+            const cfg = STATUS_CONFIG[o.status as OrderStatus]
+            return (
+              <div
+                key={o.id}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  setSelectedOrder(o)
+                }}
+                className={`border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] transition-all duration-300 hover:border-foreground/30 cursor-pointer group ${cfg?.bg || 'bg-background'}`}
+              >
+                {/* Order header row */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center px-6 py-4 gap-4">
+                  <div className="flex items-start gap-4">
+                    <div>
+                      <p className={`font-sans text-base font-medium ${cfg?.color || 'text-foreground'}`}>
+                        Order #{o.orderNumber}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-widest mt-0.5">
+                        {o.user?.name || o.user?.email}
+                        <span className="mx-2 text-border">·</span>
+                        {new Date(o.createdAt).toLocaleDateString("en-US", {
+                          day: "numeric", month: "short", year: "numeric"
+                        })}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4 w-full md:w-auto">
+                    <span className="text-base font-bold text-foreground">
+                      {Number(o.total).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}
+                    </span>
+
+                    <StatusBadge status={o.status} />
+
+                    <button type="button" className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground hover:text-foreground transition-colors ml-4 md:ml-2">
+                      View Details →
+                    </button>
                   </div>
                 </div>
-
-                <div className="flex items-center gap-4 w-full md:w-auto">
-                  <span className="text-base font-bold text-foreground">
-                    {Number(o.total).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}
-                  </span>
-
-                  <StatusBadge status={o.status} />
-
-                  <button type="button" className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground hover:text-foreground transition-colors ml-4 md:ml-2">
-                    View Details →
-                  </button>
-                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
 
@@ -370,6 +374,19 @@ function OrdersPageInner() {
                   <div className="text-[10px] text-muted-foreground font-bold uppercase tracking-[0.2em] flex items-center gap-1.5 border-b border-border/40 pb-2">
                     <CreditCard className="w-3.5 h-3.5" /> Financial Summary
                   </div>
+                  
+                  {selectedOrder.payment && (
+                    <div className="bg-primary/5 border border-primary/20 p-4 mb-4">
+                      <p className="text-[9px] uppercase tracking-widest font-bold text-primary mb-1">Payment Reference (Stripe)</p>
+                      <p className="text-xs font-mono text-foreground font-bold break-all">
+                        {selectedOrder.payment.transactionId}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground mt-1">
+                        Gateway: <span className="uppercase">{selectedOrder.payment.gateway}</span> • Status: <span className="font-bold">{selectedOrder.payment.status}</span>
+                      </p>
+                    </div>
+                  )}
+
                   <div className="bg-muted/5 border border-border/40 p-4 space-y-2 text-sm">
                     <div className="flex justify-between text-muted-foreground">
                       <span>Subtotal</span>
@@ -379,6 +396,12 @@ function OrdersPageInner() {
                       <span>Shipping</span>
                       <span>{Number(selectedOrder.shippingCost).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
                     </div>
+                    {Number(selectedOrder.insuranceCost) > 0 && (
+                      <div className="flex justify-between text-muted-foreground">
+                        <span>Insurance</span>
+                        <span>{Number(selectedOrder.insuranceCost).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between text-muted-foreground">
                       <span>Tax</span>
                       <span>{Number(selectedOrder.tax).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}</span>

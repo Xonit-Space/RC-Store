@@ -151,9 +151,9 @@ function BannerForm({ position, banner, upsert, remove }: { position: any, banne
 
       <div className="p-6 space-y-6">
         <div className="space-y-4">
-          <ImageUploadField label="Desktop Size (e.g. 1920x600)" url={desktopImage} setter={setDesktopImage} onUpload={(e) => handleUpload(e, setDesktopImage)} isUploading={isUploading} />
-          <ImageUploadField label="Tablet Size (e.g. 1024x500)" url={tabletImage} setter={setTabletImage} onUpload={(e) => handleUpload(e, setTabletImage)} isUploading={isUploading} />
-          <ImageUploadField label="Mobile Size (e.g. 640x800)" url={mobileImage} setter={setMobileImage} onUpload={(e) => handleUpload(e, setMobileImage)} isUploading={isUploading} />
+          <ImageUploadField label="Desktop Size (e.g. 1920x600)" url={desktopImage} setter={setDesktopImage} onUpload={(e: any) => handleUpload(e, setDesktopImage)} isUploading={isUploading} />
+          <ImageUploadField label="Tablet Size (e.g. 1024x500)" url={tabletImage} setter={setTabletImage} onUpload={(e: any) => handleUpload(e, setTabletImage)} isUploading={isUploading} />
+          <ImageUploadField label="Mobile Size (e.g. 640x800)" url={mobileImage} setter={setMobileImage} onUpload={(e: any) => handleUpload(e, setMobileImage)} isUploading={isUploading} />
         </div>
 
         <div className="space-y-2">

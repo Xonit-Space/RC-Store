@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic"
 
 export const DELETE = withApiHandler(async (
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: any
 ) => {
   const { id } = params
   if (!id) {
@@ -31,7 +31,7 @@ export const DELETE = withApiHandler(async (
 
 export const PATCH = withApiHandler(async (
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: any
 ) => {
   const { id } = params
   if (!id) {

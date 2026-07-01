@@ -15,7 +15,7 @@ import { useLoading } from "@/components/providers/loading-provider"
 import { useEffect, useState } from "react"
 import { CartAddonModal } from "@/components/cart/cart-addon-modal"
 import { getAddons } from "@/actions/addons"
-import { calculateShippingCost } from "@/actions/shipping"
+import { getAvailableShippingOptions } from "@/actions/shipping"
 import { getTaxRateByRegionCode } from "@/actions/tax"
 import { CheckoutStepper } from "@/components/cart/checkout-stepper"
 import { usePrice } from "@/hooks/use-price"
@@ -50,7 +50,14 @@ export default function CartPage() {
 
   useEffect(() => {
     if (isHydrated) {
-      calculateShippingCost(subtotal).then(cost => setShipping(cost))
+      getAvailableShippingOptions(subtotal).then(options => {
+        if (options && options.length > 0) {
+          const cheapest = Math.min(...options.map(o => Number(o.shippingCost)))
+          setShipping(cheapest)
+        } else {
+          setShipping(15)
+        }
+      })
     }
   }, [subtotal, isHydrated])
 

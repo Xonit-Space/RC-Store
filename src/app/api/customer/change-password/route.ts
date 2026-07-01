@@ -24,10 +24,10 @@ export async function POST(req: NextRequest) {
     // Fetch the user's current hashed password
     const user = await db.user.findUnique({
       where: { id: session.user.id },
-      select: { password: true },
+      select: { passwordHash: true },
     })
 
-    if (!user?.password) {
+    if (!user?.passwordHash) {
       return NextResponse.json(
         { success: false, error: "Password change is not available for accounts using social login" },
         { status: 400 }
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Verify current password
-    const isMatch = await bcrypt.compare(currentPassword, user.password)
+    const isMatch = await bcrypt.compare(currentPassword, user.passwordHash)
     if (!isMatch) {
       return NextResponse.json({ success: false, error: "Current password is incorrect" }, { status: 400 })
     }
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
     const hashed = await bcrypt.hash(newPassword, 12)
     await db.user.update({
       where: { id: session.user.id },
-      data: { password: hashed },
+      data: { passwordHash: hashed },
     })
 
     return NextResponse.json({ success: true })

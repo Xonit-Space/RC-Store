@@ -4,18 +4,17 @@ import { db } from "@/lib/db"
 
 export async function getStoreSettings() {
   try {
-    let settings = await db.storeSettings.findUnique({
-      where: { id: "global" },
+    const insuranceSetting = await db.siteSetting.findUnique({
+      where: { key: "shippingInsuranceCost" },
+    })
+    
+    const safeDropSetting = await db.siteSetting.findUnique({
+      where: { key: "enableSafeDrop" },
     })
 
-    if (!settings) {
-      settings = await db.storeSettings.create({
-        data: {
-          id: "global",
-          shippingInsuranceCost: 22.50,
-          enableSafeDrop: true,
-        },
-      })
+    const settings = {
+      shippingInsuranceCost: insuranceSetting ? parseFloat(insuranceSetting.value) : 22.50,
+      enableSafeDrop: safeDropSetting ? safeDropSetting.value === "true" : true,
     }
 
     return { success: true, data: settings }
@@ -30,19 +29,32 @@ export async function updateStoreSettings(data: {
   enableSafeDrop?: boolean
 }) {
   try {
-    const settings = await db.storeSettings.upsert({
-      where: { id: "global" },
-      update: {
-        shippingInsuranceCost: data.shippingInsuranceCost,
-        enableSafeDrop: data.enableSafeDrop,
-      },
-      create: {
-        id: "global",
-        shippingInsuranceCost: data.shippingInsuranceCost ?? 22.50,
-        enableSafeDrop: data.enableSafeDrop ?? true,
-      },
-    })
-    return { success: true, data: settings }
+    if (data.shippingInsuranceCost !== undefined) {
+      await db.siteSetting.upsert({
+        where: { key: "shippingInsuranceCost" },
+        update: { value: data.shippingInsuranceCost.toString() },
+        create: {
+          key: "shippingInsuranceCost",
+          value: data.shippingInsuranceCost.toString(),
+          description: "Shipping insurance cost in default currency"
+        },
+      })
+    }
+    
+    if (data.enableSafeDrop !== undefined) {
+      await db.siteSetting.upsert({
+        where: { key: "enableSafeDrop" },
+        update: { value: data.enableSafeDrop.toString() },
+        create: {
+          key: "enableSafeDrop",
+          value: data.enableSafeDrop.toString(),
+          description: "Enable safe drop option during checkout"
+        },
+      })
+    }
+
+    const { data: updatedSettings } = await getStoreSettings()
+    return { success: true, data: updatedSettings }
   } catch (error: any) {
     console.error("Failed to update store settings", error)
     return { success: false, error: "Failed to update store settings" }

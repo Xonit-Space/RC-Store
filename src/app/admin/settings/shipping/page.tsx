@@ -380,7 +380,7 @@ export default function AdminShippingRulesPage() {
             <div className="space-y-4">
               <div>
                 <h4 className="text-sm font-semibold text-foreground mb-1">Safe Drop Option</h4>
-                <p className="text-xs text-muted-foreground mb-4">Allow customers to choose "Safe Drop" (leave delivery in safe place) during checkout.</p>
+                <p className="text-xs text-muted-foreground mb-4">Allow customers to choose &quot;Safe Drop&quot; (leave delivery in safe place) during checkout.</p>
               </div>
               <div className="flex items-center space-x-2 pt-2">
                 <Switch 

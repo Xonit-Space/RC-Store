@@ -482,7 +482,7 @@ export default function CheckoutPage() {
                           <label htmlFor="safedrop" className="font-bold text-sm text-foreground cursor-pointer">
                             Safe drop
                           </label>
-                          <p className="text-xs text-muted-foreground">Leave my delivery in a safe place if no one's home.</p>
+                          <p className="text-xs text-muted-foreground">Leave my delivery in a safe place if no one&apos;s home.</p>
                         </div>
                       </div>
                     )}

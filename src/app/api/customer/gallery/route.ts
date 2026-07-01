@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { withApiHandler } from "@/lib/api-middleware"
 
-export const POST = withApiHandler(async (request, session) => {
+export const POST = withApiHandler(async (request, { session }) => {
   const body = await request.json()
   const { imageUrl, caption, productId } = body
 
@@ -17,7 +17,7 @@ export const POST = withApiHandler(async (request, session) => {
       imageUrl,
       caption,
       productId: productId || null,
-      authorName: session.user.name || session.user.email,
+      authorName: session?.user?.name || session?.user?.email || "Anonymous",
       isApproved: false // Requires admin approval
     }
   })

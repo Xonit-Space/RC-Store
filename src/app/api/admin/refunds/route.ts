@@ -3,7 +3,7 @@ import { db } from "@/lib/db"
 import { withApiHandler } from "@/lib/api-middleware"
 import { serializeForClient } from "@/lib/serialize"
 
-export const GET = withApiHandler(async (request, session) => {
+export const GET = withApiHandler(async (request, { session }) => {
   const { searchParams } = new URL(request.url)
   const status = searchParams.get("status")
 
@@ -33,7 +33,7 @@ export const GET = withApiHandler(async (request, session) => {
   return NextResponse.json({ success: true, data: serializeForClient(requests) })
 }, { requireAdmin: true })
 
-export const PATCH = withApiHandler(async (request, session) => {
+export const PATCH = withApiHandler(async (request, { session }) => {
   const { id, status } = await request.json()
 
   if (!id || !status) {
@@ -83,7 +83,7 @@ export const PATCH = withApiHandler(async (request, session) => {
   // Audit log
   await db.auditLog.create({
     data: {
-      userId: session.user.id,
+      userId: session?.user?.id || "",
       action: "UPDATE_RETURN_REQUEST",
       entity: "ReturnRequest",
       entityId: id,

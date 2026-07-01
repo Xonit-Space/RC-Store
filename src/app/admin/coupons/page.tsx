@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { RefreshCw, Coins, Plus, X } from "lucide-react"
 import { toast } from "sonner"
-import { useAdminCoupons, useAdminCreateCoupon } from "@/hooks/use-admin-data"
+import { useAdminCoupons, useAdminCreateCoupon, useAdminUpdateCouponStatus } from "@/hooks/use-admin-data"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
 
 export default function AdminCouponsPage() {
   const { data: coupons = [], isLoading: loading } = useAdminCoupons()
@@ -17,6 +19,10 @@ export default function AdminCouponsPage() {
   const [discountType, setDiscountType] = useState<"PERCENTAGE" | "FIXED_AMOUNT">("PERCENTAGE")
   const [discountValue, setDiscountValue] = useState("")
   const [minOrder, setMinOrder] = useState("")
+  const [startDate, setStartDate] = useState("")
+  const [endDate, setEndDate] = useState("")
+
+  const updateStatusMutation = useAdminUpdateCouponStatus()
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -31,6 +37,8 @@ export default function AdminCouponsPage() {
         discountType,
         discountValue: Number(discountValue),
         minOrderAmount: minOrder ? Number(minOrder) : 0,
+        startDate: startDate ? new Date(startDate).toISOString() : undefined,
+        endDate: endDate ? new Date(endDate).toISOString() : undefined,
       })
 
       toast.success("Successfully registered new discount coupon!")
@@ -40,6 +48,15 @@ export default function AdminCouponsPage() {
       setMinOrder("")
     } catch (err: any) {
       toast.error(err.message || "Failed to register coupon code")
+    }
+  }
+
+  const handleStatusChange = async (id: string, currentStatus: boolean) => {
+    try {
+      await updateStatusMutation.mutateAsync({ id, isActive: !currentStatus })
+      toast.success("Coupon status updated")
+    } catch (error: any) {
+      toast.error(error.message || "Failed to update status")
     }
   }
 
@@ -82,7 +99,18 @@ export default function AdminCouponsPage() {
                     Type: {c.discountType}
                   </p>
                 </div>
-                <Coins strokeWidth={1} className="h-6 w-6 text-foreground/40 shrink-0" />
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center space-x-2">
+                    <Label htmlFor={`status-${c.id}`} className="text-[10px] sr-only">Toggle Status</Label>
+                    <Switch
+                      id={`status-${c.id}`}
+                      checked={c.isActive}
+                      onCheckedChange={() => handleStatusChange(c.id, c.isActive)}
+                      disabled={updateStatusMutation.isPending}
+                    />
+                  </div>
+                  <Coins strokeWidth={1} className="h-6 w-6 text-foreground/40 shrink-0" />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/40">
@@ -165,6 +193,27 @@ export default function AdminCouponsPage() {
                   onChange={(e) => setMinOrder(e.target.value)}
                   className="h-12 bg-transparent border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-foreground"
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">Start Date</label>
+                  <Input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="h-12 bg-transparent border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-foreground"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">End Date</label>
+                  <Input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="h-12 bg-transparent border-border/60 rounded-none focus-visible:ring-0 focus-visible:border-foreground"
+                  />
+                </div>
               </div>
 
               <div className="flex gap-4 justify-end pt-6 border-t border-border/40 mt-8">

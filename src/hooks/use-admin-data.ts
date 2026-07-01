@@ -214,3 +214,24 @@ export function useAdminDeleteReview() {
     }
   })
 }
+
+export function useAdminUpdateCouponStatus() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
+      const res = await fetch(`/api/admin/coupons/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive }),
+      })
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null)
+        throw new Error(errorData?.error || "Failed to update coupon status")
+      }
+      return res.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "coupons"] })
+    }
+  })
+}

@@ -44,6 +44,7 @@ const navGroups = [
   {
     label: "Content",
     items: [
+      { id: "banners", name: "Banners", icon: ImageIcon, path: "/admin/banners" },
       { id: "blog", name: "Blog", icon: Newspaper, path: "/admin/blog" },
       { id: "gallery", name: "Gallery", icon: ImageIcon, path: "/admin/gallery" },
     ],

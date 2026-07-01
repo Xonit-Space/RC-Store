@@ -44,7 +44,7 @@ export async function validateAndCalculateCoupon(code: string, subtotal: number)
       code: coupon.code,
       discount,
       discountType: coupon.discountType,
-      discountValue: coupon.discountValue,
+      discountValue: Number(coupon.discountValue),
     },
   }
 }

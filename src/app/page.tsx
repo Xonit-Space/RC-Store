@@ -4,6 +4,8 @@ import nextDynamic from "next/dynamic"
 
 // Eager components for LCP
 import { HeroSection } from "@/components/sections/hero-section"
+import { ImageBanner } from "@/components/sections/image-banner"
+import { db } from "@/lib/db"
 
 // Lazy loaded below-the-fold components
 const FeaturedProductCard = nextDynamic(() => import("@/components/sections/featured-product-card").then(m => m.FeaturedProductCard))
@@ -24,7 +26,13 @@ function SectionSkeleton({ heightClass = "h-96" }) {
   return <div className={`w-full ${heightClass} bg-muted animate-pulse`} />
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const activeBanners = await db.imageBanner.findMany({
+    where: { isActive: true }
+  })
+  const topBanner = activeBanners.find(b => b.position === "TOP")
+  const bottomBanner = activeBanners.find(b => b.position === "BOTTOM")
+
   return (
     <div className="min-h-screen bg-background">
       {/* 1 & 2. Announcement Bar & Header */}
@@ -32,6 +40,9 @@ export default function HomePage() {
       <main>
         {/* 3. Hero Banner (LCP) */}
         <HeroSection />
+
+        {/* 3.5 Top Image Banner */}
+        {topBanner && <ImageBanner banner={topBanner} />}
 
         {/* 4. Featured Product */}
         <Suspense fallback={<SectionSkeleton heightClass="h-[600px]" />}>
@@ -82,6 +93,9 @@ export default function HomePage() {
         <Suspense fallback={<SectionSkeleton heightClass="h-[400px]" />}>
           <CustomerGallery />
         </Suspense>
+
+        {/* 12.5 Bottom Image Banner */}
+        {bottomBanner && <ImageBanner banner={bottomBanner} />}
 
         {/* 13. Newsletter */}
         <Suspense fallback={<SectionSkeleton heightClass="h-[400px]" />}>

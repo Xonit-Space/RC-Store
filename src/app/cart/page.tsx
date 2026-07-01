@@ -265,14 +265,6 @@ export default function CartPage() {
                 <span className="text-foreground">{formatPrice(grandTotal)}</span>
               </div>
 
-              {/* Promo input field */}
-              <div className="flex gap-2">
-                <Input placeholder="PROMO CODE" className="h-9 text-xs bg-background" />
-                <Button variant="secondary" size="sm" className="h-9 font-bold">
-                  Apply
-                </Button>
-              </div>
-
               {/* Checkout CTA */}
               <Link href="/checkout" className="block pt-2">
                 <Button className="w-full h-11 bg-foreground hover:bg-foreground/90 text-background font-bold active:scale-95 transition">

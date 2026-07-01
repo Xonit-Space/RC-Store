@@ -235,3 +235,82 @@ export function useAdminUpdateCouponStatus() {
     }
   })
 }
+
+// ==========================================
+// BANNERS HOOKS
+// ==========================================
+
+export function useAdminBanners() {
+  return useQuery({
+    queryKey: ["admin", "banners"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/banners")
+      if (!res.ok) throw new Error("Failed to fetch banners")
+      const data = await res.json()
+      return data.data
+    }
+  })
+}
+
+export function useAdminUpsertBanner() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (payload: {
+      position: string;
+      title?: string;
+      desktopImage: string;
+      tabletImage: string;
+      mobileImage: string;
+      link?: string;
+      isActive?: boolean;
+    }) => {
+      const res = await fetch("/api/admin/banners", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null)
+        throw new Error(errorData?.error || "Failed to save banner")
+      }
+      return res.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "banners"] })
+    }
+  })
+}
+
+export function useAdminUpdateBannerStatus() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
+      const res = await fetch(`/api/admin/banners/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive }),
+      })
+      if (!res.ok) throw new Error("Failed to update banner status")
+      return res.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "banners"] })
+    }
+  })
+}
+
+export function useAdminDeleteBanner() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/admin/banners/${id}`, {
+        method: "DELETE",
+      })
+      if (!res.ok) throw new Error("Failed to delete banner")
+      return res.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "banners"] })
+    }
+  })
+}

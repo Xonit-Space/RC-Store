@@ -1500,3 +1500,18 @@ model RelatedProduct {
   @@index([relatedId])
   @@map("related_products")
 }
+
+model ImageBanner {
+  id           String   @id @default(cuid())
+  position     String   @unique // "TOP", "BOTTOM"
+  title        String?  
+  desktopImage String
+  tabletImage  String
+  mobileImage  String
+  link         String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("image_banners")
+}

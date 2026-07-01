@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { signIn, getSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { AlertCircle, Zap, ShieldAlert } from "lucide-react"
+import { AlertCircle, Zap, ShieldAlert, Eye, EyeOff } from "lucide-react"
 import { toast } from "sonner"
 
 export default function LoginPage() {
@@ -17,6 +17,7 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(errorParam ? "Authentication credentials failed" : null)
   const [loading, setLoading] = useState(false)
 
@@ -144,13 +145,22 @@ export default function LoginPage() {
                     Forgot Password
                   </Link>
                 </div>
-                <Input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="h-12 bg-muted border-border rounded-none text-foreground focus-visible:ring-0 focus-visible:border-racing-yellow focus-visible:shadow-[0_0_10px_rgba(255, 204, 0,0.3)] transition-all font-mono"
-                />
+                <div className="relative">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="h-12 bg-muted border-border rounded-none text-foreground focus-visible:ring-0 focus-visible:border-racing-yellow focus-visible:shadow-[0_0_10px_rgba(255, 204, 0,0.3)] transition-all font-mono pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
               </div>
 
               <div>

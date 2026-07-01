@@ -95,7 +95,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
       // Add selected addons
       for (const addonId of selectedAddons) {
-        const addonObj = product.productAddons?.find((pa: any) => pa.addon.id === addonId)?.addon
+        const addonObj = product.addons?.find((pa: any) => pa.addon.id === addonId)?.addon
         if (addonObj) {
           promises.push(
             cartStore.addItem({
@@ -128,7 +128,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
   const currentPrice = selectedVariant?.price || product.price
   const addonsTotal = selectedAddons.reduce((sum, addonId) => {
-    const addonPrice = product.productAddons?.find((pa: any) => pa.addon.id === addonId)?.addon?.price || 0
+    const addonPrice = product.addons?.find((pa: any) => pa.addon.id === addonId)?.addon?.price || 0
     return sum + Number(addonPrice)
   }, 0)
   const displayPrice = Number(currentPrice) + addonsTotal
@@ -252,13 +252,13 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               )}
 
               {/* Addons */}
-              {product.productAddons?.length > 0 && (
+              {product.addons?.length > 0 && (
                 <div className="space-y-4 pt-4 border-t border-border/40">
                   <div className="text-[10px] tracking-[0.2em] uppercase text-foreground">
                     Optional Extras
                   </div>
                   <div className="space-y-3">
-                    {product.productAddons.map(({ addon }: any) => {
+                    {product.addons.map(({ addon }: any) => {
                       const isSelected = selectedAddons.includes(addon.id)
                       return (
                         <label 

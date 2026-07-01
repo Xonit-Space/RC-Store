@@ -1,9 +1,11 @@
 "use client"
 
-import { Home, LogOut, Bell, Search } from "lucide-react"
+import { Home, LogOut, Bell, Sun, Moon } from "lucide-react"
 import Link from "next/link"
 import { signOut } from "next-auth/react"
 import { usePathname } from "next/navigation"
+import { useTheme } from "next-themes"
+import { useEffect, useState } from "react"
 
 interface HeaderProps {
   user: any
@@ -38,6 +40,9 @@ function usePageTitle() {
 
 export function Header({ user }: HeaderProps) {
   const pageTitle = usePageTitle()
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
 
   return (
     <header className="h-14 border-b border-border/40 bg-zinc-50 dark:bg-background/95 backdrop-blur-sm flex items-center px-4 md:px-6 shrink-0 sticky top-0 z-40 gap-4">
@@ -68,6 +73,21 @@ export function Header({ user }: HeaderProps) {
 
       {/* Right: User Info + Actions */}
       <div className="flex items-center gap-2 shrink-0">
+        {/* Theme Toggle */}
+        {mounted && (
+          <button
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            className="h-8 w-8 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/60 rounded-md transition-colors"
+          >
+            {theme === "dark" ? (
+              <Sun strokeWidth={1.5} className="w-4 h-4" />
+            ) : (
+              <Moon strokeWidth={1.5} className="w-4 h-4" />
+            )}
+          </button>
+        )}
+
         {/* Notification placeholder */}
         <button
           className="h-8 w-8 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/60 rounded-md transition-colors"

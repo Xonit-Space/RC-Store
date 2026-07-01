@@ -7,6 +7,7 @@ import { ActionResponse } from "./auth"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { revalidateTag } from "next/cache"
 
 export async function searchProducts(query: string) {
   if (!query || query.length < 2) return []
@@ -194,6 +195,7 @@ export async function adminDeleteProduct(adminId: string, productId: string): Pr
 
   try {
     await ProductService.softDeleteProduct(adminId, productId)
+    revalidateTag("products")
     return { success: true }
   } catch (error) {
     console.error("CMS Product Delete Action Error:", error)

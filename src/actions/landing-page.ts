@@ -12,6 +12,7 @@ export const getFeaturedProduct = unstable_cache(
       where: {
         isFeatured: true,
         isActive: true,
+        deletedAt: null,
       },
       include: {
         images: {
@@ -59,6 +60,7 @@ export const getBestSellers = unstable_cache(
     const products = await db.product.findMany({
       where: {
         isActive: true,
+        deletedAt: null,
       },
       orderBy: {
         salesCount: "desc",
@@ -147,6 +149,7 @@ export const getNewReleases = unstable_cache(
       where: {
         isActive: true,
         isNewRelease: true,
+        deletedAt: null,
       },
       orderBy: {
         createdAt: "desc",

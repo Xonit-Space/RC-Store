@@ -347,3 +347,90 @@ export async function adminDeleteRelatedProduct(relatedId: string, productId: st
     return { success: false, error: "Failed to delete related product" }
   }
 }
+
+export async function getProducts() {
+  try {
+    const products = await db.product.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: { images: true, category: true }
+    })
+    return { success: true, products }
+  } catch (error) {
+    return { success: false, error: "Failed to fetch products" }
+  }
+}
+
+export async function getRelatedProducts(productId: string) {
+  try {
+    const related = await db.relatedProduct.findMany({
+      where: { productId },
+      include: { related: { include: { images: true, category: true } } }
+    })
+    return related.map((r: any) => r.related)
+  } catch (error) {
+    return []
+  }
+}
+
+export async function assignRelatedProducts(productId: string, relatedIds: string[]) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {
+    return { success: false, error: "Unauthorized access" }
+  }
+  
+  try {
+    await db.$transaction(async (tx) => {
+      await tx.relatedProduct.deleteMany({ where: { productId } })
+      for (const id of relatedIds) {
+        await tx.relatedProduct.create({
+          data: { productId, relatedId: id, relationType: "COMPATIBLE" }
+        })
+      }
+    })
+    return { success: true }
+  } catch (error) {
+    return { success: false, error: "Failed to assign related products" }
+  }
+}
+
+export async function getAddons() {
+  try {
+    const addons = await db.addon.findMany()
+    return addons
+  } catch (error) {
+    return []
+  }
+}
+
+export async function getProductAddons(productId: string) {
+  try {
+    const productAddons = await db.productAddon.findMany({
+      where: { productId },
+      include: { addon: true }
+    })
+    return productAddons.map((pa: any) => pa.addon)
+  } catch (error) {
+    return []
+  }
+}
+
+export async function assignAddonsToProduct(productId: string, addonIds: string[]) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {
+    return { success: false, error: "Unauthorized access" }
+  }
+  
+  try {
+    await db.$transaction(async (tx) => {
+      await tx.productAddon.deleteMany({ where: { productId } })
+      for (const id of addonIds) {
+        await tx.productAddon.create({
+          data: { productId, addonId: id }
+        })
+      }
+    })
+    return { success: true }
+  } catch (error) {
+    return { success: false, error: "Failed to assign addons" }
+  }
+}

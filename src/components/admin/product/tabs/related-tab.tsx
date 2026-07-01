@@ -1,101 +1,116 @@
 "use client"
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Plus, Trash2, X } from "lucide-react"
+import { useState, useEffect } from "react"
+import { useQuery } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { useQueryClient } from "@tanstack/react-query"
-import { adminAddRelatedProduct, adminDeleteRelatedProduct } from "@/actions/product"
-import { useAdminProducts } from "@/hooks/use-admin-data"
+import { assignRelatedProducts, getRelatedProducts, getProducts } from "@/actions/product"
+import { Button } from "@/components/ui/button"
 
-export function RelatedTab({ product }: { product: any }) {
-  const queryClient = useQueryClient()
-  const productId = product.id
+export function RelatedTab({ product, localRelated, setLocalRelated }: { product?: any, localRelated: string[], setLocalRelated: React.Dispatch<React.SetStateAction<string[]>> }) {
+  const productId = product?.id
+  const isLocalMode = !productId
 
-  const [isRelatedModalOpen, setIsRelatedModalOpen] = useState(false)
-  const [relatedId, setRelatedId] = useState("")
-  const [relationType, setRelationType] = useState("COMPATIBLE")
+  const { data: allProducts } = useQuery({
+    queryKey: ["admin", "products", "all"],
+    queryFn: () => getProducts({ limit: 100 }),
+  })
+
+  // Exclude current product if editing
+  const availableProducts = allProducts?.data?.filter((p: any) => p.id !== productId) || []
+  
+  const [selectedIds, setSelectedIds] = useState<string[]>(localRelated)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isLoading, setIsLoading] = useState(!isLocalMode)
 
-  const { data: allProducts } = useAdminProducts(1, 100)
+  useEffect(() => {
+    if (isLocalMode) {
+      setSelectedIds(localRelated)
+      return
+    }
+    const loadRelated = async () => {
+      try {
+        const related = await getRelatedProducts(productId)
+        setSelectedIds(related.map((r: any) => r.id))
+      } catch {
+        // silently fail
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    if (productId) loadRelated()
+  }, [productId, isLocalMode, localRelated])
 
-  const handleAddRelated = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!relatedId) return toast.error("Select a related product")
-    setIsSubmitting(true)
-    const res = await adminAddRelatedProduct(productId, { relatedId, relationType })
-    if (res.success) {
-      toast.success("Added related product")
-      setIsRelatedModalOpen(false)
-      setRelatedId("")
-      queryClient.invalidateQueries({ queryKey: ["admin", "product", productId] })
-    } else toast.error(res.error)
-    setIsSubmitting(false)
+  const toggleRelated = (id: string) => {
+    const newIds = selectedIds.includes(id) ? selectedIds.filter(rId => rId !== id) : [...selectedIds, id]
+    setSelectedIds(newIds)
+    if (isLocalMode) setLocalRelated(newIds)
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure?")) return
-    const res = await adminDeleteRelatedProduct(id, productId)
+  const handleSaveRelated = async () => {
+    if (isLocalMode) {
+      toast.success("Related products saved to draft")
+      return
+    }
+    setIsSubmitting(true)
+    const res = await assignRelatedProducts(productId, selectedIds)
     if (res.success) {
-      toast.success("Deleted")
-      queryClient.invalidateQueries({ queryKey: ["admin", "product", productId] })
-    } else toast.error(res.error || "Delete failed")
+      toast.success("Related products assigned successfully")
+    } else {
+      toast.error(res.error || "Failed to assign related products")
+    }
+    setIsSubmitting(false)
   }
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-end border-b border-border/40 pb-4">
         <h3 className="font-sans text-2xl font-light text-foreground">Related Products</h3>
-        <Button onClick={() => setIsRelatedModalOpen(true)} className="h-10 px-4 rounded-none bg-foreground text-background font-bold text-[10px] tracking-widest uppercase">
-          <Plus className="h-3 w-3 mr-2" /> Add Related
-        </Button>
-      </div>
-
-      <div className="space-y-4">
-        {product.relatedSource?.length === 0 ? (
-          <div className="border border-border/40 p-8 text-center bg-white dark:bg-background"><p className="text-[10px] uppercase tracking-widest text-muted-foreground">No related products.</p></div>
-        ) : (
-          product.relatedSource?.map((r: any) => (
-            <div key={r.id} className="border border-border/40 p-4 flex justify-between items-center bg-white dark:bg-background">
-              <div>
-                <p className="text-sm font-bold">{r.related.name}</p>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{r.relationType}</p>
-              </div>
-              <Button variant="ghost" onClick={() => handleDelete(r.relatedId)} className="text-terracotta h-8 w-8 p-0"><Trash2 className="h-4 w-4" /></Button>
-            </div>
-          ))
+        {!isLocalMode && (
+          <Button 
+            onClick={handleSaveRelated} 
+            disabled={isSubmitting || isLoading}
+            className="h-10 px-4 rounded-none bg-foreground text-background font-bold text-[10px] tracking-widest uppercase"
+          >
+            {isSubmitting ? "Saving..." : "Save Related"}
+          </Button>
         )}
       </div>
 
-      {isRelatedModalOpen && (
-        <div className="fixed inset-0 z-[60] bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="max-w-lg w-full bg-white dark:bg-background border border-border/40 shadow-2xl p-8 relative">
-            <button onClick={() => setIsRelatedModalOpen(false)} className="absolute right-6 top-6 text-muted-foreground hover:text-foreground transition"><X className="h-5 w-5" /></button>
-            <h3 className="font-sans text-2xl font-light text-foreground mb-2">Add Related Product</h3>
-            <form onSubmit={handleAddRelated} className="space-y-6 mt-8">
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">Product</label>
-                <select value={relatedId} onChange={e => setRelatedId(e.target.value)} className="w-full h-12 bg-background border border-border/60 rounded-none text-xs text-foreground px-3 outline-none focus:border-foreground">
-                  <option value="">Select a product...</option>
-                  {allProducts?.products.filter((p: any) => p.id !== productId).map((p: any) => (
-                    <option key={p.id} value={p.id}>{p.name}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">Relation Type</label>
-                <select value={relationType} onChange={e => setRelationType(e.target.value)} className="w-full h-12 bg-background border border-border/60 rounded-none text-xs text-foreground px-3 outline-none focus:border-foreground">
-                  <option value="COMPATIBLE">Compatible With</option>
-                  <option value="ACCESSORY">Required Accessory</option>
-                  <option value="UPGRADE">Upgrade Part</option>
-                  <option value="FREQUENTLY_BOUGHT_TOGETHER">Frequently Bought Together</option>
-                </select>
-              </div>
-              <div className="flex gap-4 justify-end pt-6 border-t border-border/40"><Button type="button" variant="outline" onClick={() => setIsRelatedModalOpen(false)} className="h-12 rounded-none bg-white dark:bg-background">Cancel</Button><Button type="submit" disabled={isSubmitting} className="h-12 rounded-none bg-foreground text-background">Add</Button></div>
-            </form>
+      <div className="space-y-4">
+        {isLoading ? (
+          <p className="text-[10px] uppercase tracking-widest text-muted-foreground text-center py-4">Loading products...</p>
+        ) : availableProducts?.length === 0 ? (
+          <div className="border border-border/40 p-8 text-center bg-white dark:bg-background">
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">No other products available in store.</p>
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {availableProducts.map((p: any) => {
+              const isSelected = selectedIds.includes(p.id)
+              return (
+                <div 
+                  key={p.id} 
+                  onClick={() => toggleRelated(p.id)}
+                  className={`cursor-pointer border p-4 flex justify-between items-center transition-colors ${
+                    isSelected ? 'border-foreground bg-foreground/5' : 'border-border/40 bg-white dark:bg-background hover:border-foreground/30'
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`w-4 h-4 border flex items-center justify-center ${isSelected ? 'border-foreground bg-foreground' : 'border-muted-foreground'}`}>
+                      {isSelected && <div className="w-2 h-2 bg-background" />}
+                    </div>
+                    {p.images?.[0] && <img src={p.images[0].url} alt={p.name} className="w-10 h-10 object-cover" />}
+                    <div>
+                      <p className="text-sm font-bold line-clamp-1">{p.name}</p>
+                      <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{p.category?.name || "Uncategorized"}</p>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

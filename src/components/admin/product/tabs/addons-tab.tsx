@@ -1,43 +1,54 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Trash2 } from "lucide-react"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { useQueryClient } from "@tanstack/react-query"
-import { assignAddonsToProduct, getProductAddons } from "@/actions/addons"
+import { assignAddonsToProduct, getProductAddons, getAddons } from "@/actions/product"
+import { Button } from "@/components/ui/button"
 
-export function AddonsTab({ product, availableAddons }: { product: any, availableAddons: any[] }) {
+export function AddonsTab({ product, localAddons, setLocalAddons }: { product?: any, localAddons: string[], setLocalAddons: React.Dispatch<React.SetStateAction<string[]>> }) {
   const queryClient = useQueryClient()
-  const productId = product.id
+  const productId = product?.id
+  const isLocalMode = !productId
 
-  const [selectedAddonIds, setSelectedAddonIds] = useState<string[]>([])
+  const { data: availableAddons } = useQuery({
+    queryKey: ["admin", "addons"],
+    queryFn: () => getAddons(),
+  })
+
+  const [selectedAddonIds, setSelectedAddonIds] = useState<string[]>(localAddons)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(!isLocalMode)
 
   useEffect(() => {
+    if (isLocalMode) {
+      setSelectedAddonIds(localAddons)
+      return
+    }
     const loadAddons = async () => {
       try {
         const addons = await getProductAddons(productId)
-        setSelectedAddonIds(addons.map(a => a.id))
+        setSelectedAddonIds(addons.map((a: any) => a.id))
       } catch {
         // silently fail
       } finally {
         setIsLoading(false)
       }
     }
-    if (productId) {
-      loadAddons()
-    }
-  }, [productId])
+    if (productId) loadAddons()
+  }, [productId, isLocalMode, localAddons])
 
   const toggleAddon = (id: string) => {
-    setSelectedAddonIds(prev => 
-      prev.includes(id) ? prev.filter(aId => aId !== id) : [...prev, id]
-    )
+    const newIds = selectedAddonIds.includes(id) ? selectedAddonIds.filter(aId => aId !== id) : [...selectedAddonIds, id]
+    setSelectedAddonIds(newIds)
+    if (isLocalMode) setLocalAddons(newIds)
   }
 
   const handleSaveAddons = async () => {
+    if (isLocalMode) {
+      toast.success("Addons saved to draft")
+      return
+    }
     setIsSubmitting(true)
     const res = await assignAddonsToProduct(productId, selectedAddonIds)
     if (res.success) {
@@ -53,13 +64,15 @@ export function AddonsTab({ product, availableAddons }: { product: any, availabl
     <div className="space-y-6">
       <div className="flex justify-between items-end border-b border-border/40 pb-4">
         <h3 className="font-sans text-2xl font-light text-foreground">Addons</h3>
-        <Button 
-          onClick={handleSaveAddons} 
-          disabled={isSubmitting || isLoading}
-          className="h-10 px-4 rounded-none bg-foreground text-background font-bold text-[10px] tracking-widest uppercase"
-        >
-          {isSubmitting ? "Saving..." : "Save Addons"}
-        </Button>
+        {!isLocalMode && (
+          <Button 
+            onClick={handleSaveAddons} 
+            disabled={isSubmitting || isLoading}
+            className="h-10 px-4 rounded-none bg-foreground text-background font-bold text-[10px] tracking-widest uppercase"
+          >
+            {isSubmitting ? "Saving..." : "Save Addons"}
+          </Button>
+        )}
       </div>
 
       <div className="space-y-4">
@@ -71,16 +84,14 @@ export function AddonsTab({ product, availableAddons }: { product: any, availabl
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {availableAddons.map((addon: any) => {
+            {availableAddons?.map((addon: any) => {
               const isSelected = selectedAddonIds.includes(addon.id)
               return (
                 <div 
                   key={addon.id} 
                   onClick={() => toggleAddon(addon.id)}
                   className={`cursor-pointer border p-4 flex justify-between items-center transition-colors ${
-                    isSelected 
-                      ? 'border-foreground bg-foreground/5' 
-                      : 'border-border/40 bg-white dark:bg-background hover:border-foreground/30'
+                    isSelected ? 'border-foreground bg-foreground/5' : 'border-border/40 bg-white dark:bg-background hover:border-foreground/30'
                   }`}
                 >
                   <div className="flex items-center gap-4">

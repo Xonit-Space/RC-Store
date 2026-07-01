@@ -4,6 +4,27 @@ export class ProductService {
   static async createProduct(adminId: string, data: any) {
     const slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "")
     return db.$transaction(async (tx) => {
+      
+      let finalBrandId = data.brandId
+      if (!finalBrandId && data.brandName) {
+        let brand = await tx.brand.findFirst({ where: { name: { equals: data.brandName, mode: 'insensitive' } } })
+        if (!brand) {
+          brand = await tx.brand.create({
+            data: { name: data.brandName, slug: data.brandName.toLowerCase().replace(/[^a-z0-9]+/g, "-") }
+          })
+        }
+        finalBrandId = brand.id
+      }
+
+      const attributesToCreate = data.attributes?.map((attr: any) => ({
+        name: attr.name,
+        value: attr.value,
+      })) || []
+
+      if (data.scale && data.scale !== "N/A") {
+        attributesToCreate.push({ name: "Scale", value: data.scale })
+      }
+
       const p = await tx.product.create({
         data: {
           name: data.name,
@@ -13,15 +34,12 @@ export class ProductService {
           originalPrice: data.originalPrice,
           gender: data.gender,
           categoryId: data.categoryId,
-          brandId: data.brandId,
+          brandId: finalBrandId,
           collectionId: data.collectionId,
           isActive: data.isActive,
           isFeatured: data.isFeatured,
           attributes: {
-            create: data.attributes?.map((attr: any) => ({
-              name: attr.name,
-              value: attr.value,
-            })),
+            create: attributesToCreate,
           },
           features: data.features || [],
           includedItems: data.includedItems || [],
@@ -64,6 +82,18 @@ export class ProductService {
 
   static async updateProduct(adminId: string, productId: string, data: any) {
     return db.$transaction(async (tx) => {
+      
+      let finalBrandId = data.brandId
+      if (!finalBrandId && data.brandName) {
+        let brand = await tx.brand.findFirst({ where: { name: { equals: data.brandName, mode: 'insensitive' } } })
+        if (!brand) {
+          brand = await tx.brand.create({
+            data: { name: data.brandName, slug: data.brandName.toLowerCase().replace(/[^a-z0-9]+/g, "-") }
+          })
+        }
+        finalBrandId = brand.id
+      }
+
       const p = await tx.product.update({
         where: { id: productId },
         data: {
@@ -73,7 +103,7 @@ export class ProductService {
           originalPrice: data.originalPrice,
           gender: data.gender,
           categoryId: data.categoryId,
-          brandId: data.brandId,
+          brandId: finalBrandId,
           collectionId: data.collectionId,
           isActive: data.isActive,
           isFeatured: data.isFeatured,
@@ -83,6 +113,22 @@ export class ProductService {
           notes: data.notes || null,
         },
       })
+
+      if (data.scale && data.scale !== "N/A") {
+        const existingScale = await tx.productAttribute.findFirst({
+          where: { productId, name: "Scale" }
+        })
+        if (existingScale) {
+          await tx.productAttribute.update({
+            where: { id: existingScale.id },
+            data: { value: data.scale }
+          })
+        } else {
+          await tx.productAttribute.create({
+            data: { productId, name: "Scale", value: data.scale }
+          })
+        }
+      }
 
       await tx.auditLog.create({
         data: {

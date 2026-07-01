@@ -9,10 +9,13 @@ import { toast } from "sonner"
 import { useQueryClient } from "@tanstack/react-query"
 import { adminAddProductFeatureBlock, adminDeleteProductFeatureBlock } from "@/actions/product"
 
-export function FeaturesTab({ product }: { product: any }) {
+export function FeaturesTab({ product, localFeatures, setLocalFeatures }: { product?: any, localFeatures: any[], setLocalFeatures: React.Dispatch<React.SetStateAction<any[]>> }) {
   const { data: session } = useSession()
   const queryClient = useQueryClient()
-  const productId = product.id
+  const productId = product?.id
+  const isLocalMode = !productId
+
+  const displayFeatures = isLocalMode ? localFeatures : (product?.featureBlocks || [])
 
   const [isBlockModalOpen, setIsBlockModalOpen] = useState(false)
   const [blockTitle, setBlockTitle] = useState("")
@@ -24,6 +27,22 @@ export function FeaturesTab({ product }: { product: any }) {
     e.preventDefault()
     if (!blockTitle || !blockDesc) return toast.error("Title and Description are required")
     setIsSubmitting(true)
+    
+    if (isLocalMode) {
+       setLocalFeatures(prev => [...prev, { 
+         localId: Date.now(), 
+         title: blockTitle, 
+         description: blockDesc, 
+         file: blockImgFile, 
+         image: blockImgFile ? URL.createObjectURL(blockImgFile) : "" 
+       }])
+       toast.success("Added feature block to draft")
+       setIsBlockModalOpen(false)
+       setBlockTitle(""); setBlockDesc(""); setBlockImgFile(null)
+       setIsSubmitting(false)
+       return
+    }
+
     try {
       let finalImgUrl = ""
       if (blockImgFile) {
@@ -51,6 +70,12 @@ export function FeaturesTab({ product }: { product: any }) {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure?")) return
+    
+    if (isLocalMode) {
+      setLocalFeatures(prev => prev.filter(f => f.localId !== id))
+      return
+    }
+    
     const res = await adminDeleteProductFeatureBlock(id)
     if (res.success) {
       toast.success("Deleted")
@@ -68,11 +93,11 @@ export function FeaturesTab({ product }: { product: any }) {
       </div>
 
       <div className="space-y-4">
-        {product.featureBlocks?.length === 0 ? (
+        {displayFeatures.length === 0 ? (
           <div className="border border-border/40 p-8 text-center bg-white dark:bg-background"><p className="text-[10px] uppercase tracking-widest text-muted-foreground">No feature blocks added.</p></div>
         ) : (
-          product.featureBlocks?.map((b: any) => (
-            <div key={b.id} className="border border-border/40 p-4 flex justify-between items-center bg-white dark:bg-background">
+          displayFeatures.map((b: any) => (
+            <div key={b.id || b.localId} className="border border-border/40 p-4 flex justify-between items-center bg-white dark:bg-background">
               <div className="flex items-center gap-4">
                 {b.image && <img src={b.image} alt={b.title} className="w-16 h-16 object-cover bg-muted" />}
                 <div>
@@ -80,7 +105,7 @@ export function FeaturesTab({ product }: { product: any }) {
                   <p className="text-xs text-muted-foreground line-clamp-1">{b.description}</p>
                 </div>
               </div>
-              <Button variant="ghost" onClick={() => handleDelete(b.id)} className="text-terracotta h-8 w-8 p-0"><Trash2 className="h-4 w-4" /></Button>
+              <Button variant="ghost" onClick={() => handleDelete(b.id || b.localId)} className="text-terracotta h-8 w-8 p-0"><Trash2 className="h-4 w-4" /></Button>
             </div>
           ))
         )}

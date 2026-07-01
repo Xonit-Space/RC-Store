@@ -7,41 +7,46 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "sonner"
 import { RefreshCw, Car } from "lucide-react"
 
-export function CompatibilityTab({ product }: { product: any }) {
-  const [assignedModelIds, setAssignedModelIds] = useState<string[]>([])
+export function CompatibilityTab({ product, localCompatibility, setLocalCompatibility }: { product?: any, localCompatibility: string[], setLocalCompatibility: React.Dispatch<React.SetStateAction<string[]>> }) {
+  const productId = product?.id
+  const isLocalMode = !productId
+
+  const [assignedModelIds, setAssignedModelIds] = useState<string[]>(localCompatibility)
   const [isUpdating, setIsUpdating] = useState(false)
 
-  // Fetch all makes and models
-  const { data: makes = [] } = useQuery({
-    queryKey: ["admin", "vehicle-makes"],
-    queryFn: () => getVehicleMakes()
-  })
+  const { data: makes = [] } = useQuery({ queryKey: ["admin", "vehicle-makes"], queryFn: () => getVehicleMakes() })
+  const { data: models = [] } = useQuery({ queryKey: ["admin", "vehicle-models"], queryFn: () => getVehicleModels() })
 
-  const { data: models = [] } = useQuery({
-    queryKey: ["admin", "vehicle-models"],
-    queryFn: () => getVehicleModels()
-  })
-
-  // Fetch product's current compatibilities
   const { data: assignedModels = [], isLoading, refetch } = useQuery({
-    queryKey: ["admin", "product-compatibility", product.id],
-    queryFn: () => getProductCompatibleModels(product.id)
+    queryKey: ["admin", "product-compatibility", productId],
+    queryFn: () => productId ? getProductCompatibleModels(productId) : Promise.resolve([]),
+    enabled: !!productId
   })
 
   useEffect(() => {
+    if (isLocalMode) {
+      setAssignedModelIds(localCompatibility)
+      return
+    }
     if (assignedModels) {
       setAssignedModelIds(assignedModels.map((m: any) => m.id))
     }
-  }, [assignedModels])
+  }, [assignedModels, isLocalMode, localCompatibility])
 
   const toggleModel = async (modelId: string, checked: boolean) => {
+    const newIds = checked ? [...assignedModelIds, modelId] : assignedModelIds.filter(id => id !== modelId)
+    setAssignedModelIds(newIds)
+    if (isLocalMode) {
+       setLocalCompatibility(newIds)
+       return
+    }
     setIsUpdating(true)
     try {
       if (checked) {
-        await linkProductToModel(modelId, product.id)
+        await linkProductToModel(modelId, productId)
         toast.success("Compatibility added")
       } else {
-        await unlinkProductFromModel(modelId, product.id)
+        await unlinkProductFromModel(modelId, productId)
         toast.success("Compatibility removed")
       }
       refetch()
@@ -52,7 +57,7 @@ export function CompatibilityTab({ product }: { product: any }) {
     }
   }
 
-  if (isLoading) {
+  if (isLoading && !isLocalMode) {
     return (
       <div className="flex flex-col items-center justify-center p-12">
         <RefreshCw className="h-6 w-6 text-muted-foreground animate-spin mb-4" />

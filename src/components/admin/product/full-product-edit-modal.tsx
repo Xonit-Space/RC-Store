@@ -13,7 +13,8 @@ import {
   adminAddProductVideo, adminDeleteProductVideo, 
   adminAddProductDocument, adminDeleteProductDocument,
   adminAddProductFeatureBlock, adminDeleteProductFeatureBlock,
-  adminAddRelatedProduct, adminDeleteRelatedProduct
+  adminAddRelatedProduct, adminDeleteRelatedProduct,
+  assignRelatedProducts, assignAddonsToProduct
 } from "@/actions/product"
 import { linkProductToModel } from "@/actions/part-finder"
 import { useAdminProduct, useAdminProducts } from "@/hooks/use-admin-data"
@@ -78,6 +79,14 @@ export function FullProductEditModal({
   const [notes, setNotes] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  // Lifted Local States for New Products
+  const [localVariants, setLocalVariants] = useState<any[]>([])
+  const [localMedia, setLocalMedia] = useState<{images: any[], videos: any[], docs: any[]}>({ images: [], videos: [], docs: [] })
+  const [localFeatures, setLocalFeatures] = useState<any[]>([])
+  const [localRelated, setLocalRelated] = useState<string[]>([])
+  const [localAddons, setLocalAddons] = useState<string[]>([])
+  const [localCompatibility, setLocalCompatibility] = useState<string[]>([])
+
   // Populate basic form when product loads
   useEffect(() => {
     if (product) {
@@ -116,11 +125,17 @@ export function FullProductEditModal({
       setIncludedItemsText("")
       setRequiredItemsText("")
       setNotes("")
+      setLocalVariants([])
+      setLocalMedia({ images: [], videos: [], docs: [] })
+      setLocalFeatures([])
+      setLocalRelated([])
+      setLocalAddons([])
+      setLocalCompatibility([])
     }
   }, [product, initialProductId])
 
-  const handleSaveBasic = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSaveAll = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
     setIsSubmitting(true)
 
     const payload = {
@@ -145,14 +160,100 @@ export function FullProductEditModal({
           toast.error(res.error || "Failed to update product")
         }
       } else {
+        const toastId = toast.loading("Saving product details (this might take a moment if you have media)...")
+
         const res = await adminCreateProduct(session?.user?.id || "", payload)
-        if (res.success) {
-          toast.success("Product created successfully! You can now add media.")
-          setProductId(res.data.id)
-          setActiveTab("media")
-          if (onSuccess) onSuccess()
-        } else {
-          toast.error(res.error || "Failed to create product")
+        if (!res.success) throw new Error(res.error || "Failed to create product")
+        const newProductId = res.data.id
+
+        try {
+            // 2. Add Variants
+            for (const v of localVariants) {
+              await adminAddVariant(session?.user?.id || "", newProductId, { ...v })
+            }
+      
+            // 3. Upload Images
+            for (let i = 0; i < localMedia.images.length; i++) {
+              const slot = localMedia.images[i]
+              if (slot.file) {
+                const fd = new FormData()
+                fd.append("file", slot.file)
+                const uploadRes = await fetch("/api/admin/products/upload", { method: "POST", body: fd })
+                const uploadData = await uploadRes.json()
+                if (uploadData.success) {
+                  await fetch(`/api/admin/products/${newProductId}/images`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ url: uploadData.url, sortOrder: i, isFeatured: i === 0 }),
+                  })
+                }
+              }
+            }
+      
+            // 4. Upload Videos
+            for (const v of localMedia.videos) {
+               if (v.file) {
+                  const fd = new FormData()
+                  fd.append("file", v.file)
+                  fd.append("folder", "rc-store/videos")
+                  const uploadRes = await fetch("/api/admin/upload", { method: "POST", body: fd })
+                  const uploadData = await uploadRes.json()
+                  if (uploadData.success) {
+                     await adminAddProductVideo(newProductId, { title: v.title, url: uploadData.url, type: v.type })
+                  }
+               }
+            }
+      
+            // 5. Upload Docs
+            for (const d of localMedia.docs) {
+               if (d.file) {
+                  const fd = new FormData()
+                  fd.append("file", d.file)
+                  fd.append("folder", "rc-store/documents")
+                  const uploadRes = await fetch("/api/admin/upload", { method: "POST", body: fd })
+                  const uploadData = await uploadRes.json()
+                  if (uploadData.success) {
+                     await adminAddProductDocument(newProductId, { name: d.name, url: uploadData.url, type: d.type })
+                  }
+               }
+            }
+      
+            // 6. Feature Blocks
+            for (const fb of localFeatures) {
+               let finalImgUrl = ""
+               if (fb.file) {
+                  const fd = new FormData()
+                  fd.append("file", fb.file)
+                  fd.append("folder", "rc-store/features")
+                  const uploadRes = await fetch("/api/admin/upload", { method: "POST", body: fd })
+                  const uploadData = await uploadRes.json()
+                  if (uploadData.success) finalImgUrl = uploadData.url
+               }
+               await adminAddProductFeatureBlock(newProductId, { title: fb.title, description: fb.description, image: finalImgUrl })
+            }
+      
+            // 7. Related Products
+            if (localRelated.length > 0) {
+               await assignRelatedProducts(newProductId, localRelated)
+            }
+      
+            // 8. Addons
+            if (localAddons.length > 0) {
+               await assignAddonsToProduct(newProductId, localAddons)
+            }
+      
+            // 9. Compatibility
+            for (const modelId of localCompatibility) {
+               await linkProductToModel(modelId, newProductId)
+            }
+      
+            toast.success("Product created with all details!", { id: toastId })
+            if (onSuccess) onSuccess()
+            onClose()
+        } catch (subErr) {
+            console.error(subErr)
+            toast.success("Product basic details saved, but some related media/data failed to upload.", { id: toastId })
+            setProductId(newProductId) // Set it so they can retry as an edit
         }
       }
     } catch (err: any) {
@@ -178,28 +279,33 @@ export function FullProductEditModal({
     <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="w-full max-w-6xl bg-white dark:bg-background border border-border/40 shadow-2xl transition-all duration-300 relative h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-start justify-between p-6 pb-4 border-b border-border/40">
+        <div className="flex items-center justify-between p-6 pb-4 border-b border-border/40">
           <div>
             <h3 className="font-sans text-2xl font-light text-foreground">
               {isEditMode ? `Edit Product: ${product?.name || "Loading..."}` : "New RC Product"}
             </h3>
             <p className="text-[10px] tracking-widest uppercase text-muted-foreground mt-1">
-              {!isEditMode ? "Save basic details first to unlock other tabs" : "Manage all product features"}
+              Manage all product features and save at once
             </p>
           </div>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition">
-            <X className="h-5 w-5" />
-          </button>
+          <div className="flex items-center gap-4">
+             <Button type="button" onClick={handleSaveAll} disabled={isSubmitting} className="h-10 px-6 rounded-none bg-foreground text-background font-bold uppercase tracking-widest text-[10px]">
+                {isSubmitting ? "Saving..." : isEditMode ? "Save Changes" : "Save All Details"}
+             </Button>
+            <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition ml-2">
+              <X className="h-5 w-5" />
+            </button>
+          </div>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex border-b border-border/40 px-6">
+        <div className="flex border-b border-border/40 px-6 overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
-              className={`px-6 py-4 text-xs tracking-widest uppercase font-bold border-b-2 transition-colors ${
+              className={`px-6 py-4 text-xs tracking-widest uppercase font-bold border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === tab.id
                   ? "border-foreground text-foreground"
                   : "border-transparent text-muted-foreground hover:text-foreground"
@@ -213,7 +319,7 @@ export function FullProductEditModal({
         {/* Content Area */}
         <div className="flex-1 overflow-y-auto p-6 bg-muted/5">
           {activeTab === "basic" && (
-            <form onSubmit={handleSaveBasic} className="space-y-6 max-w-3xl mx-auto">
+            <form id="basic-form" onSubmit={(e) => { e.preventDefault(); handleSaveAll(); }} className="space-y-6 max-w-3xl mx-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold text-foreground uppercase tracking-[0.2em] block">
@@ -293,35 +399,29 @@ export function FullProductEditModal({
                   Featured Product
                 </label>
               </div>
-
-              <div className="flex justify-end pt-6">
-                <Button type="submit" disabled={isSubmitting} className="h-12 px-8 rounded-none bg-foreground text-background font-bold uppercase tracking-widest">
-                  {isSubmitting ? "Saving..." : isEditMode ? "Save Changes" : "Create & Add Media"}
-                </Button>
-              </div>
             </form>
           )}
 
-          {activeTab === "variants" && product && (
-            <VariantsTab product={product} />
+          {activeTab === "variants" && (
+            <VariantsTab product={product} localVariants={localVariants} setLocalVariants={setLocalVariants} />
           )}
 
-          {activeTab === "media" && product && (
-            <MediaTab product={product} />
+          {activeTab === "media" && (
+            <MediaTab product={product} localMedia={localMedia} setLocalMedia={setLocalMedia} />
           )}
 
-          {activeTab === "features" && product && (
-            <FeaturesTab product={product} />
+          {activeTab === "features" && (
+            <FeaturesTab product={product} localFeatures={localFeatures} setLocalFeatures={setLocalFeatures} />
           )}
 
-          {activeTab === "related" && product && (
-            <RelatedTab product={product} />
+          {activeTab === "related" && (
+            <RelatedTab product={product} localRelated={localRelated} setLocalRelated={setLocalRelated} />
           )}
-          {activeTab === "addons" && product && (
-            <AddonsTab product={product} availableAddons={availableAddons} />
+          {activeTab === "addons" && (
+            <AddonsTab product={product} localAddons={localAddons} setLocalAddons={setLocalAddons} />
           )}
-          {activeTab === "compatibility" && product && (
-            <CompatibilityTab product={product} />
+          {activeTab === "compatibility" && (
+            <CompatibilityTab product={product} localCompatibility={localCompatibility} setLocalCompatibility={setLocalCompatibility} />
           )}
         </div>
       </div>

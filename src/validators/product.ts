@@ -24,6 +24,8 @@ export const CmsProductSchema = z.object({
   gender: z.nativeEnum(ProductGender).default(ProductGender.UNISEX),
   categoryId: z.string().min(1, "Please select a category"),
   brandId: z.string().optional().nullable(),
+  brandName: z.string().optional().nullable(),
+  scale: z.string().optional().nullable(),
   collectionId: z.string().optional().nullable(),
   isActive: z.boolean().default(true),
   isFeatured: z.boolean().default(false),
@@ -39,9 +41,9 @@ export const CmsProductSchema = z.object({
 })
 
 export const CmsProductVariantSchema = z.object({
-  size: z.string().min(1, "Size identifier is required (e.g. S, M, L)"),
-  color: z.string().min(3, "Color hex/code identifier required"),
-  colorName: z.string().min(2, "Visual color name required (e.g. Midnight Black)"),
+  size: z.string().optional().nullable().default("N/A"),
+  color: z.string().optional().nullable().default("N/A"),
+  colorName: z.string().optional().nullable().default("N/A"),
   sku: z.string().min(4, "SKU reference code required"),
   price: z.coerce.number().positive().optional().nullable(),
   stock: z.coerce.number().int().min(0, "Stock cannot be negative").default(0),

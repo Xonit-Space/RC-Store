@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useRef, useCallback, useEffect } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Plus, Trash2, X, Image as ImageIcon, ImagePlus } from "lucide-react"
+import { Plus, Trash2, X, ImagePlus } from "lucide-react"
 import { toast } from "sonner"
 import { useQueryClient } from "@tanstack/react-query"
 import { 
@@ -20,29 +20,36 @@ interface ImageSlot {
   saved?: boolean
 }
 
-export function MediaTab({ product }: { product: any }) {
+export function MediaTab({ product, localMedia, setLocalMedia }: { 
+  product?: any, 
+  localMedia: {images: ImageSlot[], videos: any[], docs: any[]}, 
+  setLocalMedia: React.Dispatch<React.SetStateAction<any>> 
+}) {
   const { data: session } = useSession()
   const queryClient = useQueryClient()
-  const productId = product.id
+  const productId = product?.id
+  const isLocalMode = !productId
 
-  // --- Images State ---
-  const [imageSlots, setImageSlots] = useState<ImageSlot[]>([])
+  // Combine DB images with local images
+  const displayImages = isLocalMode ? localMedia.images : (product?.images || [])
+  const displayVideos = isLocalMode ? localMedia.videos : (product?.videos || [])
+  const displayDocs = isLocalMode ? localMedia.docs : (product?.documents || [])
+
+  const [imageSlots, setImageSlots] = useState<ImageSlot[]>(displayImages)
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
   const [isUploadingImages, setIsUploadingImages] = useState(false)
 
   useEffect(() => {
-    if (product.images?.length > 0) {
-      setImageSlots(
-        product.images.map((img: any) => ({
-          id: img.id,
-          url: img.url,
-          saved: true,
-        }))
-      )
+    if (!isLocalMode) {
+      if (product?.images?.length > 0) {
+        setImageSlots(product.images.map((img: any) => ({ id: img.id, url: img.url, saved: true })))
+      } else {
+        setImageSlots([])
+      }
     } else {
-      setImageSlots([])
+      setImageSlots(localMedia.images)
     }
-  }, [product.images])
+  }, [product?.images, isLocalMode, localMedia.images])
 
   const handleFile = (index: number, file: File) => {
     const preview = URL.createObjectURL(file)
@@ -53,18 +60,20 @@ export function MediaTab({ product }: { product: any }) {
       newSlots.push({ id: Math.random().toString(), url: preview, file, saved: false })
     }
     setImageSlots(newSlots)
+    if (isLocalMode) setLocalMedia((prev: any) => ({ ...prev, images: newSlots }))
   }
 
   const removeSlot = async (index: number) => {
     const slot = imageSlots[index]
-    if (slot.saved && slot.id) {
+    if (!isLocalMode && slot.saved && slot.id) {
       if (!confirm("Delete this image from database?")) return
       try {
         const res = await fetch(`/api/admin/products/${productId}/images?imageId=${slot.id}`, { method: "DELETE" })
         const json = await res.json()
         if (json.success) {
           toast.success("Image deleted")
-          setImageSlots(imageSlots.filter((_, i) => i !== index))
+          const newSlots = imageSlots.filter((_, i) => i !== index)
+          setImageSlots(newSlots)
           queryClient.invalidateQueries({ queryKey: ["admin", "product", productId] })
         } else {
           toast.error("Failed to delete image")
@@ -73,11 +82,18 @@ export function MediaTab({ product }: { product: any }) {
         toast.error(err.message)
       }
     } else {
-      setImageSlots(imageSlots.filter((_, i) => i !== index))
+      const newSlots = imageSlots.filter((_, i) => i !== index)
+      setImageSlots(newSlots)
+      if (isLocalMode) setLocalMedia((prev: any) => ({ ...prev, images: newSlots }))
     }
   }
 
   const uploadImages = async () => {
+    if (isLocalMode) {
+      toast.info("Images will be uploaded when you save the product.")
+      return
+    }
+    
     setIsUploadingImages(true)
     let uploadedCount = 0
     for (let i = 0; i < imageSlots.length; i++) {
@@ -131,6 +147,20 @@ export function MediaTab({ product }: { product: any }) {
     e.preventDefault()
     if (!videoFile || !videoTitle) return toast.error("Title and Video File are required")
     setIsSubmittingVideo(true)
+    
+    if (isLocalMode) {
+       // In local mode, store the file object to be uploaded later
+       setLocalMedia((prev: any) => ({
+         ...prev,
+         videos: [...prev.videos, { localId: Date.now(), title: videoTitle, type: videoType, file: videoFile, url: URL.createObjectURL(videoFile) }]
+       }))
+       toast.success("Added video to draft")
+       setIsVideoModalOpen(false)
+       setVideoTitle(""); setVideoFile(null)
+       setIsSubmittingVideo(false)
+       return
+    }
+    
     try {
       const formData = new FormData()
       formData.append("file", videoFile)
@@ -163,6 +193,19 @@ export function MediaTab({ product }: { product: any }) {
     e.preventDefault()
     if (!docFile || !docName) return toast.error("Name and Document File are required")
     setIsSubmittingDoc(true)
+    
+    if (isLocalMode) {
+       setLocalMedia((prev: any) => ({
+         ...prev,
+         docs: [...prev.docs, { localId: Date.now(), name: docName, type: docType, file: docFile, url: URL.createObjectURL(docFile) }]
+       }))
+       toast.success("Added document to draft")
+       setIsDocModalOpen(false)
+       setDocName(""); setDocFile(null)
+       setIsSubmittingDoc(false)
+       return
+    }
+
     try {
       const formData = new FormData()
       formData.append("file", docFile)
@@ -184,8 +227,18 @@ export function MediaTab({ product }: { product: any }) {
     setIsSubmittingDoc(false)
   }
 
-  const handleDelete = async (action: any, id: string) => {
+  const handleDelete = async (action: any, id: string, type: 'video' | 'doc') => {
     if (!confirm("Are you sure?")) return
+    
+    if (isLocalMode) {
+      if (type === 'video') {
+         setLocalMedia((prev: any) => ({ ...prev, videos: prev.videos.filter((v: any) => v.localId !== id) }))
+      } else {
+         setLocalMedia((prev: any) => ({ ...prev, docs: prev.docs.filter((d: any) => d.localId !== id) }))
+      }
+      return
+    }
+    
     const res = await action(id)
     if (res.success) {
       toast.success("Deleted")
@@ -199,13 +252,15 @@ export function MediaTab({ product }: { product: any }) {
       <div className="space-y-6">
         <div className="flex justify-between items-end border-b border-border/40 pb-4">
           <h3 className="font-sans text-2xl font-light text-foreground">Product Images</h3>
-          <Button
-            onClick={uploadImages}
-            disabled={!hasUnsavedImages || isUploadingImages}
-            className="h-10 px-4 rounded-none bg-foreground text-background font-bold text-[10px] tracking-widest uppercase"
-          >
-            {isUploadingImages ? "Uploading..." : "Save Images"}
-          </Button>
+          {!isLocalMode && (
+            <Button
+              onClick={uploadImages}
+              disabled={!hasUnsavedImages || isUploadingImages}
+              className="h-10 px-4 rounded-none bg-foreground text-background font-bold text-[10px] tracking-widest uppercase"
+            >
+              {isUploadingImages ? "Uploading..." : "Save Images"}
+            </Button>
+          )}
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
@@ -266,16 +321,16 @@ export function MediaTab({ product }: { product: any }) {
           </Button>
         </div>
         <div className="space-y-4">
-          {product.videos?.length === 0 ? (
+          {displayVideos.length === 0 ? (
             <div className="border border-border/40 p-8 text-center bg-white dark:bg-background"><p className="text-[10px] uppercase tracking-widest text-muted-foreground">No videos added.</p></div>
           ) : (
-            product.videos?.map((v: any) => (
-              <div key={v.id} className="border border-border/40 p-4 flex justify-between items-center bg-white dark:bg-background">
+            displayVideos.map((v: any) => (
+              <div key={v.id || v.localId} className="border border-border/40 p-4 flex justify-between items-center bg-white dark:bg-background">
                 <div>
                   <p className="text-sm font-bold">{v.title}</p>
                   <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{v.type} | {v.url}</p>
                 </div>
-                <Button variant="ghost" onClick={() => handleDelete(adminDeleteProductVideo, v.id)} className="text-terracotta h-8 w-8 p-0"><Trash2 className="h-4 w-4" /></Button>
+                <Button variant="ghost" onClick={() => handleDelete(adminDeleteProductVideo, v.id || v.localId, 'video')} className="text-terracotta h-8 w-8 p-0"><Trash2 className="h-4 w-4" /></Button>
               </div>
             ))
           )}
@@ -291,16 +346,16 @@ export function MediaTab({ product }: { product: any }) {
           </Button>
         </div>
         <div className="space-y-4">
-          {product.documents?.length === 0 ? (
+          {displayDocs.length === 0 ? (
             <div className="border border-border/40 p-8 text-center bg-white dark:bg-background"><p className="text-[10px] uppercase tracking-widest text-muted-foreground">No documents added.</p></div>
           ) : (
-            product.documents?.map((d: any) => (
-              <div key={d.id} className="border border-border/40 p-4 flex justify-between items-center bg-white dark:bg-background">
+            displayDocs.map((d: any) => (
+              <div key={d.id || d.localId} className="border border-border/40 p-4 flex justify-between items-center bg-white dark:bg-background">
                 <div>
                   <p className="text-sm font-bold">{d.name}</p>
                   <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{d.type} | {d.url}</p>
                 </div>
-                <Button variant="ghost" onClick={() => handleDelete(adminDeleteProductDocument, d.id)} className="text-terracotta h-8 w-8 p-0"><Trash2 className="h-4 w-4" /></Button>
+                <Button variant="ghost" onClick={() => handleDelete(adminDeleteProductDocument, d.id || d.localId, 'doc')} className="text-terracotta h-8 w-8 p-0"><Trash2 className="h-4 w-4" /></Button>
               </div>
             ))
           )}

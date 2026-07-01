@@ -54,7 +54,7 @@ export async function BrandStorySection() {
                   loop
                   muted
                   playsInline
-                  className="w-full h-full object-cover opacity-80 filter contrast-125 saturate-50 mix-blend-luminosity group-hover:scale-105 group-hover:saturate-100 transition-all duration-700"
+                  className="w-full h-full object-cover scale-[1.35] opacity-80 filter contrast-125 saturate-50 mix-blend-luminosity group-hover:scale-[1.4] group-hover:saturate-100 transition-all duration-700"
                 >
                   <source src="/snaptik_7277600208995765537_v3.mp4" type="video/mp4" />
                 </video>
@@ -76,7 +76,7 @@ export async function BrandStorySection() {
                   loop
                   muted
                   playsInline
-                  className="w-full h-full object-cover opacity-80 filter contrast-125 saturate-50 mix-blend-luminosity group-hover:scale-105 group-hover:saturate-100 transition-all duration-700"
+                  className="w-full h-full object-cover scale-[1.1] opacity-80 filter contrast-125 saturate-50 mix-blend-luminosity group-hover:scale-[1.15] group-hover:saturate-100 transition-all duration-700"
                 >
                   <source src="/snaptik_7531203151316258062_v3.mp4" type="video/mp4" />
                 </video>

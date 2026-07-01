@@ -36,6 +36,7 @@ const navGroups = [
     label: "Sales",
     items: [
       { id: "orders", name: "Orders", icon: ShoppingCart, path: "/admin/orders" },
+      { id: "refunds", name: "Refunds", icon: ShoppingCart, path: "/admin/refunds" },
       { id: "customers", name: "Customers", icon: Users, path: "/admin/customers" },
       { id: "coupons", name: "Coupons", icon: Ticket, path: "/admin/coupons" },
       { id: "reviews", name: "Reviews", icon: Star, path: "/admin/reviews" },

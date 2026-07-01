@@ -45,6 +45,42 @@ export default function CheckoutPage() {
 
   const [error, setError] = useState<string | null>(null)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
+  const [addresses, setAddresses] = useState<any[]>([])
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
+  
+  const loadAddresses = async () => {
+    if (status !== "authenticated") return
+    try {
+      const res = await fetch("/api/customer/addresses")
+      const json = await res.json()
+      if (json.success && json.data.length > 0) {
+        setAddresses(json.data)
+        // Automatically select the default shipping address or the first one
+        const defaultAddr = json.data.find((a: any) => a.isDefaultShipping) || json.data[0]
+        selectAddress(defaultAddr)
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const selectAddress = (addr: any) => {
+    setSelectedAddressId(addr.id)
+    setTitle(addr.title)
+    setLine1(addr.line1)
+    setLine2(addr.line2 || "")
+    setCity(addr.city)
+    setState(addr.state)
+    setPostalCode(addr.postalCode)
+    setCountry(addr.country)
+    setPhone(addr.phone)
+  }
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      loadAddresses()
+    }
+  }, [status])
 
   useEffect(() => {
     cartStore.initializeGuestSession()
@@ -189,6 +225,49 @@ export default function CheckoutPage() {
                   <h3 className="font-extrabold text-foreground text-sm pb-3 border-b uppercase tracking-wide">
                     Shipping Destination Address
                   </h3>
+
+                  {addresses.length > 0 && (
+                    <div className="space-y-3 mb-6">
+                      <p className="text-xs font-bold text-foreground">Select a Saved Address</p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {addresses.map(addr => (
+                          <div 
+                            key={addr.id}
+                            onClick={() => selectAddress(addr)}
+                            className={`p-3 border cursor-pointer transition-colors ${selectedAddressId === addr.id ? 'border-primary bg-primary/5' : 'border-border/40 hover:border-primary/50'}`}
+                          >
+                            <div className="flex justify-between items-start mb-1">
+                              <span className="text-[11px] font-mono font-bold tracking-widest uppercase text-foreground">{addr.title}</span>
+                              {(addr.isDefaultShipping || addr.isDefaultBilling) && (
+                                <span className="text-[8px] font-mono font-bold tracking-[0.2em] uppercase text-black bg-primary px-1.5 py-0.5">
+                                  Default
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-[10px] font-mono text-muted-foreground leading-relaxed uppercase">
+                              <p>{addr.line1}</p>
+                              <p>{addr.city}, {addr.state} {addr.postalCode}</p>
+                            </div>
+                          </div>
+                        ))}
+                        <div 
+                          onClick={() => {
+                            setSelectedAddressId(null)
+                            setTitle("New Address")
+                            setLine1("")
+                            setLine2("")
+                            setCity("")
+                            setState("")
+                            setPostalCode("")
+                            setPhone("")
+                          }}
+                          className={`p-3 border cursor-pointer transition-colors flex items-center justify-center min-h-[80px] ${selectedAddressId === null ? 'border-primary bg-primary/5' : 'border-border/40 hover:border-primary/50'}`}
+                        >
+                          <span className="text-[11px] font-mono font-bold tracking-widest uppercase text-foreground">+ Add New Address</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {error && (
                     <div className="flex items-center gap-2.5 p-3.5 bg-red-50 border border-red-200 text-red-700 text-xs font-bold  animate-in slide-in-from-top-1">

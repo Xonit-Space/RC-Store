@@ -12,6 +12,9 @@ import { useLoading } from "@/components/providers/loading-provider"
 import { useCustomer } from "@/components/providers/customer-provider"
 import { useCartStore } from "@/store/cart"
 import { AddressModal } from "@/components/customer/address-modal"
+import { RefundModal } from "@/components/customer/refund-modal"
+import { ReviewsModal } from "@/components/customer/reviews-modal"
+import { GalleryModal } from "@/components/customer/gallery-modal"
 
 export default function CustomerDashboardPage() {
   const router = useRouter()
@@ -28,6 +31,10 @@ export default function CustomerDashboardPage() {
   
   const [isRefundModalOpen, setIsRefundModalOpen] = useState(false)
   const [selectedOrderForRefund, setSelectedOrderForRefund] = useState<any>(null)
+
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
+  const [isGalleryModalOpen, setIsGalleryModalOpen] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState<{ id: string, name: string } | null>(null)
 
   const loadDashboardData = async () => {
     setLoading(true)
@@ -237,6 +244,28 @@ export default function CustomerDashboardPage() {
                             <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
                               Spec: {item.variant?.size} | Units: {item.quantity}
                             </p>
+                            {order.status === "DELIVERED" && (
+                              <div className="flex gap-4 mt-3">
+                                <button 
+                                  onClick={() => {
+                                    setSelectedProduct({ id: item.variant?.product?.id, name: item.variant?.product?.name })
+                                    setIsReviewModalOpen(true)
+                                  }}
+                                  className="text-[9px] font-mono uppercase font-bold text-primary hover:text-primary/80 transition-colors tracking-widest"
+                                >
+                                  Write Review
+                                </button>
+                                <button 
+                                  onClick={() => {
+                                    setSelectedProduct({ id: item.variant?.product?.id, name: item.variant?.product?.name })
+                                    setIsGalleryModalOpen(true)
+                                  }}
+                                  className="text-[9px] font-mono uppercase font-bold text-emerald-500 hover:text-emerald-400 transition-colors tracking-widest"
+                                >
+                                  Upload to Gallery
+                                </button>
+                              </div>
+                            )}
                           </div>
                           <p className="text-sm font-mono text-muted-foreground">
                             {(item.price * item.quantity).toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}
@@ -341,6 +370,32 @@ export default function CustomerDashboardPage() {
         isFirstAddress={profile?.addresses?.length === 0}
       />
 
-          </div>
+      <RefundModal
+        isOpen={isRefundModalOpen}
+        onClose={() => setIsRefundModalOpen(false)}
+        onSuccess={() => {
+          loadDashboardData()
+          router.refresh()
+        }}
+        order={selectedOrderForRefund}
+      />
+
+      <ReviewsModal
+        isOpen={isReviewModalOpen}
+        onClose={() => setIsReviewModalOpen(false)}
+        productId={selectedProduct?.id || ""}
+        productName={selectedProduct?.name || ""}
+        onSuccess={() => {}}
+      />
+
+      <GalleryModal
+        isOpen={isGalleryModalOpen}
+        onClose={() => setIsGalleryModalOpen(false)}
+        productId={selectedProduct?.id || ""}
+        productName={selectedProduct?.name || ""}
+        onSuccess={() => {}}
+      />
+
+    </div>
   )
 }

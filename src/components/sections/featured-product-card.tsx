@@ -1,5 +1,6 @@
 import { db } from "@/lib/db"
 import { FeaturedProductSlider } from "./featured-product-slider"
+import { serializeForClient } from "@/lib/serialize"
 
 export async function FeaturedProductCard() {
   const products = await db.product.findMany({
@@ -29,5 +30,5 @@ export async function FeaturedProductCard() {
     })
   )
 
-  return <FeaturedProductSlider products={productsWithStats} />
+  return <FeaturedProductSlider products={serializeForClient(productsWithStats)} />
 }

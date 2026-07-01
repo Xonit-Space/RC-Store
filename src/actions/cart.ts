@@ -26,7 +26,7 @@ const UpdateQtySchema = z.object({
 export async function getCart(userId?: string, guestSessionId?: string) {
   if (!userId && !guestSessionId) return null
 
-  return db.cart.findFirst({
+  const cart = await db.cart.findFirst({
     where: {
       OR: [
         ...(userId ? [{ userId }] : []),

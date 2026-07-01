@@ -10,8 +10,8 @@ import { Plus, X, ArrowRight, Zap, Target } from "lucide-react"
 import { toast } from "sonner"
 import { useLoading } from "@/components/providers/loading-provider"
 import { useCustomer } from "@/components/providers/customer-provider"
-import { AddressSchema } from "@/validators/auth"
 import { useCartStore } from "@/store/cart"
+import { AddressModal } from "@/components/customer/address-modal"
 
 export default function CustomerDashboardPage() {
   const router = useRouter()
@@ -24,15 +24,10 @@ export default function CustomerDashboardPage() {
   const [loading, setLoading] = useState(true)
   
   const [isAddAddressOpen, setIsAddAddressOpen] = useState(false)
-  const [addrTitle, setAddrTitle] = useState("Base Station")
-  const [line1, setLine1] = useState("")
-  const [line2, setLine2] = useState("")
-  const [city, setCity] = useState("")
-  const [addrState, setAddrState] = useState("")
-  const [postalCode, setPostalCode] = useState("")
-  const [country, setCountry] = useState("US")
-  const [phone, setPhone] = useState("")
-  const [addressLoading, setAddressLoading] = useState(false)
+  const [editingAddress, setEditingAddress] = useState<any>(null)
+  
+  const [isRefundModalOpen, setIsRefundModalOpen] = useState(false)
+  const [selectedOrderForRefund, setSelectedOrderForRefund] = useState<any>(null)
 
   const loadDashboardData = async () => {
     setLoading(true)
@@ -59,39 +54,40 @@ export default function CustomerDashboardPage() {
     }
   }, [status])
 
-  const handleAddAddress = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setAddressLoading(true)
-
-    const payload = {
-      title: addrTitle,
-      line1, line2: line2 || undefined,
-      city, state: addrState, postalCode, country, phone,
-      isDefaultShipping: profile?.addresses?.length === 0,
-      isDefaultBilling: profile?.addresses?.length === 0,
-    }
-
-    const validation = AddressSchema.safeParse(payload)
-    if (!validation.success) {
-      toast.error(validation.error.errors.map(err => err.message).join(", "))
-      setAddressLoading(false)
-      return
-    }
-
+  const handleSetDefaultAddress = async (id: string, isShipping: boolean, isBilling: boolean) => {
     try {
-      const response = await addCustomerAddress(session?.user?.id || "", payload)
-      if (response.success) {
-        toast.success("Address Saved")
-        setIsAddAddressOpen(false)
-        setLine1(""); setLine2(""); setCity(""); setAddrState(""); setPostalCode(""); setPhone("")
-        await loadDashboardData()
+      const res = await fetch(`/api/customer/addresses/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isDefaultShipping: isShipping, isDefaultBilling: isBilling })
+      })
+      const data = await res.json()
+      if (data.success) {
+        toast.success("Default address updated")
+        loadDashboardData()
+        router.refresh()
       } else {
-        toast.error(response.error || "Error saving address")
+        toast.error(data.error || "Failed to update default address")
       }
     } catch {
-      toast.error("SYSTEM MALFUNCTION")
-    } finally {
-      setAddressLoading(false)
+      toast.error("An error occurred")
+    }
+  }
+
+  const handleDeleteAddress = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this address?")) return
+    try {
+      const res = await fetch(`/api/customer/addresses/${id}`, { method: "DELETE" })
+      const data = await res.json()
+      if (data.success) {
+        toast.success("Address deleted")
+        loadDashboardData()
+        router.refresh()
+      } else {
+        toast.error(data.error || "Failed to delete address")
+      }
+    } catch {
+      toast.error("An error occurred")
     }
   }
 
@@ -209,6 +205,17 @@ export default function CustomerDashboardPage() {
                         <p className="text-sm font-heading font-black text-foreground tracking-widest">
                           {order.total.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})}
                         </p>
+                        {order.status === "DELIVERED" && (
+                          <button
+                            onClick={() => {
+                              setSelectedOrderForRefund(order)
+                              setIsRefundModalOpen(true)
+                            }}
+                            className="mt-2 block w-full text-right text-[10px] text-red-500 hover:text-red-400 font-mono tracking-widest uppercase"
+                          >
+                            Request Refund
+                          </button>
+                        )}
                       </div>
                     </div>
 
@@ -250,7 +257,10 @@ export default function CustomerDashboardPage() {
                 My Addresses
               </h3>
               <button
-                onClick={() => setIsAddAddressOpen(true)}
+                onClick={() => {
+                  setEditingAddress(null)
+                  setIsAddAddressOpen(true)
+                }}
                 className="text-[10px] font-mono font-bold tracking-[0.2em] uppercase text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
               >
                 <Target strokeWidth={1.5} className="w-3 h-3" /> Add Address
@@ -269,11 +279,13 @@ export default function CustomerDashboardPage() {
                   <div key={addr.id} className="glass-dark border border-border p-6 relative group hover:border-racing-yellow/50 transition-colors">
                     <div className="flex justify-between items-start mb-4">
                       <span className="text-[11px] font-mono font-bold tracking-widest uppercase text-foreground">{addr.title}</span>
-                      {(addr.isDefaultShipping || addr.isDefaultBilling) && (
-                        <span className="text-[8px] font-mono font-bold tracking-[0.2em] uppercase text-black bg-primary px-1.5 py-0.5">
-                          Default Address
-                        </span>
-                      )}
+                      <div className="flex flex-col items-end gap-1">
+                        {(addr.isDefaultShipping || addr.isDefaultBilling) && (
+                          <span className="text-[8px] font-mono font-bold tracking-[0.2em] uppercase text-black bg-primary px-1.5 py-0.5">
+                            Default Address
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <div className="text-sm font-mono text-muted-foreground leading-relaxed space-y-1 uppercase">
                       <p>{addr.line1}</p>
@@ -281,6 +293,33 @@ export default function CustomerDashboardPage() {
                       <p>{addr.city}, {addr.state} {addr.postalCode}</p>
                       <p>{addr.country}</p>
                       <p className="pt-2 text-[10px] tracking-wider text-muted-foreground">{addr.phone}</p>
+                    </div>
+                    <div className="mt-4 pt-4 border-t border-border flex justify-between opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex gap-4">
+                        <button 
+                          onClick={() => {
+                            setEditingAddress(addr)
+                            setIsAddAddressOpen(true)
+                          }}
+                          className="text-[9px] font-mono uppercase text-muted-foreground hover:text-foreground transition-colors tracking-widest"
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteAddress(addr.id)}
+                          className="text-[9px] font-mono uppercase text-red-500 hover:text-red-400 transition-colors tracking-widest"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                      {(!addr.isDefaultShipping || !addr.isDefaultBilling) && (
+                        <button 
+                          onClick={() => handleSetDefaultAddress(addr.id, true, true)}
+                          className="text-[9px] font-mono uppercase text-primary hover:text-primary/80 transition-colors tracking-widest"
+                        >
+                          Set Default
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))
@@ -291,129 +330,16 @@ export default function CustomerDashboardPage() {
         </div>
       </main>
 
-      {/* ── REGISTER ADDRESS MODAL ── */}
-      {isAddAddressOpen && (
-        <div className="fixed inset-0 bg-carbon-dark/95 backdrop-blur-md flex items-center justify-center z-50 p-4">
-          <div className="glass-dark border border-racing-yellow/50 p-8 w-full max-w-md shadow-[0_0_30px_rgba(255, 204, 0,0.15)] relative">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-racing-yellow to-transparent opacity-50" />
-            <div className="flex justify-between items-center mb-8">
-              <h3 className="font-heading text-2xl font-black tracking-wider text-foreground uppercase">Add New Address</h3>
-              <button
-                onClick={() => setIsAddAddressOpen(false)}
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
-                <X strokeWidth={2} className="w-6 h-6" />
-              </button>
-            </div>
-
-            <form onSubmit={handleAddAddress} className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-[9px] font-mono tracking-[0.25em] uppercase text-muted-foreground block">Address Title</label>
-                  <input
-                    value={addrTitle}
-                    onChange={(e) => setAddrTitle(e.target.value)}
-                    placeholder="HQ, Pit Stop"
-                    required
-                    className="w-full bg-muted border-b border-border pb-2 pt-2 px-2 text-sm text-foreground focus:outline-none focus:border-racing-yellow transition-colors font-mono uppercase placeholder-gray-600"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[9px] font-mono tracking-[0.25em] uppercase text-muted-foreground block">Phone Number</label>
-                  <input
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+1..."
-                    required
-                    className="w-full bg-muted border-b border-border pb-2 pt-2 px-2 text-sm text-foreground focus:outline-none focus:border-racing-yellow transition-colors font-mono placeholder-gray-600"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-[9px] font-mono tracking-[0.25em] uppercase text-muted-foreground block">Address Line 1</label>
-                <input
-                  value={line1}
-                  onChange={(e) => setLine1(e.target.value)}
-                  placeholder="Address Line 1"
-                  required
-                  className="w-full bg-muted border-b border-border pb-2 pt-2 px-2 text-sm text-foreground focus:outline-none focus:border-racing-yellow transition-colors font-mono placeholder-gray-600 uppercase"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-[9px] font-mono tracking-[0.25em] uppercase text-muted-foreground block">Unit / Level</label>
-                <input
-                  value={line2}
-                  onChange={(e) => setLine2(e.target.value)}
-                  placeholder="Optional"
-                  className="w-full bg-muted border-b border-border pb-2 pt-2 px-2 text-sm text-foreground focus:outline-none focus:border-racing-yellow transition-colors font-mono placeholder-gray-600 uppercase"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-[9px] font-mono tracking-[0.25em] uppercase text-muted-foreground block">City</label>
-                  <input
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    required
-                    className="w-full bg-muted border-b border-border pb-2 pt-2 px-2 text-sm text-foreground focus:outline-none focus:border-racing-yellow transition-colors font-mono uppercase"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[9px] font-mono tracking-[0.25em] uppercase text-muted-foreground block">Region</label>
-                  <input
-                    value={addrState}
-                    onChange={(e) => setAddrState(e.target.value)}
-                    required
-                    className="w-full bg-muted border-b border-border pb-2 pt-2 px-2 text-sm text-foreground focus:outline-none focus:border-racing-yellow transition-colors font-mono uppercase"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[9px] font-mono tracking-[0.25em] uppercase text-muted-foreground block">Zip Code</label>
-                  <input
-                    value={postalCode}
-                    onChange={(e) => setPostalCode(e.target.value)}
-                    required
-                    className="w-full bg-muted border-b border-border pb-2 pt-2 px-2 text-sm text-foreground focus:outline-none focus:border-racing-yellow transition-colors font-mono uppercase"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[9px] font-mono tracking-[0.25em] uppercase text-muted-foreground block">Territory</label>
-                  <select
-                    value={country}
-                    onChange={(e) => setCountry(e.target.value)}
-                    className="w-full bg-muted border-b border-border pb-2 pt-2 px-2 text-[11px] font-mono tracking-wider text-foreground focus:outline-none focus:border-racing-yellow transition-colors appearance-none cursor-pointer uppercase"
-                  >
-                    <option value="US">United States</option>
-                    <option value="CA">Canada</option>
-                    <option value="GB">United Kingdom</option>
-                    <option value="LK">Sri Lanka</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="flex gap-4 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setIsAddAddressOpen(false)}
-                  className="w-1/3 py-4 border border-border text-[10px] font-mono font-bold tracking-[0.2em] uppercase text-foreground hover:bg-white/5 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={addressLoading}
-                  className="w-2/3 py-4 bg-primary text-[10px] font-heading font-black tracking-[0.2em] uppercase text-foreground hover:bg-primary/90 hover:shadow-[0_0_15px_rgba(255, 204, 0,0.5)] transition-all disabled:opacity-50"
-                >
-                  {addressLoading ? "Saving..." : "Save Address"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <AddressModal 
+        isOpen={isAddAddressOpen}
+        onClose={() => setIsAddAddressOpen(false)}
+        onSuccess={() => {
+          loadDashboardData()
+          router.refresh()
+        }}
+        editingAddress={editingAddress}
+        isFirstAddress={profile?.addresses?.length === 0}
+      />
 
           </div>
   )

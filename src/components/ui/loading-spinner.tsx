@@ -21,10 +21,30 @@ export function LoadingSpinner({ size = "md", className }: LoadingSpinnerProps) 
 
 export function PageLoader() {
   return (
-    <div className="fixed inset-0 bg-background/50 backdrop-blur-sm z-50 flex items-center justify-center">
-      <div className="text-center space-y-4">
-        <LoadingSpinner size="lg" />
-        <p className="text-muted-foreground">Loading...</p>
+    <div className="fixed inset-0 bg-background/90 backdrop-blur-sm z-50 flex items-center justify-center">
+      <div className="flex flex-col items-center gap-6">
+        {/* Logo — extra padding wrapper prevents cropping from CSS scale transform */}
+        <div style={{ padding: "28px 56px" }}>
+          <img
+            src="/Transparent/logo yellow0.png"
+            alt="Aussie Rigs Arena"
+            className="h-10 w-auto object-contain"
+            style={{ transform: "scale(2.5)", transformOrigin: "center" }}
+          />
+        </div>
+        {/* Slim sliding progress bar — no glow */}
+        <div className="w-40 h-px bg-border/30 overflow-hidden">
+          <div
+            className="h-full bg-primary"
+            style={{
+              width: "40%",
+              animation: "pageload-slide 1.2s ease-in-out infinite",
+            }}
+          />
+        </div>
+        <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-muted-foreground">
+          Loading...
+        </p>
       </div>
     </div>
   )

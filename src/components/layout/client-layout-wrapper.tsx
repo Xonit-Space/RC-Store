@@ -13,6 +13,7 @@ export function ClientLayoutWrapper({ children }: ClientLayoutWrapperProps) {
   
   // Do not render global header/footer on admin and login routes
   const isGlobalLayout = !pathname.startsWith("/admin") && !pathname.startsWith("/login") && !pathname.startsWith("/register")
+  const showFooter = isGlobalLayout && !pathname.startsWith("/customer")
 
   return (
     <>
@@ -20,7 +21,7 @@ export function ClientLayoutWrapper({ children }: ClientLayoutWrapperProps) {
       <main className="flex-1">
         {children}
       </main>
-      {isGlobalLayout && <Footer />}
+      {showFooter && <Footer />}
     </>
   )
 }

@@ -125,12 +125,11 @@ export function Header() {
             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
 
-          {/* Logo */}
           <Link href="/" className="flex items-center group">
             <img 
               src="/Transparent/logo yellow0.png" 
               alt="Aussie Rigs Arena" 
-              className="h-6 sm:h-7 lg:h-8 w-auto object-contain scale-[2] sm:scale-[2.5] lg:scale-[3] origin-left pointer-events-none group-hover:opacity-90 transition-opacity drop-shadow-sm ml-4 sm:ml-6 lg:ml-0" 
+              className="h-6 sm:h-7 lg:h-8 w-auto object-contain scale-[2] sm:scale-[2.5] lg:scale-[3] origin-left group-hover:opacity-90 transition-opacity drop-shadow-sm ml-4 sm:ml-6 lg:ml-0 cursor-pointer" 
             />
           </Link>
         </div>

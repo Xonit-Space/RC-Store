@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { db } from "@/lib/db"
 import { CustomerProvider } from "@/components/providers/customer-provider"
+import { CustomerSidebar } from "@/components/customer/sidebar"
 
 export default async function CustomerLayout({ children }: { children: ReactNode }) {
   const session = await getServerSession(authOptions)
@@ -51,7 +52,12 @@ export default async function CustomerLayout({ children }: { children: ReactNode
 
   return (
     <CustomerProvider profile={profile}>
-      {children}
+      <div className="min-h-screen bg-background flex pt-[104px]">
+        <CustomerSidebar />
+        <main className="flex-1 min-w-0">
+          {children}
+        </main>
+      </div>
     </CustomerProvider>
   )
 }

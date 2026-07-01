@@ -1,293 +1,191 @@
 "use client"
 
+export const dynamic = "force-dynamic"
+
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { MapPin, RefreshCw, ChevronRight, Home, Plus, Trash2, ShieldAlert } from "lucide-react"
-import { addCustomerAddress } from "@/actions/auth"
-import { AddressSchema } from "@/validators/auth"
+import { MapPin, Target, Zap } from "lucide-react"
 import { useCustomer } from "@/components/providers/customer-provider"
+import { AddressModal } from "@/components/customer/address-modal"
 
 export default function CustomerAddressesPage() {
   const router = useRouter()
   const { data: session, status } = useSession()
   const { profile } = useCustomer()
 
-  // Address form modal
   const [isAddAddressOpen, setIsAddAddressOpen] = useState(false)
-  const [addrTitle, setAddrTitle] = useState("Home")
-  const [line1, setLine1] = useState("")
-  const [line2, setLine2] = useState("")
-  const [city, setCity] = useState("")
-  const [addrState, setAddrState] = useState("")
-  const [postalCode, setPostalCode] = useState("")
-  const [country, setCountry] = useState("US")
-  const [phone, setPhone] = useState("")
-  const [addressLoading, setAddressLoading] = useState(false)
+  const [editingAddress, setEditingAddress] = useState<any>(null)
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login?callbackUrl=/customer/addresses")
     }
-  }, [status])
+  }, [status, router])
 
-  const handleAddAddress = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setAddressLoading(true)
-
-    const payload = {
-      title: addrTitle,
-      line1,
-      line2: line2 || undefined,
-      city,
-      state: addrState,
-      postalCode,
-      country,
-      phone,
-      isDefaultShipping: profile?.addresses?.length === 0,
-      isDefaultBilling: profile?.addresses?.length === 0,
-    }
-
-    const validation = AddressSchema.safeParse(payload)
-    if (!validation.success) {
-      const errorMsg = validation.error.errors.map((err) => err.message).join(", ")
-      toast.error(errorMsg)
-      setAddressLoading(false)
-      return
-    }
-
+  const handleSetDefaultAddress = async (id: string, isShipping: boolean, isBilling: boolean) => {
     try {
-      const response = await addCustomerAddress(session?.user?.id || "", payload)
-      if (response.success) {
-        toast.success("Successfully added address record")
-        setIsAddAddressOpen(false)
-        setLine1("")
-        setLine2("")
-        setCity("")
-        setAddrState("")
-        setPostalCode("")
-        setPhone("")
+      const addr = profile?.addresses?.find((a: any) => a.id === id)
+      if (!addr) return
+
+      const res = await fetch(`/api/customer/addresses/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: addr.title,
+          line1: addr.line1,
+          line2: addr.line2 || undefined,
+          city: addr.city,
+          state: addr.state,
+          postalCode: addr.postalCode,
+          country: addr.country,
+          phone: addr.phone,
+          isDefaultShipping: isShipping,
+          isDefaultBilling: isBilling
+        })
+      })
+      const data = await res.json()
+      if (data.success) {
+        toast.success("Default address updated")
         router.refresh()
+        // Ideally we should reload the profile context or do window.location.reload()
+        window.location.reload()
       } else {
-        toast.error(response.error || "Failed to register address")
+        toast.error(data.error || "Failed to update default address")
       }
-    } catch (err) {
-      toast.error("An unexpected error occurred")
-    } finally {
-      setAddressLoading(false)
+    } catch {
+      toast.error("An error occurred")
+    }
+  }
+
+  const handleDeleteAddress = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this address?")) return
+    try {
+      const res = await fetch(`/api/customer/addresses/${id}`, { method: "DELETE" })
+      const data = await res.json()
+      if (data.success) {
+        toast.success("Address deleted")
+        router.refresh()
+        window.location.reload()
+      } else {
+        toast.error(data.error || "Failed to delete address")
+      }
+    } catch {
+      toast.error("An error occurred")
     }
   }
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-background flex flex-col justify-between">
-                <div className="flex-grow flex items-center justify-center p-12">
-          <div className="flex flex-col items-center gap-2">
-            <RefreshCw className="h-10 w-10 text-primary animate-spin" />
-            <span className="text-sm font-bold text-muted/50">Loading addresses...</span>
-          </div>
-        </div>
-              </div>
+      <div className="flex-1 flex items-center justify-center min-h-[50vh]">
+        <p className="text-[10px] tracking-[0.3em] uppercase text-primary font-mono animate-pulse">
+          Loading...
+        </p>
+      </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col justify-between text-foreground font-sans">
+    <div className="flex-1 p-6 md:p-12 pb-24 md:pb-32 font-sans w-full max-w-5xl mx-auto">
       
-      <main className="flex-grow container mx-auto px-4 py-8 space-y-6">
-        {/* Navigation Breadcrumb */}
-        <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
-          <a href="/customer" className="hover:text-primary transition flex items-center gap-1"><Home className="w-3.5 h-3.5" /> Dashboard</a>
-          <ChevronRight className="w-3 h-3" />
-          <span className="text-foreground/70">Address Book</span>
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-white/10 pb-8 mb-12 gap-8">
+        <div>
+          <p className="text-[10px] tracking-[0.3em] uppercase text-primary mb-2 font-mono font-bold flex items-center gap-2">
+            <Zap className="w-3 h-3" /> Address Book
+          </p>
+          <h1 className="font-heading text-4xl md:text-5xl font-black text-foreground uppercase tracking-wider">
+            My Addresses
+          </h1>
         </div>
+        <button
+          onClick={() => {
+            setEditingAddress(null)
+            setIsAddAddressOpen(true)
+          }}
+          className="bg-primary text-black px-6 py-3 font-mono text-[11px] font-bold tracking-widest uppercase hover:bg-primary/90 transition-colors flex items-center gap-2"
+        >
+          <Target className="w-4 h-4" /> Add Address
+        </button>
+      </div>
 
-        <div className="flex items-center justify-between pb-4 border-b">
-          <div>
-            <h2 className="text-2xl font-extrabold text-foreground tracking-tight leading-snug">Address Book</h2>
-            <p className="text-xs text-muted-foreground font-semibold mt-0.5">Manage your shipping and billing registries.</p>
-          </div>
-          <Button
-            onClick={() => setIsAddAddressOpen(true)}
-            className="h-11 px-5 rounded-none bg-primary hover:bg-primary/95 text-foreground text-xs font-bold transition active:scale-95 shadow-md shadow-primary/10"
-          >
-            <Plus className="h-4.5 w-4.5 mr-2" /> Add Address
-          </Button>
-        </div>
-
-        {/* ── ADDRESS REGISTRY GRID ── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {profile?.addresses?.length === 0 ? (
-          <Card className="border border-dashed border-border/40 p-12 text-center rounded-none">
-            <CardContent className="pt-6">
-              <MapPin className="h-14 w-14 mx-auto text-muted-foreground/30 mb-3 animate-pulse" />
-              <p className="text-sm font-bold text-foreground">No address records found</p>
-              <p className="text-xs text-muted-foreground pt-1 mb-6">Create a default delivery address to enable Stripe checkouts.</p>
-              <Button onClick={() => setIsAddAddressOpen(true)} className="h-11 px-6 rounded-none bg-primary">
-                Add Delivery Address
-              </Button>
-            </CardContent>
-          </Card>
+          <div className="md:col-span-2 py-16 text-center glass-dark border border-white/5 rounded-xl">
+            <MapPin className="h-12 w-12 mx-auto text-white/20 mb-4" />
+            <p className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-6">No addresses saved</p>
+            <button
+              onClick={() => {
+                setEditingAddress(null)
+                setIsAddAddressOpen(true)
+              }}
+              className="text-[11px] font-mono tracking-widest uppercase text-primary border-b border-primary pb-1 inline-flex items-center gap-2 group hover:text-primary/90 transition-colors"
+            >
+              Add your first address
+            </button>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {profile?.addresses?.map((addr: any) => (
-              <Card key={addr.id} className="border border-muted/10 rounded-none shadow-sm bg-card transition hover:border-border/40">
-                <CardHeader className="bg-muted/5 border-b border-muted/10 p-4 flex flex-row items-center justify-between">
-                  <div>
-                    <CardTitle className="text-sm font-extrabold text-foreground uppercase tracking-wide">
-                      {addr.title}
-                    </CardTitle>
-                    <CardDescription className="text-[10px] text-muted-foreground font-bold mt-0.5">
-                      {addr.isDefaultShipping ? "Default Shipping Address" : "Alternate Address"}
-                    </CardDescription>
-                  </div>
-                  <MapPin className="h-5 w-5 text-primary shrink-0" />
-                </CardHeader>
-                <CardContent className="p-4 space-y-3">
-                  <div className="text-xs font-semibold text-foreground/70 space-y-1">
-                    <p>{addr.line1}</p>
-                    {addr.line2 && <p>{addr.line2}</p>}
-                    <p>{addr.city}, {addr.state} {addr.postalCode}</p>
-                    <p>{addr.country}</p>
-                  </div>
-                  <div className="pt-3 border-t border-muted/10 text-[10px] text-muted-foreground font-bold flex items-center">
-                    Phone: {addr.phone}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-
-        {/* ── ADD ADDRESS MODAL OVERLAY ── */}
-        {isAddAddressOpen && (
-          <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="max-w-lg w-full rounded-none border border-muted/10 bg-card shadow-2xl p-6 relative animate-in fade-in zoom-in duration-200">
-              <button
-                onClick={() => setIsAddAddressOpen(false)}
-                className="absolute right-4 top-4 text-muted-foreground hover:text-foreground/70 transition"
-              >
-                <RefreshCw className="h-5 w-5 rotate-45" />
-              </button>
-
-              <h3 className="text-lg font-bold text-foreground mb-1">Add Address Record</h3>
-              <p className="text-xs text-muted-foreground mb-6 font-semibold">Please provide the complete shipping details below.</p>
-
-              <form onSubmit={handleAddAddress} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-muted/50 uppercase tracking-wider block">Address Label</label>
-                    <Input
-                      type="text"
-                      placeholder="Home, Office..."
-                      value={addrTitle}
-                      onChange={(e) => setAddrTitle(e.target.value)}
-                      className="h-10 border-border/40 rounded-none"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-muted/50 uppercase tracking-wider block">Phone Contact</label>
-                    <Input
-                      type="text"
-                      placeholder="0771234567"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className="h-10 border-border/40 rounded-none"
-                    />
-                  </div>
+          profile?.addresses?.map((addr: any) => (
+            <div key={addr.id} className="glass-dark border border-white/5 p-6 rounded-xl relative group hover:border-racing-yellow/30 transition-colors">
+              <div className="flex justify-between items-start mb-4">
+                <span className="text-[12px] font-mono font-bold tracking-widest uppercase text-foreground">{addr.title}</span>
+                <div className="flex flex-col items-end gap-1">
+                  {(addr.isDefaultShipping || addr.isDefaultBilling) && (
+                    <span className="text-[9px] font-mono font-bold tracking-widest uppercase text-black bg-primary px-2 py-0.5 rounded">
+                      Default
+                    </span>
+                  )}
                 </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-muted/50 uppercase tracking-wider block">Street Address</label>
-                  <Input
-                    type="text"
-                    placeholder="Line 1"
-                    value={line1}
-                    onChange={(e) => setLine1(e.target.value)}
-                    className="h-10 border-border/40 rounded-none"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <Input
-                    type="text"
-                    placeholder="Line 2 (Optional)"
-                    value={line2}
-                    onChange={(e) => setLine2(e.target.value)}
-                    className="h-10 border-border/40 rounded-none"
-                  />
-                </div>
-
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-muted/50 uppercase tracking-wider block">City</label>
-                    <Input
-                      type="text"
-                      placeholder="Colombo"
-                      value={city}
-                      onChange={(e) => setCity(e.target.value)}
-                      className="h-10 border-border/40 rounded-none"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-muted/50 uppercase tracking-wider block">State</label>
-                    <Input
-                      type="text"
-                      placeholder="Western"
-                      value={addrState}
-                      onChange={(e) => setAddrState(e.target.value)}
-                      className="h-10 border-border/40 rounded-none"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-muted/50 uppercase tracking-wider block">Postal Code</label>
-                    <Input
-                      type="text"
-                      placeholder="00100"
-                      value={postalCode}
-                      onChange={(e) => setPostalCode(e.target.value)}
-                      className="h-10 border-border/40 rounded-none"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-muted/50 uppercase tracking-wider block">Country</label>
-                  <Input
-                    type="text"
-                    placeholder="US, LK..."
-                    value={country}
-                    onChange={(e) => setCountry(e.target.value)}
-                    className="h-10 border-border/40 rounded-none"
-                  />
-                </div>
-
-                <div className="flex gap-3 justify-end pt-4 border-t">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsAddAddressOpen(false)}
-                    className="h-10 rounded-none"
+              </div>
+              <div className="text-xs font-mono text-muted-foreground leading-relaxed uppercase space-y-1">
+                <p>{addr.line1}</p>
+                {addr.line2 && <p>{addr.line2}</p>}
+                <p>{addr.city}, {addr.state} {addr.postalCode}</p>
+                <p>{addr.country}</p>
+                <p className="pt-2 tracking-widest text-white/60">{addr.phone}</p>
+              </div>
+              <div className="mt-6 pt-4 border-t border-white/10 flex justify-between items-center">
+                <div className="flex gap-4">
+                  <button 
+                    onClick={() => {
+                      setEditingAddress(addr)
+                      setIsAddAddressOpen(true)
+                    }}
+                    className="text-[10px] font-mono uppercase text-muted-foreground hover:text-white transition-colors tracking-widest font-bold"
                   >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={addressLoading}
-                    className="h-10 rounded-none bg-primary text-foreground"
+                    Edit
+                  </button>
+                  <button 
+                    onClick={() => handleDeleteAddress(addr.id)}
+                    className="text-[10px] font-mono uppercase text-red-500 hover:text-red-400 transition-colors tracking-widest font-bold"
                   >
-                    {addressLoading ? "Saving..." : "Save Address"}
-                  </Button>
+                    Delete
+                  </button>
                 </div>
-              </form>
+                {(!addr.isDefaultShipping || !addr.isDefaultBilling) && (
+                  <button 
+                    onClick={() => handleSetDefaultAddress(addr.id, true, true)}
+                    className="text-[10px] font-mono uppercase text-primary hover:text-primary/80 transition-colors tracking-widest font-bold"
+                  >
+                    Set Default
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
+          ))
         )}
-      </main>
+      </div>
 
-          </div>
+      <AddressModal 
+        isOpen={isAddAddressOpen}
+        onClose={() => setIsAddAddressOpen(false)}
+        onSuccess={() => {
+          window.location.reload()
+        }}
+        editingAddress={editingAddress}
+        isFirstAddress={profile?.addresses?.length === 0}
+      />
+    </div>
   )
 }

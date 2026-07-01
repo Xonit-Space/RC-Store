@@ -107,6 +107,48 @@ export function useAdminCustomers(page = 1, limit = 24) {
   })
 }
 
+export function useAdminCreateCustomer() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (payload: any) => {
+      const res = await fetch("/api/admin/customers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null)
+        throw new Error(errorData?.error || "Failed to create customer")
+      }
+      return res.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "customers"] })
+    }
+  })
+}
+
+export function useAdminUpdateCustomerStatus() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
+      const res = await fetch(`/api/admin/customers/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive }),
+      })
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null)
+        throw new Error(errorData?.error || "Failed to update customer status")
+      }
+      return res.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "customers"] })
+    }
+  })
+}
+
 export function useAdminOrders(page = 1, limit = 20, search = "") {
   return useQuery({
     queryKey: ["admin", "orders", page, limit, search],

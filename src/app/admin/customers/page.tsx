@@ -1,9 +1,14 @@
 "use client"
 
-import { useCallback } from "react"
+import { useState, useCallback } from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { RefreshCw, Shield, User, ChevronLeft, ChevronRight } from "lucide-react"
-import { useAdminCustomers } from "@/hooks/use-admin-data"
+import { useAdminCustomers, useAdminCreateCustomer, useAdminUpdateCustomerStatus } from "@/hooks/use-admin-data"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
 
 const PAGE_SIZE = 24
 
@@ -26,6 +31,32 @@ export default function AdminCustomersPage() {
     router.push(`${pathname}?${params.toString()}`)
   }, [searchParams, pathname, router])
 
+  const [isAddUserOpen, setIsAddUserOpen] = useState(false)
+  const [newUser, setNewUser] = useState({ name: "", email: "", password: "" })
+  const createCustomer = useAdminCreateCustomer()
+  const updateStatus = useAdminUpdateCustomerStatus()
+
+  const handleAddUser = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      await createCustomer.mutateAsync(newUser)
+      setIsAddUserOpen(false)
+      setNewUser({ name: "", email: "", password: "" })
+    } catch (error) {
+      console.error(error)
+      alert("Failed to add user")
+    }
+  }
+
+  const handleStatusChange = async (id: string, currentStatus: string) => {
+    try {
+      await updateStatus.mutateAsync({ id, isActive: currentStatus !== "ACTIVE" })
+    } catch (error) {
+      console.error(error)
+      alert("Failed to update status")
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center p-12 h-64">
@@ -37,16 +68,51 @@ export default function AdminCustomersPage() {
 
   return (
     <div className="space-y-8 font-sans">
-      <div className="pb-6 border-b border-border/40">
-        <p className="text-[10px] tracking-[0.25em] uppercase text-muted-foreground mb-1">
-          Clientele
-        </p>
-        <h2 className="font-sans text-3xl font-light text-foreground leading-none">
-          User Accounts
-        </h2>
-        <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-2">
-          {total.toLocaleString("en-AU", { style: 'currency', currency: 'AUD' })} registered accounts
-        </p>
+      <div className="pb-6 border-b border-border/40 flex justify-between items-end">
+        <div>
+          <p className="text-[10px] tracking-[0.25em] uppercase text-muted-foreground mb-1">
+            Clientele
+          </p>
+          <h2 className="font-sans text-3xl font-light text-foreground leading-none">
+            User Accounts
+          </h2>
+          <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-2">
+            {total.toLocaleString("en-AU", { style: 'currency', currency: 'AUD' })} registered accounts
+          </p>
+        </div>
+        <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="text-[10px] uppercase tracking-widest font-bold">
+              Add User
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <form onSubmit={handleAddUser}>
+              <DialogHeader>
+                <DialogTitle>Add New User</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Name</Label>
+                  <Input id="name" value={newUser.name} onChange={e => setNewUser({...newUser, name: e.target.value})} required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" value={newUser.email} onChange={e => setNewUser({...newUser, email: e.target.value})} required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input id="password" type="password" value={newUser.password} onChange={e => setNewUser({...newUser, password: e.target.value})} required />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="submit" disabled={createCustomer.isPending}>
+                  {createCustomer.isPending ? "Adding..." : "Add User"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -65,13 +131,22 @@ export default function AdminCustomersPage() {
                   <h3 className="font-sans text-lg font-light text-foreground line-clamp-1">{u.name || "Unknown"}</h3>
                   <p className="text-[10px] text-muted-foreground font-bold tracking-widest mt-1">{u.email}</p>
                 </div>
-                <div className="flex gap-2 pt-2">
+                <div className="flex gap-2 pt-2 items-center">
                   <span className="text-[8px] font-bold px-2 py-1 bg-muted/10 text-foreground uppercase tracking-widest border border-border/40">
                     Points: {u.points || 0}
                   </span>
-                  <span className="text-[8px] font-bold px-2 py-1 bg-forest/5 text-forest uppercase tracking-widest border border-forest/20">
+                  <span className={`text-[8px] font-bold px-2 py-1 uppercase tracking-widest border ${u.status === 'ACTIVE' ? 'bg-forest/5 text-forest border-forest/20' : 'bg-destructive/5 text-destructive border-destructive/20'}`}>
                     {u.status || "ACTIVE"}
                   </span>
+                  <div className="ml-auto flex items-center space-x-2">
+                    <Label htmlFor={`status-${u.id}`} className="text-[10px] sr-only">Toggle Status</Label>
+                    <Switch
+                      id={`status-${u.id}`}
+                      checked={u.status === "ACTIVE"}
+                      onCheckedChange={() => handleStatusChange(u.id, u.status || "ACTIVE")}
+                      disabled={updateStatus.isPending || u.email === "admin@aussierigsarena.com"}
+                    />
+                  </div>
                 </div>
               </div>
             </div>

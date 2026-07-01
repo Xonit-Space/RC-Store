@@ -21,6 +21,8 @@ export async function FeaturedProductCard() {
       
       return {
         ...product,
+        price: Number(product.price),
+        originalPrice: product.originalPrice ? Number(product.originalPrice) : null,
         rating: reviewStats._avg.rating || 5,
         reviewCount: reviewStats._count.id
       }

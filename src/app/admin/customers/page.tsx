@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
+import { toast } from "sonner"
 
 const PAGE_SIZE = 24
 
@@ -42,18 +43,20 @@ export default function AdminCustomersPage() {
       await createCustomer.mutateAsync(newUser)
       setIsAddUserOpen(false)
       setNewUser({ name: "", email: "", password: "" })
-    } catch (error) {
+      toast.success("User added successfully")
+    } catch (error: any) {
       console.error(error)
-      alert("Failed to add user")
+      toast.error(error.message || "Failed to add user")
     }
   }
 
   const handleStatusChange = async (id: string, currentStatus: string) => {
     try {
       await updateStatus.mutateAsync({ id, isActive: currentStatus !== "ACTIVE" })
-    } catch (error) {
+      toast.success("Status updated successfully")
+    } catch (error: any) {
       console.error(error)
-      alert("Failed to update status")
+      toast.error(error.message || "Failed to update status")
     }
   }
 

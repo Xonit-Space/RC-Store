@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { getAdminGalleryImages, toggleGalleryImageApproval, deleteGalleryImage } from "@/actions/gallery"
+import { useState, useEffect, useRef } from "react"
+import { getAdminGalleryImages, toggleGalleryImageApproval, deleteGalleryImage, adminUploadGalleryImage } from "@/actions/gallery"
 import { Button } from "@/components/ui/button"
-import { Trash2, CheckCircle2, XCircle } from "lucide-react"
+import { Trash2, CheckCircle2, XCircle, Plus } from "lucide-react"
 import { toast } from "sonner"
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog"
 
@@ -11,6 +11,8 @@ export default function AdminGalleryPage() {
   const [images, setImages] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const fetchImages = async () => {
     setLoading(true)
@@ -50,6 +52,43 @@ export default function AdminGalleryPage() {
     }
   }
 
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setIsUploading(true)
+    const toastId = toast.loading("Uploading image...")
+
+    try {
+      const fd = new FormData()
+      fd.append("file", file)
+      
+      const uploadRes = await fetch("/api/admin/products/upload", { method: "POST", body: fd })
+      const uploadData = await uploadRes.json()
+
+      if (!uploadData.success) throw new Error(uploadData.error || "Upload failed")
+
+      const res = await adminUploadGalleryImage({
+        imageUrl: uploadData.url,
+        caption: "",
+        authorName: "Admin",
+        productId: null
+      })
+
+      if (res.success) {
+        toast.success("Image added to gallery", { id: toastId })
+        fetchImages()
+      } else {
+        throw new Error(res.error || "Failed to save gallery record")
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to upload image", { id: toastId })
+    } finally {
+      setIsUploading(false)
+      if (e.target) e.target.value = ""
+    }
+  }
+
   return (
     <div className="space-y-8 font-sans">
       <div className="flex justify-between items-end pb-6 border-b border-border/40">
@@ -60,6 +99,23 @@ export default function AdminGalleryPage() {
           <h2 className="font-sans text-3xl font-light text-foreground leading-none">
             Customer Gallery
           </h2>
+        </div>
+        <div className="flex items-center gap-4">
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            className="hidden" 
+            accept="image/jpeg,image/png,image/webp,image/jpg" 
+            onChange={handleFileChange} 
+          />
+          <Button 
+            onClick={() => fileInputRef.current?.click()} 
+            disabled={isUploading}
+            className="text-[10px] uppercase tracking-widest font-bold"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            {isUploading ? "Uploading..." : "Add Image"}
+          </Button>
         </div>
       </div>
 

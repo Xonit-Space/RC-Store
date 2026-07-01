@@ -30,6 +30,27 @@ export async function uploadGalleryImage(data: z.infer<typeof uploadSchema>) {
   }
 }
 
+export async function adminUploadGalleryImage(data: z.infer<typeof uploadSchema>) {
+  try {
+    const validated = uploadSchema.parse(data)
+    const newImage = await db.galleryImage.create({
+      data: {
+        imageUrl: validated.imageUrl,
+        caption: validated.caption,
+        authorName: validated.authorName,
+        productId: validated.productId || undefined,
+        isApproved: true // Admin uploads are pre-approved
+      }
+    })
+    revalidateTag("gallery")
+    revalidatePath("/admin/gallery")
+    revalidatePath("/")
+    return { success: true, data: newImage }
+  } catch (error: any) {
+    return { success: false, error: error.message || "Admin upload failed" }
+  }
+}
+
 export async function getAdminGalleryImages() {
   return await db.galleryImage.findMany({
     orderBy: { createdAt: "desc" },

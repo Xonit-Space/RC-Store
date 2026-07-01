@@ -52,11 +52,11 @@ export default function LoginPage() {
       {/* Column 1: Visual / Video Background (Hidden on Mobile, 2/3 width on Desktop) */}
       <div className="hidden lg:flex lg:w-2/3 relative flex-col justify-between p-10 overflow-hidden">
         {/* Video Background */}
-        <video 
-          autoPlay 
-          loop 
-          muted 
-          playsInline 
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
           className="absolute inset-0 w-full h-full object-cover z-0"
         >
           <source src="/snaptik_7531203151316258062_v3.mp4" type="video/mp4" />
@@ -92,7 +92,7 @@ export default function LoginPage() {
 
       {/* Column 2: Form Container (Full width on mobile, 1/3 on desktop) */}
       <div className="w-full lg:w-1/3 flex flex-col justify-center items-center px-6 py-12 relative z-10 border-l border-border bg-background shadow-[-20px_0_50px_rgba(0,0,0,0.5)]">
-        
+
         {/* Grid Background Decor */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
 
@@ -114,7 +114,7 @@ export default function LoginPage() {
 
           <div className="glass-dark py-10 px-8 border border-racing-yellow/40 shadow-[0_0_30px_rgba(255, 204, 0,0.15)] relative">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-racing-yellow to-transparent opacity-50" />
-            
+
             <form className="space-y-6" onSubmit={handleSubmit}>
               {error && (
                 <div className="flex items-center gap-3 p-4 bg-red-950/50 border border-red-500/50 text-yellow-400 text-xs font-mono font-bold uppercase tracking-wider">

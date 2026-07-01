@@ -45,3 +45,28 @@ export async function updateTaxRate(id: string, rate: number, isActive: boolean)
     return { success: false, error: "Failed to update tax rate" }
   }
 }
+
+export async function createTaxRate(name: string, rate: number, isActive: boolean) {
+  try {
+    const created = await db.taxRate.create({
+      data: { name, rate, isActive },
+    })
+    return { success: true, data: created }
+  } catch (error: any) {
+    console.error("Failed to create tax rate", error)
+    return { success: false, error: "Failed to create tax rate" }
+  }
+}
+
+export async function deleteTaxRate(id: string) {
+  try {
+    await db.taxRate.delete({
+      where: { id },
+    })
+    return { success: true }
+  } catch (error: any) {
+    console.error("Failed to delete tax rate", error)
+    return { success: false, error: "Failed to delete tax rate" }
+  }
+}
+

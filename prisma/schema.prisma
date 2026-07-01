@@ -576,6 +576,10 @@ model Order {
   billingAddress    Address     @relation("BillingAddress", fields: [billingAddressId], references: [id])
   couponId          String?
   coupon            Coupon?     @relation(fields: [couponId], references: [id], onDelete: SetNull)
+  insuranceCost     Decimal     @default(0)
+  isSafeDrop        Boolean     @default(false)
+  selectedShippingRuleId String?
+  
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
 
@@ -1113,11 +1117,15 @@ model ShippingZone {
 model ShippingRule {
   id              String   @id @default(cuid())
   name            String
-  minOrderAmount  Decimal?
-  maxOrderAmount  Decimal?
-  shippingCost    Decimal
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
+  minOrderAmount   Decimal?
+  maxOrderAmount   Decimal?
+  shippingCost     Decimal
+  estimatedDaysMin Int?
+  estimatedDaysMax Int?
+  courierName      String?
+  logoUrl          String?
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
   @@map("shipping_rules")

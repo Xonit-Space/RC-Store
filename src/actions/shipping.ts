@@ -19,6 +19,10 @@ export async function createShippingRule(data: {
   minOrderAmount?: number
   maxOrderAmount?: number
   shippingCost: number
+  estimatedDaysMin?: number
+  estimatedDaysMax?: number
+  courierName?: string
+  logoUrl?: string
   isActive: boolean
 }) {
   try {
@@ -28,6 +32,10 @@ export async function createShippingRule(data: {
         minOrderAmount: data.minOrderAmount,
         maxOrderAmount: data.maxOrderAmount,
         shippingCost: data.shippingCost,
+        estimatedDaysMin: data.estimatedDaysMin,
+        estimatedDaysMax: data.estimatedDaysMax,
+        courierName: data.courierName,
+        logoUrl: data.logoUrl,
         isActive: data.isActive,
       },
     })
@@ -43,6 +51,10 @@ export async function updateShippingRule(id: string, data: {
   minOrderAmount?: number | null
   maxOrderAmount?: number | null
   shippingCost?: number
+  estimatedDaysMin?: number | null
+  estimatedDaysMax?: number | null
+  courierName?: string | null
+  logoUrl?: string | null
   isActive?: boolean
 }) {
   try {
@@ -69,41 +81,30 @@ export async function deleteShippingRule(id: string) {
   }
 }
 
-export async function calculateShippingCost(subtotal: number): Promise<number> {
+export async function getAvailableShippingOptions(subtotal: number) {
   try {
     const rules = await db.shippingRule.findMany({
       where: { isActive: true },
+      orderBy: { shippingCost: "asc" },
     })
 
     if (!rules || rules.length === 0) {
-      // Default fallback if no rules
-      return 15;
+      return []
     }
 
-    // Sort descending by minOrderAmount to evaluate higher thresholds first
-    rules.sort((a, b) => {
-      const aMin = a.minOrderAmount ? Number(a.minOrderAmount) : 0;
-      const bMin = b.minOrderAmount ? Number(b.minOrderAmount) : 0;
-      return bMin - aMin;
-    });
-
-    for (const rule of rules) {
+    const availableOptions = rules.filter(rule => {
       const min = rule.minOrderAmount ? Number(rule.minOrderAmount) : null;
       const max = rule.maxOrderAmount ? Number(rule.maxOrderAmount) : null;
       
       let match = true;
       if (min !== null && subtotal < min) match = false;
       if (max !== null && subtotal > max) match = false;
+      return match;
+    })
 
-      if (match) {
-        return Number(rule.shippingCost);
-      }
-    }
-
-    // Default if no rule matches
-    return 15;
+    return availableOptions;
   } catch (error) {
-    console.error("Error calculating shipping cost:", error)
-    return 15;
+    console.error("Error getting available shipping options:", error)
+    return [];
   }
 }

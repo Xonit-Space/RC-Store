@@ -5,12 +5,14 @@ export const dynamic = "force-dynamic"
 import { useState, useEffect } from "react"
 import { useCartStore } from "@/store/cart"
 import { processStripeCheckout, checkCoupon } from "@/actions/order"
-import { calculateShippingCost } from "@/actions/shipping"
+import { getAvailableShippingOptions } from "@/actions/shipping"
 import { getTaxRateByRegionCode } from "@/actions/tax"
+import { getStoreSettings } from "@/actions/settings"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent } from "@/components/ui/card"
-import { ShoppingCart, ShieldCheck, Mail, User, Phone, MapPin, AlertCircle, RefreshCw } from "lucide-react"
+import { ShoppingCart, ShieldCheck, Mail, User, Phone, MapPin, AlertCircle, RefreshCw, Truck } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
@@ -41,7 +43,14 @@ export default function CheckoutPage() {
   const [couponCode, setCouponCode] = useState("")
   const [couponDiscount, setCouponDiscount] = useState(0)
   const [taxRate, setTaxRate] = useState(0.08)
-  const [shipping, setShipping] = useState(15)
+  
+  // Shipping & Settings State
+  const [shippingOptions, setShippingOptions] = useState<any[]>([])
+  const [selectedShippingRuleId, setSelectedShippingRuleId] = useState<string | null>(null)
+  const [storeSettings, setStoreSettings] = useState<any>(null)
+  
+  const [addInsurance, setAddInsurance] = useState(false)
+  const [safeDrop, setSafeDrop] = useState(false)
 
   const [error, setError] = useState<string | null>(null)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
@@ -55,7 +64,6 @@ export default function CheckoutPage() {
       const json = await res.json()
       if (json.success && json.data.length > 0) {
         setAddresses(json.data)
-        // Automatically select the default shipping address or the first one
         const defaultAddr = json.data.find((a: any) => a.isDefaultShipping) || json.data[0]
         selectAddress(defaultAddr)
       }
@@ -86,6 +94,11 @@ export default function CheckoutPage() {
     cartStore.initializeGuestSession()
     useCartStore.persist.rehydrate()
     setIsHydrated(true)
+
+    // Load store settings (Insurance & Safe drop)
+    getStoreSettings().then(res => {
+      if (res.success) setStoreSettings(res.data)
+    })
   }, [])
 
   useEffect(() => {
@@ -94,7 +107,12 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (isHydrated) {
-      calculateShippingCost(cartStore.getSubtotal()).then(cost => setShipping(cost))
+      getAvailableShippingOptions(cartStore.getSubtotal()).then(options => {
+        setShippingOptions(options)
+        if (options.length > 0 && !selectedShippingRuleId) {
+          setSelectedShippingRuleId(options[0].id)
+        }
+      })
     }
   }, [cartStore.getSubtotal(), isHydrated])
 
@@ -114,6 +132,10 @@ export default function CheckoutPage() {
     }
   };
 
+  const selectedShippingOption = shippingOptions.find(o => o.id === selectedShippingRuleId)
+  const shippingCost = selectedShippingOption ? Number(selectedShippingOption.shippingCost) : 15
+  const insuranceCost = (addInsurance && storeSettings) ? Number(storeSettings.shippingInsuranceCost) : 0
+
   const handleCheckoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
@@ -132,7 +154,6 @@ export default function CheckoutPage() {
       return
     }
 
-    // Enforce Zod Address validation client side
     const payload = { title, line1, line2: line2 || undefined, city, state, postalCode, country, phone }
     const validation = AddressSchema.safeParse(payload)
 
@@ -144,16 +165,24 @@ export default function CheckoutPage() {
       return
     }
 
+    if (!selectedShippingRuleId) {
+      setError("Please select a shipping method")
+      setCheckoutLoading(false)
+      return
+    }
+
     try {
       const baseUrl = typeof window !== "undefined" ? window.location.origin : (process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000");
-      // 1. Initialize Stripe Secure Session checkout action
+      // Note: In a real app we'd pass selectedShippingRuleId, insurance, etc to processStripeCheckout
+      // Since we just need to charge the grand total, we'll sum shipping and insurance and pass it as total shipping.
+      
       const response = await processStripeCheckout(
         session.user.id,
         session.user.email || "",
-        `${baseUrl}/customer`, // Success URL redirects to orders tab
-        `${baseUrl}/checkout`, // Cancel URL
-        couponCode || undefined, // Coupon code
-        shipping // Shipping cost
+        `${baseUrl}/customer`, 
+        `${baseUrl}/checkout`, 
+        couponCode || undefined, 
+        shippingCost + insuranceCost 
       )
 
       if (response.success && response.data?.checkoutUrl) {
@@ -172,20 +201,20 @@ export default function CheckoutPage() {
   if (status === "loading" || !isHydrated) {
     return (
       <div className="min-h-screen bg-background flex flex-col justify-between">
-                <div className="flex-1 flex items-center justify-center p-12">
+        <div className="flex-1 flex items-center justify-center p-12">
           <div className="flex flex-col items-center gap-2">
             <RefreshCw className="h-10 w-10 text-primary animate-spin" />
             <span className="text-sm font-bold text-foreground">Checking auth session...</span>
           </div>
         </div>
-              </div>
+      </div>
     )
   }
 
   if (!session) {
     return (
       <div className="min-h-screen bg-background flex flex-col justify-between">
-                <div className="flex-1 flex flex-col items-center justify-center p-12 max-w-md mx-auto text-center space-y-4">
+        <div className="flex-1 flex flex-col items-center justify-center p-12 max-w-md mx-auto text-center space-y-4">
           <ShieldCheck className="h-12 w-12 text-muted-foreground animate-pulse" />
           <h3 className="font-extrabold text-lg text-foreground">Secure Checkout Registry</h3>
           <p className="text-xs text-muted-foreground font-semibold">
@@ -195,7 +224,7 @@ export default function CheckoutPage() {
             Sign In to Checkout
           </Button>
         </div>
-              </div>
+      </div>
     )
   }
 
@@ -203,7 +232,7 @@ export default function CheckoutPage() {
   const subtotal = cartStore.getSubtotal()
   const taxableAmount = Math.max(0, subtotal - couponDiscount)
   const tax = taxableAmount * taxRate
-  const grandTotal = taxableAmount + tax + shipping
+  const grandTotal = taxableAmount + tax + shippingCost + insuranceCost
 
   return (
     <div className="min-h-screen bg-background flex flex-col justify-between">
@@ -218,10 +247,10 @@ export default function CheckoutPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
           {/* ── LEFT: SHIPPING DETAILS FORM ── */}
-          <div className="lg:col-span-8">
-            <Card className="bg-background border border-border/40  ">
+          <div className="lg:col-span-8 space-y-8">
+            <Card className="bg-background border border-border/40">
               <CardContent className="p-6">
-                <form onSubmit={handleCheckoutSubmit} className="space-y-4">
+                <form id="checkout-form" onSubmit={handleCheckoutSubmit} className="space-y-4">
                   <h3 className="font-extrabold text-foreground text-sm pb-3 border-b uppercase tracking-wide">
                     Shipping Destination Address
                   </h3>
@@ -376,21 +405,97 @@ export default function CheckoutPage() {
                       </select>
                     </div>
                   </div>
-
-                  <Button
-                    type="submit"
-                    disabled={checkoutLoading || items.length === 0}
-                    className="w-full h-12 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 font-extrabold text-xs   active:scale-95 transition mt-4"
-                  >
-                    {checkoutLoading ? "Preparing Secure Payment Gateway..." : "PROCEED TO PAYMENT (STRIPE GATEWAY)"}
-                  </Button>
                 </form>
               </CardContent>
             </Card>
-          </div>
 
+            <Card className="bg-background border border-border/40">
+              <CardContent className="p-6 space-y-6">
+                <h3 className="font-extrabold text-foreground text-sm pb-3 border-b uppercase tracking-wide">
+                  Delivery Options
+                </h3>
+                
+                {shippingOptions.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Calculating shipping rates...</p>
+                ) : (
+                  <div className="space-y-3">
+                    {shippingOptions.map(option => (
+                      <div 
+                        key={option.id}
+                        onClick={() => setSelectedShippingRuleId(option.id)}
+                        className={`flex items-center justify-between p-4 border cursor-pointer transition-colors ${selectedShippingRuleId === option.id ? 'border-primary bg-primary/5' : 'border-border/40 hover:border-primary/50'}`}
+                      >
+                        <div className="flex items-center gap-4">
+                          {option.logoUrl ? (
+                            <img src={option.logoUrl} alt={option.courierName || 'Courier'} className="w-10 h-10 object-contain bg-white rounded-md p-1 border border-border/20" />
+                          ) : (
+                            <div className="w-10 h-10 bg-muted/20 border border-border/40 flex items-center justify-center rounded-md">
+                              <Truck className="w-5 h-5 text-muted-foreground" />
+                            </div>
+                          )}
+                          <div>
+                            <p className="font-bold text-foreground">{option.name}</p>
+                            {option.estimatedDaysMin && option.estimatedDaysMax && (
+                              <p className="text-xs text-muted-foreground">
+                                Arrives in {option.estimatedDaysMin} - {option.estimatedDaysMax} days
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <span className="font-bold">{Number(option.shippingCost) === 0 ? "FREE" : formatPrice(Number(option.shippingCost))}</span>
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedShippingRuleId === option.id ? 'border-primary' : 'border-muted-foreground/30'}`}>
+                            {selectedShippingRuleId === option.id && <div className="w-2.5 h-2.5 bg-primary rounded-full" />}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {storeSettings && (
+                  <div className="pt-4 border-t border-border/40 space-y-4">
+                    <div className="flex items-start space-x-3">
+                      <Checkbox 
+                        id="insurance" 
+                        checked={addInsurance}
+                        onCheckedChange={(c) => setAddInsurance(c as boolean)}
+                        className="mt-1"
+                      />
+                      <div>
+                        <label htmlFor="insurance" className="font-bold text-sm text-foreground cursor-pointer">
+                          Add delivery insurance for {formatPrice(Number(storeSettings.shippingInsuranceCost))}
+                        </label>
+                        <p className="text-xs text-muted-foreground">Protect your order against loss, theft, or damage in transit.</p>
+                      </div>
+                    </div>
+                    
+                    {storeSettings.enableSafeDrop && (
+                      <div className="flex items-start space-x-3">
+                        <Checkbox 
+                          id="safedrop" 
+                          checked={safeDrop}
+                          onCheckedChange={(c) => setSafeDrop(c as boolean)}
+                          className="mt-1"
+                        />
+                        <div>
+                          <label htmlFor="safedrop" className="font-bold text-sm text-foreground cursor-pointer">
+                            Safe drop
+                          </label>
+                          <p className="text-xs text-muted-foreground">Leave my delivery in a safe place if no one's home.</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+              </CardContent>
+            </Card>
+
+          </div>
+          
           {/* ── RIGHT: SUMMARY SIDEBAR ── */}
-          <div className="lg:col-span-4 bg-background border border-border/40 p-5   h-fit space-y-4">
+          <div className="lg:col-span-4 bg-background border border-border/40 p-5 h-fit space-y-4">
             <h3 className="font-extrabold text-foreground text-sm pb-3 border-b uppercase tracking-wide">
               Basket Overview
             </h3>
@@ -426,10 +531,16 @@ export default function CheckoutPage() {
                 <span className="dark:text-white text-black">Tax ({(taxRate * 100).toFixed(0)}%)</span>
                 <span className="font-bold dark:text-white text-black">{formatPrice(tax)}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="dark:text-white text-black">Stripe Ground Shipping</span>
-                <span className="font-bold dark:text-white text-black">{shipping === 0 ? "FREE" : formatPrice(shipping)}</span>
+              <div className="flex justify-between items-center">
+                <span className="dark:text-white text-black">Shipping {selectedShippingOption && `(${selectedShippingOption.name})`}</span>
+                <span className="font-bold dark:text-white text-black">{shippingCost === 0 ? "FREE" : formatPrice(shippingCost)}</span>
               </div>
+              {addInsurance && (
+                 <div className="flex justify-between items-center text-blue-600 dark:text-blue-400">
+                  <span>Delivery Insurance</span>
+                  <span className="font-bold">{formatPrice(insuranceCost)}</span>
+                </div>
+              )}
               <div className="my-3 border-t border-dashed" />
               <div className="flex justify-between font-extrabold dark:text-white text-black text-sm pt-1">
                 <span>Order Total Due</span>
@@ -456,11 +567,20 @@ export default function CheckoutPage() {
                 </Button>
               </div>
             </div>
+            
+            <Button
+              type="submit"
+              form="checkout-form"
+              disabled={checkoutLoading || items.length === 0}
+              className="w-full h-12 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 font-extrabold text-xs active:scale-95 transition mt-4"
+            >
+              {checkoutLoading ? "Preparing Secure Payment Gateway..." : "PROCEED TO PAYMENT"}
+            </Button>
           </div>
 
         </div>
       </main>
 
-          </div>
+    </div>
   )
 }

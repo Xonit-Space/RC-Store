@@ -42,7 +42,7 @@ export default function CustomerDashboardPage() {
       const ordRes = await fetch("/api/customer/orders")
       if (ordRes.ok) {
         const json = await ordRes.json()
-        setOrders(json.data || (Array.isArray(json) ? json : []))
+        setOrders(json.orders || json.data || (Array.isArray(json) ? json : []))
       } else {
         toast.error("Failed to load data")
       }
@@ -323,7 +323,7 @@ export default function CustomerDashboardPage() {
                       <p>{addr.country}</p>
                       <p className="pt-2 text-[10px] tracking-wider text-muted-foreground">{addr.phone}</p>
                     </div>
-                    <div className="mt-4 pt-4 border-t border-border flex justify-between opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="mt-4 pt-4 border-t border-border flex justify-between transition-opacity">
                       <div className="flex gap-4">
                         <button 
                           onClick={() => {

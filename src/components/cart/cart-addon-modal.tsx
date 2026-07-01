@@ -104,9 +104,6 @@ export function CartAddonModal({
         <div className="w-full md:w-2/3 p-6 flex flex-col h-full bg-background relative">
           <div className="flex justify-between items-start mb-4">
             <h2 className="text-2xl font-bold">Addon Details</h2>
-            <Button variant="outline" size="sm" onClick={onClose} className="shrink-0 z-50">
-              Cancel
-            </Button>
           </div>
           
           {selectedAddon ? (

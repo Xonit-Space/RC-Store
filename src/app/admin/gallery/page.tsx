@@ -5,10 +5,12 @@ import { getAdminGalleryImages, toggleGalleryImageApproval, deleteGalleryImage }
 import { Button } from "@/components/ui/button"
 import { Trash2, CheckCircle2, XCircle } from "lucide-react"
 import { toast } from "sonner"
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog"
 
 export default function AdminGalleryPage() {
   const [images, setImages] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
 
   const fetchImages = async () => {
     setLoading(true)
@@ -35,8 +37,10 @@ export default function AdminGalleryPage() {
     }
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this image?")) return
+  const confirmDelete = async () => {
+    if (!deleteId) return
+    const id = deleteId
+    setDeleteId(null)
     const res = await deleteGalleryImage(id)
     if (res.success) {
       toast.success("Image deleted")
@@ -97,7 +101,7 @@ export default function AdminGalleryPage() {
                   <Button 
                     variant="outline" 
                     size="icon" 
-                    onClick={() => handleDelete(img.id)}
+                    onClick={() => setDeleteId(img.id)}
                     className="h-8 w-8 hover:text-destructive hover:border-destructive"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -108,6 +112,19 @@ export default function AdminGalleryPage() {
           ))
         )}
       </div>
+
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Image?</AlertDialogTitle>
+            <AlertDialogDescription>Are you sure you want to delete this image? This action cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

@@ -8,12 +8,14 @@ import { toast } from "sonner"
 import { MessageSquare, RefreshCw, ChevronRight, Home, Trash2, Star } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog"
 
 export default function CustomerReviewsPage() {
   const router = useRouter()
   const { data: session, status } = useSession()
   const [reviews, setReviews] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
 
   const fetchReviews = async () => {
     setLoading(true)
@@ -40,8 +42,10 @@ export default function CustomerReviewsPage() {
     }
   }, [status])
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this review?")) return
+  const confirmDelete = async () => {
+    if (!deleteId) return
+    const id = deleteId
+    setDeleteId(null)
     try {
       const res = await fetch(`/api/customer/reviews/${id}`, { method: "DELETE" })
       if (res.ok) {
@@ -128,7 +132,7 @@ export default function CustomerReviewsPage() {
                       <p className="text-xs font-bold text-foreground leading-snug line-clamp-2">{review.product?.name}</p>
                     </Link>
                     <button 
-                      onClick={() => handleDelete(review.id)}
+                      onClick={() => setDeleteId(review.id)}
                       className="p-2 text-muted-foreground hover:text-terracotta transition shrink-0"
                       title="Delete review"
                     >
@@ -141,6 +145,19 @@ export default function CustomerReviewsPage() {
           </div>
         )}
       </main>
+
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Review?</AlertDialogTitle>
+            <AlertDialogDescription>Are you sure you want to delete this review? This action cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import { toast } from "sonner"
 import { useState } from "react"
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog"
 
 interface ModelPartsGridProps {
   modelId: string
@@ -18,13 +19,17 @@ export function ModelPartsGrid({ modelId, onEditPart, onAddPart }: ModelPartsGri
   const queryClient = useQueryClient()
   const [isUnlinking, setIsUnlinking] = useState<string | null>(null)
 
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
+
   const { data: parts = [], isLoading } = useQuery({
     queryKey: ["admin", "model-parts", modelId],
     queryFn: () => getCompatibleParts(modelId)
   })
 
-  const handleUnlink = async (productId: string) => {
-    if (!confirm("Are you sure you want to remove this part from this model? It will not be deleted from the store.")) return
+  const confirmUnlink = async () => {
+    if (!deleteTarget) return
+    const productId = deleteTarget
+    setDeleteTarget(null)
     
     setIsUnlinking(productId)
     try {
@@ -109,7 +114,7 @@ export function ModelPartsGrid({ modelId, onEditPart, onAddPart }: ModelPartsGri
                     <Edit className="w-3 h-3" />
                   </button>
                   <button 
-                    onClick={() => handleUnlink(p.id)}
+                    onClick={() => setDeleteTarget(p.id)}
                     disabled={isUnlinking === p.id}
                     className="p-1.5 bg-muted/50 text-terracotta hover:bg-terracotta hover:text-white rounded-sm transition-colors disabled:opacity-50"
                     title="Unlink from Model"
@@ -122,6 +127,19 @@ export function ModelPartsGrid({ modelId, onEditPart, onAddPart }: ModelPartsGri
           })}
         </div>
       )}
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>Are you sure you want to remove this part from this model? It will not be deleted from the store.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmUnlink}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

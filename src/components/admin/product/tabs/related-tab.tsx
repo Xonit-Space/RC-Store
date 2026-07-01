@@ -12,11 +12,11 @@ export function RelatedTab({ product, localRelated, setLocalRelated }: { product
 
   const { data: allProducts } = useQuery({
     queryKey: ["admin", "products", "all"],
-    queryFn: () => getProducts({ limit: 100 }),
+    queryFn: () => getProducts(),
   })
 
   // Exclude current product if editing
-  const availableProducts = allProducts?.data?.filter((p: any) => p.id !== productId) || []
+  const availableProducts = allProducts?.products?.filter((p: any) => p.id !== productId) || []
   
   const [selectedIds, setSelectedIds] = useState<string[]>(localRelated)
   const [isSubmitting, setIsSubmitting] = useState(false)

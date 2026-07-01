@@ -8,6 +8,7 @@ import { Plus, Trash2, X } from "lucide-react"
 import { toast } from "sonner"
 import { useQueryClient } from "@tanstack/react-query"
 import { adminAddProductFeatureBlock, adminDeleteProductFeatureBlock } from "@/actions/product"
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog"
 
 export function FeaturesTab({ product, localFeatures, setLocalFeatures }: { product?: any, localFeatures: any[], setLocalFeatures: React.Dispatch<React.SetStateAction<any[]>> }) {
   const { data: session } = useSession()
@@ -22,6 +23,7 @@ export function FeaturesTab({ product, localFeatures, setLocalFeatures }: { prod
   const [blockDesc, setBlockDesc] = useState("")
   const [blockImgFile, setBlockImgFile] = useState<File | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
 
   const handleAddBlock = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -68,8 +70,10 @@ export function FeaturesTab({ product, localFeatures, setLocalFeatures }: { prod
     setIsSubmitting(false)
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure?")) return
+  const confirmDelete = async () => {
+    if (!deleteId) return
+    const id = deleteId
+    setDeleteId(null)
     
     if (isLocalMode) {
       setLocalFeatures(prev => prev.filter(f => f.localId !== id))
@@ -105,7 +109,7 @@ export function FeaturesTab({ product, localFeatures, setLocalFeatures }: { prod
                   <p className="text-xs text-muted-foreground line-clamp-1">{b.description}</p>
                 </div>
               </div>
-              <Button variant="ghost" onClick={() => handleDelete(b.id || b.localId)} className="text-terracotta h-8 w-8 p-0"><Trash2 className="h-4 w-4" /></Button>
+              <Button variant="ghost" onClick={() => setDeleteId(b.id || b.localId)} className="text-terracotta h-8 w-8 p-0"><Trash2 className="h-4 w-4" /></Button>
             </div>
           ))
         )}
@@ -125,6 +129,19 @@ export function FeaturesTab({ product, localFeatures, setLocalFeatures }: { prod
           </div>
         </div>
       )}
+
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

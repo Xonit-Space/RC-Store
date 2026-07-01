@@ -1,11 +1,12 @@
 "use client"
 
-import { useCallback } from "react"
+import { useCallback, useState } from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { RefreshCw, MessageSquare, Check, X, Trash2, ChevronLeft, ChevronRight, Star } from "lucide-react"
 import { useAdminReviews, useAdminUpdateReview, useAdminDeleteReview } from "@/hooks/use-admin-data"
 import { toast } from "sonner"
 import Image from "next/image"
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog"
 
 const PAGE_SIZE = 24
 
@@ -13,6 +14,7 @@ export default function AdminReviewsPage() {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const [deleteId, setDeleteId] = useState<string | null>(null)
 
   const currentPage = parseInt(searchParams.get("page") || "1", 10)
   
@@ -39,8 +41,10 @@ export default function AdminReviewsPage() {
     }
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this review?")) return
+  const confirmDelete = async () => {
+    if (!deleteId) return
+    const id = deleteId
+    setDeleteId(null)
     try {
       await deleteReview(id)
       toast.success("Review deleted successfully")
@@ -145,7 +149,7 @@ export default function AdminReviewsPage() {
                     )}
                   </button>
                   <button
-                    onClick={() => handleDelete(review.id)}
+                    onClick={() => setDeleteId(review.id)}
                     className="flex-1 py-3 flex items-center justify-center gap-2 text-[10px] uppercase tracking-widest font-bold hover:bg-terracotta/10 transition-colors text-terracotta"
                   >
                     <Trash2 className="w-3 h-3" /> Delete
@@ -180,6 +184,19 @@ export default function AdminReviewsPage() {
           </div>
         </div>
       )}
+
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Review?</AlertDialogTitle>
+            <AlertDialogDescription>Are you sure you want to delete this review? This action cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

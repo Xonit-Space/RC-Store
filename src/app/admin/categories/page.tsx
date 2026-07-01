@@ -7,6 +7,7 @@ import { Plus, Trash2, Edit, X, RefreshCw, Layers, Image as ImageIcon } from "lu
 import { toast } from "sonner"
 import { getCategories, createCategory, updateCategory, deleteCategory, toggleCategoryStatus } from "@/actions/categories"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog"
 
 export default function AdminCategoriesPage() {
   const queryClient = useQueryClient()
@@ -19,6 +20,7 @@ export default function AdminCategoriesPage() {
   const [isOpen, setIsOpen] = useState(false)
   const [isEditMode, setIsEditMode] = useState(false)
   const [editingId, setEditingId] = useState("")
+  const [deleteId, setDeleteId] = useState<string | null>(null)
 
   const [name, setName] = useState("")
   const [slug, setSlug] = useState("")
@@ -112,8 +114,10 @@ export default function AdminCategoriesPage() {
     }
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this category? This cannot be undone.")) return
+  const confirmDelete = async () => {
+    if (!deleteId) return
+    const id = deleteId
+    setDeleteId(null)
     try {
       const res = await deleteCategory(id)
       if (res.success) {
@@ -222,7 +226,7 @@ export default function AdminCategoriesPage() {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => handleDelete(c.id)}
+                  onClick={() => setDeleteId(c.id)}
                   className="h-8 rounded-none border-border/40 text-[9px] uppercase tracking-widest font-bold text-red-500 hover:text-red-700 hover:border-red-500/40"
                 >
                   <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Delete
@@ -361,6 +365,19 @@ export default function AdminCategoriesPage() {
           </div>
         </div>
       )}
+
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Category?</AlertDialogTitle>
+            <AlertDialogDescription>Are you sure you want to delete this category? This cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

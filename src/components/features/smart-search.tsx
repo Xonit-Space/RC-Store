@@ -97,7 +97,7 @@ export function SmartSearch() {
       recognition.start()
     } else {
       setIsListening(false)
-      alert("Voice search not supported in this browser")
+      toast.error("Voice search not supported in this browser")
     }
   }
 

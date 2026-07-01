@@ -8,6 +8,7 @@ import { toast } from "sonner"
 import { getAddons, createAddon, updateAddon, deleteAddon, assignAddonToProducts, getAddonProducts } from "@/actions/addons"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useAdminProducts } from "@/hooks/use-admin-data"
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog"
 
 export default function AdminAddonsPage() {
   const queryClient = useQueryClient()
@@ -20,6 +21,7 @@ export default function AdminAddonsPage() {
   const [isOpen, setIsOpen] = useState(false)
   const [isEditMode, setIsEditMode] = useState(false)
   const [editingId, setEditingId] = useState("")
+  const [deleteId, setDeleteId] = useState<string | null>(null)
 
   const [name, setName] = useState("")
   const [slug, setSlug] = useState("")
@@ -151,8 +153,10 @@ export default function AdminAddonsPage() {
     }
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this addon? This cannot be undone.")) return
+  const confirmDelete = async () => {
+    if (!deleteId) return
+    const id = deleteId
+    setDeleteId(null)
     try {
       const res = await deleteAddon(id)
       if (res.success) {
@@ -272,7 +276,7 @@ export default function AdminAddonsPage() {
                   </Button>
                   <Button
                     variant="outline"
-                    onClick={() => handleDelete(addon.id)}
+                    onClick={() => setDeleteId(addon.id)}
                     className="h-8 rounded-none border-border/40 text-[9px] uppercase tracking-widest font-bold text-red-500 hover:text-red-700 hover:border-red-500/40"
                   >
                     <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Delete
@@ -444,6 +448,19 @@ export default function AdminAddonsPage() {
           </div>
         </div>
       )}
+
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Addon?</AlertDialogTitle>
+            <AlertDialogDescription>Are you sure you want to delete this addon? This action cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

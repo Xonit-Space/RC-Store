@@ -11,6 +11,7 @@ import {
   adminAddProductVideo, adminDeleteProductVideo, 
   adminAddProductDocument, adminDeleteProductDocument
 } from "@/actions/product"
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog"
 
 interface ImageSlot {
   id: string
@@ -38,6 +39,8 @@ export function MediaTab({ product, localMedia, setLocalMedia }: {
   const [imageSlots, setImageSlots] = useState<ImageSlot[]>(displayImages)
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
   const [isUploadingImages, setIsUploadingImages] = useState(false)
+  const [deleteImageIndex, setDeleteImageIndex] = useState<number | null>(null)
+  const [deleteMediaTarget, setDeleteMediaTarget] = useState<{ id: string, type: 'video' | 'doc', action: any } | null>(null)
 
   useEffect(() => {
     if (!isLocalMode) {
@@ -63,10 +66,13 @@ export function MediaTab({ product, localMedia, setLocalMedia }: {
     if (isLocalMode) setLocalMedia((prev: any) => ({ ...prev, images: newSlots }))
   }
 
-  const removeSlot = async (index: number) => {
+  const confirmRemoveSlot = async () => {
+    if (deleteImageIndex === null) return
+    const index = deleteImageIndex
+    setDeleteImageIndex(null)
     const slot = imageSlots[index]
+    
     if (!isLocalMode && slot.saved && slot.id) {
-      if (!confirm("Delete this image from database?")) return
       try {
         const res = await fetch(`/api/admin/products/${productId}/images?imageId=${slot.id}`, { method: "DELETE" })
         const json = await res.json()
@@ -82,6 +88,18 @@ export function MediaTab({ product, localMedia, setLocalMedia }: {
         toast.error(err.message)
       }
     } else {
+      const newSlots = imageSlots.filter((_, i) => i !== index)
+      setImageSlots(newSlots)
+      if (isLocalMode) setLocalMedia((prev: any) => ({ ...prev, images: newSlots }))
+    }
+  }
+  
+  const removeSlot = (index: number) => {
+    const slot = imageSlots[index]
+    if (!isLocalMode && slot.saved && slot.id) {
+      setDeleteImageIndex(index)
+    } else {
+      // Local or unsaved image, just delete directly
       const newSlots = imageSlots.filter((_, i) => i !== index)
       setImageSlots(newSlots)
       if (isLocalMode) setLocalMedia((prev: any) => ({ ...prev, images: newSlots }))
@@ -227,8 +245,10 @@ export function MediaTab({ product, localMedia, setLocalMedia }: {
     setIsSubmittingDoc(false)
   }
 
-  const handleDelete = async (action: any, id: string, type: 'video' | 'doc') => {
-    if (!confirm("Are you sure?")) return
+  const confirmDeleteMedia = async () => {
+    if (!deleteMediaTarget) return
+    const { action, id, type } = deleteMediaTarget
+    setDeleteMediaTarget(null)
     
     if (isLocalMode) {
       if (type === 'video') {
@@ -244,6 +264,10 @@ export function MediaTab({ product, localMedia, setLocalMedia }: {
       toast.success("Deleted")
       queryClient.invalidateQueries({ queryKey: ["admin", "product", productId] })
     } else toast.error(res.error || "Delete failed")
+  }
+  
+  const handleDelete = (action: any, id: string, type: 'video' | 'doc') => {
+    setDeleteMediaTarget({ action, id, type })
   }
 
   return (
@@ -392,6 +416,33 @@ export function MediaTab({ product, localMedia, setLocalMedia }: {
           </div>
         </div>
       )}
+
+      {/* ALERT DIALOGS */}
+      <AlertDialog open={deleteImageIndex !== null} onOpenChange={(open) => !open && setDeleteImageIndex(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Image?</AlertDialogTitle>
+            <AlertDialogDescription>Are you sure you want to delete this image from the database? This action cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmRemoveSlot}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={!!deleteMediaTarget} onOpenChange={(open) => !open && setDeleteMediaTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>Are you sure you want to delete this {deleteMediaTarget?.type === 'video' ? 'video' : 'document'}? This action cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteMedia}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

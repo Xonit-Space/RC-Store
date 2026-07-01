@@ -14,6 +14,7 @@ import { useQueryClient, useQuery } from "@tanstack/react-query"
 import Image from "next/image"
 import { FullProductEditModal } from "@/components/admin/product/full-product-edit-modal"
 import { AlertTriangle, CheckCircle2, XCircle } from "lucide-react"
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog"
 
 function totalStock(product: any): number {
   return (product.variants || []).reduce(
@@ -76,6 +77,7 @@ export default function AdminProductsPage() {
   // ─── Modal state ────────────────────────────────────────────────────────────
   const [isOpen, setIsOpen] = useState(false)
   const [editingId, setEditingId] = useState("")
+  const [deleteId, setDeleteId] = useState<string | null>(null)
 
   const openCreateModal = () => {
     setEditingId("")
@@ -88,8 +90,10 @@ export default function AdminProductsPage() {
   }
 
   // ─── Delete handler ────────────────────────────────────────────────────────
-  const handleDelete = async (productId: string) => {
-    if (!confirm("Archive this product? It will be hidden from the store but data is preserved.")) return
+  const confirmDelete = async () => {
+    if (!deleteId) return
+    const productId = deleteId
+    setDeleteId(null)
     try {
       const res = await adminDeleteProduct(session?.user?.id || "", productId)
       if (res.success) {
@@ -233,7 +237,7 @@ export default function AdminProductsPage() {
                     </Button>
                     <Button
                       variant="outline"
-                      onClick={() => handleDelete(p.id)}
+                      onClick={() => setDeleteId(p.id)}
                       className="h-8 rounded-none border-border/40 text-[9px] uppercase tracking-widest font-bold text-red-500 hover:text-red-700 hover:border-red-500/40"
                     >
                       <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Archive
@@ -287,6 +291,19 @@ export default function AdminProductsPage() {
           availableAddons={availableAddons}
         />
       )}
+
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Archive Product?</AlertDialogTitle>
+            <AlertDialogDescription>Archive this product? It will be hidden from the store but data is preserved.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

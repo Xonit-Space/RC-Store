@@ -11,6 +11,7 @@ import { getAddons } from "@/actions/addons"
 import { FullProductEditModal } from "@/components/admin/product/full-product-edit-modal"
 import { AddSparePartModal } from "@/components/admin/part-finder/add-spare-part-modal"
 import { ModelPartsGrid } from "@/components/admin/part-finder/model-parts-grid"
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog"
 
 export default function AdminPartFinderPage() {
   const [makes, setMakes] = useState<any[]>([])
@@ -28,6 +29,9 @@ export default function AdminPartFinderPage() {
   const [newModelSlug, setNewModelSlug] = useState("")
   const [newModelScale, setNewModelScale] = useState("1/10")
   const [newModelType, setNewModelType] = useState("Off-Road")
+
+  const [deleteMakeTarget, setDeleteMakeTarget] = useState<string | null>(null)
+  const [deleteModelTarget, setDeleteModelTarget] = useState<string | null>(null)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -126,9 +130,10 @@ export default function AdminPartFinderPage() {
     }
   }
 
-  const handleDeleteMake = async (id: string, e: React.MouseEvent) => {
-    e.stopPropagation()
-    if(!confirm("Delete this Make and all its models?")) return
+  const confirmDeleteMake = async () => {
+    if (!deleteMakeTarget) return
+    const id = deleteMakeTarget
+    setDeleteMakeTarget(null)
     try {
       await deleteVehicleMake(id)
       toast.success("Deleted Make")
@@ -138,8 +143,15 @@ export default function AdminPartFinderPage() {
     }
   }
 
-  const handleDeleteModel = async (id: string) => {
-    if(!confirm("Delete this Model?")) return
+  const handleDeleteMake = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setDeleteMakeTarget(id)
+  }
+
+  const confirmDeleteModel = async () => {
+    if (!deleteModelTarget) return
+    const id = deleteModelTarget
+    setDeleteModelTarget(null)
     try {
       await deleteVehicleModel(id)
       toast.success("Deleted Model")
@@ -147,6 +159,10 @@ export default function AdminPartFinderPage() {
     } catch {
       toast.error("Failed to delete")
     }
+  }
+
+  const handleDeleteModel = (id: string) => {
+    setDeleteModelTarget(id)
   }
 
   return (
@@ -401,6 +417,32 @@ export default function AdminPartFinderPage() {
           loadData() // optionally reload if needed, though react-query invalidation might handle it
         }}
       />
+
+      <AlertDialog open={!!deleteMakeTarget} onOpenChange={(open) => !open && setDeleteMakeTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Make?</AlertDialogTitle>
+            <AlertDialogDescription>Are you sure you want to delete this Make and all its models? This action cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteMake}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={!!deleteModelTarget} onOpenChange={(open) => !open && setDeleteModelTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Model?</AlertDialogTitle>
+            <AlertDialogDescription>Are you sure you want to delete this Model? This action cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteModel}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

@@ -6,10 +6,12 @@ import { getBlogPosts, deleteBlogPost } from "@/actions/blog"
 import { Button } from "@/components/ui/button"
 import { Plus, Edit, Trash2, Eye } from "lucide-react"
 import { toast } from "sonner"
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog"
 
 export default function AdminBlogPage() {
   const [posts, setPosts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
 
   const fetchPosts = async () => {
     setLoading(true)
@@ -26,8 +28,10 @@ export default function AdminBlogPage() {
     fetchPosts()
   }, [])
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this post?")) return
+  const confirmDelete = async () => {
+    if (!deleteId) return
+    const id = deleteId
+    setDeleteId(null)
     const res = await deleteBlogPost(id)
     if (res.success) {
       toast.success("Post deleted")
@@ -105,7 +109,7 @@ export default function AdminBlogPage() {
                         <Edit className="w-4 h-4" />
                       </Button>
                     </Link>
-                    <Button variant="ghost" size="icon" onClick={() => handleDelete(post.id)} className="h-8 w-8 text-muted-foreground hover:text-red-500">
+                    <Button variant="ghost" size="icon" onClick={() => setDeleteId(post.id)} className="h-8 w-8 text-muted-foreground hover:text-red-500">
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </td>
@@ -115,6 +119,19 @@ export default function AdminBlogPage() {
           </tbody>
         </table>
       </div>
+
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Post?</AlertDialogTitle>
+            <AlertDialogDescription>Are you sure you want to delete this post? This action cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

@@ -8,6 +8,7 @@ import { Plus, Trash2, Edit, X } from "lucide-react"
 import { toast } from "sonner"
 import { useQueryClient } from "@tanstack/react-query"
 import { adminAddVariant, adminUpdateVariant } from "@/actions/product"
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog"
 
 export function VariantsTab({ product, localVariants, setLocalVariants }: { product?: any, localVariants: any[], setLocalVariants: React.Dispatch<React.SetStateAction<any[]>> }) {
   const { data: session } = useSession()
@@ -26,6 +27,7 @@ export function VariantsTab({ product, localVariants, setLocalVariants }: { prod
   const [stock, setStock] = useState("")
   const [location, setLocation] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<any>(null)
 
   // Use local state if no product ID exists (we are in Create mode)
   const isLocalMode = !productId
@@ -114,12 +116,14 @@ export function VariantsTab({ product, localVariants, setLocalVariants }: { prod
     }
   }
 
-  const handleDeleteVariant = async (v: any) => {
-    if (!confirm("Are you sure you want to delete this variant?")) return
+  const confirmDeleteVariant = async () => {
+    if (!deleteTarget) return
+    const v = deleteTarget
+    setDeleteTarget(null)
+
     if (isLocalMode) {
       setLocalVariants(prev => prev.filter(item => item.localId !== v.localId))
     } else {
-      // NOTE: Assume adminDeleteVariant exists or we can just toast for now if not imported
       toast.error("Variant deletion API not implemented here yet.")
     }
   }
@@ -166,7 +170,7 @@ export function VariantsTab({ product, localVariants, setLocalVariants }: { prod
                       <Edit className="h-4 w-4" />
                     </Button>
                     {isLocalMode && (
-                      <Button variant="ghost" onClick={() => handleDeleteVariant(v)} className="h-8 w-8 p-0 rounded-none text-red-500 hover:bg-red-500/10">
+                      <Button variant="ghost" onClick={() => setDeleteTarget(v)} className="h-8 w-8 p-0 rounded-none text-red-500 hover:bg-red-500/10">
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     )}
@@ -280,6 +284,20 @@ export function VariantsTab({ product, localVariants, setLocalVariants }: { prod
           </div>
         </div>
       )}
+
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>Are you sure you want to delete this variant?</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteVariant}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

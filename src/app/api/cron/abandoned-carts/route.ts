@@ -55,14 +55,14 @@ export async function GET(req: Request) {
             id: item.addon.id,
             name: item.addon.name,
             price: Number(item.addon.price),
-            image: item.addon.image,
+            image: item.addon.image ?? undefined,   // null → undefined
           };
         }
         return {
           id: item.variant!.id,
           name: item.variant!.product.name,
           price: Number(item.variant!.price || item.variant!.product.price),
-          image: item.variant!.product.images?.[0]?.url || undefined,
+          image: item.variant!.product.images?.[0]?.url ?? undefined,
         };
       });
 

@@ -1,4 +1,4 @@
-import { analyticsQueue, inventoryQueue, dlqQueue } from "./queues"
+import { analyticsQueue, inventoryQueue, dlqQueue, emailQueue } from "./queues"
 
 /**
  * Initializes all repeatable background cron jobs on the BullMQ queue system.
@@ -53,4 +53,16 @@ export async function initializeScheduledJobs(): Promise<void> {
       jobId: "nightly_payment_reconciliation_job"
     }
   )
+
+  // 6. Abandoned Cart Recovery — every hour
+  // Sweeps carts last updated >1hr ago; fires recovery emails via Brevo SMTP
+  await emailQueue.add(
+    "abandoned_cart_sweep",
+    { action: "ABANDONED_CART_SWEEP" },
+    {
+      repeat: { pattern: "0 * * * *" },
+      jobId: "abandoned_cart_recovery_job"
+    }
+  )
 }
+

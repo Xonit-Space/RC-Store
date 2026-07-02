@@ -7,9 +7,21 @@ import { ActionResponse } from "./auth"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { sendOrderStatusUpdateSms } from "@/services/twilio"
-import { sendOrderShippedEmail } from "@/services/email"
+import { sendOrderShippedEmail, sendOrderStatusEmail } from "@/services/email"
 import { validateAndCalculateCoupon } from "@/lib/coupon"
 import { serializeForClient } from "@/lib/serialize"
+import { updateOrderStatus } from "@/repositories/order"
+import { OrderStatus } from "@prisma/client"
+import { logger } from "@/lib/logger"
+
+export interface ShipmentData {
+  carrier: string
+  trackingNumber: string
+  estimatedDelivery?: string // ISO date string
+  trackingUrl?: string
+}
+
+// ─── Coupon Validation ────────────────────────────────────────────────────────
 
 export async function checkCoupon(code: string, subtotal: number): Promise<ActionResponse> {
   try {
@@ -19,6 +31,8 @@ export async function checkCoupon(code: string, subtotal: number): Promise<Actio
     return { success: false, error: "Failed to validate coupon" }
   }
 }
+
+// ─── Stripe Checkout ──────────────────────────────────────────────────────────
 
 export async function processStripeCheckout(
   userId: string,
@@ -85,13 +99,23 @@ export async function processStripeCheckout(
   }
 }
 
-import { updateOrderStatus } from "@/repositories/order"
-import { OrderStatus } from "@prisma/client"
+// ─── Admin Order Status Update ────────────────────────────────────────────────
+
+/**
+ * Maps which statuses trigger SMS notifications (beyond SHIPPED/DELIVERED)
+ */
+const SMS_STATUSES = new Set<OrderStatus>(["SHIPPED", "DELIVERED", "CANCELLED", "REFUNDED"])
+
+/**
+ * Maps which statuses trigger email notifications
+ */
+const EMAIL_STATUSES = new Set<OrderStatus>(["PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED", "REFUNDED"])
 
 export async function adminUpdateOrderStatus(
   adminId: string,
   orderId: string,
-  status: OrderStatus
+  status: OrderStatus,
+  shipmentData?: ShipmentData
 ): Promise<ActionResponse> {
   const session = await getServerSession(authOptions)
   if (!session?.user || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {
@@ -100,35 +124,98 @@ export async function adminUpdateOrderStatus(
 
   try {
     const updated = await updateOrderStatus(orderId, status)
-    
-    // Write admin audit trail
-    await db.auditLog.create({
-      data: {
-        userId: adminId,
-        action: "ORDER_STATUS_UPDATE",
-        entity: "Order",
-        entityId: orderId,
-        changes: JSON.stringify({ status })
-      }
-    }).catch(() => {})
 
-    // Send notifications if status is updated to SHIPPED or DELIVERED
-    if (status === "SHIPPED" || status === "DELIVERED") {
+    // ── Upsert Shipment record when SHIPPED with tracking data ───────────────
+    if (status === "SHIPPED" && shipmentData?.trackingNumber) {
+      await db.shipment.upsert({
+        where: { orderId },
+        create: {
+          orderId,
+          carrier: shipmentData.carrier || "Standard Delivery",
+          trackingNumber: shipmentData.trackingNumber,
+          estimatedDelivery: shipmentData.estimatedDelivery
+            ? new Date(shipmentData.estimatedDelivery)
+            : undefined,
+          status: "IN_TRANSIT",
+        },
+        update: {
+          carrier: shipmentData.carrier || "Standard Delivery",
+          trackingNumber: shipmentData.trackingNumber,
+          estimatedDelivery: shipmentData.estimatedDelivery
+            ? new Date(shipmentData.estimatedDelivery)
+            : undefined,
+          status: "IN_TRANSIT",
+        },
+      }).catch((err) =>
+        logger.error({ message: `[Shipment] Failed to upsert shipment for order ${orderId}`, error: err })
+      )
+    }
+
+    // Write admin audit trail
+    await db.auditLog
+      .create({
+        data: {
+          userId: adminId,
+          action: "ORDER_STATUS_UPDATE",
+          entity: "Order",
+          entityId: orderId,
+          changes: JSON.stringify({ status, trackingNumber: shipmentData?.trackingNumber }),
+        },
+      })
+      .catch(() => {})
+
+    // ── Fetch order + user details for notifications ─────────────────────────
+    if (SMS_STATUSES.has(status) || EMAIL_STATUSES.has(status)) {
       const orderDetails = await db.order.findUnique({
         where: { id: orderId },
-        include: { shippingAddress: true, user: true }
+        include: {
+          shippingAddress: true,
+          user: { select: { email: true, name: true } },
+        },
       })
-      if (orderDetails?.shippingAddress?.phone && orderDetails.shippingAddress.phone !== "0000000000") {
-        sendOrderStatusUpdateSms(orderDetails.shippingAddress.phone, orderDetails.orderNumber, status).catch(console.error)
+
+      if (!orderDetails) {
+        logger.warn(`[adminUpdateOrderStatus] Order ${orderId} not found for notifications`)
+        return { success: true, data: serializeForClient(updated) }
       }
-      
-      if (status === "SHIPPED" && orderDetails?.user?.email) {
-        sendOrderShippedEmail({
-          email: orderDetails.user.email,
-          orderNumber: orderDetails.orderNumber,
-          customerName: orderDetails.user.name || "Customer",
-          // trackingNumber can be fetched if tracking details are stored, for now we mock it
-        }).catch(console.error)
+
+      const { orderNumber, shippingAddress, user } = orderDetails
+      const phone = shippingAddress?.phone
+      const email = user?.email
+      const customerName = user?.name || "Customer"
+      const trackingNumber = shipmentData?.trackingNumber
+      const trackingUrl = shipmentData?.trackingUrl
+
+      // ── SMS Notifications ──────────────────────────────────────────────────
+      if (SMS_STATUSES.has(status) && phone && phone !== "0000000000") {
+        sendOrderStatusUpdateSms(phone, orderNumber, status).catch((err) =>
+          logger.error({ message: `[SMS] Failed for order ${orderNumber} status ${status}`, error: err })
+        )
+      }
+
+      // ── Email Notifications ────────────────────────────────────────────────
+      if (EMAIL_STATUSES.has(status) && email) {
+        if (status === "SHIPPED") {
+          sendOrderShippedEmail({
+            email,
+            orderNumber,
+            customerName,
+            trackingNumber,  // forwarded from shipmentData
+            trackingUrl,
+          }).catch((err) =>
+            logger.error({ message: `[Email] Shipped email failed for ${orderNumber}`, error: err })
+          )
+        } else {
+          sendOrderStatusEmail({
+            email,
+            orderNumber,
+            customerName,
+            status,
+            trackingNumber,
+          }).catch((err) =>
+            logger.error({ message: `[Email] Status email (${status}) failed for ${orderNumber}`, error: err })
+          )
+        }
       }
     }
 

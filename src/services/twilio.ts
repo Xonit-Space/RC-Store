@@ -25,7 +25,7 @@ export async function sendOrderConfirmationSms(to: string, orderNumber: string, 
 
   try {
     await twilioClient.messages.create({
-      body: `Hi there! Your order #{orderNumber} for ${totalAmount.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})} has been successfully confirmed. Thank you for shopping with us!`,
+      body: `Hi there! Your order #${orderNumber} for ${totalAmount.toLocaleString("en-AU", {style: 'currency', currency: 'AUD'})} has been successfully confirmed. Thank you for shopping with us!`,
       from: twilioPhoneNumber,
       to,
     })

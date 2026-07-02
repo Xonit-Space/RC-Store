@@ -1,3 +1,4 @@
+import { sendEmail } from "@/services/email"
 import { logger } from "@/lib/logger"
 
 export interface EmailJobData {
@@ -7,17 +8,19 @@ export interface EmailJobData {
 }
 
 /**
- * Sends (or simulates) a transactional email job.
- * Shared by BullMQ workers and serverless inline dispatch.
+ * Sends a transactional email via the configured Brevo SMTP transport.
+ * Used by the BullMQ email worker for queued delivery.
  */
 export async function sendEmailJob(data: EmailJobData): Promise<{ delivered: boolean; timestamp: number }> {
   const { to, subject, html } = data
-  logger.info(`[EmailJob] Sending email to ${to} (Subject: ${subject})`)
+  logger.info(`[EmailJob] Dispatching queued email to ${to} (Subject: ${subject})`)
 
-  // TODO: integrate Resend when RESEND_API_KEY is configured
-  void html
+  const result = await sendEmail({ to, subject, html })
 
-  await new Promise((resolve) => setTimeout(resolve, 500))
+  if (!result.success) {
+    logger.error({ message: `[EmailJob] Failed to deliver email to ${to}`, error: result.error })
+    throw new Error(`Email delivery failed for ${to}`)
+  }
 
   return { delivered: true, timestamp: Date.now() }
 }

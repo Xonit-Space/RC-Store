@@ -5,7 +5,7 @@ import { NotificationStrategy } from "./strategy-interface"
 
 export class EmailStrategy implements NotificationStrategy {
   /**
-   * Loads target user data and fires high-fidelity transactional emails via Resend
+   * Loads target user data and fires high-fidelity transactional emails via Brevo SMTP (nodemailer)
    */
   async send(notification: NormalizedNotification): Promise<any> {
     const userId = notification.userId

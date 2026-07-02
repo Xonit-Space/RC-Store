@@ -6,10 +6,10 @@ import { useSession } from "next-auth/react"
 import {
   RefreshCw, Search, ShoppingBag, ChevronLeft, ChevronRight,
   MapPin, Package, Clock, CheckCircle2, Truck, XCircle, RotateCcw,
-  CreditCard, Filter, X
+  CreditCard, Filter, X, QrCode, CalendarDays, Building2, ArrowRight
 } from "lucide-react"
 import { toast } from "sonner"
-import { adminUpdateOrderStatus } from "@/actions/order"
+import { adminUpdateOrderStatus, ShipmentData } from "@/actions/order"
 import { OrderStatus } from "@prisma/client"
 import { useAdminOrders } from "@/hooks/use-admin-data"
 import { useQueryClient } from "@tanstack/react-query"
@@ -69,6 +69,25 @@ function OrdersPageInner() {
   const [searchInput, setSearchInput] = useState(currentSearch)
   const [activeStatus, setActiveStatus] = useState<FilterStatus>(currentStatus)
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null)
+  // Tracking form state — shown inline when admin picks SHIPPED
+  const [trackingForm, setTrackingForm] = useState<{
+    show: boolean
+    pendingStatus: OrderStatus | null
+    carrier: string
+    trackingNumber: string
+    estimatedDelivery: string
+    trackingUrl: string
+    submitting: boolean
+  }>({
+    show: false,
+    pendingStatus: null,
+    carrier: "",
+    trackingNumber: "",
+    estimatedDelivery: "",
+    trackingUrl: "",
+    submitting: false,
+  })
+  const resetTrackingForm = () => setTrackingForm({ show: false, pendingStatus: null, carrier: "", trackingNumber: "", estimatedDelivery: "", trackingUrl: "", submitting: false })
 
   // Use the URL parameter for data fetching so it only searches when submitted
   const { data: ordersData, isLoading: loading } = useAdminOrders(currentPage, PAGE_SIZE, currentSearch)
@@ -98,6 +117,11 @@ function OrdersPageInner() {
   }, {})
 
   const handleStatusChange = useCallback(async (orderId: string, newStatus: OrderStatus) => {
+    // SHIPPED requires tracking info — show inline form instead of firing immediately
+    if (newStatus === "SHIPPED") {
+      setTrackingForm(prev => ({ ...prev, show: true, pendingStatus: newStatus }))
+      return
+    }
     try {
       const res = await adminUpdateOrderStatus(session?.user?.id || "", orderId, newStatus)
       if (res.success) {
@@ -110,6 +134,35 @@ function OrdersPageInner() {
       toast.error(err.message || "Failed to update status")
     }
   }, [session?.user?.id, queryClient])
+
+  const handleShippedConfirm = useCallback(async () => {
+    if (!selectedOrder || !trackingForm.trackingNumber.trim()) {
+      toast.error("Tracking number is required")
+      return
+    }
+    setTrackingForm(prev => ({ ...prev, submitting: true }))
+    try {
+      const shipmentData: ShipmentData = {
+        carrier: trackingForm.carrier || "Standard Delivery",
+        trackingNumber: trackingForm.trackingNumber.trim(),
+        estimatedDelivery: trackingForm.estimatedDelivery || undefined,
+        trackingUrl: trackingForm.trackingUrl || undefined,
+      }
+      const res = await adminUpdateOrderStatus(session?.user?.id || "", selectedOrder.id, "SHIPPED", shipmentData)
+      if (res.success) {
+        toast.success(`Order marked as Shipped! Tracking: ${shipmentData.trackingNumber}`)
+        queryClient.invalidateQueries({ queryKey: ["admin", "orders"] })
+        setSelectedOrder((prev: any) => prev ? { ...prev, status: "SHIPPED", shipment: { trackingNumber: shipmentData.trackingNumber, carrier: shipmentData.carrier } } : null)
+        resetTrackingForm()
+      } else {
+        toast.error(res.error || "Failed to update status")
+        setTrackingForm(prev => ({ ...prev, submitting: false }))
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to update status")
+      setTrackingForm(prev => ({ ...prev, submitting: false }))
+    }
+  }, [selectedOrder, trackingForm, session?.user?.id, queryClient])
 
   const navigatePage = useCallback((newPage: number) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -288,8 +341,11 @@ function OrdersPageInner() {
                     <select
                       value={selectedOrder.status}
                       onChange={(e) => {
-                        handleStatusChange(selectedOrder.id, e.target.value as OrderStatus)
-                        setSelectedOrder({ ...selectedOrder, status: e.target.value })
+                        const newStatus = e.target.value as OrderStatus
+                        handleStatusChange(selectedOrder.id, newStatus)
+                        if (newStatus !== "SHIPPED") {
+                          setSelectedOrder({ ...selectedOrder, status: newStatus })
+                        }
                       }}
                       className="h-9 bg-white dark:bg-background border border-border/40 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] transition-all duration-300 text-[10px] font-bold text-foreground px-2 outline-none uppercase tracking-widest cursor-pointer focus:border-foreground"
                     >
@@ -299,6 +355,87 @@ function OrdersPageInner() {
                     </select>
                   </div>
                 </div>
+
+                {/* ── Tracking Form (shown when SHIPPED is selected) ── */}
+                {trackingForm.show && (
+                  <div className="mt-4 border border-indigo-500/30 bg-indigo-500/5 p-4 space-y-3 rounded-sm">
+                    <p className="text-[10px] uppercase tracking-widest font-bold text-indigo-400 flex items-center gap-1.5">
+                      <Truck className="w-3.5 h-3.5" /> Shipment & Tracking Details
+                    </p>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold block mb-1">
+                          <Building2 className="w-3 h-3 inline mr-1" />Carrier
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Australia Post"
+                          value={trackingForm.carrier}
+                          onChange={(e) => setTrackingForm(p => ({ ...p, carrier: e.target.value }))}
+                          className="w-full h-9 px-3 text-xs bg-background border border-border/50 focus:border-indigo-500 outline-none transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold block mb-1">
+                          <CalendarDays className="w-3 h-3 inline mr-1" />Est. Delivery
+                        </label>
+                        <input
+                          type="date"
+                          value={trackingForm.estimatedDelivery}
+                          onChange={(e) => setTrackingForm(p => ({ ...p, estimatedDelivery: e.target.value }))}
+                          className="w-full h-9 px-3 text-xs bg-background border border-border/50 focus:border-indigo-500 outline-none transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold block mb-1">
+                        <QrCode className="w-3 h-3 inline mr-1" />Tracking Number <span className="text-red-400">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. 1Z999AA10123456784"
+                        value={trackingForm.trackingNumber}
+                        onChange={(e) => setTrackingForm(p => ({ ...p, trackingNumber: e.target.value }))}
+                        className="w-full h-9 px-3 text-xs font-mono bg-background border border-border/50 focus:border-indigo-500 outline-none transition-colors"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold block mb-1">
+                        Tracking URL (optional)
+                      </label>
+                      <input
+                        type="url"
+                        placeholder="https://track.auspost.com.au/..."
+                        value={trackingForm.trackingUrl}
+                        onChange={(e) => setTrackingForm(p => ({ ...p, trackingUrl: e.target.value }))}
+                        className="w-full h-9 px-3 text-xs bg-background border border-border/50 focus:border-indigo-500 outline-none transition-colors"
+                      />
+                    </div>
+
+                    <div className="flex gap-2 pt-1">
+                      <button
+                        onClick={handleShippedConfirm}
+                        disabled={trackingForm.submitting || !trackingForm.trackingNumber.trim()}
+                        className="flex-1 h-9 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-[10px] font-bold uppercase tracking-widest transition-colors flex items-center justify-center gap-1.5"
+                      >
+                        {trackingForm.submitting ? (
+                          <RefreshCw className="w-3 h-3 animate-spin" />
+                        ) : (
+                          <><ArrowRight className="w-3 h-3" /> Confirm & Notify Customer</>
+                        )}
+                      </button>
+                      <button
+                        onClick={resetTrackingForm}
+                        className="h-9 px-4 border border-border/40 text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="p-6 flex-1 space-y-8">
@@ -341,6 +478,24 @@ function OrdersPageInner() {
                   <div className="text-[10px] text-muted-foreground font-bold uppercase tracking-[0.2em] flex items-center gap-1.5 border-b border-border/40 pb-2">
                     <MapPin className="w-3.5 h-3.5" /> Fulfillment Details
                   </div>
+
+                  {/* Existing shipment / tracking info */}
+                  {selectedOrder.shipment?.trackingNumber && (
+                    <div className="bg-indigo-500/5 border border-indigo-500/20 p-3 rounded-sm">
+                      <p className="text-[9px] uppercase tracking-widest font-bold text-indigo-400 mb-2 flex items-center gap-1">
+                        <Truck className="w-3 h-3" /> Shipment Tracking
+                      </p>
+                      <p className="text-xs font-mono font-bold text-foreground">{selectedOrder.shipment.trackingNumber}</p>
+                      {selectedOrder.shipment.carrier && (
+                        <p className="text-[10px] text-muted-foreground mt-0.5">via {selectedOrder.shipment.carrier}</p>
+                      )}
+                      {selectedOrder.shipment.estimatedDelivery && (
+                        <p className="text-[10px] text-muted-foreground mt-0.5">
+                          Est. {new Date(selectedOrder.shipment.estimatedDelivery).toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" })}
+                        </p>
+                      )}
+                    </div>
+                  )}
                   
                   <div className="grid grid-cols-2 gap-6">
                     <div>
